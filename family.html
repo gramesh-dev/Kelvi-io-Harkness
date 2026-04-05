@@ -210,6 +210,7 @@ nav {
 footer { text-align: center; padding: 14px; font-size: 11px; color: var(--gold); letter-spacing: 2px; border-top: .5px solid var(--border); }
 </style>
 </head>
+<script src="config.js"></script>
 <body>
 
 <!-- ── ENTRY SCREEN ── -->
@@ -470,12 +471,6 @@ footer { text-align: center; padding: 14px; font-size: 11px; color: var(--gold);
   <main>
     <h1>Family dashboard</h1>
     <div class="sub">Track what your children are exploring in mathematics each day.</div>
-
-    <div class="api-setup">
-      <label>Anthropic API key</label>
-      <input type="password" id="parent-api-key" placeholder="sk-ant-..." oninput="saveParentKey()">
-      <div class="hint">Required for Kelvi to work. Stored only in this browser. Never shared.</div>
-    </div>
 
     <div class="children-section">
       <h2>Your children</h2>
@@ -781,12 +776,6 @@ CLOSING: "What was your favorite thing you discovered today?"`;
 }
 
 async function sendMsg() {
-  const key = localStorage.getItem('kelvi-family-api-key') || localStorage.getItem('kelvi-api-key') || '';
-  if (!key) {
-    alert('Please set your Anthropic API key in the Parent Dashboard first.');
-    showScreen('screen-parent');
-    return;
-  }
   const inp = document.getElementById('chat-input');
   const text = inp.value.trim();
   if (!text) return;
@@ -796,9 +785,9 @@ async function sendMsg() {
   document.getElementById('send-btn').disabled = true;
   document.getElementById('typing').classList.add('visible');
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
+    const res = await fetch(KELVI_API_BASE + '/api/chat',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:getSystemPrompt(),messages:chatMessages})
     });
     const data = await res.json();
@@ -890,16 +879,6 @@ function exportSession() {
 
 function addChild() { alert('Adding children via the full account system is coming soon. For now, Arya and Lhuna are set up by default.'); }
 
-// ── PARENT API KEY ────────────────────────────────────────────────────────────
-function saveParentKey() {
-  localStorage.setItem('kelvi-family-api-key', document.getElementById('parent-api-key').value);
-  localStorage.setItem('kelvi-api-key', document.getElementById('parent-api-key').value);
-}
-function loadParentKey() {
-  const k = localStorage.getItem('kelvi-family-api-key') || localStorage.getItem('kelvi-api-key');
-  if (k && document.getElementById('parent-api-key')) document.getElementById('parent-api-key').value = k;
-}
-
 // ── SPEECH ────────────────────────────────────────────────────────────────────
 let recog=null, isL=false;
 function toggleSpeech() {
@@ -916,7 +895,6 @@ function toggleSpeech() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-loadParentKey();
 renderSessionLog();
 updateCounts();
 </script>
