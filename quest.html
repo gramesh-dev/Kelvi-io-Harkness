@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi Quest Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --peacock: #00827F; --peacock-dark: #006B68; --peacock-light: #F0FAF9;
+  --gold: #C9A84C; --kadi: #C17F24; --kadi-light: #FEF9EC;
+  --terra: #A0522D; --terra-light: #FDF0E8;
+  --navy: #1A1A2E; --gray: #5F6B7A; --muted: #B4B2A9;
+  --warm: #F8F7F4; --border: #E8E4E0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--warm); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── HEADER ── */
+header {
+  background: var(--peacock); padding: 0 28px; height: 56px; width: 100%;
+  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+.logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-svg { width: 34px; height: 34px; }
+.lw { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; }
+.ls { font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-top: 2px; }
+.header-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: rgba(255,255,255,0.8); font-style: italic; }
+.divider-v { width: 1px; height: 22px; background: rgba(255,255,255,0.2); }
+.header-right { margin-left: auto; }
+.api-input { font-size: 12px; padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.8); font-family: 'DM Sans', sans-serif; outline: none; width: 200px; }
+.api-input::placeholder { color: rgba(255,255,255,0.4); }
+.api-input:focus { border-color: rgba(255,255,255,0.7); }
+
+/* ── MAIN LAYOUT ── */
+main { flex: 1; display: grid; grid-template-columns: 380px 1fr; gap: 0; max-height: calc(100vh - 56px); }
+
+/* ── LEFT PANEL — BUILDER ── */
+.builder-panel {
+  border-right: 1px solid var(--border); background: white;
+  display: flex; flex-direction: column; overflow-y: auto;
+  padding: 28px 24px 40px; gap: 24px;
+}
+
+.builder-heading { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 4px; }
+.builder-sub { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+.field-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+/* Topic tags */
+.topic-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.topic-tag {
+  font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px;
+  border-radius: 20px; border: 1.5px solid var(--border); background: white;
+  color: var(--gray); cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.topic-tag:hover { border-color: var(--peacock); color: var(--peacock); }
+.topic-tag.selected { background: var(--peacock); color: white; border-color: var(--peacock); }
+
+/* Real-world context */
+.context-input {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--navy); background: var(--warm); outline: none; transition: border-color 0.15s;
+}
+.context-input:focus { border-color: var(--peacock); background: white; }
+.context-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+/* Grade selector */
+.grade-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; }
+.grade-btn {
+  padding: 10px 4px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: white; color: var(--gray); font-family: 'DM Sans', sans-serif;
+  font-size: 11px; text-align: center; cursor: pointer; transition: all 0.15s;
+  font-weight: 400; line-height: 1.3;
+}
+.grade-btn:hover { border-color: var(--peacock); color: var(--peacock); }
+.grade-btn.selected { background: var(--peacock); color: white; border-color: var(--peacock); }
+
+/* Differentiation */
+.diff-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.diff-btn {
+  padding: 14px 10px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: white; cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.diff-btn:hover { border-color: var(--peacock); }
+.diff-btn.selected { border-width: 2px; }
+.diff-btn.entry.selected { border-color: var(--peacock); background: var(--peacock-light); }
+.diff-btn.core.selected { border-color: var(--kadi); background: var(--kadi-light); }
+.diff-btn.extension.selected { border-color: var(--terra); background: var(--terra-light); }
+.diff-label { font-size: 13px; font-weight: 500; color: var(--navy); margin-bottom: 3px; }
+.diff-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.diff-btn.entry.selected .diff-label { color: var(--peacock-dark); }
+.diff-btn.core.selected .diff-label { color: var(--kadi); }
+.diff-btn.extension.selected .diff-label { color: var(--terra); }
+
+/* Problem count */
+.count-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.count-btn {
+  min-width: 52px; height: 44px; border-radius: 10px; border: 1.5px solid var(--border);
+  background: white; color: var(--gray); font-family: 'DM Serif Display', serif;
+  font-size: 17px; cursor: pointer; transition: all 0.15s; display: flex;
+  align-items: center; justify-content: center; padding: 0 10px;
+}
+.count-btn:hover { border-color: var(--peacock); color: var(--peacock); }
+.count-btn.selected { background: var(--peacock); color: white; border-color: var(--peacock); }
+
+/* Generate button */
+.generate-btn {
+  width: 100%; padding: 15px; background: var(--navy); color: white;
+  border: none; border-radius: 12px; font-family: 'DM Serif Display', serif;
+  font-size: 17px; cursor: pointer; transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.generate-btn:hover { background: #2a2a4a; }
+.generate-btn:disabled { background: var(--muted); cursor: not-allowed; }
+
+/* ── RIGHT PANEL — QUEST OUTPUT ── */
+.quest-panel {
+  display: flex; flex-direction: column; overflow-y: auto;
+  padding: 28px 32px; background: var(--warm);
+}
+
+.quest-empty {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; color: var(--muted); gap: 12px;
+}
+.quest-empty svg { opacity: 0.3; }
+.quest-empty p { font-size: 14px; line-height: 1.6; max-width: 280px; }
+
+.quest-output { display: none; flex-direction: column; gap: 0; }
+.quest-output.visible { display: flex; }
+
+/* Quest header */
+.quest-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px; gap: 16px;
+}
+.quest-meta { flex: 1; }
+.quest-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--navy); margin-bottom: 6px; }
+.quest-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.quest-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; }
+.quest-tag.grade { background: var(--peacock-light); color: var(--peacock-dark); }
+.quest-tag.diff-entry { background: var(--peacock-light); color: var(--peacock-dark); }
+.quest-tag.diff-core { background: var(--kadi-light); color: var(--kadi); }
+.quest-tag.diff-extension { background: var(--terra-light); color: var(--terra); }
+
+.quest-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.qa-btn {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 7px 14px;
+  border-radius: 8px; border: 1px solid var(--border); background: white;
+  color: var(--gray); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.qa-btn:hover { border-color: var(--peacock); color: var(--peacock); }
+.qa-btn.primary { background: var(--peacock); color: white; border-color: var(--peacock); }
+.qa-btn.primary:hover { background: var(--peacock-dark); }
+.qa-btn.kadi { border-color: var(--kadi); color: var(--kadi); }
+.qa-btn.kadi:hover { background: var(--kadi); color: white; }
+
+/* Problems */
+.problem-card {
+  background: white; border-radius: 14px; border: 1px solid var(--border);
+  padding: 22px 24px; margin-bottom: 14px; position: relative;
+  transition: box-shadow 0.2s;
+}
+.problem-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.problem-num { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+.problem-text { font-size: 15px; color: var(--navy); line-height: 1.75; margin-bottom: 14px; }
+.problem-footer { display: flex; align-items: center; justify-content: space-between; }
+.problem-type-badge { font-size: 10px; padding: 3px 10px; border-radius: 8px; font-weight: 500; }
+.badge-P { background: var(--kadi-light); color: var(--kadi); }
+.badge-C { background: var(--peacock-light); color: var(--peacock-dark); }
+.badge-G { background: var(--terra-light); color: var(--terra); }
+.problem-actions { display: flex; gap: 6px; }
+.pab { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.pab:hover { border-color: var(--peacock); color: var(--peacock); }
+.pab.use { border-color: var(--peacock); color: var(--peacock); }
+.pab.use:hover { background: var(--peacock); color: white; }
+
+/* Loading state */
+.quest-loading { display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 16px; padding: 60px; }
+.quest-loading.visible { display: flex; }
+.loading-dots { display: flex; gap: 8px; }
+.loading-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--peacock); animation: ldot 1.4s ease-in-out infinite; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; background: var(--kadi); }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; background: var(--terra); }
+@keyframes ldot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+.loading-text { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--gray); font-style: italic; }
+
+footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold); letter-spacing: 2px; border-top: 1px solid var(--border); background: white; }
+
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; }
+  .builder-panel { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: fixed; inset: 0; background: white; padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo-link" href="school.html">
+    <svg class="logo-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
+      <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
+      <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
+      <ellipse cx="88" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
+      <circle cx="88" cy="108" r="20" fill="#F4C97A"/>
+      <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#5C3A1E"/>
+      <path d="M68,100 Q65,113 67,126" fill="#5C3A1E"/>
+      <path d="M108,100 Q111,113 109,126" fill="#5C3A1E"/>
+      <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+      <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+      <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
+      <ellipse cx="172" cy="154" rx="20" ry="23" fill="#F8E4B0"/>
+      <circle cx="172" cy="113" r="18" fill="#F4C97A"/>
+      <ellipse cx="172" cy="98" rx="18" ry="9" fill="#4A3728"/>
+      <ellipse cx="157" cy="99" rx="6" ry="7" fill="#4A3728"/>
+      <ellipse cx="187" cy="99" rx="6" ry="7" fill="#4A3728"/>
+      <circle cx="166" cy="112" r="3" fill="#3D2B1F"/>
+      <circle cx="178" cy="112" r="3" fill="#3D2B1F"/>
+      <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <div><div class="lw">Kelvi</div><div class="ls">SCHOOL</div></div>
+  </a>
+  <div class="divider-v"></div>
+  <div class="header-title">Quest Builder</div>
+  <div class="header-right">
+    <input type="password" class="api-input" id="api-key" placeholder="Anthropic API key" oninput="saveKey()">
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: BUILDER PANEL -->
+  <div class="builder-panel">
+    <div>
+      <div class="builder-heading">Build a Quest</div>
+      <div class="builder-sub">Design a set of mathematical problems for your students — calibrated to their age and level.</div>
+    </div>
+
+    <!-- Topics -->
+    <div>
+      <span class="field-label">Topics</span>
+      <div class="topic-grid" id="topic-grid">
+        <div class="topic-tag" onclick="toggleTopic(this,'Number sense')">Number sense</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Algebra')">Algebra</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Geometry')">Geometry</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Fractions')">Fractions</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Patterns')">Patterns</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Measurement')">Measurement</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Data & statistics')">Data & statistics</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Probability')">Probability</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Calculus')">Calculus</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Trigonometry')">Trigonometry</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Ratios & proportions')">Ratios & proportions</div>
+        <div class="topic-tag" onclick="toggleTopic(this,'Functions')">Functions</div>
+      </div>
+    </div>
+
+    <!-- Real-world context -->
+    <div>
+      <span class="field-label">Real-world context <span style="color:var(--muted);font-size:10px;letter-spacing:0;text-transform:none">(optional)</span></span>
+      <input type="text" class="context-input" id="context-input" placeholder="e.g. cricket scores, a recipe, a building blueprint, the monsoon season...">
+      <div class="context-hint">Kelvi will anchor the problems in this context.</div>
+    </div>
+
+    <!-- Student context -->
+    <div>
+      <span class="field-label">Student context <span style="color:var(--muted);font-size:10px;letter-spacing:0;text-transform:none">(optional)</span></span>
+      <input type="text" class="context-input" id="student-context-input" placeholder="e.g. fishing communities in Kerala, urban middle school in Chennai, rural school in New Hampshire...">
+      <div class="context-hint">Kelvi will make problems feel relevant to your students' world.</div>
+    </div>
+
+    <!-- Grade -->
+    <div>
+      <span class="field-label">Grade level</span>
+      <div class="grade-grid">
+        <button class="grade-btn" id="g-23" onclick="selectGrade(this,'2–3')">Grades<br>2–3</button>
+        <button class="grade-btn" id="g-45" onclick="selectGrade(this,'4–5')">Grades<br>4–5</button>
+        <button class="grade-btn" id="g-68" onclick="selectGrade(this,'6–8')">Grades<br>6–8</button>
+        <button class="grade-btn" id="g-910" onclick="selectGrade(this,'9–10')">Grades<br>9–10</button>
+        <button class="grade-btn" id="g-1112" onclick="selectGrade(this,'11–12')">Grades<br>11–12</button>
+      </div>
+    </div>
+
+    <!-- Differentiation -->
+    <div>
+      <span class="field-label">Differentiation level</span>
+      <div class="diff-grid">
+        <div class="diff-btn entry" onclick="toggleDiff(this,'entry')">
+          <div class="diff-label">Entry</div>
+          <div class="diff-desc">Foundational. Concrete. Accessible to all.</div>
+        </div>
+        <div class="diff-btn core" onclick="toggleDiff(this,'core')">
+          <div class="diff-label">Core</div>
+          <div class="diff-desc">Grade level. Mixed representations.</div>
+        </div>
+        <div class="diff-btn extension" onclick="toggleDiff(this,'extension')">
+          <div class="diff-label">Extension</div>
+          <div class="diff-desc">Challenging. Open-ended. Generative.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Number of problems -->
+    <div>
+      <span class="field-label">Number of problems</span>
+      <input type="number" id="count-input" min="1" max="20" value="5" class="context-input" style="width:120px" placeholder="e.g. 5">
+    </div>
+
+    <button class="generate-btn" id="generate-btn" onclick="buildQuest()">
+      Build this Quest →
+    </button>
+  </div>
+
+  <!-- RIGHT: OUTPUT PANEL -->
+  <div class="quest-panel" id="quest-panel">
+
+    <div class="quest-empty" id="quest-empty">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="30" stroke="#C9A84C" stroke-width="1.5"/>
+        <text x="32" y="42" text-anchor="middle" font-size="28" fill="#C9A84C" font-family="Georgia,serif" font-style="italic">?</text>
+      </svg>
+      <p>Choose your topics, grade, and level — then build your Quest.</p>
+    </div>
+
+    <div class="quest-loading" id="quest-loading">
+      <div class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+      <div class="loading-text" id="loading-text">Building your Quest...</div>
+    </div>
+
+    <div class="quest-output" id="quest-output">
+      <div class="quest-header">
+        <div class="quest-meta">
+          <div class="quest-title" id="quest-title">Quest</div>
+          <div class="quest-tags" id="quest-tags"></div>
+        </div>
+        <div class="quest-actions">
+          <button class="qa-btn" onclick="regenerate()">Regenerate</button>
+          <button class="qa-btn kadi" onclick="copyAll()">Copy all</button>
+          <button class="qa-btn primary" onclick="sendToSchool()">Use in school →</button>
+        </div>
+      </div>
+      <div id="problems-list"></div>
+
+      <!-- Print button — Arya's idea -->
+      <div style="margin-top:8px;padding:20px;background:#FDF0E8;border-radius:14px;border:1px solid #D4956A;display:flex;align-items:center;justify-content:space-between;gap:16px">
+        <div>
+          <div style="font-family:'DM Serif Display',Georgia,serif;font-size:16px;color:#7A3B1E;margin-bottom:4px">Print this Quest as a worksheet</div>
+          <div style="font-size:12px;color:#A0522D;line-height:1.5">For students who prefer to write — each problem includes space to notice, question, and work. <em>Arya's idea.</em></div>
+        </div>
+        <button onclick="printWorksheet()" style="flex-shrink:0;padding:12px 22px;background:#A0522D;color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:opacity 0.15s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">🖨 Print worksheet</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let selectedTopics = [];
+let selectedGrade = '';
+let selectedDiffs = [];
+let selectedCount = 5;
+let lastQuestText = '';
+let lastParams = {};
+
+// ── SELECTORS ─────────────────────────────────────────────────────────────────
+function toggleTopic(el, topic) {
+  el.classList.toggle('selected');
+  if (selectedTopics.includes(topic)) selectedTopics = selectedTopics.filter(t => t !== topic);
+  else selectedTopics.push(topic);
+}
+
+function selectGrade(el, grade) {
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGrade = grade;
+}
+
+function toggleDiff(el, diff) {
+  el.classList.toggle('selected');
+  if (selectedDiffs.includes(diff)) selectedDiffs = selectedDiffs.filter(d => d !== diff);
+  else selectedDiffs.push(diff);
+}
+
+
+// ── BUILD QUEST ───────────────────────────────────────────────────────────────
+async function buildQuest() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { alert('Please enter your Anthropic API key at the top.'); return; }
+  if (selectedTopics.length === 0) { alert('Please select at least one topic.'); return; }
+  if (!selectedGrade) { alert('Please select a grade level.'); return; }
+  if (selectedDiffs.length === 0) { alert('Please select at least one differentiation level.'); return; }
+
+  selectedCount = parseInt(document.getElementById('count-input').value) || 5;
+  const context = document.getElementById('context-input').value.trim();
+  const studentContext = document.getElementById('student-context-input').value.trim();
+  lastParams = { topics: [...selectedTopics], grade: selectedGrade, diffs: [...selectedDiffs], count: selectedCount, context, studentContext };
+
+  showLoading();
+
+  const diffDescriptions = {
+    entry: 'Entry level — foundational, concrete, accessible, procedural entry points',
+    core: 'Core level — grade appropriate, mixed representations, some conceptual depth',
+    extension: 'Extension level — challenging, open-ended, generative thinking, multiple solution paths'
+  };
+
+  const diffText = selectedDiffs.map(d => diffDescriptions[d]).join('\n');
+  const contextLine = context ? `\nReal-world context to embed problems in: ${context}` : '';
+  const studentLine = studentContext ? `\nStudent context — make problems feel relevant to: ${studentContext}` : '';
+
+  const prompt = `You are an expert mathematics curriculum designer building a "Quest" — a set of rich, engaging mathematics problems for students.
+
+QUEST PARAMETERS:
+- Topics: ${selectedTopics.join(', ')}
+- Grade level: ${selectedGrade}
+- Differentiation: ${diffText}${contextLine}${studentLine}
+- Number of problems: ${selectedCount}
+
+DESIGN PRINCIPLES:
+- Each problem should invite questioning, not just computation
+- Problems should have multiple entry points — students at different levels can engage
+- Use real contexts that feel genuine and interesting, not contrived
+- Avoid problems that have one obvious mechanical answer — prefer problems that reward thinking
+- Each problem should naturally lead students to ask procedural, conceptual, or generative questions
+- If a real-world context was specified, anchor every problem in that context authentically
+- DEI awareness: use diverse names, contexts from different cultures, and avoid stereotyping
+- Do NOT say "worksheet" anywhere — these are Quest problems
+
+OUTPUT FORMAT — respond with valid JSON only, no markdown, no preamble:
+{
+  "title": "A short evocative Quest title (not just the topic name)",
+  "problems": [
+    {
+      "number": 1,
+      "text": "The full problem text. Can be multi-sentence. Rich and specific.",
+      "type": "P" or "C" or "G",
+      "note": "A brief teacher note about what kind of thinking this invites (1 sentence)"
+    }
+  ]
+}
+
+The "type" field classifies the primary question type the problem invites:
+P = Procedural entry (how to calculate/find)
+C = Conceptual depth (why it works, what it means)
+G = Generative exploration (what if, what happens when)
+
+Distribute types across the problems. Do not make all problems the same type.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
+    const quest = JSON.parse(raw);
+    lastQuestText = quest;
+    renderQuest(quest);
+  } catch(err) {
+    hideLoading();
+    alert('Something went wrong: ' + err.message);
+  }
+}
+
+function regenerate() { buildQuest(); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function showLoading() {
+  document.getElementById('quest-empty').style.display = 'none';
+  document.getElementById('quest-output').classList.remove('visible');
+  document.getElementById('quest-loading').classList.add('visible');
+
+  const phrases = [
+    'Building your Quest...',
+    'Designing rich problems...',
+    'Anchoring in real contexts...',
+    'Calibrating for your students...',
+    'Almost ready...'
+  ];
+  let i = 0;
+  const el = document.getElementById('loading-text');
+  el.textContent = phrases[0];
+  window._loadingInterval = setInterval(() => {
+    i = (i + 1) % phrases.length;
+    el.textContent = phrases[i];
+  }, 1800);
+}
+
+function hideLoading() {
+  clearInterval(window._loadingInterval);
+  document.getElementById('quest-loading').classList.remove('visible');
+}
+
+function renderQuest(quest) {
+  hideLoading();
+
+  document.getElementById('quest-title').textContent = quest.title;
+
+  const tags = document.getElementById('quest-tags');
+  tags.innerHTML = `<span class="quest-tag grade">Grades ${lastParams.grade}</span>` +
+    lastParams.diffs.map(d => `<span class="quest-tag diff-${d}">${d.charAt(0).toUpperCase()+d.slice(1)}</span>`).join('') +
+    lastParams.topics.map(t => `<span class="quest-tag grade">${t}</span>`).join('');
+
+  const list = document.getElementById('problems-list');
+  list.innerHTML = quest.problems.map((p, i) => `
+    <div class="problem-card" id="pc-${i}">
+      <div class="problem-num">Problem ${p.number}</div>
+      <div class="problem-text" contenteditable="true" spellcheck="false">${p.text}</div>
+      <div class="problem-footer">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="problem-type-badge badge-${p.type}">${{P:'Procedural',C:'Conceptual',G:'Generative'}[p.type]}</span>
+          <span style="font-size:11px;color:var(--muted);font-style:italic">${p.note}</span>
+        </div>
+        <div class="problem-actions">
+          <button class="pab use" onclick="useProblem(${i})">Use in school →</button>
+          <button class="pab" onclick="copyProblem(${i})">Copy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('quest-output').classList.add('visible');
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function copyAll() {
+  const title = document.getElementById('quest-title').textContent;
+  let text = `KELVI QUEST: ${title}\n`;
+  text += `Grade ${lastParams.grade} · ${lastParams.diffs.join(', ')} · ${lastParams.topics.join(', ')}\n\n`;
+  document.querySelectorAll('.problem-text').forEach((el, i) => {
+    text += `Problem ${i+1}:\n${el.textContent.trim()}\n\n`;
+  });
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy all', 2000);
+  });
+}
+
+function copyProblem(i) {
+  const text = document.querySelectorAll('.problem-text')[i].textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = document.querySelectorAll('.pab');
+    const btn = document.querySelectorAll('[onclick="copyProblem('+i+')"]')[0];
+    if (btn) { btn.textContent = '✓ Copied'; setTimeout(() => btn.textContent = 'Copy', 1500); }
+  });
+}
+
+function useProblem(i) {
+  const text = document.querySelectorAll('.problem-text')[i].textContent.trim();
+  const mode = lastParams.diffs.includes('extension') ? 'exploration' : lastParams.diffs.includes('entry') ? 'guided' : 'questioning';
+  const url = `school.html?role=student&mode=${mode}&p=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function sendToSchool() {
+  const problems = [...document.querySelectorAll('.problem-text')].map(el => el.textContent.trim()).join('\n\n');
+  const title = document.getElementById('quest-title').textContent;
+  const mode = lastParams.diffs.includes('extension') ? 'exploration' : lastParams.diffs.includes('entry') ? 'guided' : 'questioning';
+  const url = `school.html?role=teacher&mode=${mode}&p=${encodeURIComponent(title + '\n\n' + problems)}`;
+  window.open(url, '_blank');
+}
+
+// ── PRINT WORKSHEET ───────────────────────────────────────────────────────────
+function printWorksheet() {
+  const title = document.getElementById('quest-title').textContent;
+  const problems = [...document.querySelectorAll('.problem-card')];
+  const grade = lastParams.grade;
+  const diffs = lastParams.diffs.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(' · ');
+  const topics = lastParams.topics.join(', ');
+  const date = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  const problemsHTML = problems.map((card, i) => {
+    const text = card.querySelector('.problem-text').textContent.trim();
+    const type = card.querySelector('.problem-type-badge').textContent.trim();
+    const note = card.querySelector('.problem-footer span:last-of-type') ?
+      card.querySelector('.problem-footer').querySelector('span:not(.problem-type-badge)').textContent.trim() : '';
+    return `
+      <div style="margin-bottom:40px;page-break-inside:avoid">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px">
+          <span style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;color:#00827F;font-weight:normal">${i+1}</span>
+          <span style="font-size:10px;padding:2px 8px;border-radius:6px;background:${type==='Conceptual'?'#F0FAF9':type==='Generative'?'#FEF9EC':'#FEF9EC'};color:${type==='Conceptual'?'#006B68':type==='Generative'?'#C17F24':'#C17F24'};font-weight:500;letter-spacing:0.5px">${type}</span>
+        </div>
+        <p style="font-size:14px;line-height:1.9;color:#1A1A2E;margin-bottom:16px">${text}</p>
+        <div style="border:1px solid #E8E4E0;border-radius:8px;padding:12px 16px;margin-bottom:8px">
+          <div style="font-size:10px;color:#B4B2A9;letter-spacing:2px;margin-bottom:8px">WHAT DO YOU NOTICE?</div>
+          <div style="height:40px;border-bottom:1px solid #E8E4E0;margin-bottom:8px"></div>
+          <div style="height:40px;border-bottom:1px solid #E8E4E0"></div>
+        </div>
+        <div style="border:1px solid #E8E4E0;border-radius:8px;padding:12px 16px;margin-bottom:8px">
+          <div style="font-size:10px;color:#B4B2A9;letter-spacing:2px;margin-bottom:8px">WHAT QUESTION DOES THIS MAKE YOU WANT TO ASK?</div>
+          <div style="height:40px;border-bottom:1px solid #E8E4E0;margin-bottom:8px"></div>
+          <div style="height:40px"></div>
+        </div>
+        <div style="border:1px solid #E8E4E0;border-radius:8px;padding:12px 16px">
+          <div style="font-size:10px;color:#B4B2A9;letter-spacing:2px;margin-bottom:8px">MY WORKING</div>
+          <div style="height:80px;border-bottom:1px solid #E8E4E0;margin-bottom:8px"></div>
+          <div style="height:80px"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; color: #1A1A2E; padding: 48px 56px; max-width: 800px; margin: 0 auto; }
+  @media print {
+    body { padding: 32px 44px; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <div style="font-size:11px;color:#B4B2A9;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">Kelvi Quest</div>
+      <h1 style="font-family:'DM Serif Display',Georgia,serif;font-size:28px;font-weight:normal;color:#1A1A2E;margin-bottom:6px">${title}</h1>
+      <div style="font-size:12px;color:#5F6B7A">${topics} · Grades ${grade} · ${diffs}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:#B4B2A9;margin-bottom:4px">${date}</div>
+      <div style="font-size:11px;color:#B4B2A9">Name: ___________________________</div>
+    </div>
+  </div>
+
+  <div style="border-top:2px solid #00827F;margin:18px 0 32px"></div>
+
+  <!-- Kelvi prompt -->
+  <div style="background:#F0FAF9;border-left:3px solid #00827F;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:36px">
+    <p style="font-size:13px;color:#006B68;line-height:1.6;font-style:italic">For each problem: take a moment to look at it before you write anything. Notice what you see. Then write your question. Then work. When you're done, bring your questions to Kelvi.</p>
+  </div>
+
+  ${problemsHTML}
+
+  <!-- Footer -->
+  <div style="margin-top:48px;padding-top:16px;border-top:1px solid #E8E4E0;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-family:'DM Serif Display',Georgia,serif;font-size:13px;font-style:italic;color:#B4B2A9">The question is the answer.</div>
+    <div style="font-size:11px;color:#B4B2A9">kelvi.io · Arya's idea</div>
+  </div>
+
+  <div class="no-print" style="margin-top:32px;text-align:center">
+    <button onclick="window.print()" style="padding:12px 28px;background:#00827F;color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer">Print this Quest</button>
+  </div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+}
+function saveKey() { localStorage.setItem('kelvi-key', document.getElementById('api-key').value); }
+function loadKey() { const k = localStorage.getItem('kelvi-key'); if (k) document.getElementById('api-key').value = k; }
+loadKey();
+</script>
+</body>
+</html>
