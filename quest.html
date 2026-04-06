@@ -203,7 +203,6 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
 }
 </style>
 </head>
-<script src="config.js"></script>
 <body>
 
 <header>
@@ -234,7 +233,9 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
   </a>
   <div class="divider-v"></div>
   <div class="header-title">Quest Builder</div>
-  <div class="header-right"></div>
+  <div class="header-right">
+    <input type="password" class="api-input" id="api-key" placeholder="Anthropic API key" oninput="saveKey()">
+  </div>
 </header>
 
 <main>
@@ -400,6 +401,8 @@ function toggleDiff(el, diff) {
 
 // ── BUILD QUEST ───────────────────────────────────────────────────────────────
 async function buildQuest() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { alert('Please enter your Anthropic API key at the top.'); return; }
   if (selectedTopics.length === 0) { alert('Please select at least one topic.'); return; }
   if (!selectedGrade) { alert('Please select a grade level.'); return; }
   if (selectedDiffs.length === 0) { alert('Please select at least one differentiation level.'); return; }
@@ -460,9 +463,14 @@ G = Generative exploration (what if, what happens when)
 Distribute types across the problems. Do not make all problems the same type.`;
 
   try {
-    const res = await fetch(KELVI_API_BASE + '/api/chat', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
@@ -675,6 +683,9 @@ function printWorksheet() {
   w.document.close();
   w.focus();
 }
+function saveKey() { localStorage.setItem('kelvi-key', document.getElementById('api-key').value); }
+function loadKey() { const k = localStorage.getItem('kelvi-key'); if (k) document.getElementById('api-key').value = k; }
+loadKey();
 </script>
 </body>
 </html>
