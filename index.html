@@ -11,7 +11,7 @@
   --peacock: #00827F; --peacock-dark: #006B68; --peacock-light: #F0FAF9;
   --gold: #C9A84C; --gold-light: #FDF6E3; --kadi: #C17F24;
   --guided: #B8860B; --exploration: #A0522D; --kadi: #C17F24;
-  --navy: #1A1A2E; --gray: #5F6B7A;
+  --navy: #3D3D3A; --charcoal: #3D3D3A; --solo-bg: #EDE8E0; --solo-text: #2C2C2A; --gray: #5F6B7A;
   --warm: #F8F7F4; --off: #F0EDE8; --border: #E8E4E0;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,13 +104,17 @@ section { padding: 96px 40px; }
 
 /* ── TWO PRODUCTS ── */
 .products-section { background: var(--warm); }
-.products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; }
-@media (max-width: 680px) { .products-grid { grid-template-columns: 1fr; } }
+.products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+@media (max-width: 900px) { .products-grid { grid-template-columns: 1fr; } }
 
 .product-card { border-radius: 20px; overflow: hidden; border: 0.5px solid var(--border); }
 .product-card-header { padding: 32px 28px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .product-card-header.school { background: var(--peacock); }
 .product-card-header.family { background: var(--guided); }
+.product-card-header.solo { background: var(--charcoal); }
+.product-tag.solo { background: var(--solo-bg); color: var(--solo-text); }
+.product-cta.solo { background: var(--charcoal); color: white; }
+.product-cta.solo:hover { opacity: 0.88; }
 .product-card-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: white; margin-top: 16px; margin-bottom: 6px; }
 .product-card-sub { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 2px; text-transform: uppercase; }
 .product-card-body { background: white; padding: 28px; }
@@ -132,26 +136,20 @@ section { padding: 96px 40px; }
 
 
 /* ── Q TYPES ── */
-.qtypes-section { background: white; }
+.qtypes-section { background: #3D3D3A; }
 .qtypes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; max-width: 860px; margin: 0 auto; }
 @media (max-width: 640px) { .qtypes-grid { grid-template-columns: 1fr; } }
-.qtype { border-radius: 14px; padding: 26px 22px; border: 1px solid; }
-.qtype.P { background: #FFFDF5; border-color: #E8C96A; }
-.qtype.C { background: var(--peacock-light); border-color: #C2E0DE; }
-.qtype.G { background: #FDF0E8; border-color: #D4956A; }
+.qtype { border-radius: 14px; padding: 26px 22px; border: 2px solid; background: transparent; }
+.qtype.P { border-color: #B8860B; }
+.qtype.C { border-color: #00827F; }
+.qtype.G { border-color: #C9A84C; }
 .qtype-letter { font-family: 'DM Serif Display', serif; font-size: 40px; margin-bottom: 8px; line-height: 1; }
-.qtype.P .qtype-letter { color: var(--guided); }
-.qtype.C .qtype-letter { color: var(--peacock); }
-.qtype.G .qtype-letter { color: #C17F24; }
-.qtype-name { font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-.qtype.P .qtype-name { color: var(--guided); }
-.qtype.C .qtype-name { color: var(--peacock); }
-.qtype.G .qtype-name { color: #C17F24; }
-.qtype-desc { font-size: 13px; color: var(--gray); line-height: 1.6; margin-bottom: 14px; }
-.qtype-ex { font-size: 12px; font-style: italic; padding: 8px 12px; border-radius: 8px; line-height: 1.5; }
-.qtype.P .qtype-ex { background: #FDF6E3; color: #8B6914; }
-.qtype.C .qtype-ex { background: #E8F5F4; color: var(--peacock-dark); }
-.qtype.G .qtype-ex { background: #FEF9EC; color: #8B5E10; }
+.qtype.P .qtype-letter { color: var(--gold); }
+.qtype.C .qtype-letter { color: #5DCAA5; }
+.qtype.G .qtype-letter { color: var(--gold); }
+.qtype-name { font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; color: rgba(255,255,255,0.5); }
+.qtype-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 14px; }
+.qtype-ex { font-size: 12px; font-style: italic; padding: 8px 12px; border-radius: 8px; line-height: 1.5; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
 
 /* ── BY TEACHERS ── */
 .byteachers { background: var(--peacock); text-align: center; }
@@ -180,7 +178,7 @@ section { padding: 96px 40px; }
 .cta-note { font-size: 11px; color: rgba(255,255,255,0.3); }
 
 /* ── FOOTER ── */
-footer { background: #111120; padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+footer { background: #3D3D3A; padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
 .footer-logo { display: flex; align-items: center; gap: 10px; }
 .footer-mark { width: 28px; height: 28px; border-radius: 50%; background: var(--peacock); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--gold); }
 .footer-name { font-family: 'DM Serif Display', serif; font-size: 15px; color: white; }
@@ -208,15 +206,17 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
 
 <!-- NAV -->
 <nav>
-  <a href="/" class="nav-logo">
+  <a href="index.html" class="nav-logo">
     <div class="nav-mark">கே</div>
     <span class="nav-wordmark">Kelvi</span>
   </a>
   <div class="nav-links">
-    <a href="#products">Two products</a>
+    <a href="#products">Three products</a>
     <a href="#questions">The question ladder</a>
+    <a href="about.html">Our story</a>
     <a href="school.html" class="nav-school">Kelvi School</a>
     <a href="family.html" class="nav-family">Kelvi Family</a>
+    <a href="solo.html" class="nav-solo" style="background:#3D3D3A;color:white !important;padding:8px 18px;border-radius:8px;font-weight:500 !important">Kelvi Solo</a>
   </div>
 </nav>
 
@@ -257,12 +257,12 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
   </div>
 </section>
 
-<!-- TWO PRODUCTS -->
+<!-- THREE PRODUCTS -->
 <section class="products-section" id="products">
-  <div style="max-width:1000px;margin:0 auto;text-align:center">
-    <div class="section-label reveal">Two products</div>
-    <h2 class="section-h reveal">One for school. One for home.</h2>
-    <p class="section-sub reveal" style="margin:0 auto 48px">The same Socratic philosophy, designed for two different contexts.</p>
+  <div style="max-width:1100px;margin:0 auto;text-align:center">
+    <div class="section-label reveal">Three products</div>
+    <h2 class="section-h reveal">The same Socratic philosophy, designed for different contexts.</h2>
+    <p class="section-sub reveal" style="margin:0 auto 48px"></p>
     <div class="products-grid">
 
       <div class="product-card reveal">
@@ -303,6 +303,25 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
         </div>
       </div>
 
+
+      <div class="product-card reveal">
+        <div class="product-card-header solo">
+          <div class="product-card-title">Kelvi Solo</div>
+          <div class="product-card-sub">For independent learners</div>
+        </div>
+        <div class="product-card-body">
+          <span class="product-tag solo">For students everywhere</span>
+          <p>Students bring their own homework or explore advanced topics. Kelvi helps them think through problems without giving the answer. The only AI math tool that makes you smarter, not lazier.</p>
+          <ul class="product-list" style="margin-bottom:24px">
+            <li>Homework help that never gives the solution</li>
+            <li>Integrated Math 1-5, AP courses, and beyond</li>
+            <li>Linear algebra, differential equations, discrete math</li>
+            <li>MathQuill visual equation editor</li>
+            <li>Session history with question tracking</li>
+          </ul>
+          <a href="solo.html" class="product-cta solo">Open Kelvi Solo</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -310,9 +329,9 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
 <!-- QUESTION LADDER -->
 <section class="qtypes-section center" id="questions">
   <div style="max-width:860px;margin:0 auto">
-    <div class="section-label reveal">The question ladder</div>
-    <h2 class="section-h reveal">Three types of questions. One direction.</h2>
-    <p class="section-sub reveal" style="margin:0 auto 44px">Kelvi identifies every question a student asks and coaches them toward the next level. This is the heart of what we mean by a math mindset.</p>
+    <div class="section-label reveal" style="color:rgba(255,255,255,0.4)">The question ladder</div>
+    <h2 class="section-h reveal" style="color:white">Three types of questions. One direction.</h2>
+    <p class="section-sub reveal" style="margin:0 auto 44px;color:rgba(255,255,255,0.55)">Kelvi identifies every question a student asks and coaches them toward the next level. This is the heart of what we mean by a math mindset.</p>
     <div class="qtypes-grid">
       <div class="qtype P reveal">
         <div class="qtype-letter">P</div>
@@ -336,53 +355,20 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
   </div>
 </section>
 
-<!-- BY TEACHERS / BY PARENTS -->
-<section id="about" style="background:var(--navy);padding:0">
-
-  <!-- By teachers for teachers -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;min-height:400px">
-    <div style="padding:80px 64px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.08)">
-      <div class="section-label reveal" style="color:rgba(255,255,255,0.4)">Kelvi School</div>
-      <h2 class="reveal" style="font-family:'DM Serif Display',serif;font-size:clamp(28px,3.5vw,44px);color:white;line-height:1.1;margin-bottom:20px">By teachers.<br><em style="color:var(--gold)">For teachers.</em></h2>
-      <p class="reveal" style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:360px;margin-bottom:28px">Kelvi School was built by practicing mathematics educators. Every mode, every prompt, every pedagogical decision came from real classrooms.</p>
-      <p class="reveal" style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:360px;margin-bottom:36px">Teachers set the problem. Teachers choose the mode. Teachers generate the link. Students arrive and think. The teacher stays in control — Kelvi just asks better questions.</p>
-      <a href="school.html" class="reveal" style="display:inline-flex;align-items:center;gap:8px;background:var(--peacock);color:white;padding:13px 24px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;width:220px;justify-content:center">Open Kelvi School →</a>
+<!-- BUILT BY -->
+<section id="about" style="background:var(--warm);padding:80px 64px">
+  <div style="max-width:900px;margin:0 auto;text-align:center">
+    <div class="section-label reveal" style="color:var(--gray)">Who we are</div>
+    <h2 class="reveal" style="font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);color:#3D3D3A;line-height:1.15;margin-bottom:20px">Built by teachers and parents.<br><em style="color:var(--gold)">For anyone who wants to build a math mindset.</em></h2>
+    <p class="reveal" style="font-size:15px;color:var(--gray);line-height:1.8;max-width:600px;margin:0 auto 16px">Kelvi was built by practicing mathematics educators and parents who believe curiosity is the foundation of mathematical thinking. Every mode, every prompt, every pedagogical decision came from real classrooms and real families.</p>
+    <a href="about.html" class="reveal" style="font-size:14px;color:var(--peacock);font-weight:500;text-decoration:none;display:inline-block;margin-bottom:36px">Read our story &rarr;</a>
+    <p class="reveal" style="font-size:14px;color:var(--gray);opacity:0.7;margin-bottom:20px">Expanding to schools and homes across the world. Leave your email to be first.</p>
+    <div class="reveal" style="max-width:420px;margin:0 auto 10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <input type="email" id="email-input" placeholder="your@school.edu or your@email.com" style="flex:1;min-width:220px;padding:13px 16px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);outline:none;background:white">
+      <button onclick="handleSignup()" style="background:var(--gold);color:white;padding:13px 22px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">Stay in touch</button>
     </div>
-
-    <!-- By parents for parents -->
-    <div style="padding:80px 64px;display:flex;flex-direction:column;justify-content:center">
-      <div class="section-label reveal" style="color:rgba(255,255,255,0.4)">Kelvi Family</div>
-      <h2 class="reveal" style="font-family:'DM Serif Display',serif;font-size:clamp(28px,3.5vw,44px);color:white;line-height:1.1;margin-bottom:20px">By parents.<br><em style="color:var(--gold)">For parents.</em></h2>
-      <p class="reveal" style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:360px;margin-bottom:28px">Kelvi Family was built by parents who believe mathematical curiosity starts at home. With questions — asked at the right moment, in the right way.</p>
-      <p class="reveal" style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:360px;margin-bottom:36px">Children choose a math world, follow their curiosity, and build a questioning habit that stays with them. Parents see what their children are discovering. No pressure. Just wonder.</p>
-      <a href="family.html" class="reveal" style="display:inline-flex;align-items:center;gap:8px;background:var(--guided);color:white;padding:13px 24px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;width:220px;justify-content:center">Open Kelvi Family →</a>
-    </div>
+    <div style="font-size:11px;color:var(--gray);opacity:0.4" id="cta-note">For teachers, school leaders, parents, and students. We will never share your email.</div>
   </div>
-
-  <!-- Bottom rule line -->
-  <div style="border-top:1px solid rgba(255,255,255,0.08);padding:32px 64px;display:flex;align-items:center;justify-content:center">
-    <p style="font-family:'DM Serif Display',serif;font-size:16px;font-style:italic;color:rgba(255,255,255,0.35);text-align:center">
-      Built by teachers. Built by parents. For anyone who wants to build a math mindset.
-    </p>
-  </div>
-
-</section>
-
-<!-- CTA -->
-<section class="cta-section">
-  <h2>The question is the answer.</h2>
-  <div class="cta-tagline">For anyone who wants to build a math mindset.</div>
-  <p>Kelvi is free to try. No account required. Open Kelvi School for classrooms or Kelvi Family for home — and start asking better questions today.</p>
-  <div class="cta-btns">
-    <a href="school.html" class="cta-btn school" style="min-width:200px;text-align:center">Open Kelvi School</a>
-    <a href="family.html" class="cta-btn family" style="min-width:200px;text-align:center">Open Kelvi Family</a>
-  </div>
-  <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:28px">Expanding to schools across the world in 2026. Leave your email to be first.</p>
-  <div class="email-form">
-    <input type="email" id="email-input" placeholder="your@school.edu or your@email.com">
-    <button onclick="handleSignup()">Stay in touch</button>
-  </div>
-  <div class="cta-note" id="cta-note">For teachers, school leaders, and parents. We will never share your email.</div>
 </section>
 
 <!-- FOOTER -->

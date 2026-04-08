@@ -27,8 +27,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px
 
 /* WELCOME - playful, centered */
 .welcome{text-align:center;padding:100px 24px 60px;max-width:460px;margin:0 auto}
-.welcome-k{width:80px;height:80px;border-radius:50%;background:var(--peacock);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold);margin:0 auto 28px;animation:bobble 3s ease-in-out infinite}
-@keyframes bobble{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.welcome-k{width:100px;height:100px;margin:0 auto 28px}
 .welcome h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,42px);margin-bottom:10px;color:var(--navy)}
 .welcome p{font-size:16px;color:var(--gray);line-height:1.6;margin-bottom:36px}
 .welcome-input{display:flex;gap:10px;max-width:320px;margin:0 auto}
@@ -189,8 +188,7 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-sp
 
 <nav>
   <div class="nav-left">
-    <div class="nav-mark">K</div>
-    <span class="nav-word">Kelvi</span>
+    <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px"><div class="nav-mark">K</div><span class="nav-word">Kelvi</span></a>
     <span class="nav-fam">Family</span>
   </div>
   <div class="nav-right">
@@ -202,13 +200,48 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-sp
 </nav>
 
 <div class="screen active" id="screen-welcome">
-  <div class="welcome fi">
-    <div class="welcome-k">K</div>
-    <h1>Hello! I'm Kelvi.</h1>
-    <p>I'm your mathematics thinking companion. Ready to start wondering?</p>
-    <div class="welcome-input">
-      <input type="text" id="cname" placeholder="What's your name?" onkeydown="if(event.key==='Enter')go()">
-      <button class="btn" onclick="go()">Let's go!</button>
+  <div style="max-width:480px;margin:0 auto;padding:24px 16px">
+    <div style="border:3px solid #3D3D3A;border-radius:6px;overflow:hidden;background:white">
+      <div style="background:var(--peacock);padding:18px 24px;text-align:center;border-bottom:3px solid #3D3D3A">
+        <div style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:500;color:white;letter-spacing:2px">Kelvi Family</div>
+        <div style="font-size:12px;color:var(--gold);margin-top:4px;letter-spacing:3px">A math thinking adventure</div>
+      </div>
+      <div style="border-bottom:3px solid #3D3D3A;background:white">
+        <svg width="100%" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="210" width="480" height="70" fill="#E1F5EE"/>
+          <path d="M-5 215 Q60 180 140 190 Q220 198 300 182 Q380 168 490 195 L490 215 L-5 215 Z" fill="#9FE1CB" opacity="0.4"/>
+          <path d="M-5 215 Q60 180 140 190 Q220 198 300 182 Q380 168 490 195" fill="none" stroke="#3D3D3A" stroke-width="1.5"/>
+          <path d="M-5 235 Q100 210 200 220 Q300 228 400 218 Q450 212 490 220" fill="none" stroke="#3D3D3A" stroke-width="1"/>
+          <circle cx="380" cy="45" r="20" fill="#FDF6E3" stroke="#C9A84C" stroke-width="1.2"/><circle cx="380" cy="45" r="7" fill="#C9A84C" opacity="0.3"/>
+          <line x1="380" y1="21" x2="380" y2="15" stroke="#C9A84C" stroke-width="1"/><line x1="380" y1="69" x2="380" y2="75" stroke="#C9A84C" stroke-width="1"/>
+          <line x1="356" y1="45" x2="350" y2="45" stroke="#C9A84C" stroke-width="1"/><line x1="404" y1="45" x2="410" y2="45" stroke="#C9A84C" stroke-width="1"/>
+          <line x1="365" y1="30" x2="361" y2="26" stroke="#C9A84C" stroke-width="0.8"/><line x1="395" y1="30" x2="399" y2="26" stroke="#C9A84C" stroke-width="0.8"/>
+          <path d="M46 95 C46 88 52 82 58 82 C60 78 66 75 72 78 C76 74 84 74 88 78 C94 76 100 80 100 86 C104 88 104 94 100 97 C100 100 96 102 92 102 L56 102 C50 102 46 99 46 95 Z" fill="white" stroke="#3D3D3A" stroke-width="1.3"/>
+          <path d="M310 100 C310 96 314 93 318 93 C319 90 323 89 327 90 C329 88 334 88 336 90 C339 89 343 91 343 94 C345 95 345 98 343 99 L317 99 C313 99 310 98 310 100 Z" fill="white" stroke="#3D3D3A" stroke-width="1"/>
+          <path d="M140 75 C140 73 142 71 144 71 C145 69 148 68 150 69 C152 68 155 69 155 71 C157 71 157 74 155 75 L143 75 C141 75 140 74 140 75 Z" fill="white" stroke="#3D3D3A" stroke-width="0.8"/>
+          <g transform="translate(75,145)"><path d="M-8 48 Q-2 20 4 26 Q10 10 16 24 Q22 16 26 32 Q28 26 32 48" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1.2" opacity="0.7"/></g>
+          <g transform="translate(42,165)"><path d="M-5 28 Q0 12 5 16 Q10 5 15 15 Q18 10 22 28" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1" opacity="0.6"/></g>
+          <g transform="translate(330,148)"><path d="M-6 36 Q0 14 6 20 Q12 4 18 18 Q22 12 26 36" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1" opacity="0.6"/></g>
+          <g transform="translate(415,168)"><path d="M-6 34 Q0 14 6 20 Q12 4 18 16 Q22 10 28 34" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1.1" opacity="0.5"/></g>
+          <g transform="translate(140,168)"><circle cx="0" cy="0" r="10" fill="#FDF6E3" stroke="#3D3D3A" stroke-width="2"/><circle cx="-3.5" cy="-2" r="3" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="3.5" cy="-2" r="3" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-2.5" cy="-2" r="1.3" fill="#3D3D3A"/><circle cx="4.5" cy="-2" r="1.3" fill="#3D3D3A"/><circle cx="0" cy="5" r="2" fill="#3D3D3A"/><path d="M0 10 L-9 46 L9 46 Z" fill="#F0FAF9" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-5" y="46" width="4" height="4" rx="1" fill="#3D3D3A"/><rect x="1" y="46" width="4" height="4" rx="1" fill="#3D3D3A"/></g>
+          <g transform="translate(200,164)"><circle cx="0" cy="0" r="11" fill="#E8C9A0" stroke="#3D3D3A" stroke-width="2"/><circle cx="-4" cy="-1.5" r="3.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="4" cy="-1.5" r="3.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-3" cy="-1.5" r="1.5" fill="#3D3D3A"/><circle cx="5" cy="-1.5" r="1.5" fill="#3D3D3A"/><path d="M-4 5 Q0 9 4 5" fill="none" stroke="#3D3D3A" stroke-width="1.2" stroke-linecap="round"/><path d="M0 11 L-11 52 L11 52 Z" fill="#E1F5EE" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-6" y="52" width="5" height="4" rx="1" fill="#3D3D3A"/><rect x="2" y="52" width="5" height="4" rx="1" fill="#3D3D3A"/></g>
+          <g transform="translate(270,153)"><circle cx="0" cy="0" r="14" fill="#E2B07E" stroke="#3D3D3A" stroke-width="2"/><circle cx="-5" cy="-1.5" r="4.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="5" cy="-1.5" r="4.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-4" cy="-1.5" r="2" fill="#3D3D3A"/><circle cx="6" cy="-1.5" r="2" fill="#3D3D3A"/><path d="M-5 6 Q0 11 5 6" fill="none" stroke="#3D3D3A" stroke-width="1.5" stroke-linecap="round"/><path d="M0 14 L-15 68 L15 68 Z" fill="#00827F" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-8" y="68" width="6" height="5" rx="1" fill="#3D3D3A"/><rect x="3" y="68" width="6" height="5" rx="1" fill="#3D3D3A"/></g>
+          <g transform="translate(68,130)"><rect x="0" y="0" width="100" height="18" rx="8" fill="white" stroke="#3D3D3A" stroke-width="1.2"/><text x="50" y="13" text-anchor="middle" font-size="7.5" fill="#3D3D3A">But why does it work?</text><path d="M75 18 L78 30" stroke="#3D3D3A" stroke-width="1" fill="none"/></g>
+          <g transform="translate(270,112)"><rect x="0" y="0" width="108" height="18" rx="8" fill="white" stroke="#3D3D3A" stroke-width="1.2"/><text x="54" y="13" text-anchor="middle" font-size="7.5" fill="#3D3D3A">What a great question!</text><path d="M22 18 L16 30" stroke="#3D3D3A" stroke-width="1" fill="none"/></g>
+        </svg>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;text-align:center;color:#3D3D3A;margin-bottom:2px">Parent sign in</div>
+        <div style="text-align:center;font-size:12px;color:#5F6B7A;margin-bottom:8px">Child? <a style="color:#00827F;font-weight:500;cursor:pointer">Sign in here.</a></div>
+        <input type="text" id="cname" placeholder="Username" style="padding:13px 16px;border:2px solid #E8E4E0;border-radius:12px;font-size:14px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')go()">
+        <input type="password" placeholder="Password" style="padding:13px 16px;border:2px solid #E8E4E0;border-radius:12px;font-size:14px;font-family:inherit;outline:none">
+        <button class="btn" onclick="go()" style="width:100%;padding:13px;border-radius:12px;font-size:15px">Sign in</button>
+        <div style="font-size:12px;color:#5F6B7A;display:flex;flex-direction:column;gap:4px">
+          <span>Forgot your password? <a style="color:#00827F;font-weight:500;cursor:pointer">Reset password.</a></span>
+          <span>Don't have an account? <a style="color:#00827F;font-weight:500;cursor:pointer">Enroll now</a> or <a style="color:#00827F;font-weight:500;cursor:pointer">try it out.</a></span>
+        </div>
+      </div>
+      <div style="border-top:3px solid #3D3D3A;padding:8px;text-align:center;font-size:9px;color:#C9A84C;letter-spacing:2px;background:#3D3D3A">The question is the answer.</div>
     </div>
   </div>
 </div>

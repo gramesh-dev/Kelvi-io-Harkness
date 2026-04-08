@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi Solo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{--peacock:#00827F;--peacock-dark:#006B68;--peacock-light:#F0FAF9;--gold:#C9A84C;--gold-light:#FDF6E3;--navy:#1A1A2E;--gray:#5F6B7A;--warm:#F8F7F4;--off:#F0EDE8;--border:#E8E4E0;--sand:#3D3D3A;--sand-light:#EDE8E0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--navy);border-bottom:3px solid var(--gold)}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-mark{width:30px;height:30px;border-radius:50%;background:var(--peacock);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold)}
+.nav-word{font-family:'DM Serif Display',serif;font-size:17px;color:white}
+.nav-label{font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-link{color:rgba(255,255,255,0.6);font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all .15s;text-decoration:none}
+.nav-link:hover{background:rgba(255,255,255,0.1);color:white}
+.nav-link.active{background:white;color:var(--navy);font-weight:500}
+.nav-api{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;width:180px}
+.nav-api::placeholder{color:rgba(255,255,255,0.3)}
+
+.screen{display:none;flex:1}.screen.active{display:flex;flex-direction:column}
+
+/* WELCOME */
+.welcome{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.welcome-inner{text-align:center;max-width:480px}
+.welcome-mark{width:100px;height:100px;margin:0 auto 28px}
+.welcome-inner h1{font-family:'DM Serif Display',serif;font-size:clamp(30px,5vw,40px);margin-bottom:8px}
+.welcome-inner p{font-size:15px;color:var(--gray);line-height:1.6;margin-bottom:32px}
+.welcome-row{display:flex;gap:8px;max-width:340px;margin:0 auto}
+.welcome-row input{flex:1;padding:13px 16px;border:2px solid var(--border);border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none}
+.welcome-row input:focus{border-color:var(--peacock)}
+.btn{background:var(--navy);color:white;border:none;padding:13px 24px;border-radius:14px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s}
+.btn:hover{background:#2a2a4a}
+
+/* HOME */
+.home{flex:1;max-width:800px;margin:0 auto;padding:40px 24px 60px;width:100%}
+.home-greeting{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,32px);margin-bottom:24px}
+.home-section{margin-bottom:32px}
+.home-label{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:1px;margin-bottom:12px}
+
+/* HOMEWORK INPUT */
+.hw-box{background:white;border:2px solid var(--border);border-radius:16px;padding:20px;transition:border-color .15s}
+.hw-box:focus-within{border-color:var(--peacock)}
+.hw-textarea{width:100%;border:none;outline:none;font-size:15px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.6;color:var(--navy);background:transparent}
+.hw-textarea::placeholder{color:var(--border)}
+.hw-toolbar{display:flex;align-items:center;gap:4px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+.hw-tb{padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;cursor:pointer;background:white;color:var(--navy);font-family:'DM Sans',sans-serif;transition:all .1s}
+.hw-tb:hover{border-color:var(--peacock);background:var(--peacock-light)}
+.hw-tb sup{font-size:8px;vertical-align:super}
+.hw-tb sub{font-size:8px;vertical-align:sub}
+.hw-mq{flex:1;min-width:200px;min-height:32px;font-size:15px;padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;background:white;margin:4px 0}
+.hw-actions{display:flex;gap:8px;margin-top:12px;align-items:center}
+.hw-go{background:var(--peacock);color:white;border:none;padding:11px 24px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.hw-go:hover{background:var(--peacock-dark)}
+.hw-photo{background:white;border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray);transition:all .15s}
+.hw-photo:hover{border-color:var(--peacock)}
+.hw-mic{background:white;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;cursor:pointer;font-size:16px;transition:all .15s}
+.hw-mic:hover{border-color:var(--peacock)}
+.hw-mic.rec{border-color:var(--gold);background:var(--gold-light)}
+
+/* COURSE CARDS */
+.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.course{background:white;border:1.5px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .15s}
+.course:hover{border-color:var(--peacock);transform:translateY(-2px)}
+.course-icon{font-size:24px;margin-bottom:10px;display:block}
+.course-name{font-size:15px;font-weight:500;margin-bottom:4px}
+.course-desc{font-size:12px;color:var(--gray);line-height:1.45}
+.course-level{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:8px}
+
+
+/* CHAT VIEW */
+.chat-layout{flex:1;display:flex;flex-direction:column;max-width:720px;margin:0 auto;width:100%}
+.chat-header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.chat-back{font-size:13px;color:var(--peacock);cursor:pointer;text-decoration:none}
+.chat-topic{font-size:14px;font-weight:500}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start}
+.msg-s{align-self:flex-end}
+.msg-name{font-size:9px;font-weight:500;margin-bottom:3px;padding-left:2px}
+.msg-name-k{color:var(--peacock)}
+.msg-name-s{color:var(--gray);text-align:right}
+.msg-bubble-k{background:white;border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;padding:12px 16px;font-size:14px;line-height:1.55;color:var(--gray)}
+.msg-bubble-s{background:var(--navy);border-radius:16px;border-bottom-right-radius:4px;padding:12px 16px;font-size:14px;line-height:1.55;color:white}
+.chat-input-bar{padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:white}
+.chat-input{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:none;max-height:100px}
+.chat-input:focus{border-color:var(--peacock)}
+.chat-send{background:var(--peacock);color:white;border:none;border-radius:12px;padding:11px 18px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
+.chat-send:hover{background:var(--peacock-dark)}
+.chat-mic{background:none;border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;cursor:pointer;font-size:16px;transition:all .15s}
+.chat-mic:hover{border-color:var(--peacock)}
+.chat-mic.rec{border-color:var(--gold);background:var(--gold-light)}
+.chat-footer{padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--gray);border-top:1px solid var(--border)}
+.q-badge{background:var(--peacock-light);color:var(--peacock-dark);padding:3px 10px;border-radius:6px;font-weight:500}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:var(--peacock-light);border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--peacock);animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* HISTORY */
+.history{flex:1;max-width:700px;margin:0 auto;padding:40px 24px 60px;width:100%}
+.hist-h{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:20px}
+.hist-item{background:white;border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:border-color .12s;display:flex;justify-content:space-between;align-items:center}
+.hist-item:hover{border-color:var(--peacock)}
+.hist-topic{font-size:14px;font-weight:500}
+.hist-date{font-size:11px;color:var(--gray)}
+.hist-q{font-size:11px;color:var(--peacock);margin-top:2px}
+
+footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-spacing:2px;border-top:1px solid var(--border)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div class="nav-mark">K</div>
+    <span class="nav-word">Kelvi</span>
+    </a>
+    <span class="nav-label">Solo</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-link active" onclick="show('home')" id="tab-home">Home</span>
+    <span class="nav-link" onclick="show('history')" id="tab-history">My sessions</span>
+    <input type="password" class="nav-api" id="api-key" placeholder="API key" oninput="saveKey()">
+  </div>
+</nav>
+
+<!-- WELCOME -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome">
+    <div class="welcome-inner">
+      <div class="welcome-mark"><svg width="100" height="100" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"><defs><style>.qmark-path{stroke:#00827F;stroke-width:18;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:400;stroke-dashoffset:400;animation:draw 1.4s cubic-bezier(0.4,0,0.2,1) infinite}.dot-circle{fill:#00827F;animation:dotPop 1.4s cubic-bezier(0.4,0,0.2,1) infinite}.gold-ring{stroke:#C9A84C;stroke-width:3;fill:none;stroke-dasharray:314;stroke-dashoffset:314;animation:ringDraw 1.4s cubic-bezier(0.4,0,0.2,1) infinite}@keyframes draw{0%{stroke-dashoffset:400;opacity:0.2}20%{opacity:1}70%{stroke-dashoffset:0;opacity:1}85%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0.2}}@keyframes dotPop{0%{r:0;opacity:0}65%{r:0;opacity:0}80%{r:12;opacity:1}90%{r:12;opacity:1}100%{r:12;opacity:0}}@keyframes ringDraw{0%{stroke-dashoffset:314;opacity:0}10%{opacity:0.4}70%{stroke-dashoffset:0;opacity:0.4}100%{stroke-dashoffset:0;opacity:0}}</style></defs><circle cx="340" cy="155" r="100" class="gold-ring"/><circle cx="340" cy="155" r="88" fill="#F0FAF9" opacity="0.6"/><path class="qmark-path" d="M305,115 C305,90 325,75 340,75 C355,75 378,88 378,110 C378,130 362,140 348,152 C342,158 340,164 340,175 L340,195"/><circle cx="340" cy="222" class="dot-circle"/></svg></div>
+      <h1>Think it through.</h1>
+      <p>Kelvi helps you work through math problems without giving you the answer. Because figuring it out yourself is the whole point.</p>
+      <div class="welcome-row">
+        <input type="text" id="stu-name" placeholder="What's your name?" onkeydown="if(event.key==='Enter')startApp()">
+        <button class="btn" onclick="startApp()">Start</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="screen-home">
+  <div class="home" style="animation:fadeUp .5s ease">
+
+    <div class="home-greeting" id="greeting">What are you working on?</div>
+
+    <div class="home-section">
+      <div class="home-label">HOMEWORK HELP</div>
+      <div class="hw-box">
+        <textarea class="hw-textarea" id="hw-input" rows="3" placeholder="Paste your problem here, or describe what you're stuck on..."></textarea>
+        <div class="hw-toolbar">
+          <span style="font-size:10px;color:var(--gray);margin-right:4px">Math:</span>
+          <button class="hw-tb" onclick="mqC('\\frac')">a/b</button>
+          <button class="hw-tb" onclick="mqC('^')">x<sup>n</sup></button>
+          <button class="hw-tb" onclick="mqC('_')">x<sub>n</sub></button>
+          <button class="hw-tb" onclick="mqC('\\sqrt')">&radic;</button>
+          <button class="hw-tb" onclick="mqW('\\pi')">&pi;</button>
+          <button class="hw-tb" onclick="mqW('\\theta')">&theta;</button>
+          <button class="hw-tb" onclick="mqW('\\sin(')">sin</button>
+          <button class="hw-tb" onclick="mqW('\\cos(')">cos</button>
+          <button class="hw-tb" onclick="mqW('\\tan(')">tan</button>
+          <button class="hw-tb" onclick="mqW('\\log(')">log</button>
+          <button class="hw-tb" onclick="mqW('\\int')">&int;</button>
+          <button class="hw-tb" onclick="mqW('\\sum')">&Sigma;</button>
+          <button class="hw-tb" onclick="mqW('\\infty')">&infin;</button>
+          <button class="hw-tb" onclick="mqW('\\le ')">&le;</button>
+          <button class="hw-tb" onclick="mqW('\\ge ')">&ge;</button>
+          <span id="hw-mq" class="hw-mq"></span>
+          <button class="hw-tb" onclick="insertHwMath()" style="background:var(--peacock-light);color:var(--peacock-dark);border-color:var(--peacock)">Add</button>
+        </div>
+        <div class="hw-actions">
+          <button class="hw-go" onclick="startChat()">Help me think through this</button>
+          <label class="hw-photo"><input type="file" accept="image/*" onchange="handlePhoto(event)" style="display:none">Upload photo</label>
+          <button class="hw-mic" id="hw-mic" onclick="toggleHwVoice()">&#127908;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-section">
+      <div class="home-label">EXPLORE A TOPIC</div>
+      <div class="courses">
+        <div class="course" onclick="openCourse('Integrated Math 1','Linear equations, inequalities, intro geometry, data')">
+          <span class="course-icon">&#x2160;</span>
+          <div class="course-name">Integrated Math 1</div>
+          <div class="course-desc">Linear equations, inequalities, geometric foundations, data analysis</div>
+        </div>
+        <div class="course" onclick="openCourse('Integrated Math 2','Quadratics, similarity, probability, right triangles')">
+          <span class="course-icon">&#x2161;</span>
+          <div class="course-name">Integrated Math 2</div>
+          <div class="course-desc">Quadratics, similarity, probability, right triangle trigonometry</div>
+        </div>
+        <div class="course" onclick="openCourse('Integrated Math 3','Polynomials, rational functions, circles, trig identities')">
+          <span class="course-icon">&#x2162;</span>
+          <div class="course-name">Integrated Math 3</div>
+          <div class="course-desc">Polynomials, rational functions, circles, trigonometric identities</div>
+        </div>
+        <div class="course" onclick="openCourse('Math 4','Precalculus, limits, intro to derivatives and integrals')">
+          <span class="course-icon">&#x2163;</span>
+          <div class="course-name">Math 4</div>
+          <div class="course-desc">Precalculus, limits, introduction to derivatives and integrals (AB Calculus)</div>
+        </div>
+        <div class="course" onclick="openCourse('Math 5','BC Calculus: series, parametric, polar, advanced integration')">
+          <span class="course-icon">&#x2164;</span>
+          <div class="course-name">Math 5</div>
+          <div class="course-desc">BC Calculus: series, parametric equations, polar coordinates, advanced integration</div>
+        </div>
+        <div class="course" onclick="openCourse('AP Statistics','Probability, distributions, inference, experimental design')">
+          <span class="course-icon">&#x03C3;</span>
+          <div class="course-name">AP Statistics</div>
+          <div class="course-desc">Probability, distributions, inference, regression, experimental design</div>
+        </div>
+        <div class="course" onclick="openCourse('Linear Algebra','Vectors, matrices, eigenvalues, linear transformations')">
+          <span class="course-icon">&#x27E8;&#x27E9;</span>
+          <div class="course-name">Linear Algebra</div>
+          <div class="course-desc">Vectors, matrices, eigenvalues, linear transformations, vector spaces</div>
+        </div>
+        <div class="course" onclick="openCourse('Differential Equations','First and second order ODEs, systems, Laplace transforms')">
+          <span class="course-icon">&#x2202;</span>
+          <div class="course-name">Differential Equations</div>
+          <div class="course-desc">First and second order ODEs, systems, Laplace transforms</div>
+        </div>
+        <div class="course" onclick="openCourse('Discrete Math','Logic, proofs, sets, combinatorics, graph theory')">
+          <span class="course-icon">&#x2227;</span>
+          <div class="course-name">Discrete Math</div>
+          <div class="course-desc">Logic, proofs, sets, combinatorics, graph theory</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="screen" id="screen-chat">
+  <div class="chat-layout">
+    <div class="chat-header">
+      <span class="chat-back" onclick="show('home')">&larr; Back</span>
+      <span class="chat-topic" id="chat-topic"></span>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="msg msg-k">
+        <div class="msg-name msg-name-k">Kelvi</div>
+        <div class="msg-bubble-k" id="opening-msg"></div>
+      </div>
+    </div>
+    <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="chat-input-bar">
+      <textarea class="chat-input" id="chat-input" rows="1" placeholder="Type your thinking..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+      <button class="chat-mic" id="chat-mic" onclick="toggleChatVoice()">&#127908;</button>
+      <button class="chat-send" onclick="sendMsg()">Send</button>
+    </div>
+    <div class="chat-footer">
+      <span id="q-count" class="q-badge" style="display:none"></span>
+      <span style="font-size:10px;color:var(--gray)">Kelvi never gives answers. Only better questions.</span>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="screen" id="screen-history">
+  <div class="history" style="animation:fadeUp .5s ease">
+    <div class="hist-h">My sessions</div>
+    <div id="hist-list">
+      <div class="hist-item">
+        <div><div class="hist-topic">Simplify sin(sin<sup>-1</sup>(x))</div><div class="hist-q">3 questions asked</div></div>
+        <div class="hist-date">Today</div>
+      </div>
+      <div class="hist-item">
+        <div><div class="hist-topic">Factor x<sup>3</sup> - 8</div><div class="hist-q">5 questions asked</div></div>
+        <div class="hist-date">Yesterday</div>
+      </div>
+      <div class="hist-item">
+        <div><div class="hist-topic">AP Calculus: Related rates</div><div class="hist-q">4 questions asked</div></div>
+        <div class="hist-date">Apr 5</div>
+      </div>
+      <div class="hist-item">
+        <div><div class="hist-topic">Linear Algebra: Eigenvalues</div><div class="hist-q">6 questions asked</div></div>
+        <div class="hist-date">Apr 4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>The question is the answer.</footer>
+
+<script>
+let name='',msgs=[],qCount=0,rec=null,isR=false,mqF=null;
+
+const SYS=`You are Kelvi — a mathematics thinking companion for students ages 14-18+. You NEVER give answers. You help students think through problems themselves.
+
+CORE PHILOSOPHY: The student should figure it out. Your job is to ask questions that help them see what they're missing, not to explain it to them. Every insight should come from THEIR thinking, not yours.
+
+YOUR APPROACH:
+- When a student shares a problem, don't solve it. Ask: "What do you notice about this?" or "Where does your thinking get stuck?"
+- When they make progress, name it: "You just connected two important ideas there."
+- When they're stuck, offer a smaller version of the same problem, or ask them to explain what they DO understand.
+- Sometimes end with an observation, not a question. Create space for them to think.
+- When they ask YOU a question, respond with more energy. Reward curiosity.
+- After they reach an insight: "What would you change about this problem to make it harder?" Shift them from solver to creator.
+
+NEVER:
+- Give the answer or a complete solution
+- Say "correct" or "incorrect" — say "interesting" or "tell me more about that"
+- Show more than one step at a time
+- Use the word "simply" or "just" — nothing is simple when you're learning
+
+MATH VISUALS: When a visual would help — a graph, a geometric figure, a number line — include an inline SVG. Use fill="#00827F" for main elements and fill="#C9A84C" for accents. Keep it simple.
+
+CLOSING: Tell them how many questions they asked. "You asked [n] questions today — that's what mathematicians do." End with: "What question are you taking with you?"`;
+
+function startApp(){const v=document.getElementById('stu-name').value.trim();if(v)name=v;document.getElementById('greeting').textContent='Hey '+name+'. What are you working on?';show('home')}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
+
+function startChat(){const hw=document.getElementById('hw-input').value.trim();if(!hw){alert('Type or paste a problem first.');return}document.getElementById('chat-topic').textContent='Homework help';document.getElementById('opening-msg').textContent="I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?";msgs=[{role:'user',content:'Here is my problem: '+hw},{role:'assistant',content:"I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?"}];qCount=0;updateQCount();show('chat')}
+
+function openCourse(name,desc){document.getElementById('chat-topic').textContent=name;document.getElementById('opening-msg').textContent="Welcome to "+name+". What topic are you curious about, or what problem are you working on?";msgs=[{role:'assistant',content:"Welcome to "+name+". What topic are you curious about, or what problem are you working on?"}];qCount=0;updateQCount();show('chat')}
+
+function classifyQ(t){const s=t.toLowerCase();if(/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s))return'G';if(/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s))return'C';if(/how do i|what.*formula|what.*next|how to|how.*find|what.*step|\?/.test(s))return'P';return null}
+
+async function sendMsg(){const inp=document.getElementById('chat-input');const text=inp.value.trim();if(!text)return;const key=document.getElementById('api-key').value.trim();if(!key){alert('Please enter your API key.');return}
+const qt=classifyQ(text);if(qt)qCount++;updateQCount();
+const cm=document.getElementById('chat-msgs');cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s">'+eh(text)+'</div></div>';
+inp.value='';cm.scrollTop=cm.scrollHeight;
+msgs.push({role:'user',content:text});
+document.getElementById('typing').classList.add('vis');
+try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:SYS,messages:msgs})});
+const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
+document.getElementById('typing').classList.remove('vis');
+cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'</div></div>';
+cm.scrollTop=cm.scrollHeight;
+}catch(e){document.getElementById('typing').classList.remove('vis');cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key.</div></div>'}}
+
+function eh(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderMath(t){if(typeof katex==='undefined')return t;return t.replace(/\$\$(.*?)\$\$/g,function(m,l){try{return katex.renderToString(l,{throwOnError:false})}catch(e){return m}})}
+function updateQCount(){const el=document.getElementById('q-count');if(qCount>0){el.style.display='inline-block';el.textContent=qCount+' question'+(qCount===1?'':'s')+' asked'}}
+
+function initMQ(){if(typeof MathQuill==='undefined')return;const MQ=MathQuill.getInterface(2);const el=document.getElementById('hw-mq');if(el&&!mqF){mqF=MQ.MathField(el,{spaceBehavesLikeTab:true,handlers:{enter:function(){insertHwMath()}}})}}
+function mqC(c){if(!mqF)return;mqF.cmd(c);mqF.focus()}
+function mqW(l){if(!mqF)return;mqF.write(l);mqF.focus()}
+function insertHwMath(){if(!mqF)return;const l=mqF.latex();if(!l)return;const ta=document.getElementById('hw-input');const p=ta.selectionStart;ta.value=ta.value.substring(0,p)+'$$'+l+'$$'+ta.value.substring(p);mqF.latex('');ta.focus()}
+
+function handlePhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){document.getElementById('hw-input').value+=' [Uploaded photo of problem]'};r.readAsDataURL(f)}
+
+function toggleHwVoice(){voiceToggle('hw-mic','hw-input')}
+function toggleChatVoice(){voiceToggle('chat-mic','chat-input')}
+function voiceToggle(btnId,fieldId){const b=document.getElementById(btnId);if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice not supported.');return}if(isR){rec.stop();b.classList.remove('rec');isR=false;return}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.onresult=function(e){let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById(fieldId).value=t};rec.onerror=function(){b.classList.remove('rec');isR=false};rec.onend=function(){b.classList.remove('rec');isR=false};rec.start();b.classList.add('rec');isR=true}
+
+function saveKey(){localStorage.setItem('kelvi-solo-key',document.getElementById('api-key').value)}
+function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k)document.getElementById('api-key').value=k}
+
+loadKey();
+setTimeout(initMQ,500);
+</script>
+</body>
+</html>

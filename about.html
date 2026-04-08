@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi — About Us</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--peacock:#00827F;--peacock-dark:#006B68;--peacock-light:#F0FAF9;--gold:#C9A84C;--gold-light:#FDF6E3;--navy:#3D3D3A;--gray:#5F6B7A;--warm:#F8F7F4;--border:#E8E4E0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--navy)}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:62px;background:rgba(248,247,244,0.94);backdrop-filter:blur(12px);border-bottom:0.5px solid rgba(0,130,127,0.12)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-mark{width:34px;height:34px;border-radius:50%;background:var(--peacock);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold)}
+.nav-wordmark{font-family:'DM Serif Display',serif;font-size:19px;color:var(--navy)}
+.nav-back{font-size:13px;color:var(--peacock);text-decoration:none}
+.nav-back:hover{text-decoration:underline}
+
+.hero{padding:80px 40px 60px;text-align:center;max-width:800px;margin:0 auto}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,48px);color:var(--navy);line-height:1.15;margin-bottom:12px}
+.hero p{font-size:16px;color:var(--gray);line-height:1.7;max-width:600px;margin:0 auto}
+
+.story{max-width:700px;margin:0 auto;padding:0 40px 60px}
+.story-section{margin-bottom:48px}
+.story-label{font-size:10px;font-weight:500;color:var(--gold);letter-spacing:2px;margin-bottom:12px}
+.story h2{font-family:'DM Serif Display',serif;font-size:clamp(22px,3vw,30px);color:var(--navy);margin-bottom:16px;line-height:1.2}
+.story p{font-size:15px;color:var(--gray);line-height:1.8;margin-bottom:16px}
+.story em{font-style:italic;color:var(--navy)}
+
+.founders{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:700px;margin:0 auto;padding:0 40px 60px}
+@media(max-width:600px){.founders{grid-template-columns:1fr}.hero{padding:60px 24px 40px}.story{padding:0 24px 40px}.founders{padding:0 24px 40px}}
+.founder{background:white;border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center}
+.founder-circle{width:80px;height:80px;border-radius:50%;background:var(--peacock);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:24px;color:var(--gold);margin:0 auto 16px}
+.founder-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:4px}
+.founder-role{font-size:12px;color:var(--peacock);font-weight:500;margin-bottom:16px}
+.founder-list{list-style:none;text-align:left;display:flex;flex-direction:column;gap:6px}
+.founder-list li{font-size:13px;color:var(--gray);line-height:1.5;padding-left:14px;position:relative}
+.founder-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);position:absolute;left:0;top:8px}
+
+.origin{max-width:700px;margin:0 auto;padding:0 40px 60px}
+.origin-card{background:#3D3D3A;border-radius:16px;padding:40px 36px;text-align:center}
+.origin-tamil{font-family:'DM Serif Display',serif;font-size:36px;color:var(--gold);margin-bottom:8px}
+.origin-word{font-family:'DM Serif Display',serif;font-size:22px;color:white;margin-bottom:8px}
+.origin-meaning{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:20px}
+.origin-text{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:500px;margin:0 auto}
+
+footer{background:#3D3D3A;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-logo{display:flex;align-items:center;gap:10px}
+.footer-mark{width:28px;height:28px;border-radius:50%;background:var(--peacock);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold)}
+.footer-name{font-family:'DM Serif Display',serif;font-size:15px;color:white}
+.footer-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:2px}
+.footer-right{font-size:11px;color:rgba(255,255,255,0.3)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-mark">கே</div>
+    <span class="nav-wordmark">Kelvi</span>
+  </a>
+  <a href="index.html" class="nav-back">&larr; Back to home</a>
+</nav>
+
+<div class="hero">
+  <h1>How Kelvi started.</h1>
+  <p>It wasn't a business plan. It was a dinner.</p>
+</div>
+
+<div class="story">
+
+  <div class="story-section">
+    <h2>A chance meeting on campus.</h2>
+    <p>Gayatri and Padmaja met randomly on the Phillips Exeter Academy campus. They got talking — the way people do when they realize mid-sentence that they have more in common than expected. As it turned out, Padmaja's son Gautham was going to take Gayatri's Fourier analysis class the following term.</p>
+    <p>Padmaja, the ever-welcoming person that she is, invited Gayatri's family over for dinner. Padmaja's mom made rice, rasam, and thoran. Gayatri made sushi. True to Exeter's tradition, they had a Harkness-like discussion around the table — varied topics, no agenda, everyone's voice heard. That's how it started.</p>
+  </div>
+
+  <div class="story-section">
+    <h2>Ideas, family, food, and everything in between.</h2>
+    <p>They both have too many ideas. After the AI boom, they talked constantly — about what AI could do for education, about what it was getting wrong, about their families, about food, about everything. Padmaja has a way of seeing a problem and immediately thinking about the infrastructure it needs. Gayatri sees the same problem and thinks about the pedagogy. They kept finishing each other's thoughts without meaning to.</p>
+    <p>Gautham is a force of his own — he has a story that deserves its own telling. But this is about how his mother and his math teacher found their way to something neither of them expected.</p>
+    <p>They landed on Kelvi in April 2026. The name, the product, the philosophy — all of it came together after months of conversations that they didn't realize were leading somewhere. கேள்வி. The Tamil word for question. It fit because it's exactly what they both believe: the question is where learning begins.</p>
+  </div>
+
+  <div class="story-section">
+    <h2>A strong pair.</h2>
+    <p>Padmaja brings an impressive resume — PhD in cancer biology from Madurai Kamaraj University, MBA from Rutgers, CEO of Sathgen Therapeutics, VP of Business Development at Godavari BioRefineries, Senior Portfolio Analyst at Johnson & Johnson. She thinks in systems, builds infrastructure, and moves fast.</p>
+    <p>Gayatri brings the classroom — PhD in mathematics from the University of Central Florida, nearly two decades of teaching, former Chair of Math at The Branson School, faculty and Assistant Dean of Faculty at Phillips Exeter Academy, and a former professional tennis player from Kerala, India. She has watched thousands of students decide they're not "math people" and has spent her career trying to catch them before that happens.</p>
+    <p>Together, they're building the thing they both wished existed: a tool that helps children think mathematically, not just perform mathematically. Padmaja builds it. Gayatri makes sure it teaches the right way. And they argue about everything in between — usually over rice and rasam.</p>
+  </div>
+
+</div>
+
+<div class="founders">
+  <div class="founder">
+    <div class="founder-circle">GR</div>
+    <div class="founder-name">Gayatri Ramesh, PhD</div>
+    <div class="founder-role">Co-Founder · Pedagogy & Curriculum</div>
+    <ul class="founder-list">
+      <li>PhD Mathematics, University of Central Florida</li>
+      <li>Faculty, Phillips Exeter Academy</li>
+      <li>Former Asst. Dean of Faculty, PEA</li>
+      <li>Former Chair of Math, The Branson School</li>
+      <li>Former Pro Tennis Player · Kerala, India</li>
+    </ul>
+  </div>
+  <div class="founder">
+    <div class="founder-circle">PG</div>
+    <div class="founder-name">Padmaja Ganapathy, PhD</div>
+    <div class="founder-role">Co-Founder · Data, Analytics & Technology</div>
+    <ul class="founder-list">
+      <li>PhD Cancer Biology, Madurai Kamaraj University</li>
+      <li>MBA, Rutgers University</li>
+      <li>CEO, Sathgen Therapeutics LLC</li>
+      <li>Former VP BD, Godavari BioRefineries</li>
+      <li>Sr. Portfolio Analyst, Johnson & Johnson</li>
+    </ul>
+  </div>
+</div>
+
+<div class="origin">
+  <div class="origin-card">
+    <div class="origin-tamil">கேள்வி</div>
+    <div class="origin-word">Kelvi</div>
+    <div class="origin-meaning">Tamil · "the question"</div>
+    <div class="origin-text">In the guru-sishya tradition, learning begins not with the teacher's answer but with the student's question. Kelvi carries that tradition forward — with AI as the guru who never stops asking.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">
+    <div class="footer-mark">கே</div>
+    <div>
+      <div class="footer-name">Kelvi</div>
+      <div class="footer-sub">கேள்வி · the question</div>
+    </div>
+  </div>
+  <div class="footer-right">© 2026 Kelvi-io · Gayatri Ramesh & Padmaja Ganapathy · kelvi.io</div>
+</footer>
+
+</body>
+</html>
