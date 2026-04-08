@@ -120,7 +120,7 @@ section { padding: 96px 40px; }
 .product-tag.family { background: #FDF6E3; color: #8B6914; }
 .product-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
 .product-list li { font-size: 13px; color: var(--gray); padding-left: 18px; position: relative; line-height: 1.6; }
-.product-list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: 50%; }
+.product-list li::before { display: none; }
 .product-list.school li::before { background: var(--peacock); }
 .product-list.family li::before { background: var(--guided); }
 .product-cta { display: block; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
@@ -129,26 +129,7 @@ section { padding: 96px 40px; }
 .product-cta.family { background: var(--guided); color: white; }
 .product-cta.family:hover { opacity: 0.88; }
 
-/* ── MODES ── */
-.modes-section { background: var(--off); }
-.modes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 18px; max-width: 1000px; margin: 0 auto; }
-.mode-card { background: white; border-radius: 16px; padding: 28px 24px; border: 1px solid var(--border); transition: transform 0.2s; }
-.mode-card:hover { transform: translateY(-3px); }
-.mode-dot { width: 10px; height: 10px; border-radius: 50%; margin-bottom: 16px; }
-.mode-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
-.mode-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 10px; }
-.mode-desc { font-size: 13px; color: var(--gray); line-height: 1.65; margin-bottom: 16px; }
-.mode-grades { font-size: 11px; color: #B4B2A9; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
-.mode-opening { font-size: 13px; font-style: italic; padding: 10px 14px; border-radius: 8px; line-height: 1.5; }
-.mode-q .mode-dot { background: var(--peacock); }
-.mode-q .mode-tag { color: var(--peacock); }
-.mode-q .mode-opening { background: var(--peacock-light); color: var(--peacock-dark); }
-.mode-g .mode-dot { background: var(--guided); }
-.mode-g .mode-tag { color: var(--guided); }
-.mode-g .mode-opening { background: #FDF6E3; color: #8B6914; }
-.mode-e .mode-dot { background: var(--exploration); }
-.mode-e .mode-tag { color: var(--exploration); }
-.mode-e .mode-opening { background: #FDF0E8; color: #7A3B1E; }
+
 
 /* ── Q TYPES ── */
 .qtypes-section { background: white; }
@@ -233,64 +214,9 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
   </a>
   <div class="nav-links">
     <a href="#products">Two products</a>
-    <a href="#modes">Three modes</a>
     <a href="#questions">The question ladder</a>
-    <a href="school.html" class="nav-school" style="display:flex;align-items:center;gap:8px;padding:6px 14px">
-      <svg width="24" height="24" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="rgba(255,255,255,0.2)"/>
-        <path d="M63,155 Q63,190 76,199 Q88,206 100,199 Q113,190 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
-        <path d="M100,158 Q107,153 113,158" fill="none" stroke="#FDF6E3" stroke-width="3" opacity="0.6"/>
-        <ellipse cx="88" cy="151" rx="20" ry="22" fill="#D4956A"/>
-        <circle cx="88" cy="112" r="18" fill="#D4956A"/>
-        <path d="M70,104 Q71,91 88,94 Q105,91 106,104" fill="#2C1A0E"/>
-        <ellipse cx="88" cy="95" rx="9" ry="6" fill="#2C1A0E"/>
-        <circle cx="88" cy="90" r="5" fill="#2C1A0E"/>
-        <circle cx="88" cy="103" r="3" fill="#A0522D"/>
-        <ellipse cx="82" cy="112" rx="3" ry="2.5" fill="#1A0A00"/>
-        <ellipse cx="94" cy="112" rx="3" ry="2.5" fill="#1A0A00"/>
-        <path d="M148,162 Q148,190 158,197 Q169,203 180,197 Q191,190 191,162 Q181,154 169,154 Q157,154 148,162Z" fill="#E8F5F4"/>
-        <ellipse cx="169" cy="158" rx="16" ry="18" fill="#D4956A"/>
-        <circle cx="169" cy="127" r="14" fill="#D4956A"/>
-        <path d="M155,119 Q156,108 169,111 Q182,108 183,119" fill="#2C1A0E"/>
-        <ellipse cx="157" cy="116" rx="4" ry="5" fill="#2C1A0E"/>
-        <ellipse cx="181" cy="116" rx="4" ry="5" fill="#2C1A0E"/>
-        <ellipse cx="164" cy="126" r="2.2" fill="#1A0A00"/>
-        <ellipse cx="174" cy="126" r="2.2" fill="#1A0A00"/>
-      </svg>
-      Kelvi School
-    </a>
-    <a href="family.html" class="nav-family" style="display:flex;align-items:center;gap:8px;padding:6px 14px">
-      <svg width="24" height="24" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="170" cy="170" r="165" fill="rgba(255,255,255,0.2)"/>
-        <!-- Gayatri -->
-        <path d="M138,200 Q138,240 153,250 Q170,258 187,250 Q202,240 202,200 Q186,188 170,188 Q154,188 138,200Z" fill="#C9A84C"/>
-        <ellipse cx="170" cy="195" rx="24" ry="22" fill="#D4956A"/>
-        <circle cx="170" cy="148" r="22" fill="#D4956A"/>
-        <path d="M148,139 Q149,125 170,128 Q191,125 192,139" fill="#2C1A0E"/>
-        <path d="M148,139 Q145,154 147,170" fill="#2C1A0E"/>
-        <path d="M192,139 Q195,154 193,170" fill="#2C1A0E"/>
-        <circle cx="170" cy="137" r="3" fill="#A0522D"/>
-        <ellipse cx="163" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-        <ellipse cx="177" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-        <!-- Arya -->
-        <path d="M62,212 Q62,238 73,245 Q86,251 99,245 Q112,238 112,212 Q101,203 86,203 Q71,203 62,212Z" fill="#00827F"/>
-        <ellipse cx="86" cy="208" rx="17" ry="18" fill="#D4956A"/>
-        <circle cx="86" cy="177" r="15" fill="#D4956A"/>
-        <ellipse cx="86" cy="164" rx="15" ry="6" fill="#2C1A0E"/>
-        <ellipse cx="72" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-        <ellipse cx="100" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-        <!-- Lhuna -->
-        <path d="M228,212 Q228,238 239,245 Q252,251 265,245 Q278,238 278,212 Q267,203 252,203 Q237,203 228,212Z" fill="#F0FAF9"/>
-        <ellipse cx="252" cy="208" rx="17" ry="18" fill="#F8E4B0"/>
-        <circle cx="252" cy="177" r="15" fill="#F4C97A"/>
-        <ellipse cx="243" cy="165" rx="7" ry="6" fill="#8B6347"/>
-        <ellipse cx="261" cy="165" rx="7" ry="6" fill="#8B6347"/>
-        <ellipse cx="252" cy="167" rx="13" ry="5" fill="#8B6347"/>
-        <circle cx="246" cy="176" r="2.3" fill="#4A7FA5"/>
-        <circle cx="258" cy="176" r="2.3" fill="#4A7FA5"/>
-      </svg>
-      Kelvi Family
-    </a>
+    <a href="school.html" class="nav-school">Kelvi School</a>
+    <a href="family.html" class="nav-family">Kelvi Family</a>
   </div>
 </nav>
 
@@ -341,30 +267,6 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
 
       <div class="product-card reveal">
         <div class="product-card-header school">
-          <svg width="90" height="90" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
-            <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
-            <text x="130" y="42" text-anchor="middle" font-size="18" fill="white" font-family="Georgia,serif" letter-spacing="2">Kelvi</text>
-            <text x="130" y="62" text-anchor="middle" font-size="14" fill="#C9A84C" font-family="sans-serif" letter-spacing="6" font-weight="bold">SCHOOL</text>
-            <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
-            <ellipse cx="88" cy="151" rx="22" ry="25" fill="#D4956A"/>
-            <circle cx="88" cy="108" r="20" fill="#D4956A"/>
-            <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#2C1A0E"/>
-            <path d="M68,100 Q65,113 67,126" fill="#2C1A0E"/>
-            <path d="M108,100 Q111,113 109,126" fill="#2C1A0E"/>
-            <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-            <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-            <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
-            <ellipse cx="172" cy="154" rx="20" ry="23" fill="#D4956A"/>
-            <circle cx="172" cy="113" r="18" fill="#D4956A"/>
-            <ellipse cx="172" cy="98" rx="18" ry="9" fill="#2C1A0E"/>
-            <ellipse cx="157" cy="99" rx="6" ry="7" fill="#2C1A0E"/>
-            <ellipse cx="187" cy="99" rx="6" ry="7" fill="#2C1A0E"/>
-            <circle cx="166" cy="112" r="3" fill="#1A0A00"/>
-            <circle cx="178" cy="112" r="3" fill="#1A0A00"/>
-            <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
           <div class="product-card-title">Kelvi School</div>
           <div class="product-card-sub">For teachers &amp; students</div>
         </div>
@@ -384,53 +286,6 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
 
       <div class="product-card reveal">
         <div class="product-card-header family">
-          <svg width="90" height="90" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="170" cy="170" r="165" fill="rgba(0,0,0,0.2)"/>
-            <circle cx="170" cy="170" r="155" fill="none" stroke="#FDF6E3" stroke-width="2" opacity="0.4"/>
-            <text x="170" y="58" text-anchor="middle" font-size="22" fill="white" font-family="Georgia,serif" letter-spacing="2">Kelvi</text>
-            <text x="170" y="80" text-anchor="middle" font-size="17" fill="#FDF6E3" font-family="sans-serif" letter-spacing="7" font-weight="bold">FAMILY</text>
-            <!-- Gayatri — gold saree, medium brown, centered -->
-            <path d="M138,200 Q138,240 153,250 Q170,258 187,250 Q202,240 202,200 Q186,188 170,188 Q154,188 138,200Z" fill="#C9A84C"/>
-            <path d="M187,203 Q196,198 202,203" fill="none" stroke="#FDF6E3" stroke-width="2" opacity="0.6"/>
-            <path d="M138,222 Q170,216 202,222" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.4"/>
-            <ellipse cx="170" cy="195" rx="24" ry="22" fill="#D4956A"/>
-            <circle cx="170" cy="148" r="22" fill="#D4956A"/>
-            <path d="M148,139 Q149,125 170,128 Q191,125 192,139" fill="#2C1A0E"/>
-            <path d="M148,139 Q145,154 147,170" fill="#2C1A0E"/>
-            <path d="M192,139 Q195,154 193,170" fill="#2C1A0E"/>
-            <circle cx="170" cy="137" r="3" fill="#A0522D"/>
-            <ellipse cx="163" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-            <ellipse cx="177" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-            <path d="M161,157 Q170,163 179,157" fill="none" stroke="#1A0A00" stroke-width="2" stroke-linecap="round"/>
-            <!-- Arya — left, peacock green, medium brown -->
-            <path d="M62,212 Q62,238 73,245 Q86,251 99,245 Q112,238 112,212 Q101,203 86,203 Q71,203 62,212Z" fill="#00827F"/>
-            <path d="M62,226 Q86,221 112,226" fill="none" stroke="#E8F5F4" stroke-width="1.5" opacity="0.5"/>
-            <ellipse cx="86" cy="208" rx="17" ry="18" fill="#D4956A"/>
-            <circle cx="86" cy="177" r="15" fill="#D4956A"/>
-            <ellipse cx="86" cy="164" rx="15" ry="6" fill="#2C1A0E"/>
-            <ellipse cx="72" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-            <ellipse cx="100" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-            <circle cx="72" cy="161" r="2.5" fill="#FDF6E3"/>
-            <circle cx="100" cy="161" r="2.5" fill="#FDF6E3"/>
-            <circle cx="80" cy="176" r="2.3" fill="#1A0A00"/>
-            <circle cx="92" cy="176" r="2.3" fill="#1A0A00"/>
-            <path d="M80,184 Q86,189 92,184" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-            <!-- Lhuna — right, white/teal outfit, yellow skin, blue eyes -->
-            <path d="M228,212 Q228,238 239,245 Q252,251 265,245 Q278,238 278,212 Q267,203 252,203 Q237,203 228,212Z" fill="#F0FAF9"/>
-            <path d="M228,226 Q252,221 278,226" fill="none" stroke="#C2E0DE" stroke-width="1.5" opacity="0.6"/>
-            <ellipse cx="252" cy="208" rx="17" ry="18" fill="#F8E4B0"/>
-            <circle cx="252" cy="177" r="15" fill="#F4C97A"/>
-            <ellipse cx="243" cy="165" rx="7" ry="6" fill="#8B6347"/>
-            <ellipse cx="261" cy="165" rx="7" ry="6" fill="#8B6347"/>
-            <ellipse cx="252" cy="167" rx="13" ry="5" fill="#8B6347"/>
-            <circle cx="243" cy="161" r="3" fill="#C9A84C"/>
-            <circle cx="261" cy="161" r="3" fill="#C9A84C"/>
-            <circle cx="246" cy="176" r="2.3" fill="#4A7FA5"/>
-            <circle cx="258" cy="176" r="2.3" fill="#4A7FA5"/>
-            <circle cx="247" cy="175" r="1" fill="white"/>
-            <circle cx="259" cy="175" r="1" fill="white"/>
-            <path d="M246,184 Q252,189 258,184" fill="none" stroke="#4A3728" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
           <div class="product-card-title">Kelvi Family</div>
           <div class="product-card-sub">For parents &amp; children</div>
         </div>
@@ -448,41 +303,6 @@ footer { background: #111120; padding: 36px 40px; display: flex; align-items: ce
         </div>
       </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- THREE MODES -->
-<section class="modes-section center" id="modes">
-  <div style="max-width:1000px;margin:0 auto">
-    <div class="section-label reveal">Three modes</div>
-    <h2 class="section-h reveal">Different ages. Different contexts. One philosophy.</h2>
-    <p class="section-sub reveal" style="margin:0 auto 48px">Every mode is built on the same Socratic core — Kelvi never gives answers, always asks better questions.</p>
-    <div class="modes-grid">
-      <div class="mode-card mode-q reveal">
-        <div class="mode-dot"></div>
-        <div class="mode-tag">Grades 6–12 · Questioning mode</div>
-        <div class="mode-name">Math Questioning Mode</div>
-        <p class="mode-desc">The student asks the questions. Kelvi coaches quality — pushing from procedural to conceptual to generative thinking. Every message is classified P, C, or G.</p>
-        <div class="mode-grades">Best for · Secondary school · Problem sets · Independent work</div>
-        <div class="mode-opening">"Look at the problem. What is your first question?"</div>
-      </div>
-      <div class="mode-card mode-g reveal">
-        <div class="mode-dot"></div>
-        <div class="mode-tag">Grades 2–6 · Guided mode</div>
-        <div class="mode-name">Math Guided Activity Mode</div>
-        <p class="mode-desc">Teacher designs a step-by-step activity. Kelvi guides students through each step with warm, simple questions. No cold questioning — the activity scaffolds the thinking.</p>
-        <div class="mode-grades">Best for · Primary school · Foundational concepts · Younger learners</div>
-        <div class="mode-opening">"Let's go through this together, one step at a time."</div>
-      </div>
-      <div class="mode-card mode-e reveal">
-        <div class="mode-dot"></div>
-        <div class="mode-tag">Any age · Exploration mode</div>
-        <div class="mode-name">Math Exploration Mode</div>
-        <p class="mode-desc">No problem to solve. No right answer. A rich mathematical object — a pattern, a sequence, a shape — and Kelvi follows wherever curiosity leads.</p>
-        <div class="mode-grades">Best for · Home learning · Gifted learners · Mathematical wonder</div>
-        <div class="mode-opening">"Here's something mathematical. What do you notice first?"</div>
-      </div>
     </div>
   </div>
 </section>

@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kelvi School</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
 <style>
 :root {
@@ -15,7 +20,7 @@
 
 body[data-mode="questioning"] { --p:#00827F; --pd:#006B68; --pl:#F0FAF9; --pm:#C2E0DE; }
 body[data-mode="guided"]      { --p:#B8860B; --pd:#8B6508; --pl:#FDF6E3; --pm:#E8C96A; }
-body[data-mode="exploration"] { --p:#A0522D; --pd:#7A3B1E; --pl:#FDF0E8; --pm:#D4956A; }
+body[data-mode="quest"]        { --p:#3D3D3A; --pd:#2C2C2A; --pl:#EDE8E0; --pm:#D3CFC7; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--warm); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; }
@@ -29,6 +34,7 @@ header {
 
 .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
 .logo-svg { width: 36px; height: 36px; }
+.logo-mark { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--gold); }
 
 .lw { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; line-height: 1; }
 .ls { font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-top: 2px; }
@@ -96,7 +102,7 @@ header {
 .mode-card-btn:hover { border-color: var(--p); }
 .mode-card-btn.selected { border-color: var(--p); background: var(--pl); }
 .mode-card-btn .mc-name { font-size: 13px; font-weight: 500; color: var(--navy); margin-bottom: 3px; }
-.mode-card-btn .mc-ages { font-size: 11px; color: var(--muted); }
+.mode-card-btn .mc-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
 
 /* ── PROBLEM BOX (Claude-style) ── */
 .problem-box {
@@ -151,12 +157,12 @@ header {
 .drag-hint { font-size: 11px; color: var(--muted); }
 
 .generate-btn {
-  width: 100%; padding: 14px; background: var(--navy); color: white;
+  width: 100%; padding: 14px; background: #00827F; color: white;
   border: none; border-radius: 12px; font-family: 'DM Serif Display', serif;
   font-size: 16px; cursor: pointer; transition: background 0.15s;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.generate-btn:hover { background: #2a2a4a; }
+.generate-btn:hover { background: #006B68; }
 
 .link-confirm {
   text-align: center; font-size: 13px; color: var(--p);
@@ -165,6 +171,26 @@ header {
 
 .steps-section { margin-bottom: 28px; display: none; }
 .steps-section.visible { display: block; }
+.quest-panel { margin-bottom: 28px; display: none; }
+.quest-panel.visible { display: block; }
+.quest-topics { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.qt-tag { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; transition: all 0.12s; background: white; }
+.qt-tag:hover { border-color: var(--p); }
+.qt-tag.selected { background: var(--pl); border-color: var(--p); color: var(--pd); font-weight: 500; }
+.quest-grades { display: flex; gap: 6px; margin-bottom: 16px; }
+.qg-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; transition: all 0.12s; background: white; text-align: center; }
+.qg-btn:hover { border-color: var(--p); }
+.qg-btn.selected { background: var(--pl); border-color: var(--p); color: var(--pd); font-weight: 500; }
+.quest-context { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: 16px; }
+.quest-context:focus { border-color: var(--p); }
+.quest-generate { background: #3D3D3A; color: #EDE8E0; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.quest-generate:hover { background: #2C2C2A; }
+.quest-output { margin-top: 16px; padding: 16px; background: white; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; line-height: 1.6; color: var(--navy); white-space: pre-wrap; display: none; }
+.quest-use-btn { margin-top: 10px; background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.mq-toolbar-btn { padding: 4px 8px; border: 1px solid var(--border); border-radius: 5px; font-size: 11px; cursor: pointer; background: white; color: var(--navy); font-family: 'DM Sans', sans-serif; transition: all 0.1s; line-height: 1.2; }
+.mq-toolbar-btn:hover { border-color: var(--p); background: var(--pl); color: var(--pd); }
+.mq-toolbar-btn sup { font-size: 8px; vertical-align: super; }
+.mq-toolbar-btn sub { font-size: 8px; vertical-align: sub; }
 .step-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--p); color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.3s; }
 .step-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--navy); background: white; outline: none; }
@@ -310,35 +336,13 @@ body.high-contrast .input-bar textarea { background: #222; color: white; border-
 footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold); letter-spacing: 2px; border-top: 1px solid var(--border); }
 </style>
 </head>
-<script src="config.js"></script>
 <body data-mode="questioning">
 
 <!-- ROLE SELECTOR -->
 <div id="role-screen" style="display:flex;flex-direction:column;min-height:100vh">
   <header>
     <a class="logo-link" href="school.html">
-      <svg class="logo-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
-        <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
-        <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
-        <ellipse cx="88" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
-        <circle cx="88" cy="108" r="20" fill="#F4C97A"/>
-        <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#5C3A1E"/>
-        <path d="M68,100 Q65,113 67,126" fill="#5C3A1E"/>
-        <path d="M108,100 Q111,113 109,126" fill="#5C3A1E"/>
-        <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-        <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-        <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
-        <ellipse cx="172" cy="154" rx="20" ry="23" fill="#F8E4B0"/>
-        <circle cx="172" cy="113" r="18" fill="#F4C97A"/>
-        <ellipse cx="172" cy="98" rx="18" ry="9" fill="#4A3728"/>
-        <ellipse cx="157" cy="99" rx="6" ry="7" fill="#4A3728"/>
-        <ellipse cx="187" cy="99" rx="6" ry="7" fill="#4A3728"/>
-        <circle cx="166" cy="112" r="3" fill="#3D2B1F"/>
-        <circle cx="178" cy="112" r="3" fill="#3D2B1F"/>
-        <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
+      <div class="logo-mark">கே</div>
       <div><div class="lw">Kelvi</div><div class="ls">SCHOOL</div></div>
     </a>
   </header>
@@ -347,36 +351,10 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
     <p style="font-size:15px;color:#5F6B7A;margin-bottom:44px;max-width:380px;line-height:1.6">Kelvi helps students get to the answer by asking better questions.</p>
     <div class="role-cards">
       <div class="role-card" onclick="startAs('teacher')">
-        <svg width="68" height="68" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="130" cy="130" r="125" fill="#00827F"/>
-          <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.5"/>
-          <path d="M104,155 Q104,195 119,206 Q130,212 141,206 Q156,195 156,155 Q143,145 130,145 Q117,145 104,155Z" fill="#C9A84C"/>
-          <ellipse cx="130" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
-          <circle cx="130" cy="108" r="20" fill="#F4C97A"/>
-          <path d="M110,100 Q111,87 130,90 Q149,87 150,100" fill="#5C3A1E"/>
-          <path d="M110,100 Q107,113 109,126" fill="#5C3A1E"/>
-          <path d="M150,100 Q153,113 151,126" fill="#5C3A1E"/>
-          <ellipse cx="124" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-          <ellipse cx="136" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-          <path d="M124,117 Q130,122 136,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
         <h2>I'm a teacher</h2>
         <p>Set up the problem and mode, then share a link with students.</p>
       </div>
       <div class="role-card" onclick="startAs('student')">
-        <svg width="68" height="68" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="130" cy="130" r="125" fill="#00827F"/>
-          <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.5"/>
-          <path d="M104,158 Q104,190 117,199 Q130,205 143,199 Q156,190 156,158 Q143,148 130,148 Q117,148 104,158Z" fill="#E8F5F4"/>
-          <ellipse cx="130" cy="154" rx="22" ry="24" fill="#F8E4B0"/>
-          <circle cx="130" cy="112" r="18" fill="#F4C97A"/>
-          <ellipse cx="130" cy="97" rx="18" ry="9" fill="#4A3728"/>
-          <circle cx="123" cy="111" r="2.8" fill="#3D2B1F"/>
-          <circle cx="137" cy="111" r="2.8" fill="#3D2B1F"/>
-          <path d="M119,105 Q123,103 127,105" fill="none" stroke="#3D2B1F" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M133,105 Q137,103 141,105" fill="none" stroke="#3D2B1F" stroke-width="1.3" stroke-linecap="round"/>
-          <path d="M123,121 Q130,127 137,121" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
         <h2>I'm a student</h2>
         <p>Your teacher should have sent you a link. Click it to get started.</p>
       </div>
@@ -389,60 +367,68 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
 <div id="app-shell">
   <header>
     <a class="logo-link" href="school.html">
-      <svg class="logo-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
-        <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
-        <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
-        <ellipse cx="88" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
-        <circle cx="88" cy="108" r="20" fill="#F4C97A"/>
-        <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#5C3A1E"/>
-        <path d="M68,100 Q65,113 67,126" fill="#5C3A1E"/>
-        <path d="M108,100 Q111,113 109,126" fill="#5C3A1E"/>
-        <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-        <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
-        <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
-        <ellipse cx="172" cy="154" rx="20" ry="23" fill="#F8E4B0"/>
-        <circle cx="172" cy="113" r="18" fill="#F4C97A"/>
-        <ellipse cx="172" cy="98" rx="18" ry="9" fill="#4A3728"/>
-        <ellipse cx="157" cy="99" rx="6" ry="7" fill="#4A3728"/>
-        <ellipse cx="187" cy="99" rx="6" ry="7" fill="#4A3728"/>
-        <circle cx="166" cy="112" r="3" fill="#3D2B1F"/>
-        <circle cx="178" cy="112" r="3" fill="#3D2B1F"/>
-        <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
+      <div class="logo-mark">கே</div>
       <div><div class="lw">Kelvi</div><div class="ls">SCHOOL</div></div>
     </a>
     <div class="divider teacher-only"></div>
     <div class="mode-pills teacher-only">
       <button class="mp active" id="pill-q" onclick="setMode('questioning')">Questioning</button>
       <button class="mp" id="pill-g" onclick="setMode('guided')">Guided</button>
-      <button class="mp" id="pill-e" onclick="setMode('exploration')">Exploration</button>
+      <button class="mp" id="pill-quest" onclick="setMode('quest')">Quest Builder</button>
     </div>
     <div class="header-right">
       <span class="role-badge" id="role-badge">TEACHER</span>
+      <input type="password" class="header-api" id="api-key" placeholder="Anthropic API key" oninput="saveKey()">
     </div>
   </header>
 
   <!-- TEACHER SETUP -->
   <div id="teacher-setup">
     <div class="setup-heading">Set up your session</div>
-    <div class="setup-sub">Choose a mode, type the problem, then generate a link for your students. <a href="quest.html" style="color:var(--p);text-decoration:none;font-weight:500">Build a Quest →</a></div>
+    <div class="setup-sub">Choose a mode, type the problem, then generate a link for your students.</div>
 
     <span class="setup-label">Mode</span>
     <div class="mode-cards" id="mode-cards">
       <div class="mode-card-btn selected" id="mc-questioning" onclick="selectMode('questioning')">
         <div class="mc-name">Questioning</div>
-        <div class="mc-ages">Grades 6–12</div>
+        <div class="mc-desc">Students ask the questions. Kelvi coaches quality.</div>
       </div>
       <div class="mode-card-btn" id="mc-guided" onclick="selectMode('guided')">
         <div class="mc-name">Guided</div>
-        <div class="mc-ages">Grades 2–6</div>
+        <div class="mc-desc">Kelvi walks students through step by step.</div>
       </div>
-      <div class="mode-card-btn" id="mc-exploration" onclick="selectMode('exploration')">
-        <div class="mc-name">Exploration</div>
-        <div class="mc-ages">Any age</div>
+      <div class="mode-card-btn" id="mc-quest" onclick="selectMode('quest')">
+        <div class="mc-name">Quest Builder</div>
+        <div class="mc-desc">Generate rich problems by topic and context.</div>
       </div>
+    </div>
+
+    <div class="quest-panel" id="quest-panel">
+      <span class="setup-label">Topics</span>
+      <div class="quest-topics" id="quest-topics">
+        <div class="qt-tag" onclick="toggleQT(this)">Number sense</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Algebra</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Geometry</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Fractions</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Patterns</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Measurement</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Data & statistics</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Trigonometry</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Calculus</div>
+        <div class="qt-tag" onclick="toggleQT(this)">Functions</div>
+      </div>
+      <span class="setup-label">Grade band</span>
+      <div class="quest-grades">
+        <div class="qg-btn" onclick="selectQG(this,'K–2')">K–2</div>
+        <div class="qg-btn" onclick="selectQG(this,'2–3')">2–3</div>
+        <div class="qg-btn" onclick="selectQG(this,'4–5')">4–5</div>
+        <div class="qg-btn" onclick="selectQG(this,'6–8')">6–8</div>
+        <div class="qg-btn" onclick="selectQG(this,'9–12')">9–12</div>
+      </div>
+      <span class="setup-label">Real-world context (optional)</span>
+      <input type="text" class="quest-context" id="quest-context" placeholder="e.g. cricket scores, a recipe, building a treehouse...">
+      <button class="quest-generate" onclick="generateQuest()">Generate problems</button>
+      <div class="quest-output" id="quest-output"></div>
     </div>
 
     <span class="setup-label">Problem or context</span>
@@ -453,7 +439,37 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
       ondragleave="probDragLeave(event)"
       ondrop="probDrop(event)">
       <div class="prob-preview" id="prob-preview"></div>
-      <textarea class="prob-textarea" id="problem-input" placeholder="Type or paste the problem here..." rows="3"></textarea>
+      <textarea class="prob-textarea" id="problem-input" placeholder="Type or paste the problem text here..." rows="3"></textarea>
+      <div style="border-top:1px solid var(--border);padding:10px 14px">
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-size:10px;color:var(--muted);margin-right:4px">Insert math:</span>
+          <button class="mq-toolbar-btn" onclick="mqCmd('\\frac')" title="Fraction">a/b</button>
+          <button class="mq-toolbar-btn" onclick="mqCmd('^')" title="Exponent">x<sup>n</sup></button>
+          <button class="mq-toolbar-btn" onclick="mqCmd('_')" title="Subscript">x<sub>n</sub></button>
+          <button class="mq-toolbar-btn" onclick="mqCmd('\\sqrt')" title="Square root">&radic;</button>
+          <button class="mq-toolbar-btn" onclick="mqCmd('\\nthroot')" title="Nth root"><sup>n</sup>&radic;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\pi')" title="Pi">&pi;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\theta')" title="Theta">&theta;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\infty')" title="Infinity">&infin;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\sin(')" title="sin">sin</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\cos(')" title="cos">cos</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\tan(')" title="tan">tan</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\sin^{-1}(')" title="arcsin">sin<sup>-1</sup></button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\log(')" title="log">log</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\ln(')" title="ln">ln</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\le ')" title="Less than or equal">&le;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\ge ')" title="Greater than or equal">&ge;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\ne ')" title="Not equal">&ne;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\pm ')" title="Plus or minus">&plusmn;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\sum')" title="Sum">&Sigma;</button>
+          <button class="mq-toolbar-btn" onclick="mqWrite('\\int')" title="Integral">&int;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="mq-field" style="flex:1;min-height:36px;font-size:16px;padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;background:white"></span>
+          <button onclick="insertMath()" style="padding:7px 16px;border:1px solid var(--p);border-radius:8px;font-size:12px;cursor:pointer;background:var(--pl);color:var(--pd);font-weight:500;font-family:'DM Sans',sans-serif">Add to problem</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Type or click buttons above, then hit "Add to problem." Students will see formatted math.</div>
+      </div>
       <div class="prob-actions">
         <div class="plus-wrap">
           <button class="plus-btn" id="plus-btn" onclick="togglePlusMenu()" title="Add attachment">+</button>
@@ -519,8 +535,18 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
         <button class="db primary" onclick="plotExpr()">Plot</button>
         <button class="db" onclick="clearDesmos()">Clear</button>
         <button class="db" onclick="sendGraph()" style="border-color:#C9A84C;color:#8B6914">Send to Kelvi</button>
+        <button class="db" onclick="toggleDesmos()" style="margin-left:auto;font-size:16px;padding:4px 10px" title="Close graph">&times;</button>
       </div>
       <div id="dc"></div>
+    </div>
+
+    <div class="desmos-panel" id="geogebra-panel">
+      <div class="desmos-toolbar">
+        <span style="font-size:12px;font-weight:500;color:var(--pd)">GeoGebra Geometry</span>
+        <button class="db" onclick="sendGeogebra()" style="border-color:#C9A84C;color:#8B6914;margin-left:auto">Send to Kelvi</button>
+        <button class="db" onclick="toggleGeogebra()" style="font-size:16px;padding:4px 10px" title="Close geometry">&times;</button>
+      </div>
+      <div id="ggb-container" style="width:100%;height:400px"></div>
     </div>
 
     <div class="input-bar">
@@ -544,8 +570,10 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
 
     <div style="border-top:1px solid var(--border);background:var(--warm);padding:8px 24px;max-width:680px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
       <div class="bottom-actions">
-        <button class="bab" id="graph-btn" onclick="toggleDesmos()">Show graph</button>
+        <button class="bab" id="graph-btn" onclick="toggleDesmos()">Graph</button>
+        <button class="bab" id="ggb-btn" onclick="toggleGeogebra()">Geometry</button>
         <button class="bab gold" onclick="exportChat()">Copy transcript</button>
+        <span id="q-counter" style="font-size:11px;color:var(--pd);background:var(--pl);padding:4px 10px;border-radius:8px;display:none"></span>
       </div>
       <button class="end-btn" onclick="endSession()">End session</button>
     </div>
@@ -557,35 +585,76 @@ footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold);
 <script>
 // ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
 const PROMPTS = {
-questioning: `You are Kelvi in MATH QUESTIONING MODE. Develop students into better mathematical questioners — from procedural to conceptual to generative questions.
-CORE: The student asks the questions. You coach quality. Never drive. Never let a student stay lost.
-THREE QUESTION TYPES: PROCEDURAL "How do I...?" → CONCEPTUAL "Why does this work?" → GENERATIVE "What if I changed...?"
-RESPONSES: PROCEDURAL → nudge toward conceptual. CONCEPTUAL → name it, push deeper. GENERATIVE → celebrate, pursue it. STATEMENT → "Can you turn that into a question?"
-FRUSTRATION: Level 1 → smaller entry point. Level 2 → simpler parallel problem. Level 3 → first step as a question.
-RULES: Never give answers. Never confirm right/wrong. Never use correct/right/wrong/exactly/yes as affirmations. Every response ends with exactly one question. Two to three sentences max.
-CLOSING: Always name something specific the student did well. "What question are you leaving with?"`,
+questioning: `You are Kelvi in MATH QUESTIONING MODE. Your job is to develop students into mathematical questioners — people who generate their own questions, not just answer yours.
 
-guided: `You are Kelvi in MATH GUIDED ACTIVITY MODE — warm, patient, for younger students. Guide through structured activities one step at a time.
-TONE: Simple vocabulary. Warm. Celebrate small wins. ONE question per response.
-RULES: Never give the answer. Short sentences. If stuck: offer simpler version. Never use correct/right/wrong.
-CLOSING: "What's one thing you understand now that you didn't before?"`,
+CORE PHILOSOPHY: The student should ask MORE questions than you do. You are not an interrogator. You are a thinking partner who creates space for curiosity. If you find yourself asking all the questions, you are doing it wrong.
 
-exploration: `You are Kelvi in MATH EXPLORATION MODE. No problem to solve. No right answer. Follow the student's mathematical curiosity wherever it leads.
-TONE: Open, delighted, genuinely curious. You are exploring together.
-APPROACH: Respond to whatever the student notices. "What else do you notice?" "What happens if you look differently?" "Does this always happen?" When student conjectures, don't confirm — help them test it.
-RULES: Every response ends with exactly one question. Never redirect to a correct path. Follow the student always.
-CLOSING: "What was the most interesting thing you discovered?"` };
+THREE QUESTION TYPES (classify silently, never label out loud):
+- PROCEDURAL: "How do I...?" — the starting point
+- CONCEPTUAL: "Why does this work?" — the target
+- GENERATIVE: "What if I changed...?" — the highest level
+
+YOUR FIVE MOVES:
+
+MOVE 1 — SILENCE. After naming what the student did, sometimes end with an observation and NO question. "I notice you're on to something here." Full stop. Let the student decide what to do next. Use this after every 2-3 exchanges to create space.
+
+MOVE 2 — INVITE QUESTIONS. After the student has built enough understanding: "You've been sitting with this for a while. What's one thing you're still wondering about?" or "What question is forming in your mind right now?"
+
+MOVE 3 — REWARD QUESTIONS. When a student asks a question, respond with noticeably more energy and engagement than when they make a statement. "Now THAT is a question worth exploring." Make asking feel better than telling.
+
+MOVE 4 — THE "WHAT IF" NUDGE. When a student reaches a conclusion: "You figured that out. Now — what would you change about this problem to make it more interesting?" This shifts them from solver to poser.
+
+MOVE 5 — FOLLOW, DON'T LEAD. When a student asks a question, pursue THEIR question. Don't redirect to your own agenda. Their question is the curriculum now.
+
+WHEN TO ASK vs WHEN NOT TO:
+- Ask when the student is stuck and needs an entry point
+- Ask when the student made an observation but hasn't connected it yet
+- DO NOT ask when the student is building momentum — get out of the way
+- DO NOT ask when the student just asked YOU something — answer their question with a question that deepens THEIRS, not one that changes the subject
+
+FRUSTRATION PROTOCOL:
+- Level 1 (one "I don't know") → offer a smaller entry point
+- Level 2 (two confusions) → offer a simpler parallel problem
+- Level 3 ("I give up" / 3+ confusions) → offer the first step as a question yourself
+
+RULES: Never give answers. Never confirm right or wrong. Never use correct/right/wrong/exactly/yes as affirmations. Keep responses to 2-4 sentences. Not every response needs to end with a question — sometimes silence is more powerful.
+
+VISUALS: When a visual would help — a number line, fraction bar, array of dots, geometric shape, coordinate grid — include an inline SVG in your response. Keep it simple: under 10 elements, max 300px wide, use fill="#00827F" for main elements and fill="#C9A84C" for accents.
+
+CLOSING: Name something specific the student did well. Tell them how many questions they asked. End with: "What question are you leaving with?"`,
+
+guided: `You are Kelvi in MATH GUIDED ACTIVITY MODE — a warm, patient companion for younger students.
+
+CORE PHILOSOPHY: Even young children can ask questions. Your job is not just to guide — it is to help them discover they have questions worth asking. Every session should end with the child asking YOU something.
+
+TONE: Simple vocabulary. Warm and encouraging. Celebrate small wins genuinely.
+
+YOUR APPROACH:
+- Guide with warmth. One step at a time. Concrete examples.
+- After every 2-3 steps, pause and ask: "What do you notice?" or "Does anything surprise you?"
+- After the child completes a step successfully, sometimes say: "You did that! Is there anything you're wondering about?" Then wait.
+- Never say correct/right/wrong/exactly. Say "I like how you noticed that" or "That's interesting thinking."
+- When a child asks ANY question, celebrate it: "I love that question! Let's think about it together."
+- Near the end: "You've been thinking hard. What's one question you want to ask me before we finish?"
+
+RULES: Never give the answer directly. Keep it simple and warm. Not every response needs a question — sometimes "I notice you're thinking about something" is enough.
+
+VISUALS: When a picture would help a young learner — dots in groups, shapes, a number line, fraction circles — include a simple inline SVG. Keep it very simple: bright colors, large shapes, max 250px wide. Use fill="#00827F" and fill="#C9A84C".
+
+CLOSING: "Look at everything you did today. You asked some great questions! What's one more question you want to take with you?"`,
+
+};
 
 const OPENING = {
   questioning: "Look at the problem. What is your first question?",
   guided: "Let's explore this together, one step at a time. Look at the first step — what do you notice?",
-  exploration: "Here is something mathematical. Take a moment and look at it. What do you notice first?"
 };
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let role = 'teacher';
 let mode = 'questioning';
 let msgs = [];
+let studentQuestionCount = 0;
 let pendingImgs = [];
 let probImg = null;
 let steps = [];
@@ -641,7 +710,7 @@ function loadFromURL() {
   if (prob) {
     const chp = document.getElementById('chp');
     chp.classList.add('visible');
-    document.getElementById('chp-text').textContent = prob;
+    document.getElementById('chp-text').innerHTML = renderMathInText(eh(prob));
   }
   resetChat();
 }
@@ -650,23 +719,82 @@ function loadFromURL() {
 function setMode(m) {
   mode = m;
   document.body.setAttribute('data-mode', m);
-  ['questioning','guided','exploration'].forEach(x => {
-    document.getElementById('pill-'+x[0]).classList.toggle('active', x === m);
-  });
+  document.getElementById('pill-q').classList.toggle('active', m === 'questioning');
+  document.getElementById('pill-g').classList.toggle('active', m === 'guided');
+  document.getElementById('pill-quest').classList.toggle('active', m === 'quest');
   selectMode(m);
 }
 
 function selectMode(m) {
   mode = m;
   document.body.setAttribute('data-mode', m);
-  ['questioning','guided','exploration'].forEach(x => {
+  ['questioning','guided','quest'].forEach(x => {
     const el = document.getElementById('mc-'+x);
     if (el) el.classList.toggle('selected', x === m);
-    const pill = document.getElementById('pill-'+x[0]);
-    if (pill) pill.classList.toggle('active', x === m);
   });
+  document.getElementById('pill-q').classList.toggle('active', m === 'questioning');
+  document.getElementById('pill-g').classList.toggle('active', m === 'guided');
+  document.getElementById('pill-quest').classList.toggle('active', m === 'quest');
   const stepsSection = document.getElementById('steps-section');
   if (stepsSection) stepsSection.classList.toggle('visible', m === 'guided');
+  const questPanel = document.getElementById('quest-panel');
+  if (questPanel) questPanel.classList.toggle('visible', m === 'quest');
+}
+
+// ── QUEST BUILDER ─────────────────────────────────────────────────────────────
+let questTopics = [];
+let questGrade = '';
+
+function toggleQT(el) {
+  el.classList.toggle('selected');
+  questTopics = Array.from(document.querySelectorAll('.qt-tag.selected')).map(t => t.textContent);
+}
+
+function selectQG(el, grade) {
+  document.querySelectorAll('.qg-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  questGrade = grade;
+}
+
+async function generateQuest() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { alert('Please enter your Anthropic API key.'); return; }
+  if (questTopics.length === 0) { alert('Please select at least one topic.'); return; }
+  if (!questGrade) { alert('Please select a grade band.'); return; }
+
+  const context = document.getElementById('quest-context').value.trim();
+  const out = document.getElementById('quest-output');
+  out.style.display = 'block';
+  out.textContent = 'Generating problems...';
+
+  const prompt = `Generate 4 rich mathematical problems for grades ${questGrade} covering: ${questTopics.join(', ')}.${context ? ' Use this real-world context: ' + context + '.' : ''} 
+
+Each problem should:
+- Be a provocation that invites thinking, not just computation
+- Have multiple entry points
+- End with a space for the student to ask their own question
+
+Format each problem with a number and clear separation. After the 4 problems, add a section called "What do you notice? What do you wonder?" with 3 blank lines for student responses.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1500, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content[0].text;
+    out.innerHTML = text.replace(/\n/g, '<br>') + '<br><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="quest-use-btn" onclick="useQuest()">Use in session</button><button class="quest-use-btn" style="background:var(--gold)" onclick="printQuest()">Print / Save PDF</button></div>';
+  } catch (err) {
+    out.textContent = 'Error generating problems. Check your API key.';
+  }
+}
+
+function useQuest() {
+  const out = document.getElementById('quest-output');
+  const text = out.innerText.replace('Use these problems in a session', '').trim();
+  document.getElementById('problem-input').value = text;
+  setMode('questioning');
 }
 
 // ── STEPS ─────────────────────────────────────────────────────────────────────
@@ -823,8 +951,21 @@ function renderChatImgs() {
 }
 function rmChatImg(i) { pendingImgs.splice(i,1); renderChatImgs(); }
 function eh(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderReply(text) {
+  const svgMatch = text.match(/<svg[\s\S]*?<\/svg>/i);
+  if (svgMatch) {
+    const before = text.slice(0, text.indexOf(svgMatch[0]));
+    const after = text.slice(text.indexOf(svgMatch[0]) + svgMatch[0].length);
+    return (before ? '<p style="margin-bottom:8px">' + eh(before.trim()) + '</p>' : '') +
+      '<div style="max-width:300px;margin:8px 0;border-radius:8px;overflow:hidden;background:white;padding:8px">' + svgMatch[0] + '</div>' +
+      (after.trim() ? '<p style="margin-top:8px">' + eh(after.trim()) + '</p>' : '');
+  }
+  return eh(text);
+}
 
 async function sendMessage() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { alert('Please enter your Anthropic API key in the top bar.'); return; }
   const inp = document.getElementById('chat-input');
   const text = inp.value.trim();
   if (!text && pendingImgs.length === 0) return;
@@ -833,6 +974,7 @@ async function sendMessage() {
   let uc = [];
   pendingImgs.forEach(img => { const[m,b]=img.data.split(','); uc.push({type:'image',source:{type:'base64',media_type:m.match(/:(.*?);/)[1],data:b}}); });
   if (probImg && msgs.length===0) { const[m,b]=probImg.split(','); uc.unshift({type:'image',source:{type:'base64',media_type:m.match(/:(.*?);/)[1],data:b}}); }
+  // Attach pending PDF if present
   if (window._pendingPDF) {
     const pdfData = await new Promise(res => { const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(window._pendingPDF); });
     const[m,b]=pdfData.split(',');
@@ -843,10 +985,12 @@ async function sendMessage() {
   if (text) uc.push({type:'text',text});
   if (uc.length===1&&uc[0].type==='text') uc = text;
   const qtype = classifyQ(text);
+  if (qtype) studentQuestionCount++;
   let display = pendingImgs.map(img=>`<img src="${img.data}" style="max-width:180px;border-radius:6px;display:block;margin-bottom:4px">`).join('');
   if (qtype) display += `<div class="qbadge ${qtype}">${{P:'Procedural',C:'Conceptual',G:'Generative'}[qtype]}</div>`;
   display += text ? eh(text) : '';
   appendMsg('student', display);
+  updateQuestionCounter();
   msgs.push({role:'user',content:uc});
   pendingImgs=[]; renderChatImgs(); inp.value='';
   document.getElementById('send-btn').disabled = true;
@@ -855,12 +999,12 @@ async function sendMessage() {
   if (prob) sys += `\n\nProblem: ${prob}`;
   if (stxt) sys += `\n\nActivity steps:\n${stxt}`;
   try {
-    const res = await fetch(KELVI_API_BASE + '/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages:msgs})});
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages:msgs})});
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
     const reply = data.content[0].text;
     msgs.push({role:'assistant',content:reply});
-    appendMsg('kelvi', eh(reply));
+    appendMsg('kelvi', renderReply(reply));
   } catch(err) { appendMsg('kelvi',`<span style="color:var(--pd)">Something went wrong. Please try again.</span>`); }
   document.getElementById('typing').classList.remove('visible');
   document.getElementById('send-btn').disabled = false;
@@ -877,6 +1021,14 @@ function appendMsg(role, html) {
 }
 
 function endSession() { if(confirm('End this session?')) window.location.href='school.html'; }
+
+function updateQuestionCounter() {
+  const el = document.getElementById('q-counter');
+  if (studentQuestionCount > 0) {
+    el.style.display = 'inline-block';
+    el.textContent = studentQuestionCount + ' question' + (studentQuestionCount===1?'':'s') + ' asked';
+  }
+}
 
 function exportChat() {
   const msgs2 = document.querySelectorAll('.message');
@@ -917,8 +1069,8 @@ function initDesmos() { if(calc)return; calc=Desmos.GraphingCalculator(document.
 function toggleDesmos() {
   desmosOpen=!desmosOpen;
   document.getElementById('desmos-panel').classList.toggle('open',desmosOpen);
-  document.getElementById('graph-btn').textContent=desmosOpen?'Hide graph':'Show graph';
-  if(desmosOpen) initDesmos();
+  document.getElementById('graph-btn').textContent=desmosOpen?'Hide graph':'Graph';
+  if(desmosOpen) { initDesmos(); if(ggbOpen) toggleGeogebra(); }
 }
 function plotExpr() { const e=document.getElementById('desmos-expr').value.trim(); if(!e)return; initDesmos(); calc.setExpression({id:'e'+(++exprCount),latex:e}); document.getElementById('desmos-expr').value=''; }
 function clearDesmos() { if(calc){calc.setBlank();exprCount=0;} }
@@ -931,7 +1083,127 @@ function sendGraph() {
   i.focus();
 }
 
+// ── GEOGEBRA ─────────────────────────────────────────────────────────────────
+let ggbOpen = false;
+let ggbApp = null;
+function initGeogebra() {
+  if (ggbApp) return;
+  const script = document.createElement('script');
+  script.src = 'https://www.geogebra.org/apps/deployggb.js';
+  script.onload = function() {
+    ggbApp = new GGBApplet({
+      appName: 'geometry',
+      width: document.getElementById('ggb-container').offsetWidth,
+      height: 400,
+      showToolBar: true,
+      showAlgebraInput: false,
+      showMenuBar: false,
+      borderColor: '#E8E4E0',
+      enableRightClick: false
+    }, true);
+    ggbApp.inject('ggb-container');
+  };
+  document.head.appendChild(script);
+}
+function toggleGeogebra() {
+  ggbOpen = !ggbOpen;
+  document.getElementById('geogebra-panel').classList.toggle('open', ggbOpen);
+  document.getElementById('ggb-btn').textContent = ggbOpen ? 'Hide geometry' : 'Geometry';
+  if (ggbOpen) { initGeogebra(); if(desmosOpen) toggleDesmos(); }
+}
+function sendGeogebra() {
+  const i = document.getElementById('chat-input');
+  i.value = 'I made a geometric construction. Can you ask me a question about what I see?';
+  i.focus();
+}
+
+// ── MATHQUILL ────────────────────────────────────────────────────────────────
+let mqField = null;
+function initMathQuill() {
+  if (typeof MathQuill === 'undefined') return;
+  const MQ = MathQuill.getInterface(2);
+  const el = document.getElementById('mq-field');
+  if (el && !mqField) {
+    mqField = MQ.MathField(el, {
+      spaceBehavesLikeTab: true,
+      handlers: {
+        enter: function() { insertMath(); }
+      }
+    });
+  }
+}
+function mqCmd(cmd) {
+  if (!mqField) return;
+  mqField.cmd(cmd);
+  mqField.focus();
+}
+function mqWrite(latex) {
+  if (!mqField) return;
+  mqField.write(latex);
+  mqField.focus();
+}
+function insertMath() {
+  if (!mqField) return;
+  const latex = mqField.latex();
+  if (!latex) return;
+  const ta = document.getElementById('problem-input');
+  const pos = ta.selectionStart;
+  const before = ta.value.substring(0, pos);
+  const after = ta.value.substring(pos);
+  ta.value = before + '$$' + latex + '$$' + after;
+  mqField.latex('');
+  ta.focus();
+}
+function renderMathInText(text) {
+  if (typeof katex === 'undefined') return text;
+  return text.replace(/\$\$(.*?)\$\$/g, function(match, latex) {
+    try {
+      return katex.renderToString(latex, { throwOnError: false, displayMode: false });
+    } catch(e) { return match; }
+  });
+}
+
+// ── QUEST PDF ────────────────────────────────────────────────────────────────
+function printQuest() {
+  const out = document.getElementById('quest-output');
+  const text = out.innerText.replace('Use in session', '').replace('Print / Save PDF', '').trim();
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Kelvi Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{font-family:'DM Sans',sans-serif;max-width:700px;margin:40px auto;padding:0 24px;color:#1A1A2E;line-height:1.7;font-size:14px}
+h1{font-family:'DM Serif Display',serif;font-size:22px;color:#00827F;margin-bottom:4px}
+.sub{font-size:12px;color:#5F6B7A;margin-bottom:24px}
+.bar{height:3px;background:#00827F;width:60px;margin-bottom:20px;border-radius:2px}
+.footer{margin-top:40px;padding-top:12px;border-top:1px solid #E8E4E0;font-size:10px;color:#C9A84C;letter-spacing:2px;text-align:center}
+.notice-box{margin-top:32px;padding:16px;border:2px solid #C9A84C;border-radius:10px}
+.notice-box h3{font-family:'DM Serif Display',serif;font-size:14px;color:#C9A84C;margin-bottom:6px}
+.notice-line{border-bottom:1px solid #E8E4E0;height:28px;margin-bottom:4px}
+@media print{body{margin:20px auto}}
+</style></head><body>
+<h1>Kelvi Quest</h1>
+<div class="sub">${questTopics.join(', ')} · ${questGrade}</div>
+<div class="bar"></div>
+${text.split('\n').map(l => l.trim() ? '<p>' + l + '</p>' : '').join('\n')}
+<div class="notice-box">
+<h3>What do you notice? What do you wonder?</h3>
+<div class="notice-line"></div>
+<div class="notice-line"></div>
+<div class="notice-line"></div>
+</div>
+<div class="footer">The question is the answer.</div>
+</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+
+// ── KEY STORAGE ───────────────────────────────────────────────────────────────
+function saveKey(){localStorage.setItem('kelvi-key',document.getElementById('api-key').value);}
+function loadKey(){const k=localStorage.getItem('kelvi-key');if(k)document.getElementById('api-key').value=k;}
+
+loadKey();
 loadFromURL();
+setTimeout(initMathQuill, 500);
 </script>
 </body>
 </html>

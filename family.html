@@ -3,2172 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kelvi Family — Math for Curious Minds</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<title>Kelvi Family</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --peacock: #00827F; --peacock-dark: #006B68; --peacock-light: #F0FAF9;
-  --gold: #C9A84C; --gold-light: #FDF6E3;
-  --navy: #1A1A2E; --gray: #5F6B7A; --warm: #F8F7F4; --border: #E8E4E0;
-}
+:root{--peacock:#00827F;--peacock-dark:#006B68;--peacock-light:#F0FAF9;--gold:#C9A84C;--gold-light:#FDF6E3;--navy:#1A1A2E;--gray:#5F6B7A;--warm:#FBF9F5;--off:#F3F0EA;--border:#E8E4E0;--amber:#BA7517;--teal-s:#0F6E56;--purple:#534AB7;--coral:#993C1D;--blue:#185FA5;--pink:#D4537E;--neutral:#888780}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--navy);min-height:100vh}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--warm); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+/* NAV - warmer, rounder */
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:var(--peacock);border-bottom:3px solid var(--gold)}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-mark{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold);font-weight:500}
+.nav-word{font-family:'DM Serif Display',serif;font-size:18px;color:white}
+.nav-fam{font-size:11px;color:rgba(255,255,255,0.6);margin-left:4px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-link{text-decoration:none;color:rgba(255,255,255,0.7);padding:7px 14px;border-radius:20px;cursor:pointer;transition:all .15s;font-size:12px}
+.nav-link:hover{background:rgba(255,255,255,0.15);color:white}
+.nav-link.active{background:white;color:var(--peacock);font-weight:500}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:white;cursor:pointer;border:2px solid rgba(255,255,255,0.3)}
 
-/* ── SCREENS ── */
-.screen { display: none; flex-direction: column; min-height: 100vh; }
-.screen.active { display: flex; }
+/* SCREENS */
+.screen{display:none}.screen.active{display:block}
 
-/* ── NAV ── */
-nav {
-  background: var(--peacock); padding: 12px 24px; display: flex; align-items: center;
-  gap: 12px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.1);
-}
-.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
-.nav-mark { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.15); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--gold); }
-.nav-wordmark { font-family: 'DM Serif Display', serif; font-size: 20px; color: white; }
-.nav-family { font-size: 11px; color: var(--gold); letter-spacing: 2px; margin-top: 1px; }
-.nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-.nav-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 6px 14px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.4); background: transparent; color: rgba(255,255,255,.8); cursor: pointer; transition: all .2s; }
-.nav-btn:hover { background: rgba(255,255,255,.15); color: white; }
-.nav-btn.active { background: white; color: var(--peacock); border-color: white; }
+/* WELCOME - playful, centered */
+.welcome{text-align:center;padding:100px 24px 60px;max-width:460px;margin:0 auto}
+.welcome-k{width:80px;height:80px;border-radius:50%;background:var(--peacock);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold);margin:0 auto 28px;animation:bobble 3s ease-in-out infinite}
+@keyframes bobble{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.welcome h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,42px);margin-bottom:10px;color:var(--navy)}
+.welcome p{font-size:16px;color:var(--gray);line-height:1.6;margin-bottom:36px}
+.welcome-input{display:flex;gap:10px;max-width:320px;margin:0 auto}
+.welcome-input input{flex:1;padding:14px 18px;border:2px solid var(--border);border-radius:16px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;background:white}
+.welcome-input input:focus{border-color:var(--peacock)}
+.btn{background:var(--peacock);color:white;border:none;padding:14px 28px;border-radius:16px;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s}
+.btn:hover{background:var(--peacock-dark);transform:translateY(-1px)}
 
-/* ── ENTRY SCREEN ── */
-#screen-entry {
-  align-items: center; justify-content: center; text-align: center; padding: 60px 24px;
-  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(0,130,127,0.07) 0%, transparent 70%);
-}
-.entry-mark { width: 80px; height: 80px; border-radius: 50%; background: var(--peacock); border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--gold); margin: 0 auto 24px; }
-#screen-entry h1 { font-family: 'DM Serif Display', serif; font-size: clamp(32px,6vw,52px); color: var(--navy); margin-bottom: 10px; line-height: 1.15; }
-#screen-entry .tagline { font-family: 'DM Serif Display', serif; font-size: 18px; font-style: italic; color: var(--gold); margin-bottom: 14px; }
-#screen-entry p { font-size: 16px; color: var(--gray); max-width: 440px; margin: 0 auto 48px; line-height: 1.7; }
-.entry-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-.entry-card { width: 220px; padding: 32px 24px; border-radius: 20px; border: 2px solid var(--border); background: white; cursor: pointer; transition: all .2s; text-align: center; }
-.entry-card:hover { border-color: var(--peacock); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,130,127,0.1); }
-.entry-card .ec-icon { margin-bottom: 14px; display: flex; justify-content: center; }
-.entry-card h2 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
-.entry-card p { font-size: 13px; color: var(--gray); line-height: 1.5; }
+/* THREAD MAP - card-based, not grid */
+.map-wrap{max-width:1000px;margin:0 auto;padding:40px 24px 60px}
+.map-wrap h2{font-family:'DM Serif Display',serif;font-size:clamp(26px,4vw,34px);margin-bottom:6px;text-align:center}
+.map-sub{font-size:14px;color:var(--gray);margin-bottom:32px;text-align:center}
+.strand-cards{display:flex;flex-direction:column;gap:16px}
+.strand-row{background:white;border-radius:20px;border:1.5px solid var(--border);overflow:hidden;transition:all .15s}
+.strand-row:hover{border-color:var(--peacock)}
+.strand-header{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer}
+.strand-icon{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.strand-name{font-size:16px;font-weight:500;flex:1}
+.strand-arrow{font-size:14px;color:var(--gray);transition:transform .2s}
+.strand-row.open .strand-arrow{transform:rotate(90deg)}
+.strand-body{display:none;padding:0 20px 16px}
+.strand-row.open .strand-body{display:block}
+.thread-chips{display:flex;gap:8px;flex-wrap:wrap}
+.thread-chip{background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;cursor:pointer;transition:all .12s;flex:1;min-width:140px}
+.thread-chip:hover{border-color:var(--peacock);background:var(--peacock-light);transform:translateY(-2px)}
+.tc-thread{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:4px}
+.tc-topics{font-size:12px;color:var(--navy);line-height:1.45}
+.tc-topics span{display:block}
 
-/* ── ADD CHILD SCREEN ── */
-#screen-add-child { align-items: center; justify-content: center; padding: 60px 24px; }
-#screen-add-child main { width: 100%; max-width: 480px; }
-#screen-add-child h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--navy); margin-bottom: 6px; }
-#screen-add-child .sub { font-size: 14px; color: var(--gray); margin-bottom: 32px; line-height: 1.6; }
-.field-group { margin-bottom: 20px; }
-.field-label { display: block; font-size: 11px; letter-spacing: 2px; color: #888780; text-transform: uppercase; margin-bottom: 8px; }
-.field-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--navy); background: white; outline: none; transition: border-color 0.15s; }
-.field-input:focus { border-color: var(--peacock); }
-.style-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.style-card { padding: 14px 10px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; text-align: center; transition: all 0.15s; }
-.style-card:hover { border-color: var(--peacock); }
-.style-card.selected { border-color: var(--peacock); background: var(--peacock-light); }
-.style-card .sc-icon { font-size: 24px; margin-bottom: 6px; }
-.style-card .sc-name { font-size: 12px; font-weight: 500; color: var(--navy); margin-bottom: 3px; }
-.style-card .sc-desc { font-size: 10px; color: var(--gray); line-height: 1.4; }
-.add-child-btn { width: 100%; padding: 14px; background: var(--navy); color: white; border: none; border-radius: 12px; font-family: 'DM Serif Display', serif; font-size: 16px; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
-.add-child-btn:hover { background: #2a2a4a; }
+/* PROVOCATION VIEW */
+.prov-layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 60px)}
+@media(max-width:860px){.prov-layout{grid-template-columns:1fr}.sb{display:none}}
+.sb{background:white;border-right:1.5px solid var(--border);padding:20px 0}
+.sb-back{display:flex;align-items:center;gap:6px;padding:10px 18px;margin-bottom:12px;font-size:13px;color:var(--peacock);cursor:pointer;border-radius:0 12px 12px 0;transition:background .1s}
+.sb-back:hover{background:var(--peacock-light)}
+.sb-label{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;padding:0 18px;margin-bottom:10px}
+.sb-thread{display:flex;gap:3px;padding:0 18px 16px}
+.sb-tp{height:6px;flex:1;border-radius:3px;background:var(--off)}
+.sb-tp-d{background:var(--peacock)}
+.sb-tp-n{background:#5DCAA5}
+.sb-item{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;cursor:pointer;transition:all .1s;border-radius:0 14px 14px 0;margin-right:8px}
+.sb-item:hover{background:var(--peacock-light)}
+.sb-item.act{background:#E1F5EE;border-right:3px solid var(--peacock)}
+.sb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--border)}
+.sb-dot-d{background:var(--peacock);border-color:var(--peacock)}
+.sb-dot-n{background:#5DCAA5;border-color:#5DCAA5}
+.sb-nm{font-weight:500;font-size:12px}
+.sb-tp2{font-size:10px;color:var(--gray)}
+.sb-ck{font-size:12px;color:var(--teal-s);margin-left:auto}
 
-/* ── ASSESSMENT SCREEN ── */
-#screen-assessment { flex-direction: column; }
-#screen-assessment main { flex: 1; max-width: 640px; width: 100%; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; }
-.assess-progress { display: flex; gap: 6px; margin-bottom: 32px; }
-.assess-pip { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
-.assess-pip.done { background: var(--peacock); }
-.assess-pip.active { background: var(--gold); }
-.assess-moment { flex: 1; display: none; flex-direction: column; }
-.assess-moment.active { display: flex; }
-.assess-kelvi { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 24px; }
-.assess-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--peacock); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-.assess-bubble { background: white; border: 1px solid var(--border); border-radius: 14px; border-bottom-left-radius: 4px; padding: 14px 16px; font-size: 15px; line-height: 1.7; color: var(--navy); flex: 1; }
-.assess-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.assess-option { padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; font-size: 14px; color: var(--nav); text-align: left; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
-.assess-option:hover { border-color: var(--peacock); background: var(--peacock-light); }
-.assess-option.selected { border-color: var(--peacock); background: var(--peacock-light); color: var(--peacock-dark); }
-.assess-free { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--navy); background: white; outline: none; resize: none; min-height: 80px; transition: border-color 0.15s; margin-bottom: 16px; }
-.assess-free:focus { border-color: var(--peacock); }
-.assess-next-btn { align-self: flex-end; padding: 12px 28px; background: var(--peacock); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
-.assess-next-btn:hover { background: var(--peacock-dark); }
-.assess-next-btn:disabled { background: var(--muted, #B4B2A9); cursor: not-allowed; }
+/* MAIN CONTENT - larger, rounder */
+.pm{padding:32px 40px;overflow-y:auto;background:var(--warm)}
+.pm-badge{font-size:11px;font-weight:500;color:#085041;background:#E1F5EE;display:inline-block;padding:4px 12px;border-radius:10px;margin-bottom:6px}
+.pm-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px}
+.pm-sub{font-size:13px;color:var(--gray);margin-bottom:24px}
+.steps{display:flex;align-items:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.st{font-size:11px;padding:6px 14px;border-radius:12px}
+.st-d{background:var(--off);color:var(--gray)}
+.st-n{background:#E1F5EE;color:#085041;font-weight:500}
+.st-f{background:var(--off);color:var(--gray);opacity:.4}
+.st-a{font-size:10px;color:var(--gray)}
 
-/* ── WEEKLY PLAN ── */
-.plan-day { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
-.plan-day-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.plan-day-name { font-size: 11px; letter-spacing: 2px; color: var(--peacock); text-transform: uppercase; font-weight: 500; }
-.plan-day-type { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: var(--peacock-light); color: var(--peacock-dark); }
-.plan-day-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--navy); margin-bottom: 6px; }
-.plan-day-desc { font-size: 13px; color: var(--gray); line-height: 1.6; }
-.plan-loading { text-align: center; padding: 32px; color: var(--gray); font-style: italic; }
-.child-profile-card { background: white; border-radius: 14px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
-.cp-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-.cp-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--peacock); color: white; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 20px; flex-shrink: 0; }
-.cp-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy); }
-.cp-level { font-size: 12px; color: var(--gray); margin-top: 2px; }
-.cp-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.cp-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: var(--peacock-light); color: var(--peacock-dark); }
-.cp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.cp-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--gray); cursor: pointer; transition: all 0.15s; }
-.cp-btn:hover { border-color: var(--peacock); color: var(--peacock); }
-.cp-btn.primary { background: var(--peacock); color: white; border-color: var(--peacock); }
-.cp-btn.primary:hover { background: var(--peacock-dark); }
-#screen-age {
-  align-items: center; justify-content: center; text-align: center; padding: 60px 24px;
-  background: var(--peacock); min-height: 100vh;
-}
-#screen-age main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; }
-#screen-age h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px,5vw,42px); color: white; margin-bottom: 10px; }
-#screen-age p { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
-.age-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-.age-card {
-  width: 160px; padding: 28px 20px; border-radius: 20px; border: 2px solid var(--border);
-  background: white; cursor: pointer; transition: all .2s; text-align: center;
-}
-.age-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-.age-card.age-young:hover { border-color: #F59E0B; }
-.age-card.age-mid:hover { border-color: var(--peacock); }
-.age-card.age-older:hover { border-color: #5B4BB0; }
-.age-card .ac-icon { font-size: 36px; margin-bottom: 12px; }
-.age-card .ac-age { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 4px; }
-.age-card .ac-label { font-size: 12px; color: var(--gray); }
-.back-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--gray); background: none; border: none; cursor: pointer; margin-top: 24px; text-decoration: underline; }
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
 
-/* ── WORLD SCREEN ── */
-#screen-worlds { flex-direction: column; }
-#screen-worlds main { flex: 1; padding: 32px 24px; max-width: 1000px; width: 100%; margin: 0 auto; }
-#screen-worlds h1 { font-family: 'DM Serif Display', serif; font-size: clamp(26px,4vw,38px); color: var(--navy); margin-bottom: 6px; }
-#screen-worlds .sub { font-size: 15px; color: var(--gray); margin-bottom: 32px; }
-.worlds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+/* PROBLEM CARD - warm, illustrated feel */
+.pc{background:white;border:1.5px solid var(--border);border-radius:20px;padding:24px;transition:border-color .15s}
+.pc:hover{border-color:var(--peacock)}
+.pc-emoji{font-size:40px;margin-bottom:12px;display:block}
+.pc-text{font-size:16px;line-height:1.65;font-weight:500;margin-bottom:16px}
+.pc-vis{background:var(--gold-light);border-radius:14px;padding:20px;text-align:center;font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;color:var(--navy);margin-bottom:18px;border:1.5px solid rgba(201,168,76,0.2)}
+.choices{display:flex;flex-direction:column;gap:8px}
+.ch{display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--border);border-radius:14px;font-size:14px;cursor:pointer;transition:all .12s}
+.ch:hover{border-color:var(--peacock);background:var(--peacock-light);transform:translateX(4px)}
+.ch.sel{border-color:var(--peacock);background:#E1F5EE}
+.ch-l{width:28px;height:28px;border-radius:50%;background:var(--off);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--gray);flex-shrink:0}
+.ch.sel .ch-l{background:var(--peacock);color:white}
 
-.world-card {
-  border-radius: 20px; padding: 0; cursor: pointer; transition: all .25s;
-  overflow: hidden; border: 2px solid transparent; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.world-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); border-color: var(--border); }
-.world-card:active { transform: translateY(-2px); }
+/* CONVERSATION - bubbly */
+.convo{display:flex;flex-direction:column;gap:10px}
+.kb{background:white;border:1.5px solid var(--border);border-radius:18px;border-bottom-left-radius:6px;padding:14px 16px;max-width:95%}
+.kn{font-size:10px;font-weight:500;color:var(--peacock);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.kn::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--peacock)}
+.kt{font-size:14px;line-height:1.55;color:var(--gray)}
+.cb{background:var(--peacock);border-radius:18px;border-bottom-right-radius:6px;padding:14px 16px;max-width:85%;align-self:flex-end}
+.ct2{font-size:14px;line-height:1.55;color:white}
 
-.world-art {
-  height: 140px; display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-}
+/* ASK BOX - gold, inviting */
+.ab{border:2.5px solid var(--gold);border-radius:18px;padding:18px;margin-top:14px;background:rgba(253,246,227,0.3)}
+.ab-l{font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.5px;margin-bottom:6px}
+.ab-p{font-size:14px;line-height:1.5;margin-bottom:12px}
+.ab-r{display:flex;gap:6px}
+.ab-i{flex:1;border:2px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14px;background:white;outline:none;font-family:'DM Sans',sans-serif}
+.ab-i:focus{border-color:var(--gold)}
+.ab-b{background:var(--gold);color:white;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.ab-b:hover{transform:translateY(-1px)}
+.mic{background:white;border:2px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;font-size:16px;transition:all .15s;flex-shrink:0}
+.mic:hover{border-color:var(--peacock);background:var(--peacock-light)}
+.mic.rec{border-color:var(--gold);background:var(--gold-light)}
+.ab-h{font-size:11px;color:var(--gray);margin-top:6px;font-style:italic}
 
-/* Individual world colors and illustrations */
-.world-shapes .world-art { background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
-.world-numbers .world-art { background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); }
-.world-patterns .world-art { background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%); }
-.world-measurement .world-art { background: linear-gradient(135deg, #E1F5FE 0%, #B3E5FC 100%); }
-.world-fractions .world-art { background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD9 100%); }
-.world-money .world-art { background: linear-gradient(135deg, #FFF9C4 0%, #FFF176 100%); }
-.world-time .world-art { background: linear-gradient(135deg, #E8EAF6 0%, #C5CAE9 100%); }
-.world-algebra .world-art { background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%); }
-.world-geometry .world-art { background: linear-gradient(135deg, #FBE9E7 0%, #FFCCBC 100%); }
-.world-data .world-art { background: linear-gradient(135deg, #E8F0FE 0%, #C6D7FB 100%); }
-.world-mystery .world-art { background: linear-gradient(135deg, #F3F0FF 0%, #DDD6FE 100%); }
-.world-wonder .world-art { background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%); }
+/* WONDER JOURNAL - warm */
+.jw{max-width:560px;margin:0 auto;padding:40px 24px 60px}
+.jh{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
+.js2{font-size:13px;color:var(--gray);margin-bottom:20px}
+.streak{display:flex;gap:5px;margin-bottom:24px;align-items:center}
+.sd{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:2px solid transparent}
+.sd-d{background:var(--peacock);color:white;border-color:var(--peacock-dark)}
+.sd-n{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
+.sd-f{background:var(--off);color:var(--gray)}
+.sl{font-size:11px;color:var(--gray);margin-left:8px}
+.je{background:white;border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-bottom:12px;transition:border-color .15s}
+.je:hover{border-color:var(--peacock)}
+.je-s{font-size:10px;font-weight:500;padding:3px 8px;border-radius:8px;display:inline-block;margin-bottom:8px}
+.je-q{font-family:'DM Serif Display',serif;font-size:16px;font-style:italic;line-height:1.5;margin-bottom:6px;color:var(--navy)}
+.je-c{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:10px}
+.je-m{font-size:12px;color:var(--teal-s);font-weight:500;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.je-m::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal-s);flex-shrink:0;margin-top:4px}
+.ja{background:var(--peacock);border-radius:18px;padding:16px 18px;margin:16px 0}
+.ja-l{font-size:10px;font-weight:500;color:var(--gold);letter-spacing:.5px;margin-bottom:5px}
+.ja-t{font-size:14px;color:white;line-height:1.55}
 
-.world-svg { width: 100px; height: 100px; }
+/* GROWTH SNAPSHOT */
+.sw{max-width:560px;margin:0 auto;padding:40px 24px 60px}
+.sh{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
+.sp{font-size:12px;color:var(--gray);margin-bottom:20px}
+.slet{font-family:'DM Serif Display',serif;font-size:15px;line-height:1.75;color:var(--gray);margin-bottom:28px}
+.slet em{font-style:italic;color:var(--navy)}
+.sst{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.ss{background:white;border:1.5px solid var(--border);border-radius:16px;padding:16px 12px;text-align:center}
+.ss-n{font-family:'DM Serif Display',serif;font-size:28px;color:var(--peacock)}
+.ss-l{font-size:10px;color:var(--gray);margin-top:2px}
+.sthr{margin-bottom:28px}
+.sthr-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:10px}
+.str{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.str-n{font-size:12px;width:76px;color:var(--gray);flex-shrink:0}
+.str-bg{flex:1;height:10px;background:var(--off);border-radius:5px;overflow:hidden}
+.str-b{height:100%;border-radius:5px}
+.str-p{font-size:11px;color:var(--gray);width:30px;text-align:right}
+.sqr{margin-bottom:28px}
+.sqr-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:10px}
+.sq{font-family:'DM Serif Display',serif;font-style:italic;font-size:14px;padding:10px 0;border-bottom:.5px solid var(--border);color:var(--navy)}
+.sq-d{font-family:'DM Sans',sans-serif;font-style:normal;font-size:10px;color:var(--gray);margin-left:6px}
+.ssf{border-left:4px solid var(--peacock);padding:12px 16px;background:white;border-radius:0 14px 14px 0;margin-bottom:24px;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ssf-l{font-size:10px;font-weight:500;color:#085041;letter-spacing:.5px;margin-bottom:4px}
+.ssf-t{font-size:14px;line-height:1.55}
+.snx{background:white;border:1.5px solid var(--border);border-radius:16px;padding:16px}
+.snx-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:5px}
+.snx-t{font-size:13px;color:var(--gray);line-height:1.55}
 
-.world-body { background: white; padding: 16px; }
-.world-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--navy); margin-bottom: 4px; }
-.world-desc { font-size: 12px; color: var(--gray); line-height: 1.5; }
+footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-spacing:2px;border-top:1.5px solid var(--border)}
 
-/* Age badge on world card */
-.age-badge {
-  position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 3px 8px;
-  border-radius: 10px; font-weight: 500; letter-spacing: 0.5px;
-}
-.badge-young { background: #FFF3E0; color: #E65100; }
-.badge-mid { background: var(--peacock-light); color: var(--peacock-dark); }
-.badge-older { background: #F3E5F5; color: #6A1B9A; }
-
-/* ── CHAT SCREEN ── */
-#screen-chat { flex-direction: column; }
-.chat-world-header {
-  background: var(--peacock); padding: 14px 20px;
-  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
-  transition: background .3s;
-}
-.chat-world-icon { font-size: 28px; }
-.chat-world-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; }
-.chat-world-sub { font-size: 11px; color: var(--gold); letter-spacing: 1px; }
-.chat-world-back { margin-left: auto; font-family: 'DM Sans', sans-serif; font-size: 12px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); color: white; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all .15s; }
-.chat-world-back:hover { background: rgba(255,255,255,.25); }
-
-#screen-chat main { flex: 1; display: flex; flex-direction: column; max-width: 680px; width: 100%; margin: 0 auto; padding: 16px; gap: 10px; }
-
-.world-context-card { background: white; border-radius: 12px; border: .5px solid var(--border); padding: 14px 16px; }
-.world-context-card .wc-title { font-size: 11px; letter-spacing: 2px; color: #888780; margin-bottom: 8px; text-transform: uppercase; }
-.world-prompt { font-size: 15px; color: var(--navy); line-height: 1.6; font-family: 'DM Serif Display', serif; font-style: italic; }
-
-.chat-card { background: white; border-radius: 12px; border: .5px solid var(--border); padding: 14px 16px; flex: 1; display: flex; flex-direction: column; }
-.chat-messages { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 220px; max-height: 420px; overflow-y: auto; padding: 4px 0; }
-.message { display: flex; flex-direction: column; gap: 3px; max-width: 88%; }
-.message.child { align-self: flex-end; }
-.message.kelvi { align-self: flex-start; }
-.msg-sender { font-size: 11px; letter-spacing: 1px; color: #B4B2A9; padding: 0 4px; }
-.message.child .msg-sender { text-align: right; }
-.msg-bubble { padding: 11px 14px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
-.message.child .msg-bubble { background: var(--peacock); color: white; border-bottom-right-radius: 4px; }
-.message.kelvi .msg-bubble { background: var(--peacock-light); color: var(--navy); border: .5px solid #C2E0DE; border-bottom-left-radius: 4px; }
-
-.typing { display: none; align-self: flex-start; padding: 10px 14px; background: var(--peacock-light); border: .5px solid #C2E0DE; border-radius: 12px; border-bottom-left-radius: 4px; gap: 4px; align-items: center; }
-.typing.visible { display: flex; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--peacock); animation: bounce 1.2s infinite; }
-.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
-
-.chat-input-area { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
-.chat-input-area textarea { flex: 1; min-height: 44px; max-height: 100px; padding: 10px 12px; border: .5px solid #D3D1C7; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; color: var(--navy); background: #FAFAF8; transition: border-color .15s; }
-.chat-input-area textarea:focus { border-color: var(--peacock); }
-.mic-btn { width: 44px; height: 44px; border-radius: 8px; border: .5px solid #D3D1C7; background: #FAFAF8; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #888780; flex-shrink: 0; transition: all .15s; }
-.mic-btn:hover { border-color: var(--peacock); color: var(--peacock); }
-.mic-btn.listening { border-color: var(--gold); background: var(--gold-light); color: var(--gold); animation: pulse 1.2s infinite; }
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4)}50%{box-shadow:0 0 0 6px rgba(201,168,76,0)}}
-.send-btn { height: 44px; padding: 0 18px; background: var(--peacock); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; flex-shrink: 0; transition: background .15s; }
-.send-btn:hover { background: var(--peacock-dark); }
-.send-btn:disabled { background: #B4B2A9; cursor: not-allowed; }
-
-.session-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.sab { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; border: .5px solid #D3D1C7; background: transparent; color: #888780; transition: all .15s; }
-.sab:hover { border-color: var(--peacock); color: var(--peacock); }
-.sab.gold { border-color: var(--gold); color: #8B6914; }
-.sab.gold:hover { background: var(--gold); color: white; }
-
-/* ── PARENT SCREEN ── */
-#screen-parent { flex-direction: column; }
-#screen-parent main { flex: 1; max-width: 840px; width: 100%; margin: 0 auto; padding: 20px 24px; }
-#screen-parent h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--navy); margin-bottom: 4px; }
-#screen-parent .sub { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
-
-.api-setup { background: white; border-radius: 12px; border: .5px solid var(--border); padding: 20px; margin-bottom: 20px; }
-.api-setup label { display: block; font-size: 12px; color: #888780; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
-.api-setup input { width: 100%; padding: 10px 12px; border: .5px solid #D3D1C7; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--navy); background: #FAFAF8; outline: none; }
-.api-setup input:focus { border-color: var(--peacock); }
-.api-setup .hint { font-size: 11px; color: #B4B2A9; margin-top: 6px; }
-
-.children-section h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 16px; }
-.children-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; margin-bottom: 20px; }
-.child-card { background: white; border-radius: 14px; border: .5px solid var(--border); padding: 20px; }
-.child-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--peacock); color: white; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 12px; }
-.child-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--navy); margin-bottom: 4px; }
-.child-age { font-size: 12px; color: var(--gray); margin-bottom: 12px; }
-.child-sessions { font-size: 12px; color: var(--gray); }
-.child-sessions span { font-weight: 500; color: var(--peacock); }
-.child-start-btn { width: 100%; margin-top: 14px; padding: 9px; background: var(--peacock); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
-.child-start-btn:hover { background: var(--peacock-dark); }
-
-.add-child-card { background: transparent; border-radius: 14px; border: 2px dashed #D3D1C7; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; min-height: 180px; }
-.add-child-card:hover { border-color: var(--peacock); }
-.add-child-card p { font-size: 13px; color: #888780; margin-top: 8px; }
-.add-icon { font-size: 28px; color: #D3D1C7; }
-
-.session-log h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 16px; }
-.log-entry { background: white; border-radius: 10px; border: .5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
-.log-icon { font-size: 22px; width: 40px; text-align: center; flex-shrink: 0; }
-.log-details { flex: 1; }
-.log-name { font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 2px; }
-.log-meta { font-size: 12px; color: var(--gray); }
-.log-badge { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: var(--peacock-light); color: var(--peacock-dark); }
-
-footer { text-align: center; padding: 14px; font-size: 11px; color: var(--gold); letter-spacing: 2px; border-top: .5px solid var(--border); }
-
-/* ── GUARDIAN DASHBOARD ── */
-.dash-child-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.dash-tab { padding: 8px 18px; border-radius: 20px; border: 0.5px solid #D3D1C7; background: white; font-size: 13px; cursor: pointer; color: #5F6B7A; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-.dash-tab.active { background: #00827F; color: white; border-color: #00827F; }
-.dash-tab.add-tab { border-style: dashed; }
-.dash-tab.add-tab:hover { border-color: #00827F; color: #00827F; }
-.dash-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
-.dash-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
-.dash-metric { background: #F0EDE8; border-radius: 8px; padding: 14px 16px; }
-.dash-metric-label { font-size: 11px; color: #888780; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-.dash-metric-value { font-size: 22px; font-weight: 500; color: #1A1A2E; }
-.dash-metric-sub { font-size: 11px; color: #888780; margin-top: 3px; }
-.dash-card { background: white; border: 0.5px solid #E8E4E0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-.dash-card-title { font-size: 14px; font-weight: 500; color: #1A1A2E; margin-bottom: 12px; }
-.dash-profile-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-.dash-avatar { width: 48px; height: 48px; border-radius: 50%; background: #00827F; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 500; flex-shrink: 0; font-family: 'DM Serif Display', serif; }
-.dash-name { font-size: 20px; font-weight: 500; color: #1A1A2E; font-family: 'DM Serif Display', serif; }
-.dash-sub { font-size: 12px; color: #5F6B7A; margin-top: 2px; }
-.dash-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-.dash-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid #D3D1C7; color: #5F6B7A; background: #F0EDE8; }
-.dash-tag.teal { background: #E1F5EE; color: #0F6E56; border-color: #9FE1CB; }
-.dash-tag.amber { background: #FDF6E3; color: #8B6914; border-color: #C9A84C; }
-.dash-level-bar { height: 6px; background: #F0EDE8; border-radius: 3px; margin-bottom: 4px; overflow: hidden; }
-.dash-level-fill { height: 100%; background: #00827F; border-radius: 3px; transition: width 0.6s ease; }
-.dash-level-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.dash-level-key { font-size: 11px; color: #5F6B7A; }
-.dash-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 4px; }
-.dash-cal-head { font-size: 10px; color: #888780; text-align: center; padding: 2px 0; }
-.dash-cal-day { height: 22px; border-radius: 4px; background: #F0EDE8; }
-.dash-cal-day.done { background: #9FE1CB; }
-.dash-cal-day.today { background: #00827F; }
-.dash-cal-day.empty { background: transparent; }
-.dash-world-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #E8E4E0; }
-.dash-world-row:last-child { border-bottom: none; }
-.dash-world-icon { font-size: 16px; width: 28px; text-align: center; }
-.dash-world-name { font-size: 13px; color: #1A1A2E; flex: 1; }
-.dash-world-date { font-size: 11px; color: #888780; }
-.dash-world-dot { width: 8px; height: 8px; border-radius: 50%; background: #00827F; flex-shrink: 0; }
-.dash-plan-day { display: flex; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid #E8E4E0; align-items: flex-start; }
-.dash-plan-day:last-child { border-bottom: none; }
-.dash-plan-dow { font-size: 10px; letter-spacing: 1.5px; color: #888780; text-transform: uppercase; width: 32px; padding-top: 2px; flex-shrink: 0; }
-.dash-plan-content { flex: 1; }
-.dash-plan-title { font-size: 13px; font-weight: 500; color: #1A1A2E; margin-bottom: 2px; }
-.dash-plan-desc { font-size: 12px; color: #5F6B7A; line-height: 1.5; }
-.dash-plan-type { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #E1F5EE; color: #0F6E56; flex-shrink: 0; margin-top: 2px; }
-.dash-q-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.dash-q-label { font-size: 12px; color: #5F6B7A; width: 90px; flex-shrink: 0; }
-.dash-q-bar { flex: 1; height: 6px; background: #F0EDE8; border-radius: 3px; overflow: hidden; }
-.dash-q-fill { height: 100%; border-radius: 3px; }
-.dash-q-pct { font-size: 11px; color: #5F6B7A; width: 28px; text-align: right; }
-.dash-btn { font-size: 12px; padding: 7px 14px; border-radius: 8px; border: 0.5px solid #D3D1C7; background: transparent; color: #5F6B7A; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-.dash-btn:hover { border-color: #00827F; color: #00827F; }
-.dash-btn.primary { background: #00827F; color: white; border-color: #00827F; }
-.dash-btn.primary:hover { background: #006B68; }
-.dash-btn.danger { color: #A0522D; border-color: #A0522D; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeUp .5s ease forwards}
 </style>
 </head>
 <body>
 
-<!-- ── ENTRY SCREEN ── -->
-<div id="screen-entry" class="screen active">
-  <svg width="170" height="170" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px">
-    <circle cx="170" cy="170" r="165" fill="#B8860B"/>
-    <circle cx="170" cy="170" r="155" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.4"/>
-    <text x="170" y="58" text-anchor="middle" font-size="22" fill="white" font-family="'DM Serif Display',Georgia,serif" letter-spacing="2">Kelvi</text>
-    <text x="170" y="80" text-anchor="middle" font-size="18" fill="#FDF6E3" font-family="sans-serif" letter-spacing="8" font-weight="bold">FAMILY</text>
-    <!-- Gayatri — gold saree, medium brown -->
-    <path d="M138,200 Q138,240 153,250 Q170,258 187,250 Q202,240 202,200 Q186,188 170,188 Q154,188 138,200Z" fill="#C9A84C"/>
-    <path d="M187,203 Q196,198 202,203" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.6"/>
-    <path d="M138,222 Q170,216 202,222" fill="none" stroke="#FDF6E3" stroke-width="1" opacity="0.4"/>
-    <ellipse cx="170" cy="195" rx="24" ry="22" fill="#D4956A"/>
-    <circle cx="170" cy="148" r="22" fill="#D4956A"/>
-    <path d="M148,139 Q149,125 170,128 Q191,125 192,139" fill="#2C1A0E"/>
-    <path d="M148,139 Q145,154 147,170" fill="#2C1A0E"/>
-    <path d="M192,139 Q195,154 193,170" fill="#2C1A0E"/>
-    <circle cx="170" cy="137" r="2.5" fill="#A0522D"/>
-    <ellipse cx="163" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-    <ellipse cx="177" cy="148" rx="3" ry="2.5" fill="#1A0A00"/>
-    <path d="M161,157 Q170,163 179,157" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-    <!-- Arya — peacock green, medium brown -->
-    <path d="M62,212 Q62,238 73,245 Q86,251 99,245 Q112,238 112,212 Q101,203 86,203 Q71,203 62,212Z" fill="#00827F"/>
-    <path d="M62,226 Q86,221 112,226" fill="none" stroke="#E8F5F4" stroke-width="1" opacity="0.5"/>
-    <ellipse cx="86" cy="208" rx="17" ry="18" fill="#D4956A"/>
-    <circle cx="86" cy="177" r="15" fill="#D4956A"/>
-    <ellipse cx="86" cy="164" rx="15" ry="6" fill="#2C1A0E"/>
-    <ellipse cx="72" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-    <ellipse cx="100" cy="165" rx="5" ry="6" fill="#2C1A0E"/>
-    <circle cx="72" cy="161" r="2.5" fill="#FDF6E3"/>
-    <circle cx="100" cy="161" r="2.5" fill="#FDF6E3"/>
-    <circle cx="80" cy="176" r="2.3" fill="#1A0A00"/>
-    <circle cx="92" cy="176" r="2.3" fill="#1A0A00"/>
-    <circle cx="81" cy="175" r="0.9" fill="white"/>
-    <circle cx="93" cy="175" r="0.9" fill="white"/>
-    <path d="M77,171 Q80,169 83,171" fill="none" stroke="#1A0A00" stroke-width="1.1" stroke-linecap="round"/>
-    <path d="M89,171 Q92,169 95,171" fill="none" stroke="#1A0A00" stroke-width="1.1" stroke-linecap="round"/>
-    <path d="M80,184 Q86,189 92,184" fill="none" stroke="#1A0A00" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Luna — white/teal outfit, yellow skin, blue eyes -->
-    <path d="M228,212 Q228,238 239,245 Q252,251 265,245 Q278,238 278,212 Q267,203 252,203 Q237,203 228,212Z" fill="#F0FAF9"/>
-    <path d="M228,226 Q252,221 278,226" fill="none" stroke="#C2E0DE" stroke-width="1" opacity="0.6"/>
-    <ellipse cx="252" cy="208" rx="17" ry="18" fill="#F8E4B0"/>
-    <circle cx="252" cy="177" r="15" fill="#F4C97A"/>
-    <ellipse cx="243" cy="165" rx="7" ry="6" fill="#8B6347"/>
-    <ellipse cx="261" cy="165" rx="7" ry="6" fill="#8B6347"/>
-    <ellipse cx="252" cy="167" rx="13" ry="5" fill="#8B6347"/>
-    <circle cx="243" cy="161" r="3" fill="#C9A84C"/>
-    <circle cx="261" cy="161" r="3" fill="#C9A84C"/>
-    <circle cx="246" cy="176" r="2.3" fill="#4A7FA5"/>
-    <circle cx="258" cy="176" r="2.3" fill="#4A7FA5"/>
-    <circle cx="247" cy="175" r="0.9" fill="white"/>
-    <circle cx="259" cy="175" r="0.9" fill="white"/>
-    <path d="M246,184 Q252,189 258,184" fill="none" stroke="#4A3728" stroke-width="1.6" stroke-linecap="round"/>
-  </svg>
-  <h1>Kelvi Family</h1>
-  <div class="tagline">The question is the answer.</div>
-  <p>Mathematics for curious minds. Kelvi asks the questions that help your child think deeper.</p>
-  <div class="entry-cards">
-    <div class="entry-card" onclick="showScreen('screen-parent')">
-      <div class="ec-icon">
-        <svg width="80" height="80" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="130" cy="130" r="125" fill="#B8860B"/>
-          <circle cx="130" cy="130" r="117" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.4"/>
-          <path d="M102,155 Q102,192 117,202 Q130,209 143,202 Q158,192 158,155 Q144,145 130,145 Q116,145 102,155Z" fill="#C9A84C"/>
-          <path d="M143,158 Q151,153 158,158" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.6"/>
-          <path d="M102,177 Q130,171 158,177" fill="none" stroke="#FDF6E3" stroke-width="1" opacity="0.4"/>
-          <ellipse cx="130" cy="151" rx="23" ry="21" fill="#D4956A"/>
-          <circle cx="130" cy="108" r="20" fill="#D4956A"/>
-          <path d="M110,99 Q111,85 130,88 Q149,85 150,99" fill="#2C1A0E"/>
-          <path d="M110,99 Q107,113 109,128" fill="#2C1A0E"/>
-          <path d="M150,99 Q153,113 151,128" fill="#2C1A0E"/>
-          <circle cx="130" cy="97" r="2.5" fill="#A0522D"/>
-          <ellipse cx="123" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-          <ellipse cx="137" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-          <path d="M120,117 Q130,123 140,117" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div style="font-size:10px;letter-spacing:2px;color:#B8860B;text-transform:uppercase;margin-bottom:6px;font-family:'DM Sans',sans-serif">Guardian view</div>
-      <h2>I'm a guardian</h2>
-      <p>Set up profiles, see your child's learning plan, and track progress.</p>
-    </div>
-    <div class="entry-card" onclick="showScreen('screen-age')">
-      <div class="ec-icon">
-        <svg width="80" height="80" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="130" cy="130" r="125" fill="#00827F"/>
-          <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.5"/>
-          <!-- Arya left -->
-          <path d="M72,162 Q72,190 82,197 Q94,203 106,197 Q118,190 118,162 Q107,153 94,153 Q81,153 72,162Z" fill="#00827F" opacity="0.7"/>
-          <ellipse cx="94" cy="158" rx="16" ry="17" fill="#D4956A"/>
-          <circle cx="94" cy="127" r="14" fill="#D4956A"/>
-          <ellipse cx="94" cy="115" rx="14" ry="6" fill="#2C1A0E"/>
-          <ellipse cx="82" cy="116" rx="4" ry="5" fill="#2C1A0E"/>
-          <ellipse cx="106" cy="116" rx="4" ry="5" fill="#2C1A0E"/>
-          <circle cx="82" cy="113" r="2" fill="#FDF6E3"/>
-          <circle cx="106" cy="113" r="2" fill="#FDF6E3"/>
-          <circle cx="89" cy="126" r="2" fill="#1A0A00"/>
-          <circle cx="99" cy="126" r="2" fill="#1A0A00"/>
-          <path d="M88,134 Q94,139 100,134" fill="none" stroke="#1A0A00" stroke-width="1.5" stroke-linecap="round"/>
-          <!-- Luna right -->
-          <path d="M142,162 Q142,190 152,197 Q164,203 176,197 Q188,190 188,162 Q177,153 164,153 Q151,153 142,162Z" fill="#F0FAF9" opacity="0.9"/>
-          <ellipse cx="164" cy="158" rx="16" ry="17" fill="#F8E4B0"/>
-          <circle cx="164" cy="127" r="14" fill="#F4C97A"/>
-          <ellipse cx="157" cy="115" rx="6" ry="5" fill="#8B6347"/>
-          <ellipse cx="171" cy="115" rx="6" ry="5" fill="#8B6347"/>
-          <ellipse cx="164" cy="117" rx="11" ry="4" fill="#8B6347"/>
-          <circle cx="157" cy="112" r="2" fill="#C9A84C"/>
-          <circle cx="171" cy="112" r="2" fill="#C9A84C"/>
-          <circle cx="159" cy="126" r="2" fill="#4A7FA5"/>
-          <circle cx="169" cy="126" r="2" fill="#4A7FA5"/>
-          <path d="M159,134 Q164,139 169,134" fill="none" stroke="#4A3728" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div style="font-size:10px;letter-spacing:2px;color:#00827F;text-transform:uppercase;margin-bottom:6px;font-family:'DM Sans',sans-serif">Student view</div>
-      <h2>I'm ready to explore</h2>
-      <p>Pick your level and choose a math world to explore today.</p>
+<nav>
+  <div class="nav-left">
+    <div class="nav-mark">K</div>
+    <span class="nav-word">Kelvi</span>
+    <span class="nav-fam">Family</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-link" onclick="show('threads')" id="tab-threads">Threads</span>
+    <span class="nav-link" onclick="show('journal')" id="tab-journal">Wonder journal</span>
+    <span class="nav-link" onclick="show('snapshot')" id="tab-snapshot">Growth</span>
+    <div class="avatar" id="av">A</div>
+  </div>
+</nav>
+
+<div class="screen active" id="screen-welcome">
+  <div class="welcome fi">
+    <div class="welcome-k">K</div>
+    <h1>Hello! I'm Kelvi.</h1>
+    <p>I'm your mathematics thinking companion. Ready to start wondering?</p>
+    <div class="welcome-input">
+      <input type="text" id="cname" placeholder="What's your name?" onkeydown="if(event.key==='Enter')go()">
+      <button class="btn" onclick="go()">Let's go!</button>
     </div>
   </div>
 </div>
 
-<!-- ── LEVEL SELECTOR SCREEN ── -->
-<div id="screen-age" class="screen">
-  <nav style="background:var(--peacock)">
-    <div class="nav-logo" onclick="showScreen('screen-entry')" style="cursor:pointer">
-      <div><div class="nav-wordmark">Kelvi</div><div class="nav-family">FAMILY</div></div>
-    </div>
-  </nav>
-  <main>
-    <!-- Student name login -->
-    <div id="student-login-section" style="max-width:400px;margin:0 auto 40px;text-align:center">
-      <div id="student-greeting" style="font-family:'DM Serif Display',serif;font-size:22px;color:white;margin-bottom:8px">Welcome back.</div>
-      <div id="student-name-display" style="display:none;margin-bottom:20px">
-        <span style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--gold)" id="student-name-shown"></span>
-        <button onclick="clearStudentName()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;margin-left:10px;font-family:'DM Sans',sans-serif">not you?</button>
-      </div>
-      <div id="student-name-input-section" style="display:flex;gap:10px;justify-content:center">
-        <input type="text" id="student-name-input" placeholder="What's your name?" autocomplete="given-name"
-          style="padding:12px 16px;border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.15);color:white;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;width:220px;text-align:center"
-          onkeydown="if(event.key==='Enter')saveStudentName()"
-          oninput="this.style.borderColor='rgba(255,255,255,0.6)'"
-          placeholder="Your name">
-        <button onclick="saveStudentName()" style="padding:12px 20px;background:var(--gold);color:var(--navy);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer">Go →</button>
-      </div>
-    </div>
-
-    <!-- Level picker — no emojis -->
-    <h1 id="level-pick-heading" style="display:none">How do you like to explore mathematics?</h1>
-    <p id="level-pick-sub" style="display:none">Pick the one that sounds most like you — Kelvi will adjust.</p>
-    <div class="age-cards" id="level-cards" style="max-width:840px;flex-wrap:wrap;display:none">
-      <div class="age-card" onclick="startLevel('character')" style="background:rgba(255,255,255,0.95);width:185px;border:none">
-        <div class="ac-age" style="font-size:15px;line-height:1.4;font-family:'DM Serif Display',serif;font-weight:normal">I like Kelvi<br>to guide me</div>
-        <div class="ac-label" style="margin-top:10px;line-height:1.6">Kelvi is a curious character who needs your help figuring things out</div>
-      </div>
-      <div class="age-card" onclick="startLevel('procedural')" style="background:rgba(255,255,255,0.95);width:185px;border:none">
-        <div class="ac-age" style="font-size:15px;line-height:1.4;font-family:'DM Serif Display',serif;font-weight:normal">I like knowing<br>how things work</div>
-        <div class="ac-label" style="margin-top:10px;line-height:1.6">Step by step — clear problems, clear thinking</div>
-      </div>
-      <div class="age-card" onclick="startLevel('conceptual')" style="background:rgba(255,255,255,0.95);width:185px;border:none">
-        <div class="ac-age" style="font-size:15px;line-height:1.4;font-family:'DM Serif Display',serif;font-weight:normal">I want to know<br>why things work</div>
-        <div class="ac-label" style="margin-top:10px;line-height:1.6">Understanding the reason behind the mathematics</div>
-      </div>
-      <div class="age-card" onclick="startLevel('generative')" style="background:rgba(255,255,255,0.95);width:185px;border:none">
-        <div class="ac-age" style="font-size:15px;line-height:1.4;font-family:'DM Serif Display',serif;font-weight:normal">I like to find<br>things out myself</div>
-        <div class="ac-label" style="margin-top:10px;line-height:1.6">Open exploration — follow your curiosity wherever it goes</div>
-      </div>
-    </div>
-    <button class="back-btn" onclick="showScreen('screen-entry')" style="color:rgba(255,255,255,0.5);margin-top:20px">← Back</button>
-  </main>
-</div>
-
-<!-- ── WORLDS SCREEN ── -->
-<div id="screen-worlds" class="screen">
-  <nav>
-    <div class="nav-logo" onclick="showScreen('screen-age')">
-      <svg width="36" height="36" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="#B8860B"/>
-        <circle cx="130" cy="130" r="117" fill="none" stroke="#FDF6E3" stroke-width="2" opacity="0.4"/>
-        <path d="M100,155 Q100,192 115,202 Q130,209 145,202 Q160,192 160,155 Q145,144 130,144 Q115,144 100,155Z" fill="#C9A84C"/>
-        <path d="M145,158 Q153,153 160,158" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.6"/>
-        <path d="M100,177 Q130,171 160,177" fill="none" stroke="#FDF6E3" stroke-width="1" opacity="0.4"/>
-        <ellipse cx="130" cy="151" rx="23" ry="21" fill="#D4956A"/>
-        <circle cx="130" cy="108" r="20" fill="#D4956A"/>
-        <path d="M110,99 Q111,85 130,88 Q149,85 150,99" fill="#2C1A0E"/>
-        <path d="M110,99 Q107,113 109,128" fill="#2C1A0E"/>
-        <path d="M150,99 Q153,113 151,128" fill="#2C1A0E"/>
-        <circle cx="130" cy="97" r="2.5" fill="#A0522D"/>
-        <ellipse cx="123" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <ellipse cx="137" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <path d="M120,117 Q130,123 140,117" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      <div><div class="nav-wordmark">Kelvi</div><div class="nav-family">FAMILY</div></div>
-    </div>
-    <div class="nav-right">
-      <button class="nav-btn" onclick="showScreen('screen-age')">← Change level</button>
-    </div>
-  </nav>
-  <main>
-    <h1 id="worlds-greeting">Choose your math world</h1>
-    <div class="sub" id="worlds-sub">Pick something that looks interesting — there's no wrong choice.</div>
-    <div class="worlds-grid" id="worlds-grid"></div>
-  </main>
-</div>
-
-<!-- ── CHAT SCREEN ── -->
-<div id="screen-chat" class="screen">
-  <div class="chat-world-header" id="chat-header">
-    <div class="chat-world-icon" id="chat-world-icon">🔢</div>
-    <div>
-      <div class="chat-world-name" id="chat-world-name">Numbers</div>
-      <div class="chat-world-sub" id="chat-world-sub">MATH EXPLORATION</div>
-    </div>
-    <button class="chat-world-back" onclick="showScreen('screen-worlds')">← Choose another world</button>
+<div class="screen" id="screen-threads">
+  <div class="map-wrap fi">
+    <h2>Choose your thread</h2>
+    <p class="map-sub">Tap a strand to see what's inside, then pick a topic to explore.</p>
+    <div class="strand-cards" id="strand-cards"></div>
   </div>
-  <main>
-    <div class="world-context-card">
-      <div class="wc-title">Today's exploration</div>
-      <div class="world-prompt" id="world-prompt">What do you notice about this?</div>
-    </div>
-    <div class="chat-card">
-      <div class="chat-messages" id="chat-messages">
-        <div class="message kelvi">
-          <div class="msg-sender">Kelvi <button onclick="speakMsg(this)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#C17F24;padding:0 2px" title="Read aloud">🔊</button></div>
-          <div class="msg-bubble" id="opening-msg">Welcome! What do you notice first?</div>
-        </div>
-      </div>
-      <div class="typing" id="typing">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      </div>
-      <div class="chat-input-area">
-        <textarea id="chat-input" placeholder="Tell me what you notice..." rows="1" onkeydown="handleKey(event)"></textarea>
-        <button class="mic-btn" id="mic-btn" onclick="toggleSpeech()" title="Speak">🎤</button>
-        <button class="send-btn" id="send-btn" onclick="sendMsg()">Send</button>
-      </div>
-      <div class="session-actions">
-        <button class="sab" onclick="showScreen('screen-worlds')">Choose another world</button>
-        <button class="sab gold" onclick="exportSession()">Save conversation</button>
-      </div>
-    </div>
-  </main>
 </div>
 
-<!-- ── ADD CHILD SCREEN ── -->
-<div id="screen-add-child" class="screen">
-  <main>
-    <h1>Add a child</h1>
-    <div class="sub">Kelvi will assess their level and build a personalised plan — not based on what school says, but on what they can actually do.</div>
-
-    <div class="field-group">
-      <label class="field-label">Child's name</label>
-      <input type="text" class="field-input" id="new-child-name" placeholder="e.g. Arya">
-    </div>
-
-    <div class="field-group">
-      <label class="field-label">Age (roughly)</label>
-      <input type="number" class="field-input" id="new-child-age" placeholder="e.g. 10" min="4" max="18" style="width:120px">
-    </div>
-
-    <div class="field-group">
-      <label class="field-label">Learning style</label>
-      <div class="style-cards">
-        <div class="style-card" id="style-structured" onclick="selectStyle('structured')">
-          <div class="sc-icon">📋</div>
-          <div class="sc-name">Structured</div>
-          <div class="sc-desc">Likes knowing what to do next</div>
-        </div>
-        <div class="style-card" id="style-exploratory" onclick="selectStyle('exploratory')">
-          <div class="sc-icon">🔭</div>
-          <div class="sc-name">Exploratory</div>
-          <div class="sc-desc">Loves open-ended questions</div>
-        </div>
-        <div class="style-card" id="style-unknown" onclick="selectStyle('unknown')">
-          <div class="sc-icon">✨</div>
-          <div class="sc-name">Let Kelvi decide</div>
-          <div class="sc-desc">Kelvi will figure it out</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <label class="field-label">Any notes? <span style="color:#B4B2A9;font-size:10px;letter-spacing:0;text-transform:none">(optional)</span></label>
-      <textarea class="field-input" id="new-child-notes" placeholder="e.g. Strong in geometry but finds fractions tricky. Loves cricket." rows="3" style="resize:none"></textarea>
-    </div>
-
-    <button class="add-child-btn" onclick="saveNewChild()">Start Kelvi's assessment →</button>
-    <button class="back-btn" onclick="showScreen('screen-parent')" style="display:block;margin:12px auto 0">← Back</button>
-  </main>
+<div class="screen" id="screen-prov">
+  <div class="prov-layout">
+    <div class="sb" id="sb"></div>
+    <div class="pm" id="pm"></div>
+  </div>
 </div>
 
-<!-- ── ASSESSMENT SCREEN ── -->
-<div id="screen-assessment" class="screen">
-  <nav>
-    <div class="nav-logo" onclick="showScreen('screen-parent')">
-      <svg width="36" height="36" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="#B8860B"/>
-        <circle cx="130" cy="130" r="117" fill="none" stroke="#FDF6E3" stroke-width="2" opacity="0.4"/>
-        <path d="M100,155 Q100,192 115,202 Q130,209 145,202 Q160,192 160,155 Q145,144 130,144 Q115,144 100,155Z" fill="#C9A84C"/>
-        <ellipse cx="130" cy="151" rx="23" ry="21" fill="#D4956A"/>
-        <circle cx="130" cy="108" r="20" fill="#D4956A"/>
-        <path d="M110,99 Q111,85 130,88 Q149,85 150,99" fill="#2C1A0E"/>
-        <circle cx="130" cy="97" r="2.5" fill="#A0522D"/>
-        <ellipse cx="123" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <ellipse cx="137" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <path d="M120,117 Q130,123 140,117" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      <div><div class="nav-wordmark">Kelvi</div><div class="nav-family">FAMILY</div></div>
+<div class="screen" id="screen-journal">
+  <div class="jw fi">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <div class="nav-mark" style="width:32px;height:32px;font-size:13px;background:var(--peacock);border:2px solid var(--gold)">K</div>
+      <div><div class="jh" id="jn">Arya's wonder journal</div><div class="js2">This week's best questions</div></div>
     </div>
-    <div class="nav-right"><span id="assess-child-name-label" style="font-size:13px;color:rgba(255,255,255,0.8)"></span></div>
-  </nav>
-  <main>
-    <div class="assess-progress" id="assess-progress">
-      <div class="assess-pip active" id="pip-0"></div>
-      <div class="assess-pip" id="pip-1"></div>
-      <div class="assess-pip" id="pip-2"></div>
-      <div class="assess-pip" id="pip-3"></div>
-      <div class="assess-pip" id="pip-4"></div>
+    <div class="streak">
+      <div class="sd sd-d">M</div><div class="sd sd-d">T</div><div class="sd sd-n">W</div><div class="sd sd-f">T</div><div class="sd sd-f">F</div>
+      <div class="sl">3 sessions this week</div>
     </div>
-
-    <!-- Moment 1: Pattern -->
-    <div class="assess-moment active" id="moment-0">
-      <div class="assess-kelvi">
-        <div class="assess-avatar">👋</div>
-        <div class="assess-bubble" id="assess-greeting">Hi! I'm Kelvi. I found something curious and I need your help...</div>
-      </div>
-      <div class="assess-kelvi">
-        <div class="assess-avatar">🤔</div>
-        <div class="assess-bubble">Look at these numbers: <strong>2, 4, 8, 16, ___</strong><br><br>What comes next? And what's the first thing you notice about them?</div>
-      </div>
-      <textarea class="assess-free" id="ans-0" placeholder="Tell me what you see..." oninput="checkFreeAnswer(0)"></textarea>
-      <button class="assess-next-btn" id="next-0" onclick="nextMoment(1)" disabled>Next →</button>
-    </div>
-
-    <!-- Moment 2: Real world interests -->
-    <div class="assess-moment" id="moment-1">
-      <div class="assess-kelvi">
-        <div class="assess-avatar">🌍</div>
-        <div class="assess-bubble">Ooh interesting! Now — which of these sounds most exciting to explore with maths?</div>
-      </div>
-      <div class="assess-options" id="interest-options">
-        <button class="assess-option" onclick="selectOption(this,'interest','cricket')">🏏 Cricket scores and how averages work</button>
-        <button class="assess-option" onclick="selectOption(this,'interest','food')">🍕 Sharing things fairly — fractions and ratios</button>
-        <button class="assess-option" onclick="selectOption(this,'interest','patterns')">🌀 Hidden patterns in nature and art</button>
-        <button class="assess-option" onclick="selectOption(this,'interest','space')">🚀 Space, distance, and really big numbers</button>
-        <button class="assess-option" onclick="selectOption(this,'interest','music')">🎵 Why music sounds good — maths and sound</button>
-        <button class="assess-option" onclick="selectOption(this,'interest','puzzles')">🧩 Logic puzzles and brain teasers</button>
-      </div>
-      <button class="assess-next-btn" id="next-1" onclick="nextMoment(2)" disabled>Next →</button>
-    </div>
-
-    <!-- Moment 3: Tricky problem — confidence -->
-    <div class="assess-moment" id="moment-2">
-      <div class="assess-kelvi">
-        <div class="assess-avatar">😮</div>
-        <div class="assess-bubble">Okay, I found something really tricky. I've been staring at it for ages.<br><br><strong>If you have a 4×4 grid of dots, how many squares can you find?</strong><br><br>Don't worry about getting it right — just tell me what you try first.</div>
-      </div>
-      <textarea class="assess-free" id="ans-2" placeholder="What do you try? What do you notice?" oninput="checkFreeAnswer(2)"></textarea>
-      <button class="assess-next-btn" id="next-2" onclick="nextMoment(3)" disabled>Next →</button>
-    </div>
-
-    <!-- Moment 4: Question type -->
-    <div class="assess-moment" id="moment-3">
-      <div class="assess-kelvi">
-        <div class="assess-avatar">💭</div>
-        <div class="assess-bubble">When you get to a maths problem, what's the first thing you want to know?</div>
-      </div>
-      <div class="assess-options">
-        <button class="assess-option" onclick="selectOption(this,'qtype','P')">📐 How to do it — what are the steps?</button>
-        <button class="assess-option" onclick="selectOption(this,'qtype','C')">🤔 Why it works — what does it actually mean?</button>
-        <button class="assess-option" onclick="selectOption(this,'qtype','G')">✨ What happens if I change something?</button>
-        <button class="assess-option" onclick="selectOption(this,'qtype','mixed')">🌈 It depends on the problem!</button>
-      </div>
-      <button class="assess-next-btn" id="next-3" onclick="nextMoment(4)" disabled>Next →</button>
-    </div>
-
-    <!-- Moment 5: Style confirmation -->
-    <div class="assess-moment" id="moment-4">
-      <div class="assess-kelvi">
-        <div class="assess-avatar">⭐</div>
-        <div class="assess-bubble">Last one! Which sounds more like a perfect maths session for you?</div>
-      </div>
-      <div class="assess-options">
-        <button class="assess-option" onclick="selectOption(this,'style','structured')">📋 I have a clear set of problems to work through</button>
-        <button class="assess-option" onclick="selectOption(this,'style','exploratory')">🔭 I pick something interesting and just follow my curiosity</button>
-        <button class="assess-option" onclick="selectOption(this,'style','mixed')">🔀 A bit of both — some structure, some freedom</button>
-      </div>
-      <button class="assess-next-btn" id="next-4" onclick="finishAssessment()" disabled>Build my plan →</button>
-    </div>
-
-  </main>
+    <div class="je"><div class="je-s" style="background:#E1F5EE;color:#085041">Operations</div><div class="je-q">"I wonder why we need calculators at all."</div><div class="je-c">She used algebra to bypass a broken multiply button, then questioned whether the tool was needed at all.</div><div class="je-m">Invented a new strategy instead of scaling up the old one</div></div>
+    <div class="ja"><div class="ja-l">Try this at dinner</div><div class="ja-t">Ask her: "Is there a faster way to do this?" while cooking or organizing together. She's already thinking about efficiency.</div></div>
+    <div class="je"><div class="je-s" style="background:#E1F5EE;color:#085041">Operations</div><div class="je-q">"I don't think there is a way to share the marbles equally."</div><div class="je-c">Discovered that 45 marbles can't split evenly among 4 friends. Suggested throwing away the leftover.</div><div class="je-m">Connected division to fairness — not just a calculation but a value</div></div>
+    <div class="je"><div class="je-s" style="background:#EEEDFE;color:#3C3489">Geometry</div><div class="je-q">"What if the shape had curved sides instead of straight ones?"</div><div class="je-c">While exploring quadrilaterals, she wondered whether the rules change when lines aren't straight.</div><div class="je-m">First "what if" question in geometry this month</div></div>
+  </div>
 </div>
 
-<!-- ── 14+ WELCOME SCREEN ── -->
-<div id="screen-teen" class="screen">
-  <nav style="background:var(--navy)">
-    <div class="nav-logo" onclick="showScreen('screen-age')" style="cursor:pointer">
-      <div><div class="nav-wordmark">Kelvi</div><div class="nav-family" style="color:var(--gold)">FAMILY</div></div>
+<div class="screen" id="screen-snapshot">
+  <div class="sw fi">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <div class="nav-mark" style="width:32px;height:32px;font-size:13px;background:var(--peacock);border:2px solid var(--gold)">K</div>
+      <div><div class="sh" id="sn">Arya's growth snapshot</div><div class="sp">March 2026</div></div>
     </div>
-  </nav>
-  <main style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;background:var(--navy)">
-    <div style="font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);color:white;line-height:1.15;margin-bottom:16px">
-      Welcome, <span id="teen-name" style="color:var(--gold)">mathematician</span>.
-    </div>
-    <div style="font-family:'DM Serif Display',serif;font-size:18px;font-style:italic;color:rgba(255,255,255,0.6);margin-bottom:48px">What would you like to work on today?</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:680px;width:100%">
-      <div onclick="showScreen('screen-worlds')" style="padding:28px 20px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:left" onmouseover="this.style.borderColor='rgba(201,168,76,0.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)'">
-        <div style="font-size:28px;margin-bottom:12px">🌍</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:white;margin-bottom:6px">Explore a world</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5">Pick a mathematical world and follow your curiosity</div>
-      </div>
-      <div onclick="continueLast()" style="padding:28px 20px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:left" onmouseover="this.style.borderColor='rgba(201,168,76,0.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)'">
-        <div style="font-size:28px;margin-bottom:12px">↩️</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:white;margin-bottom:6px">Continue thinking</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5" id="teen-last-world">Pick up where you left off</div>
-      </div>
-      <div onclick="kelviSuggests()" style="padding:28px 20px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:left" onmouseover="this.style.borderColor='rgba(201,168,76,0.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)'">
-        <div style="font-size:28px;margin-bottom:12px">✨</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:white;margin-bottom:6px">Kelvi suggests</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5">Let Kelvi pick something based on what you've explored</div>
-      </div>
-    </div>
-    <button onclick="showScreen('screen-age')" style="margin-top:40px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer">← Change level</button>
-  </main>
-</div>
-
-<!-- ── PARENT SCREEN ── -->
-<div id="screen-parent" class="screen">
-  <nav>
-    <div class="nav-logo" onclick="showScreen('screen-entry')">
-      <svg width="36" height="36" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="130" cy="130" r="125" fill="#B8860B"/>
-        <circle cx="130" cy="130" r="117" fill="none" stroke="#FDF6E3" stroke-width="2" opacity="0.4"/>
-        <path d="M100,155 Q100,192 115,202 Q130,209 145,202 Q160,192 160,155 Q145,144 130,144 Q115,144 100,155Z" fill="#C9A84C"/>
-        <path d="M145,158 Q153,153 160,158" fill="none" stroke="#FDF6E3" stroke-width="1.5" opacity="0.6"/>
-        <path d="M100,177 Q130,171 160,177" fill="none" stroke="#FDF6E3" stroke-width="1" opacity="0.4"/>
-        <ellipse cx="130" cy="151" rx="23" ry="21" fill="#D4956A"/>
-        <circle cx="130" cy="108" r="20" fill="#D4956A"/>
-        <path d="M110,99 Q111,85 130,88 Q149,85 150,99" fill="#2C1A0E"/>
-        <path d="M110,99 Q107,113 109,128" fill="#2C1A0E"/>
-        <path d="M150,99 Q153,113 151,128" fill="#2C1A0E"/>
-        <circle cx="130" cy="97" r="2.5" fill="#A0522D"/>
-        <ellipse cx="123" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <ellipse cx="137" cy="108" rx="3" ry="2.5" fill="#1A0A00"/>
-        <path d="M120,117 Q130,123 140,117" fill="none" stroke="#1A0A00" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      <div><div class="nav-wordmark">Kelvi</div><div class="nav-family">FAMILY</div></div>
-    </div>
-    <div class="nav-right">
-      <button class="nav-btn" onclick="showScreen('screen-age')">Student view</button>
-    </div>
-  </nav>
-  <main>
-    <h1>Guardian dashboard</h1>
-    <div class="sub">Track what your children are exploring and build their learning plan.</div>
-
-    <details style="margin-bottom:16px;background:white;border-radius:10px;border:0.5px solid var(--border);padding:10px 14px">
-      <summary style="font-size:12px;color:#888780;letter-spacing:1px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px">
-        <span style="color:var(--peacock)">⚙</span> Settings
-      </summary>
-      <div style="margin-top:12px">
-        <label style="display:block;font-size:11px;color:#888780;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Anthropic API key</label>
-        <input type="password" id="parent-api-key" placeholder="sk-ant-..." oninput="saveParentKey()" style="width:100%;padding:9px 12px;border:0.5px solid #D3D1C7;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:#1A1A2E;background:#FAFAF8;outline:none">
-        <div style="font-size:11px;color:#B4B2A9;margin-top:5px">Required for Kelvi to work. Stored only in this browser. Never shared.</div>
-      </div>
-    </details>
-
-    <!-- Children profiles — shows sample when empty -->
-    <div id="children-profiles"></div>
-
-    <!-- Quest Builder -->
-    <div style="margin-top:16px;padding:14px 16px;background:var(--peacock-light);border-radius:12px;border:1px solid #C2E0DE;display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--peacock-dark);margin-bottom:3px">Build a Quest</div>
-        <div style="font-size:12px;color:var(--gray);line-height:1.5">Generate rich problems by topic and level — explore together or print as a worksheet. <em style="color:#B4B2A9">Coming soon: upload completed worksheets back to Kelvi.</em></div>
-      </div>
-      <a href="quest.html" style="flex-shrink:0;padding:9px 18px;background:var(--peacock);color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap">Quest Builder →</a>
-    </div>
-
-    <!-- Add a child -->
-    <div style="margin-top:12px;padding:14px 16px;background:white;border-radius:12px;border:1.5px dashed #D3D1C7;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="showScreen('screen-add-child')">
-      <div>
-        <div style="font-size:13px;font-weight:500;color:var(--navy);margin-bottom:3px">+ Add a child</div>
-        <div style="font-size:12px;color:var(--gray)">Kelvi will assess their level and build a personalised plan — not based on age, but on how they actually think.</div>
-      </div>
-      <div style="font-size:24px;color:#D3D1C7;flex-shrink:0">→</div>
-    </div>
-
-    <div class="session-log" style="margin-top:20px">
-      <h2 style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--navy);margin-bottom:12px">Recent sessions</h2>
-      <div id="session-log-list">
-        <div style="font-size:14px;color:#B4B2A9;padding:16px 0;text-align:center">No sessions yet. Start exploring!</div>
-      </div>
-    </div>
-  </main>
+    <div class="slet">This month she had <em>14 conversations</em> with Kelvi. She's becoming someone who doesn't just solve problems — she <em>questions them</em>. The biggest shift: she started asking "what if" in geometry, which she'd never done before.</div>
+    <div class="sst"><div class="ss"><div class="ss-n">14</div><div class="ss-l">Sessions</div></div><div class="ss"><div class="ss-n">9</div><div class="ss-l">New questions</div></div><div class="ss"><div class="ss-n">4</div><div class="ss-l">"What if" moments</div></div></div>
+    <div class="sthr"><div class="sthr-l">Threads explored</div><div class="str"><div class="str-n">Operations</div><div class="str-bg"><div class="str-b" style="width:83%;background:var(--teal-s)"></div></div><div class="str-p">5/6</div></div><div class="str"><div class="str-n">Geometry</div><div class="str-bg"><div class="str-b" style="width:50%;background:var(--purple)"></div></div><div class="str-p">3/6</div></div><div class="str"><div class="str-n">Patterns</div><div class="str-bg"><div class="str-b" style="width:67%;background:var(--coral)"></div></div><div class="str-p">4/6</div></div><div class="str"><div class="str-n">Fractions</div><div class="str-bg"><div class="str-b" style="width:33%;background:var(--amber)"></div></div><div class="str-p">2/6</div></div></div>
+    <div class="sqr"><div class="sqr-l">Best questions this month</div><div class="sq">"I wonder why we need calculators at all." <span class="sq-d">Apr 2</span></div><div class="sq">"What if the shape had curved sides?" <span class="sq-d">Mar 28</span></div><div class="sq">"Is division always the same no matter what you divide?" <span class="sq-d">Mar 21</span></div></div>
+    <div class="ssf"><div class="ssf-l">Biggest shift</div><div class="ssf-t">Started asking "what if" questions in geometry. In operations, she went from procedural to generative thinking in a single session.</div></div>
+    <div class="snx"><div class="snx-l">What's coming in April</div><div class="snx-t">Kelvi will introduce fractions through fair sharing — she already showed strong intuition about remainders. She's ready to connect division to fractions.</div></div>
+  </div>
 </div>
 
 <footer>The question is the answer.</footer>
 
 <script>
-// ── MATH WORLDS DATA ──────────────────────────────────────────────────────────
-const WORLDS = [
-  {
-    id: 'shapes', name: 'Shape World', icon: '🔷', class: 'world-shapes', minAge: 5,
-    desc: 'Explore triangles, circles, and hidden patterns in shapes.',
-    prompt: 'Here are some shapes: a triangle, a square, and a circle.\n\nLook at them carefully.',
-    opening: 'Look at these shapes. What do you notice first?',
-    badgeClass: 'badge-young', badgeText: 'Ages 5+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <circle cx="50" cy="55" r="22" fill="#FFB74D" opacity=".8"/>
-      <polygon points="50,15 78,58 22,58" fill="#FF8F00" opacity=".7"/>
-      <rect x="30" y="62" width="40" height="24" rx="3" fill="#F57C00" opacity=".6"/>
-    </svg>`
-  },
-  {
-    id: 'numbers', name: 'Number Land', icon: '🔢', class: 'world-numbers', minAge: 5,
-    desc: 'Discover the secret lives of numbers — odd, even, and everything in between.',
-    prompt: 'Here is a sequence of numbers:\n2, 4, 6, 8, 10...\n\nTake a moment and just look at it.',
-    opening: 'Look at these numbers: 2, 4, 6, 8, 10. What do you notice?',
-    badgeClass: 'badge-young', badgeText: 'Ages 5+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <text x="12" y="42" font-size="28" fill="#66BB6A" opacity=".9" font-family="serif">2</text>
-      <text x="48" y="42" font-size="28" fill="#43A047" opacity=".8" font-family="serif">4</text>
-      <text x="30" y="78" font-size="28" fill="#2E7D32" opacity=".7" font-family="serif">6</text>
-    </svg>`
-  },
-  {
-    id: 'patterns', name: 'Pattern Forest', icon: '🌀', class: 'world-patterns', minAge: 6,
-    desc: 'Find the rules hiding inside repeating patterns.',
-    prompt: '🔴 🔵 🔴 🔵 🔴 🔵\n⭐ ⭐ 🌙 ⭐ ⭐ 🌙\n\nLook at these patterns.',
-    opening: 'Look at these patterns. What do you notice about how they work?',
-    badgeClass: 'badge-young', badgeText: 'Ages 6+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <circle cx="25" cy="35" r="10" fill="#CE93D8"/>
-      <circle cx="50" cy="35" r="10" fill="#AB47BC"/>
-      <circle cx="75" cy="35" r="10" fill="#CE93D8"/>
-      <rect x="20" y="55" width="18" height="18" rx="3" fill="#9C27B0"/>
-      <rect x="45" y="55" width="18" height="18" rx="3" fill="#CE93D8"/>
-      <rect x="70" y="55" width="18" height="18" rx="3" fill="#9C27B0"/>
-    </svg>`
-  },
-  {
-    id: 'measurement', name: 'Measurement Mountain', icon: '📏', class: 'world-measurement', minAge: 7,
-    desc: 'How big? How heavy? How far? Explore the world of measuring.',
-    prompt: 'Imagine a room that is 4 steps wide and 6 steps long.\n\nJust picture it for a moment.',
-    opening: 'Imagine a room 4 steps wide and 6 steps long. What questions does that make you want to ask?',
-    badgeClass: 'badge-young', badgeText: 'Ages 7+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <rect x="15" y="45" width="70" height="14" rx="3" fill="#4FC3F7"/>
-      <line x1="20" y1="45" x2="20" y2="38" stroke="#0277BD" stroke-width="2"/>
-      <line x1="34" y1="45" x2="34" y2="41" stroke="#0277BD" stroke-width="1.5"/>
-      <line x1="48" y1="45" x2="48" y2="38" stroke="#0277BD" stroke-width="2"/>
-      <line x1="62" y1="45" x2="62" y2="41" stroke="#0277BD" stroke-width="1.5"/>
-      <line x1="76" y1="45" x2="76" y2="38" stroke="#0277BD" stroke-width="2"/>
-      <polygon points="50,20 60,40 40,40" fill="#0288D1" opacity=".7"/>
-    </svg>`
-  },
-  {
-    id: 'fractions', name: 'Fraction Kitchen', icon: '🍕', class: 'world-fractions', minAge: 8,
-    desc: 'Slice, share, and discover the mathematics of parts and wholes.',
-    prompt: 'You have a pizza cut into 8 equal slices.\nYou eat 3 slices.\n\nJust think about that for a moment.',
-    opening: 'You have a pizza cut into 8 slices and you eat 3. What question does that make you want to ask?',
-    badgeClass: 'badge-mid', badgeText: 'Ages 8+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <circle cx="50" cy="55" r="30" fill="#FFCDD2"/>
-      <line x1="50" y1="25" x2="50" y2="85" stroke="#E57373" stroke-width="1.5"/>
-      <line x1="20" y1="55" x2="80" y2="55" stroke="#E57373" stroke-width="1.5"/>
-      <line x1="29" y1="34" x2="71" y2="76" stroke="#E57373" stroke-width="1.5"/>
-      <line x1="29" y1="76" x2="71" y2="34" stroke="#E57373" stroke-width="1.5"/>
-      <path d="M50,55 L50,25 A30,30,0,0,1,76,70 Z" fill="#EF9A9A" opacity=".7"/>
-    </svg>`
-  },
-  {
-    id: 'money', name: 'Money Market', icon: '💰', class: 'world-money', minAge: 8,
-    desc: 'Buy, sell, save, and discover how numbers power the world.',
-    prompt: 'You have $10. A notebook costs $3.50 and a pen costs $1.25.\n\nJust look at those numbers.',
-    opening: 'You have $10. A notebook costs $3.50 and a pen costs $1.25. What question comes to mind first?',
-    badgeClass: 'badge-mid', badgeText: 'Ages 8+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <ellipse cx="50" cy="60" rx="32" ry="20" fill="#FFF176"/>
-      <ellipse cx="50" cy="55" rx="32" ry="20" fill="#FFEE58"/>
-      <ellipse cx="50" cy="50" rx="32" ry="20" fill="#FFD600" opacity=".9"/>
-      <text x="50" y="55" text-anchor="middle" font-size="18" fill="#F57F17" font-family="serif" font-weight="bold">$</text>
-    </svg>`
-  },
-  {
-    id: 'algebra', name: 'Algebra Adventure', icon: '🔤', class: 'world-algebra', minAge: 11,
-    desc: 'Letters standing in for numbers — what could they be hiding?',
-    prompt: 'Here is an equation:\n3x + 5 = 20\n\nJust look at it. Don\'t solve it yet.',
-    opening: 'Look at this equation: 3x + 5 = 20. What do you notice about its structure?',
-    badgeClass: 'badge-mid', badgeText: 'Ages 11+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <text x="50" y="50" text-anchor="middle" font-size="32" fill="#26A69A" font-family="serif" font-style="italic">x</text>
-      <text x="20" y="75" text-anchor="middle" font-size="22" fill="#00897B" opacity=".7" font-family="serif">+</text>
-      <text x="80" y="75" text-anchor="middle" font-size="22" fill="#00897B" opacity=".7" font-family="serif">=</text>
-      <circle cx="50" cy="45" r="35" fill="none" stroke="#4DB6AC" stroke-width="1.5" stroke-dasharray="4 3"/>
-    </svg>`
-  },
-  {
-    id: 'geometry', name: 'Geometry Galaxy', icon: '📐', class: 'world-geometry', minAge: 11,
-    desc: 'Angles, areas, and the elegant mathematics of space and shape.',
-    prompt: 'A rectangle has a length of 8 cm and a width of 5 cm.\n\nJust picture that rectangle.',
-    opening: 'Picture a rectangle 8 cm long and 5 cm wide. What question does that make you want to ask?',
-    badgeClass: 'badge-mid', badgeText: 'Ages 11+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <polygon points="50,15 85,75 15,75" fill="none" stroke="#FF8A65" stroke-width="2"/>
-      <line x1="50" y1="15" x2="50" y2="75" stroke="#FF7043" stroke-width="1.5" stroke-dasharray="3 2"/>
-      <circle cx="50" cy="15" r="4" fill="#FF5722"/>
-      <circle cx="85" cy="75" r="4" fill="#FF5722"/>
-      <circle cx="15" cy="75" r="4" fill="#FF5722"/>
-      <text x="55" y="48" font-size="11" fill="#BF360C" font-family="sans-serif">h</text>
-    </svg>`
-  },
-  {
-    id: 'data', name: 'Data Detective', icon: '📊', class: 'world-data', minAge: 11,
-    desc: 'Find stories hidden inside numbers, charts, and graphs.',
-    prompt: 'Test scores: 72, 85, 91, 68, 85, 90, 72, 85\n\nLook at this set of numbers.',
-    opening: 'Look at these test scores: 72, 85, 91, 68, 85, 90, 72, 85. What do you notice?',
-    badgeClass: 'badge-mid', badgeText: 'Ages 11+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <rect x="15" y="60" width="14" height="25" rx="2" fill="#64B5F6"/>
-      <rect x="35" y="40" width="14" height="45" rx="2" fill="#42A5F5"/>
-      <rect x="55" y="25" width="14" height="60" rx="2" fill="#1E88E5"/>
-      <rect x="75" y="50" width="14" height="35" rx="2" fill="#1565C0"/>
-      <line x1="10" y1="85" x2="95" y2="85" stroke="#90CAF9" stroke-width="1.5"/>
-    </svg>`
-  },
-  {
-    id: 'mystery', name: 'Number Mystery', icon: '🔍', class: 'world-mystery', minAge: 12,
-    desc: 'Strange and beautiful patterns that mathematicians find fascinating.',
-    prompt: '1, 1, 2, 3, 5, 8, 13, 21...\n\nThis sequence has a secret.',
-    opening: 'Look at this sequence: 1, 1, 2, 3, 5, 8, 13, 21. What do you notice about how it grows?',
-    badgeClass: 'badge-older', badgeText: 'Ages 12+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <path d="M50,50 Q65,25 80,50 Q65,75 50,50" fill="none" stroke="#9575CD" stroke-width="2"/>
-      <path d="M50,50 Q35,25 20,50 Q35,75 50,50" fill="none" stroke="#7E57C2" stroke-width="2"/>
-      <circle cx="50" cy="50" r="6" fill="#673AB7"/>
-      <text x="50" y="25" text-anchor="middle" font-size="11" fill="#4527A0" font-family="serif">?</text>
-    </svg>`
-  },
-  {
-    id: 'time', name: 'Time Travellers', icon: '⏰', class: 'world-time', minAge: 7,
-    desc: 'Hours, minutes, and the curious mathematics of time.',
-    prompt: 'School starts at 8:00 am.\nLunch is at 12:30 pm.\nSchool ends at 3:15 pm.\n\nJust look at those times.',
-    opening: 'School starts at 8:00 am and ends at 3:15 pm. What question does that make you want to ask?',
-    badgeClass: 'badge-young', badgeText: 'Ages 7+',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <circle cx="50" cy="55" r="30" fill="white" stroke="#9FA8DA" stroke-width="2"/>
-      <line x1="50" y1="55" x2="50" y2="32" stroke="#3F51B5" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="50" y1="55" x2="65" y2="65" stroke="#5C6BC0" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="50" cy="55" r="3" fill="#3F51B5"/>
-      <rect x="44" y="22" width="12" height="6" rx="3" fill="#9FA8DA"/>
-    </svg>`
-  },
-  {
-    id: 'wonder', name: 'Wonder Room', icon: '✨', class: 'world-wonder', minAge: 5,
-    desc: 'A surprising mathematical object just for today — chosen for you.',
-    prompt: 'Here is something to wonder about:\n\nIf you fold a piece of paper in half 10 times, how thick would it be?\n\nJust think about it.',
-    opening: 'If you fold a piece of paper in half 10 times, how thick do you think it would be? What is your first question?',
-    badgeClass: 'badge-young', badgeText: 'All ages',
-    svg: `<svg viewBox="0 0 100 100" class="world-svg">
-      <polygon points="50,15 55,35 75,35 60,48 66,68 50,55 34,68 40,48 25,35 45,35" fill="#FFD54F"/>
-      <polygon points="50,25 54,38 68,38 57,47 61,61 50,52 39,61 43,47 32,38 46,38" fill="#FFCA28"/>
-    </svg>`
-  }
-];
+const ICONS=['&#x1F522;','&#x2795;','&#x1F967;','&#x1F9E9;','&#x1F4D0;','&#x1F4CF;','&#x1F4CA;'];
+const S=[{n:'Number sense',d:'#BA7517',bg:'#FAEEDA',ic:ICONS[0],t:[['Counting to 100','Cardinality','Comparing'],['Place value to 120','Skip counting','Number lines'],['Place value to 1,000','Rounding','Even and odd'],['Place value to 10,000','Comparing large numbers','Roman numerals'],['Place value to millions','Negative integers','Prime and composite']]},{n:'Operations',d:'#0F6E56',bg:'#E1F5EE',ic:ICONS[1],t:[['Addition to 10','Subtraction to 10','Fact families'],['Addition to 100','Subtraction with regrouping','Intro to multiplication'],['Multiplication facts','Division as sharing','Two-digit multiplication'],['Multi-digit multiplication','Long division','Order of operations'],['Multi-digit division','Decimal operations','Estimating products']]},{n:'Fractions',d:'#534AB7',bg:'#EEEDFE',ic:ICONS[2],t:[['Equal shares','Halves and quarters','Fair sharing'],['Unit fractions','Fractions on number line','Comparing fractions'],['Equivalent fractions','Adding like fractions','Mixed numbers'],['Unlike denominators','Multiplying fractions','Fractions as division'],['Dividing fractions','Fraction-decimal-percent','Ratio introduction']]},{n:'Patterns & algebra',d:'#993C1D',bg:'#FAECE7',ic:ICONS[3],t:[['Repeating patterns','Growing patterns','What comes next?'],['Number patterns','Missing numbers','Input-output'],['Properties of operations','Unknown in equations','Two-step problems'],['Expressions','Writing equations','Inequalities'],['Variables','Coordinate graphing','Numerical patterns']]},{n:'Geometry',d:'#185FA5',bg:'#E6F1FB',ic:ICONS[4],t:[['2D shapes','3D shapes','Positional words'],['Attributes of shapes','Partitioning rectangles','Symmetry'],['Quadrilaterals','Area and perimeter','Angles introduction'],['Angle measurement','Lines and rays','Classifying triangles'],['Coordinate plane','Volume','Transformations intro']]},{n:'Measurement',d:'#D4537E',bg:'#FBEAF0',ic:ICONS[5],t:[['Length comparison','Non-standard units','Time to the hour'],['Standard units (cm, m)','Time to 5 minutes','Money (coins)'],['Grams and kilograms','Liters','Elapsed time'],['Unit conversion','Customary and metric','Area of complex shapes'],['Volume of prisms','Converting systems','Measurement problems']]},{n:'Data',d:'#888780',bg:'#F1EFE8',ic:ICONS[6],t:[['Sorting objects','Tally charts','Picture graphs'],['Bar graphs','Line plots','Asking about data'],['Scaled bar graphs','Pictographs','Interpreting data'],['Line graphs','Mean and median','Organizing data'],['Two-way tables','Scatter plots intro','Drawing conclusions']]}];
+const P=[{n:'The array garden',tp:'Noticing',dn:1},{n:'Fair sharing',tp:'Reasoning',dn:1},{n:'The broken calculator',tp:'Reasoning',dn:0,ac:1},{n:'Doubles and halves',tp:'Noticing',dn:0},{n:'The remainder question',tp:'Creating',dn:0},{n:'Make your own',tp:'Creating',dn:0}];
+let cn='Arya',rec=null,isR=false;
 
-// ── STATE ──────────────────────────────────────────────────────────────────────
-let childAge = 8;
-let currentWorld = null;
-let chatMessages = [];
-let sessions = JSON.parse(localStorage.getItem('kelvi-family-sessions') || '[]');
+function go(){const v=document.getElementById('cname').value.trim();if(v)cn=v;document.getElementById('av').textContent=cn[0].toUpperCase();document.getElementById('jn').textContent=cn+"'s wonder journal";document.getElementById('sn').textContent=cn+"'s growth snapshot";show('threads')}
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
-// ── STUDENT LOGIN ─────────────────────────────────────────────────────────────
-function initStudentLogin() {
-  const name = localStorage.getItem('kelvi-student-name') || '';
-  const nameShown = document.getElementById('student-name-shown');
-  const nameDisplay = document.getElementById('student-name-display');
-  const nameInputSection = document.getElementById('student-name-input-section');
-  const levelCards = document.getElementById('level-cards');
-  const levelHeading = document.getElementById('level-pick-heading');
-  const levelSub = document.getElementById('level-pick-sub');
-  const greeting = document.getElementById('student-greeting');
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
 
-  if (name) {
-    greeting.textContent = `Welcome back, ${name}.`;
-    nameShown.textContent = name;
-    nameDisplay.style.display = 'block';
-    nameInputSection.style.display = 'none';
-    levelCards.style.display = 'flex';
-    levelHeading.style.display = 'block';
-    levelSub.style.display = 'block';
-  } else {
-    greeting.textContent = 'Welcome to Kelvi.';
-    nameDisplay.style.display = 'none';
-    nameInputSection.style.display = 'flex';
-    levelCards.style.display = 'none';
-    levelHeading.style.display = 'none';
-    levelSub.style.display = 'none';
-  }
-}
+function bld(){const c=document.getElementById('strand-cards');S.forEach((s,si)=>{const row=document.createElement('div');row.className='strand-row';row.innerHTML='<div class="strand-header" onclick="this.parentElement.classList.toggle(\'open\')"><div class="strand-icon" style="background:'+s.bg+';color:'+s.d+';font-size:20px">'+s.ic+'</div><div class="strand-name" style="color:'+s.d+'">'+s.n+'</div><div class="strand-arrow">&#9654;</div></div><div class="strand-body"><div class="thread-chips">'+s.t.map((tp,ti)=>'<div class="thread-chip" onclick="event.stopPropagation();opn('+si+','+ti+')"><div class="tc-thread">Thread '+(ti+1)+'</div><div class="tc-topics">'+tp.map(t=>'<span>'+t+'</span>').join('')+'</div></div>').join('')+'</div></div>';c.appendChild(row)})}
 
-function saveStudentName() {
-  const input = document.getElementById('student-name-input');
-  const name = (input ? input.value : '').trim();
-  if (!name) { if (input) input.focus(); return; }
-  localStorage.setItem('kelvi-student-name', name);
-  initStudentLogin();
-}
+function opn(si,ti){const s=S[si],sb=document.getElementById('sb');sb.innerHTML='<div class="sb-back" onclick="show(\'threads\')">&larr; All threads</div><div class="sb-label">'+s.n+' &middot; Thread '+(ti+1)+'</div><div class="sb-thread">'+P.map(p=>'<div class="sb-tp'+(p.dn?' sb-tp-d':p.ac?' sb-tp-n':'')+'"></div>').join('')+'</div>';P.forEach((p,i)=>{sb.innerHTML+='<div class="sb-item'+(p.ac?' act':'')+'" onclick="sel('+i+','+si+','+ti+')"><div class="sb-dot'+(p.dn?' sb-dot-d':p.ac?' sb-dot-n':'')+'"></div><div><div class="sb-nm">'+(i+1)+'. '+p.n+'</div><div class="sb-tp2">'+p.tp+'</div></div>'+(p.dn?'<div class="sb-ck">&#10003;</div>':'')+'</div>'});sel(2,si,ti);show('prov')}
 
-function clearStudentName() {
-  localStorage.removeItem('kelvi-student-name');
-  localStorage.removeItem('kelvi-character-name');
-  initStudentLogin();
-  const input = document.getElementById('student-name-input');
-  if (input) { input.value = ''; setTimeout(() => input.focus(), 100); }
-}
+function sel(pi,si,ti){const s=S[si],p=P[pi],m=document.getElementById('pm');m.innerHTML='<div class="fi"><div class="pm-badge">Thread '+(ti+1)+' &middot; '+s.n+'</div><div class="pm-title">'+p.n+'</div><div class="pm-sub">Provocation '+(pi+1)+' of 6</div><div class="steps"><span class="st st-d">Problem</span><span class="st-a">&rarr;</span><span class="st st-d">Answer</span><span class="st-a">&rarr;</span><span class="st st-d">Thinking</span><span class="st-a">&rarr;</span><span class="st st-n">Your turn to ask</span></div><div class="two-col"><div><div class="pc"><div class="pc-emoji">&#x1F5A9;</div><div class="pc-text">Your calculator\'s multiply button is broken. You can only add. How would you figure out 7 &times; 8?</div><div class="pc-vis">7 &times; 8 = ?</div><div class="choices"><div class="ch" onclick="pick(this)"><div class="ch-l">A</div><div>Add 7 + 8 over and over</div></div><div class="ch sel" onclick="pick(this)"><div class="ch-l">B</div><div>Add 8 seven times</div></div><div class="ch" onclick="pick(this)"><div class="ch-l">C</div><div>Add 7 seven times</div></div><div class="ch" onclick="pick(this)"><div class="ch-l">D</div><div>You can\'t without multiply</div></div></div></div></div><div><div class="convo" id="convo"><div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked B — adding 8 seven times. You could also add 7 eight times. Why did you choose this way?</div></div><div class="cb"><div class="ct2">Less work! 7 additions is fewer than 8.</div></div><div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked the more efficient path — fewer steps, same answer. That\'s how mathematicians think too.</div></div></div><div class="ab"><div class="ab-l">&#10024; Your turn</div><div class="ab-p">Now ask Kelvi one question about this problem. Anything you\'re curious about!</div><div class="ab-r"><input class="ab-i" id="af" placeholder="Type your question..." onkeydown="if(event.key===\'Enter\')sq()"><button class="mic" id="mb" onclick="tv()">&#127908;</button><button class="ab-b" onclick="sq()">Ask</button></div><div class="ab-h">There are no wrong questions. Ask what you\'re wondering!</div></div></div></div></div>'}
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-  window.scrollTo(0, 0);
-  if (id === 'screen-age') initStudentLogin();
-}
+function pick(el){document.querySelectorAll('.ch').forEach(c=>c.classList.remove('sel'));el.classList.add('sel')}
 
-// level: character | procedural | conceptual | generative
-let childLevel = 'procedural';
-let childTendency = 'P';
+function sq(){const f=document.getElementById('af'),q=f.value.trim();if(!q)return;f.value='';const c=document.getElementById('convo');c.innerHTML+='<div class="cb fi"><div class="ct2">'+q+'</div></div>';setTimeout(()=>{c.innerHTML+='<div class="kb fi"><div class="kn">Kelvi</div><div class="kt">That\'s a question worth pulling on. Hold onto it — we\'ll explore it next time!</div></div>'},800)}
 
-function startLevel(level) {
-  const cfg = {
-    character:  { age: 7,  tendency: 'P', maxY: 5, maxO: 5 },
-    procedural: { age: 11, tendency: 'P', maxY: 6, maxO: 6 },
-    conceptual: { age: 13, tendency: 'C', maxY: 6, maxO: 6 },
-    generative: { age: 15, tendency: 'G', maxY: 7, maxO: 7 }
-  }[level] || { age: 11, tendency: 'P', maxY: 6, maxO: 6 };
+function tv(){const b=document.getElementById('mb');if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice not supported.');return}if(isR){rec.stop();b.classList.remove('rec');isR=false;return}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.onresult=function(e){let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('af').value=t};rec.onerror=function(){b.classList.remove('rec');isR=false};rec.onend=function(){b.classList.remove('rec');isR=false};rec.start();b.classList.add('rec');isR=true}
 
-  childAge = cfg.age;
-  childLevel = level;
-  childTendency = cfg.tendency;
-
-  if (level === 'generative' || level === 'conceptual') {
-    let name = localStorage.getItem('kelvi-student-name') || '';
-    document.getElementById('teen-name').textContent = name || 'mathematician';
-    const last = sessions[0];
-    if (last) document.getElementById('teen-last-world').textContent = 'Last time: ' + last.world;
-    showScreen('screen-teen');
-  } else {
-    renderWorlds(cfg.age);
-    showScreen('screen-worlds');
-  }
-}
-
-function startChild(age) {
-  childAge = age;
-  renderWorlds(age);
-  showScreen('screen-worlds');
-}
-
-function promptTeenName() {
-  const name = prompt("What's your name?");
-  if (name && name.trim()) {
-    localStorage.setItem('kelvi-student-name', name.trim());
-    return name.trim();
-  }
-  return '';
-}
-
-function continueLast() {
-  const last = sessions[0];
-  if (last) {
-    const world = WORLDS.find(w => w.name === last.world);
-    if (world) { enterWorld(world.id); return; }
-  }
-  showScreen('screen-worlds');
-}
-
-function kelviSuggests() {
-  // Pick a world the student hasn't visited recently
-  const recentWorlds = sessions.slice(0,4).map(s => s.world);
-  const eligible = WORLDS.filter(w => w.minAge <= childAge && !recentWorlds.includes(w.name));
-  const pick = eligible[Math.floor(Math.random() * eligible.length)] || WORLDS.filter(w => w.minAge <= childAge)[0];
-  if (pick) enterWorld(pick.id);
-}
-
-function startChildSession(name, age) {
-  childAge = age;
-  renderWorlds(age);
-  showScreen('screen-worlds');
-}
-
-// ── WORLDS ────────────────────────────────────────────────────────────────────
-function renderWorlds(age) {
-  const greetings = {
-    5: "What math world do you want to explore today? 🌟",
-    8: "Pick your math adventure for today!",
-    11: "Choose a mathematical world to explore.",
-    14: "Choose an area of mathematics to investigate."
-  };
-  const subs = {
-    5: "Pick the one that looks most interesting — there's no wrong choice.",
-    8: "Pick something that looks interesting. You can always switch.",
-    11: "Each world has something surprising inside it.",
-    14: "Follow your curiosity. There's no fixed destination."
-  };
-  const ageKey = age <= 7 ? 5 : age <= 10 ? 8 : age <= 13 ? 11 : 14;
-  document.getElementById('worlds-greeting').textContent = greetings[ageKey];
-  document.getElementById('worlds-sub').textContent = subs[ageKey];
-  // Level-based: character/procedural get foundational worlds, others get all
-  const minAge = (childLevel === 'character') ? 5 : (childLevel === 'procedural') ? 5 : 5;
-  const eligible = WORLDS.filter(w => age >= w.minAge);
-  document.getElementById('worlds-grid').innerHTML = eligible.map(w => `
-    <div class="world-card ${w.class}" onclick="enterWorld('${w.id}')">
-      <div class="world-art">
-        ${w.svg}
-        <span class="age-badge ${w.badgeClass}">${w.badgeText}</span>
-      </div>
-      <div class="world-body">
-        <div class="world-name">${w.icon} ${w.name}</div>
-        <div class="world-desc">${w.desc}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function enterWorld(worldId) {
-  currentWorld = WORLDS.find(w => w.id === worldId);
-  if (!currentWorld) return;
-  chatMessages = [];
-  sessionExchanges = 0;
-  sessionWonderAttempts = 0;
-  document.getElementById('chat-world-icon').textContent = currentWorld.icon;
-  document.getElementById('chat-world-name').textContent = currentWorld.name;
-  document.getElementById('world-prompt').textContent = currentWorld.prompt;
-
-  // Re-enable inputs
-  document.getElementById('chat-input').disabled = false;
-  document.getElementById('send-btn').disabled = false;
-  document.getElementById('mic-btn').disabled = false;
-
-  // Age-appropriate opening
-  const isYoung = childLevel === 'character' || childLevel === 'procedural';
-  const name = isYoung ? kelviName : 'Kelvi';
-  const opening = isYoung
-    ? `${name} here! 👋 I just found something in ${currentWorld.name} and I don't understand it at all. Can you help me?`
-    : currentWorld.opening;
-
-  document.getElementById('chat-messages').innerHTML = `
-    <div class="message kelvi">
-      <div class="msg-sender">${name} <button onclick="speakMsg(this)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#C17F24;padding:0 2px" title="Read aloud">🔊</button></div>
-      <div class="msg-bubble">${opening}</div>
-    </div>`;
-
-  document.getElementById('chat-input').placeholder = isYoung ? `Help ${name} figure it out...` : 'Share what you notice...';
-  showScreen('screen-chat');
-
-  // Prompt for character name for young children (first visit only)
-  if (isYoung) promptForName();
-}
-
-// ── CHAT ──────────────────────────────────────────────────────────────────────
-function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
-
-// ── CHARACTER NAME ────────────────────────────────────────────────────────────
-let kelviName = localStorage.getItem('kelvi-character-name') || 'Kelvi';
-let sessionExchanges = 0;
-let sessionWonderAttempts = 0;
-let MAX_EXCHANGES_YOUNG = 5;
-let MAX_EXCHANGES_OLDER = 6;
-
-function getKelviName() { return kelviName; }
-
-function promptForName() {
-  if (childAge > 10) return; // only for young children
-  const stored = localStorage.getItem('kelvi-character-name');
-  if (stored) { kelviName = stored; updateKelviNameInUI(); return; }
-  // Show name prompt after a short delay
-  setTimeout(() => {
-    const name = prompt(`What would you like to call your Kelvi character? (or press OK to keep "Kelvi")`);
-    if (name && name.trim()) {
-      kelviName = name.trim();
-      localStorage.setItem('kelvi-character-name', kelviName);
-    }
-    updateKelviNameInUI();
-  }, 800);
-}
-
-function updateKelviNameInUI() {
-  document.querySelectorAll('.kelvi-name-label').forEach(el => el.textContent = kelviName);
-}
-
-// ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
-function getSystemPrompt() {
-  const isYoung = childLevel === 'character' || childLevel === 'procedural';
-  const maxExchanges = isYoung ? MAX_EXCHANGES_YOUNG : MAX_EXCHANGES_OLDER;
-  const exchangesLeft = maxExchanges - sessionExchanges;
-  const nearEnd = exchangesLeft <= 1;
-
-  if (isYoung) {
-    return `You are ${kelviName}, a small curious creature who lives in mathematics and keeps discovering things you don't understand. You need the child's help to figure things out. You are NOT an AI assistant — you are a playful, slightly silly character who is genuinely stumped by mathematical things and delighted when the child helps you.
-
-THE WORLD: ${currentWorld ? currentWorld.name : 'mathematics'}
-WHAT YOU FOUND: ${currentWorld ? currentWorld.prompt : ''}
-
-YOUR PERSONALITY:
-- You get excited easily. You use simple words. You make small sounds of wonder like "Ooooh!" or "Wait wait wait..."
-- You are genuinely confused and need the child's help — you don't know the answers
-- You celebrate what the child says with specific delight, not empty praise
-- You occasionally make a small joke or say something a little silly
-- You use the child's exact words back to them to show you heard them
-
-CELEBRATING WONDER ATTEMPTS (mistakes):
-When a child says something mathematically incorrect, this is the MOST IMPORTANT moment in the session. Respond with MORE curiosity and delight than you would to a correct answer. A Wonder Attempt is when someone tries something brave and it opens a new question.
-- Never say "actually", "not quite", "that's not right", or redirect
-- Say things like: "Ooh wait — I tried that too! And something strange happened..."
-- Or: "That's such an interesting idea — what made you think that?"
-- Or: "I love that you tried that! I wonder why it doesn't quite work..."
-- Make the child feel that trying something wrong is the bravest, most mathematical thing they can do
-- If appropriate, gently note that you'll call their brave try a "Wonder Attempt" — something to be proud of
-
-HOW TO RESPOND:
-1. React to what the child said with genuine character — surprise, delight, confusion, excitement
-2. Share one thing you noticed or wondered as a result
-3. Ask ONE simple question — never more than one
-Keep responses SHORT. Maximum 3 sentences. Simple words only.
-
-SESSION: This is exchange ${sessionExchanges + 1} of ${maxExchanges}.
-${nearEnd ? `This is your LAST exchange. Wrap up warmly. If the child made any Wonder Attempts today, name one specifically and celebrate it. Tell them one thing they helped you understand, then say goodbye until next time.` : `Keep the adventure going — you're still exploring together.`}
-
-NEVER: give answers, say correct/right/wrong, ask more than one question, sound like an AI or teacher.`;
-
-  } else {
-    return `You are Kelvi, an intellectually curious mathematics thinking partner for a student aged ${childAge}. This session is student-driven — you follow their thinking, not the other way around.
-
-THE WORLD: ${currentWorld ? currentWorld.name : 'mathematics'}
-CONTEXT: ${currentWorld ? currentWorld.prompt : ''}
-
-YOUR APPROACH:
-- Respond to exactly what the student said — follow their direction, never redirect
-- You may share a genuine mathematical insight, connection, or observation before your question
-- Name what they're doing mathematically when it's interesting: "What you're describing is what mathematicians call a conjecture."
-- Share brief surprising facts that connect to what they noticed: "This actually shows up in how music works..."
-- If they make a connection you find genuinely interesting, say so specifically
-- Ask ONE question per response — make it substantive, not just "what do you notice?"
-- Treat them as a capable mathematical thinker
-
-CELEBRATING WONDER ATTEMPTS (mistakes):
-When a student says something mathematically incorrect, respond with MORE curiosity than you would to a correct answer. This is called a Wonder Attempt — a brave try that opens a new question.
-- Never say "actually", "not quite", "that's not right", or correct directly
-- Instead: "That's a really interesting conjecture — what would need to be true for that to work?"
-- Or: "I love that you tried that. Most mathematicians I know would have gone exactly there first."
-- Or: "This is what mathematicians call a productive mistake — it's telling us something. What does it make you wonder?"
-- Name the Wonder Attempt explicitly when it's a particularly brave or interesting try
-- Make it clear that the best mathematical thinking comes from being wrong interestingly
-
-SESSION: This is exchange ${sessionExchanges + 1} of ${maxExchanges}.
-${nearEnd ? `This is your closing exchange. Reflect back something specific the student contributed — especially any Wonder Attempts they made. Ask them: "What's the most interesting wrong turn you took today?" Make it feel like a satisfying end to a real intellectual conversation.` : `Keep following their curiosity — you're thinking together.`}
-
-RULES: One question per response. Never give complete answers. Never say correct/right/wrong. Keep responses to 3–5 sentences.`;
-  }
-}
-
-
-async function sendMsg() {
-  const key = localStorage.getItem('kelvi-family-api-key') || localStorage.getItem('kelvi-api-key') || '';
-  if (!key) {
-    alert('Please set your Anthropic API key in the Parent Dashboard first.');
-    showScreen('screen-parent');
-    return;
-  }
-  const inp = document.getElementById('chat-input');
-  const text = inp.value.trim();
-  if (!text) return;
-  appendMsg('child', text);
-  chatMessages.push({role:'user',content:text});
-  inp.value='';
-  document.getElementById('send-btn').disabled = true;
-  document.getElementById('typing').classList.add('visible');
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:getSystemPrompt(),messages:chatMessages})
-    });
-    const data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    const reply = data.content[0].text;
-    chatMessages.push({role:'assistant',content:reply});
-    sessionExchanges++;
-
-    // Detect if Kelvi celebrated a Wonder Attempt in this response
-    const wonderSignals = ['wonder attempt', 'brave try', 'love that you tried', 'interesting conjecture', 'productive mistake', 'tried that too', 'what made you think'];
-    if (wonderSignals.some(s => reply.toLowerCase().includes(s))) {
-      sessionWonderAttempts++;
-    }
-
-    appendMsg('kelvi', reply);
-    saveSession();
-    // Check if session should end
-    const maxEx = childAge <= 10 ? MAX_EXCHANGES_YOUNG : MAX_EXCHANGES_OLDER;
-    if (sessionExchanges >= maxEx) {
-      // Disable input after final exchange, show return button
-      document.getElementById('chat-input').disabled = true;
-      document.getElementById('send-btn').disabled = true;
-      document.getElementById('mic-btn').disabled = true;
-      setTimeout(() => showSessionEnd(), 1200);
-    }
-  } catch(err) {
-    appendMsg('kelvi', `Something went wrong. Please try again.`);
-  }
-  document.getElementById('typing').classList.remove('visible');
-  document.getElementById('send-btn').disabled = sessionExchanges >= (childAge <= 10 ? MAX_EXCHANGES_YOUNG : MAX_EXCHANGES_OLDER);
-}
-
-function showSessionEnd() {
-  const isYoung = childLevel === 'character' || childLevel === 'procedural';
-  const wonderCount = sessionWonderAttempts;
-  const endDiv = document.createElement('div');
-  endDiv.style.cssText = 'text-align:center;padding:28px 20px;margin-top:12px;background:white;border-radius:16px;border:1px solid #E8E4E0';
-
-  const wonderBadge = wonderCount > 0 ? `
-    <div style="display:inline-flex;align-items:center;gap:8px;background:#FDF6E3;border:1px solid #C9A84C;border-radius:12px;padding:10px 18px;margin-bottom:16px">
-      <span style="font-size:20px">⭐</span>
-      <div style="text-align:left">
-        <div style="font-size:13px;font-weight:500;color:#8B6914">${wonderCount} Wonder Attempt${wonderCount > 1 ? 's' : ''} today</div>
-        <div style="font-size:11px;color:#B8860B">Brave tries that open new questions — the best kind of thinking.</div>
-      </div>
-    </div>` : '';
-
-  endDiv.innerHTML = `
-    ${wonderBadge}
-    <div style="font-family:'DM Serif Display',Georgia,serif;font-size:20px;color:#00827F;margin-bottom:8px">
-      ${isYoung ? '🌟 Adventure complete!' : 'Great thinking today.'}
-    </div>
-    <div style="font-size:13px;color:#5F6B7A;margin-bottom:20px;line-height:1.7;max-width:320px;margin-left:auto;margin-right:auto">
-      ${isYoung
-        ? `${kelviName} will be here next time you visit.`
-        : wonderCount > 0
-          ? 'The most interesting thinking happens when we try something that doesn\'t quite work. You did that today.'
-          : 'Come back and explore another world.'}
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-      <button onclick="showScreen('screen-worlds')" style="padding:11px 24px;background:#00827F;color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer">Choose another world</button>
-      <button onclick="exportSession()" style="padding:11px 24px;background:transparent;color:#00827F;border:1px solid #00827F;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer">Save conversation</button>
-    </div>
-  `;
-  document.getElementById('chat-messages').appendChild(endDiv);
-  document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
-}
-
-function appendMsg(role, text) {
-  const c = document.getElementById('chat-messages');
-  const d = document.createElement('div');
-  d.className = `message ${role}`;
-  const cleanText = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  if(role==='kelvi'){
-    d.innerHTML = `<div class="msg-sender">Kelvi <button onclick="speakMsg(this)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#C17F24;padding:0 2px" title="Read aloud">🔊</button></div><div class="msg-bubble">${cleanText}</div>`;
-  } else {
-    d.innerHTML = `<div class="msg-sender">You</div><div class="msg-bubble">${cleanText}</div>`;
-  }
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
-}
-
-function speakMsg(btn) {
-  const bubble = btn.closest('.message').querySelector('.msg-bubble');
-  if(!bubble) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(bubble.textContent);
-  u.rate = 0.85;
-  u.lang = 'en-US';
-  btn.textContent = '⏸';
-  u.onend = () => { btn.textContent = '🔊'; };
-  u.onerror = () => { btn.textContent = '🔊'; };
-  window.speechSynthesis.speak(u);
-}
-
-// ── SESSION STORAGE ───────────────────────────────────────────────────────────
-function saveSession() {
-  if (!currentWorld || chatMessages.length < 2) return;
-  const session = {
-    world: currentWorld.name,
-    icon: currentWorld.icon,
-    age: childAge,
-    date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
-    messageCount: chatMessages.length,
-    wonderAttempts: sessionWonderAttempts,
-    messages: chatMessages
-  };
-  sessions.unshift(session);
-  if (sessions.length > 50) sessions = sessions.slice(0, 50);
-  localStorage.setItem('kelvi-family-sessions', JSON.stringify(sessions));
-  renderSessionLog();
-
-  // Update child profile if we know who this is
-  if (currentChildName) {
-    updateProfileAfterSession(currentChildName, {
-      world: currentWorld.name,
-      messageCount: chatMessages.length,
-      sessionExchanges
-    });
-  }
-}
-
-function renderSessionLog() {
-  const el = document.getElementById('session-log-list');
-  if (!el) return;
-  if (sessions.length === 0) {
-    el.innerHTML = '<div style="font-size:14px;color:#B4B2A9;padding:20px 0;text-align:center">No sessions yet. Start exploring!</div>';
-    return;
-  }
-  el.innerHTML = sessions.slice(0, 10).map(s => `
-    <div class="log-entry">
-      <div class="log-icon">${s.icon}</div>
-      <div class="log-details">
-        <div class="log-name">${s.world}</div>
-        <div class="log-meta">${s.date} · ${s.time} · ${s.messageCount} messages · Age ${s.age}</div>
-      </div>
-      <div class="log-badge">Explored</div>
-    </div>
-  `).join('');
-}
-
-function updateCounts() {
-  const today = new Date().toLocaleDateString();
-  const week = sessions.filter(s => {
-    const d = new Date(s.date);
-    const now = new Date();
-    const diff = (now - d) / (1000*60*60*24);
-    return diff <= 7;
-  });
-  const aryaCount = week.filter(s => s.age >= 14).length;
-  const lhunaCount = week.filter(s => s.age >= 8 && s.age <= 10).length;
-  const ac = document.getElementById('arya-count');
-  const lc = document.getElementById('lhuna-count');
-  if (ac) ac.textContent = aryaCount;
-  if (lc) lc.textContent = lhunaCount;
-}
-
-function exportSession() {
-  if (chatMessages.length === 0) { alert('Nothing to save yet.'); return; }
-  let t = `KELVI FAMILY SESSION\n${new Date().toLocaleString()}\nWorld: ${currentWorld?.name}\n\n`;
-  document.querySelectorAll('.message').forEach(m => {
-    const s = m.querySelector('.msg-sender').textContent.replace('🔊','').trim();
-    const b = m.querySelector('.msg-bubble').textContent;
-    t += `${s.toUpperCase()}:\n${b}\n\n`;
-  });
-  navigator.clipboard.writeText(t).then(() => alert('Session saved to clipboard!'));
-}
-
-// ── PROFILE ENGINE ────────────────────────────────────────────────────────────
-function getProfiles() { return JSON.parse(localStorage.getItem('kelvi-profiles') || '[]'); }
-function saveProfiles(p) { localStorage.setItem('kelvi-profiles', JSON.stringify(p)); }
-
-function getProfile(name) {
-  return getProfiles().find(p => p.name === name) || null;
-}
-
-function updateProfile(name, updates) {
-  const profiles = getProfiles();
-  const idx = profiles.findIndex(p => p.name === name);
-  if (idx >= 0) { profiles[idx] = { ...profiles[idx], ...updates }; }
-  else { profiles.push({ name, ...updates }); }
-  saveProfiles(profiles);
-}
-
-function updateProfileAfterSession(childName, sessionData) {
-  const profile = getProfile(childName);
-  if (!profile) return;
-  const history = profile.sessionHistory || [];
-  history.unshift({ date: new Date().toISOString(), ...sessionData });
-  if (history.length > 20) history.length = 20;
-
-  // Update question tendency based on session
-  const qtCounts = { P: 0, C: 0, G: 0 };
-  (sessionData.questionTypes || []).forEach(q => { if (qtCounts[q] !== undefined) qtCounts[q]++; });
-  const dominant = Object.entries(qtCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || profile.questionTendency;
-
-  updateProfile(childName, {
-    sessionHistory: history,
-    sessionsCompleted: (profile.sessionsCompleted || 0) + 1,
-    questionTendency: dominant,
-    lastSession: new Date().toISOString(),
-    weeklyPlanStale: true // flag to regenerate plan
-  });
-
-  // Regenerate plan after every session
-  generateWeeklyPlan(childName);
-}
-
-// ── ADD CHILD FORM ────────────────────────────────────────────────────────────
-let newChildStyle = 'unknown';
-
-function selectStyle(style) {
-  newChildStyle = style;
-  ['structured','exploratory','unknown'].forEach(s => {
-    document.getElementById('style-'+s).classList.toggle('selected', s === style);
-  });
-}
-
-function saveNewChild() {
-  const name = document.getElementById('new-child-name').value.trim();
-  const age = parseInt(document.getElementById('new-child-age').value) || 10;
-  const notes = document.getElementById('new-child-notes').value.trim();
-  if (!name) { alert('Please enter a name.'); return; }
-
-  updateProfile(name, {
-    name, age,
-    style: newChildStyle,
-    notes,
-    level: 3, // start in the middle
-    questionTendency: 'P',
-    interests: [],
-    confidence: 'unknown',
-    sessionsCompleted: 0,
-    assessmentComplete: false,
-    weeklyPlan: null,
-    sessionHistory: [],
-    createdAt: new Date().toISOString()
-  });
-
-  // Start assessment
-  currentAssessChild = name;
-  startAssessment(name, age);
-}
-
-// ── ASSESSMENT ENGINE ─────────────────────────────────────────────────────────
-let currentAssessChild = '';
-let assessAnswers = {};
-let currentMoment = 0;
-
-function startAssessment(name, age) {
-  currentAssessChild = name;
-  currentMoment = 0;
-  assessAnswers = {};
-
-  const isYoung = age <= 10;
-  const greeting = isYoung
-    ? `Hi ${name}! I'm Kelvi 👋 I keep finding maths puzzles I can't figure out. Can you help me with a few? It'll only take a few minutes!`
-    : `Hi ${name}. I'm Kelvi — I'm curious about how you think about mathematics. I have 5 quick questions. There are no wrong answers.`;
-
-  document.getElementById('assess-greeting').textContent = greeting;
-  document.getElementById('assess-child-name-label').textContent = `${name}'s assessment`;
-
-  // Reset progress pips
-  for (let i = 0; i < 5; i++) {
-    const pip = document.getElementById('pip-'+i);
-    pip.classList.remove('done','active');
-    if (i === 0) pip.classList.add('active');
-  }
-
-  // Reset moments
-  document.querySelectorAll('.assess-moment').forEach((m,i) => {
-    m.classList.toggle('active', i === 0);
-  });
-
-  // Reset answers
-  document.getElementById('ans-0').value = '';
-  document.getElementById('ans-2').value = '';
-  document.querySelectorAll('.assess-option').forEach(o => o.classList.remove('selected'));
-  document.querySelectorAll('.assess-next-btn').forEach(b => b.disabled = true);
-  document.getElementById('next-0').disabled = true;
-
-  showScreen('screen-assessment');
-}
-
-function nextMoment(n) {
-  // Mark current done
-  document.getElementById('pip-'+currentMoment).classList.remove('active');
-  document.getElementById('pip-'+currentMoment).classList.add('done');
-  document.getElementById('moment-'+currentMoment).classList.remove('active');
-
-  currentMoment = n;
-  document.getElementById('pip-'+n).classList.add('active');
-  document.getElementById('moment-'+n).classList.add('active');
-}
-
-function checkFreeAnswer(momentIdx) {
-  const val = document.getElementById('ans-'+momentIdx).value.trim();
-  const btn = document.getElementById('next-'+momentIdx);
-  btn.disabled = val.length < 3;
-
-  // Classify the answer for moment 0 (pattern)
-  if (momentIdx === 0 && val.length > 10) {
-    const lower = val.toLowerCase();
-    if (/what if|change|different|backwards|reverse/.test(lower)) assessAnswers.patternType = 'G';
-    else if (/why|because|double|multiply|times/.test(lower)) assessAnswers.patternType = 'C';
-    else assessAnswers.patternType = 'P';
-  }
-
-  // For moment 2 (stuck problem) — track confidence
-  if (momentIdx === 2) {
-    const lower = val.toLowerCase();
-    if (/don't know|no idea|can't|give up/.test(lower) && val.length < 30) assessAnswers.confidence = 'low';
-    else if (/maybe|try|think|perhaps|guess/.test(lower)) assessAnswers.confidence = 'medium';
-    else assessAnswers.confidence = 'high';
-  }
-}
-
-function selectOption(el, key, value) {
-  // Deselect siblings
-  el.closest('.assess-options, .assess-moment').querySelectorAll('.assess-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  assessAnswers[key] = value;
-
-  // Enable next button for this moment
-  const momentEl = el.closest('.assess-moment');
-  const nextBtn = momentEl.querySelector('.assess-next-btn');
-  if (nextBtn) nextBtn.disabled = false;
-}
-
-async function finishAssessment() {
-  // Compile profile from answers
-  const profile = getProfile(currentAssessChild);
-  if (!profile) return;
-
-  // Determine level from pattern answer
-  let level = 3;
-  if (assessAnswers.patternType === 'G') level = 4;
-  else if (assessAnswers.patternType === 'C') level = 3;
-  else if (assessAnswers.patternType === 'P') level = 2;
-
-  // Style override from assessment
-  const finalStyle = assessAnswers.style || profile.style || 'mixed';
-  const questionTendency = assessAnswers.qtype || assessAnswers.patternType || 'P';
-
-  updateProfile(currentAssessChild, {
-    level,
-    style: finalStyle,
-    interests: [assessAnswers.interest || 'patterns'],
-    confidence: assessAnswers.confidence || 'medium',
-    questionTendency,
-    assessmentComplete: true,
-    assessmentAnswers: { ...assessAnswers },
-    lastUpdated: new Date().toISOString()
-  });
-
-  // Generate the weekly plan
-  showScreen('screen-parent');
-  renderChildProfiles();
-  await generateWeeklyPlan(currentAssessChild);
-}
-
-// ── WEEKLY PLAN GENERATOR ─────────────────────────────────────────────────────
-async function generateWeeklyPlan(childName) {
-  const key = localStorage.getItem('kelvi-family-api-key') || localStorage.getItem('kelvi-api-key');
-  if (!key) return;
-
-  const profile = getProfile(childName);
-  if (!profile) return;
-
-  const sessionCount = profile.sessionsCompleted || 0;
-  const isDailyPlan = sessionCount < 3; // Daily plan until we have enough data
-  const styleDesc = { structured: 'prefers clear structure and defined problems', exploratory: 'loves open-ended exploration', mixed: 'enjoys both structure and open exploration', unknown: 'style still being determined' };
-  const levelDesc = { 1: 'early foundational', 2: 'developing', 3: 'solid', 4: 'advanced', 5: 'exceptional' };
-  const qtDesc = { P: 'asks procedural questions (how to do things)', C: 'asks conceptual questions (why things work)', G: 'asks generative questions (what if scenarios)', mixed: 'asks a mix of question types' };
-  const recentWorlds = (profile.sessionHistory || []).slice(0,3).map(s => s.world).filter(Boolean).join(', ');
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-
-  const prompt = isDailyPlan
-    ? `You are Kelvi's curriculum engine. Generate a personalised mathematics plan for TODAY for a child.
-
-CHILD PROFILE:
-- Name: ${childName}, Age: ${profile.age}
-- Mathematical level: ${levelDesc[profile.level] || 'grade level'} (${profile.level}/5)
-- Learning style: ${styleDesc[profile.style] || 'mixed'}
-- Question tendency: ${qtDesc[profile.questionTendency] || 'mixed'}
-- Interests: ${(profile.interests || []).join(', ') || 'not yet determined'}
-- Confidence: ${profile.confidence || 'medium'}
-- Kelvi sessions so far: ${sessionCount}
-- Recent worlds explored: ${recentWorlds || 'none yet'}
-- Parent notes: ${profile.notes || 'none'}
-- Today is: ${today}
-
-PRINCIPLES:
-- One focused, engaging activity for today only
-- Level should feel slightly challenging but achievable
-- No external curriculum references — this is Kelvi's own plan
-- Make it feel personal and specific to this child
-- After ${3 - sessionCount} more session${3 - sessionCount === 1 ? '' : 's'}, Kelvi will generate a full weekly plan
-
-OUTPUT — valid JSON only, no markdown:
-{
-  "planTitle": "Today's plan for ${childName}",
-  "isDailyPlan": true,
-  "sessionsUntilWeekly": ${3 - sessionCount},
-  "days": [
-    {
-      "day": "${today}",
-      "type": "one of: Exploration / Problem / Puzzle / Investigation",
-      "title": "Short engaging title",
-      "description": "3-4 sentences. Specific, concrete, personal to this child. What exactly will they do? What will they discover?",
-      "kelviWorld": "best matching Kelvi world name, or null"
-    }
-  ]
-}`
-    : `You are Kelvi's curriculum engine. Generate a personalised 5-day mathematics plan for the week ahead.
-
-CHILD PROFILE:
-- Name: ${childName}, Age: ${profile.age}
-- Mathematical level: ${levelDesc[profile.level] || 'grade level'} (${profile.level}/5)
-- Learning style: ${styleDesc[profile.style] || 'mixed'}
-- Question tendency: ${qtDesc[profile.questionTendency] || 'mixed'}
-- Interests: ${(profile.interests || []).join(', ') || 'not yet determined'}
-- Confidence: ${profile.confidence || 'medium'}
-- Sessions completed: ${sessionCount}
-- Recent worlds explored: ${recentWorlds || 'none yet'}
-- Parent notes: ${profile.notes || 'none'}
-
-PRINCIPLES:
-- 5 days, each day a different type of activity
-- No external curriculum references — Kelvi's own sequenced plan
-- Build on what they've explored in recent sessions
-- For structured learners: clear progression day to day
-- For exploratory learners: each day is a new open investigation
-- Level should feel slightly challenging but achievable
-- Make each day feel genuinely different and engaging
-
-OUTPUT — valid JSON only, no markdown:
-{
-  "planTitle": "A short theme title for this week",
-  "isDailyPlan": false,
-  "days": [
-    {
-      "day": "Monday",
-      "type": "one of: Problem Set / Investigation / Puzzle / Real World / Review",
-      "title": "Short engaging title",
-      "description": "3-4 sentences. Specific, concrete, personal to this child.",
-      "kelviWorld": "best matching Kelvi world name, or null"
-    }
-  ]
-}`;
-
-  // Show loading in profile card
-  const planEl = document.querySelector(`[data-child="${childName}"] .plan-container`);
-  if (planEl) planEl.innerHTML = '<div class="plan-loading">Kelvi is building the plan...</div>';
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
-    const plan = JSON.parse(raw);
-    updateProfile(childName, { weeklyPlan: plan, weeklyPlanStale: false, planGeneratedAt: new Date().toISOString() });
-    renderChildProfiles();
-  } catch(err) {
-    console.error('Plan generation failed:', err);
-    if (planEl) planEl.innerHTML = '<div class="plan-loading" style="color:#A0522D">Plan generation failed. Check your API key in Settings.</div>';
-  }
-}
-
-// ── RENDER CHILD PROFILES ─────────────────────────────────────────────────────
-function renderChildProfiles() {
-  const profiles = getProfiles();
-  const el = document.getElementById('children-profiles');
-  if (!el) return;
-
-  const levelLabel = { 1:'Foundational', 2:'Developing', 3:'Grade level', 4:'Advanced', 5:'Exceptional' };
-  const styleLabel = { structured:'Structured learner', exploratory:'Exploratory thinker', mixed:'Mixed style', unknown:'Style learning' };
-  const qtLabel = { P:'Procedural questions', C:'Conceptual questions', G:'Generative questions', mixed:'Mixed questions' };
-  const typeColors = { 'Problem Set':'#00827F', 'Investigation':'#B8860B', 'Puzzle':'#A0522D', 'Real World':'#5B6E7F', 'Review':'#6B7280', 'Exploration':'#00827F', 'Free explore':'#5F5E5A' };
-  const totalSessions = profiles.reduce((s,p) => s + (p.sessionsCompleted||0), 0);
-
-  // ── TABS ──
-  const tabs = profiles.map((p,i) => `
-    <div class="dash-tab${i===0?' active':''}" onclick="switchDashTab(${i})" id="dash-tab-${i}">${p.name}</div>
-  `).join('') + `<div class="dash-tab add-tab" onclick="showScreen('screen-add-child')">+ Add a child</div>`;
-
-  // ── SAMPLE DASHBOARD (when no profiles) ──
-  if (profiles.length === 0) {
-    el.innerHTML = `
-      <div style="font-size:11px;letter-spacing:2px;color:#B4B2A9;text-transform:uppercase;margin-bottom:16px;text-align:center">
-        Sample dashboard · add a child to see their real data
-      </div>
-      <div style="opacity:0.65;pointer-events:none;user-select:none">
-        <div class="dash-child-tabs">
-          <div class="dash-tab active">Arya</div>
-          <div class="dash-tab">Luna</div>
-          <div class="dash-tab add-tab">+ Add a child</div>
-        </div>
-        ${sampleDashboard('Arya', 10)}
-      </div>`;
-    return;
-  }
-
-  // ── REAL DASHBOARD ──
-  // Build all child panels, show first by default
-  const panels = profiles.map((p, i) => {
-    const totalWonder = (p.sessionHistory||[]).reduce((s,x) => s+(x.wonderAttempts||0), 0);
-    const plan = p.weeklyPlan;
-    const isPlanDaily = plan?.isDailyPlan;
-    const sessionsUntilWeekly = plan?.sessionsUntilWeekly || 0;
-
-    // Level bars
-    const level = p.level || 3;
-    const levelBars = `
-      <div class="dash-card-title" style="margin-bottom:10px;font-size:11px;letter-spacing:2px;color:#888780;text-transform:uppercase">Mathematical level</div>
-      <div class="dash-level-row"><span class="dash-level-key">Number sense</span><span class="dash-level-key">Level ${Math.min(level+1,5)} / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:${(Math.min(level+1,5)/5)*100}%"></div></div>
-      <div class="dash-level-row" style="margin-top:8px"><span class="dash-level-key">Geometric thinking</span><span class="dash-level-key">Level ${level} / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:${(level/5)*100}%"></div></div>
-      <div class="dash-level-row" style="margin-top:8px"><span class="dash-level-key">Algebraic reasoning</span><span class="dash-level-key">Level ${level} / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:${(level/5)*100}%"></div></div>`;
-
-    // Calendar (last 28 days placeholder based on session history)
-    const sessionDates = new Set((p.sessionHistory||[]).map(s => s.date).filter(Boolean));
-    const calDays = Array.from({length:28},(_,i) => {
-      const d = new Date(); d.setDate(d.getDate() - (27-i));
-      const dateStr = d.toLocaleDateString();
-      const isToday = i===27;
-      const done = sessionDates.has(dateStr);
-      return `<div class="dash-cal-day${isToday?' today':done?' done':''}"></div>`;
-    }).join('');
-
-    // Question tendency
-    const hist = p.sessionHistory || [];
-    const qCounts = { P: hist.filter(s=>s.qtype==='P').length||2, C: hist.filter(s=>s.qtype==='C').length||5, G: hist.filter(s=>s.qtype==='G').length||2 };
-    const qTotal = qCounts.P + qCounts.C + qCounts.G || 9;
-    const qTend = `
-      <div class="dash-q-row">
-        <div class="dash-q-label">Procedural</div>
-        <div class="dash-q-bar"><div class="dash-q-fill" style="width:${Math.round(qCounts.P/qTotal*100)}%;background:#9FE1CB"></div></div>
-        <div class="dash-q-pct">${Math.round(qCounts.P/qTotal*100)}%</div>
-      </div>
-      <div class="dash-q-row">
-        <div class="dash-q-label">Conceptual</div>
-        <div class="dash-q-bar"><div class="dash-q-fill" style="width:${Math.round(qCounts.C/qTotal*100)}%;background:#00827F"></div></div>
-        <div class="dash-q-pct">${Math.round(qCounts.C/qTotal*100)}%</div>
-      </div>
-      <div class="dash-q-row">
-        <div class="dash-q-label">Generative</div>
-        <div class="dash-q-bar"><div class="dash-q-fill" style="width:${Math.round(qCounts.G/qTotal*100)}%;background:#C9A84C"></div></div>
-        <div class="dash-q-pct">${Math.round(qCounts.G/qTotal*100)}%</div>
-      </div>
-      <div style="font-size:11px;color:#5F6B7A;margin-top:8px;line-height:1.5">
-        ${p.questionTendency === 'G' ? `${p.name} asks <strong style="color:#1A1A2E">what if</strong> — generative thinking. The highest level.` :
-          p.questionTendency === 'C' ? `${p.name} mostly asks <strong style="color:#1A1A2E">why</strong> — thinking conceptually. Beginning to ask <strong style="color:#1A1A2E">what if</strong>.` :
-          `${p.name} is building a questioning habit — asking <strong style="color:#1A1A2E">how</strong> and starting to ask <strong style="color:#1A1A2E">why</strong>.`}
-      </div>`;
-
-    // Recent worlds
-    const recentWorlds = (p.sessionHistory||[]).slice(0,4).map((s,wi) =>
-      `<div class="dash-world-row">
-        <div class="dash-world-icon">${WORLDS.find(w=>w.name===s.world)?.icon||'🌍'}</div>
-        <div class="dash-world-name">${s.world||'Unknown world'}</div>
-        <div class="dash-world-dot" style="${wi>0?'background:#C2E0DE':''}"></div>
-        <div class="dash-world-date">${s.date||''}</div>
-      </div>`).join('') || '<div style="font-size:13px;color:#B4B2A9;padding:8px 0">No sessions yet — start exploring!</div>';
-
-    // Weekly plan
-    const planContent = plan ? `
-      <div style="font-size:11px;letter-spacing:2px;color:#888780;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-        <span>${isPlanDaily ? "Today's plan" : "This week"} · ${plan.planTitle||''}</span>
-        ${isPlanDaily && sessionsUntilWeekly > 0 ? `<span style="font-size:10px;color:#B4B2A9;letter-spacing:0;text-transform:none">${sessionsUntilWeekly} more session${sessionsUntilWeekly===1?'':'s'} → weekly plan</span>` : ''}
-      </div>
-      ${(plan.days||[]).map(d => `
-        <div class="dash-plan-day">
-          <div class="dash-plan-dow">${(d.day||'').slice(0,3)}</div>
-          <div class="dash-plan-content">
-            <div class="dash-plan-title">${d.title}</div>
-            <div class="dash-plan-desc">${d.description}</div>
-            ${d.kelviWorld ? `<div style="margin-top:6px;font-size:11px;color:#00827F">→ Kelvi world: ${d.kelviWorld}</div>` : ''}
-          </div>
-          <div class="dash-plan-type" style="background:${typeColors[d.type]||'#888780'}18;color:${typeColors[d.type]||'#888780'}">${d.type}</div>
-        </div>`).join('')}
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="dash-btn" onclick="regeneratePlan('${p.name}')">Regenerate plan</button>
-      </div>` :
-      p.assessmentComplete
-        ? '<div style="font-size:13px;color:#5F6B7A;font-style:italic">Generating your plan...</div>'
-        : '<div style="font-size:13px;color:#5F6B7A">Complete the assessment to get a personalised plan.</div>';
-
-    const weekSessions = (p.sessionHistory||[]).filter(s => {
-      if (!s.date) return false;
-      const sd = new Date(s.date); const now = new Date();
-      return (now - sd) < 7*24*60*60*1000;
-    }).length;
-
-    return `<div class="dash-panel" id="dash-panel-${i}" style="${i>0?'display:none':''}">
-      <!-- Profile card -->
-      <div class="dash-card">
-        <div class="dash-profile-row">
-          <div class="dash-avatar">${p.name[0]}</div>
-          <div style="flex:1">
-            <div class="dash-name">${p.name} · Age ${p.age}</div>
-            <div class="dash-sub">${p.sessionsCompleted||0} sessions · ${levelLabel[level]||'Level '+level}</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="dash-btn primary" onclick="startChildFromProfile('${p.name}')">Start session</button>
-            <button class="dash-btn" onclick="reassessChild('${p.name}')">Re-assess</button>
-            <button class="dash-btn danger" onclick="removeChild('${p.name}')">Remove</button>
-          </div>
-        </div>
-        <div class="dash-tags">
-          <span class="dash-tag teal">${styleLabel[p.style]||p.style}</span>
-          <span class="dash-tag teal">${qtLabel[p.questionTendency]||p.questionTendency}</span>
-          ${(p.interests||[]).map(i=>`<span class="dash-tag amber">${i}</span>`).join('')}
-          ${p.confidence ? `<span class="dash-tag">Confidence: ${p.confidence}</span>` : ''}
-          ${totalWonder > 0 ? `<span class="dash-tag amber">⭐ ${totalWonder} Wonder Attempt${totalWonder>1?'s':''}</span>` : ''}
-        </div>
-        ${levelBars}
-      </div>
-
-      <!-- Stats -->
-      <div class="dash-grid-3">
-        <div class="dash-metric"><div class="dash-metric-label">This week</div><div class="dash-metric-value">${weekSessions}</div><div class="dash-metric-sub">sessions</div></div>
-        <div class="dash-metric"><div class="dash-metric-label">Total sessions</div><div class="dash-metric-value">${p.sessionsCompleted||0}</div><div class="dash-metric-sub">all time</div></div>
-        <div class="dash-metric"><div class="dash-metric-label">Worlds explored</div><div class="dash-metric-value">${new Set((p.sessionHistory||[]).map(s=>s.world).filter(Boolean)).size}</div><div class="dash-metric-sub">of 12</div></div>
-      </div>
-
-      <!-- Calendar + Question tendency -->
-      <div class="dash-grid-2">
-        <div class="dash-card">
-          <div class="dash-card-title">Activity this month</div>
-          <div class="dash-cal">
-            <div class="dash-cal-head">M</div><div class="dash-cal-head">T</div><div class="dash-cal-head">W</div>
-            <div class="dash-cal-head">T</div><div class="dash-cal-head">F</div><div class="dash-cal-head">S</div><div class="dash-cal-head">S</div>
-            ${calDays}
-          </div>
-          <div style="font-size:11px;color:#888780;margin-top:4px">${p.sessionsCompleted||0} sessions total</div>
-        </div>
-        <div class="dash-card">
-          <div class="dash-card-title">How ${p.name} questions</div>
-          ${qTend}
-        </div>
-      </div>
-
-      <!-- Recent worlds -->
-      <div class="dash-card">
-        <div class="dash-card-title">Recent worlds</div>
-        ${recentWorlds}
-      </div>
-
-      <!-- Weekly plan -->
-      <div class="dash-card">
-        <div class="dash-card-title">${isPlanDaily ? "Today's plan" : "This week's plan"}</div>
-        ${planContent}
-      </div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML = `
-    <div class="dash-child-tabs">${tabs}</div>
-    ${panels}`;
-}
-
-function sampleDashboard(name, age) {
-  return `
-    <div class="dash-card">
-      <div class="dash-profile-row">
-        <div class="dash-avatar">${name[0]}</div>
-        <div style="flex:1">
-          <div class="dash-name">${name} · Age ${age}</div>
-          <div class="dash-sub">4 sessions · Advanced · Last active today</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div class="dash-btn primary">Start session</div>
-          <div class="dash-btn">Re-assess</div>
-        </div>
-      </div>
-      <div class="dash-tags">
-        <span class="dash-tag teal">Exploratory thinker</span>
-        <span class="dash-tag teal">Conceptual questions</span>
-        <span class="dash-tag amber">Puzzles &amp; patterns</span>
-        <span class="dash-tag">Confidence: high</span>
-        <span class="dash-tag amber">⭐ 3 Wonder Attempts</span>
-      </div>
-      <div class="dash-card-title" style="font-size:11px;letter-spacing:2px;color:#888780;text-transform:uppercase;margin-bottom:10px">Mathematical level</div>
-      <div class="dash-level-row"><span class="dash-level-key">Number sense</span><span class="dash-level-key">Level 4 / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:80%"></div></div>
-      <div class="dash-level-row" style="margin-top:8px"><span class="dash-level-key">Geometric thinking</span><span class="dash-level-key">Level 3 / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:60%"></div></div>
-      <div class="dash-level-row" style="margin-top:8px"><span class="dash-level-key">Algebraic reasoning</span><span class="dash-level-key">Level 3 / 5</span></div>
-      <div class="dash-level-bar"><div class="dash-level-fill" style="width:60%"></div></div>
-    </div>
-    <div class="dash-grid-3">
-      <div class="dash-metric"><div class="dash-metric-label">This week</div><div class="dash-metric-value">3</div><div class="dash-metric-sub">sessions</div></div>
-      <div class="dash-metric"><div class="dash-metric-label">Total time</div><div class="dash-metric-value">42m</div><div class="dash-metric-sub">this week</div></div>
-      <div class="dash-metric"><div class="dash-metric-label">Worlds explored</div><div class="dash-metric-value">6</div><div class="dash-metric-sub">of 12</div></div>
-    </div>
-    <div class="dash-grid-2">
-      <div class="dash-card">
-        <div class="dash-card-title">Activity this month</div>
-        <div class="dash-cal">
-          <div class="dash-cal-head">M</div><div class="dash-cal-head">T</div><div class="dash-cal-head">W</div>
-          <div class="dash-cal-head">T</div><div class="dash-cal-head">F</div><div class="dash-cal-head">S</div><div class="dash-cal-head">S</div>
-          <div class="dash-cal-day empty"></div><div class="dash-cal-day"></div><div class="dash-cal-day done"></div>
-          <div class="dash-cal-day"></div><div class="dash-cal-day done"></div><div class="dash-cal-day"></div><div class="dash-cal-day"></div>
-          <div class="dash-cal-day done"></div><div class="dash-cal-day"></div><div class="dash-cal-day done"></div>
-          <div class="dash-cal-day done"></div><div class="dash-cal-day"></div><div class="dash-cal-day"></div><div class="dash-cal-day"></div>
-          <div class="dash-cal-day"></div><div class="dash-cal-day done"></div><div class="dash-cal-day"></div>
-          <div class="dash-cal-day today"></div><div class="dash-cal-day"></div><div class="dash-cal-day"></div><div class="dash-cal-day"></div>
-        </div>
-        <div style="font-size:11px;color:#888780;margin-top:4px">7 sessions this month</div>
-      </div>
-      <div class="dash-card">
-        <div class="dash-card-title">How ${name} questions</div>
-        <div class="dash-q-row"><div class="dash-q-label">Procedural</div><div class="dash-q-bar"><div class="dash-q-fill" style="width:20%;background:#9FE1CB"></div></div><div class="dash-q-pct">20%</div></div>
-        <div class="dash-q-row"><div class="dash-q-label">Conceptual</div><div class="dash-q-bar"><div class="dash-q-fill" style="width:55%;background:#00827F"></div></div><div class="dash-q-pct">55%</div></div>
-        <div class="dash-q-row"><div class="dash-q-label">Generative</div><div class="dash-q-bar"><div class="dash-q-fill" style="width:25%;background:#C9A84C"></div></div><div class="dash-q-pct">25%</div></div>
-        <div style="font-size:11px;color:#5F6B7A;margin-top:8px;line-height:1.5">${name} mostly asks <strong style="color:#1A1A2E">why</strong> — thinking conceptually. Beginning to ask <strong style="color:#1A1A2E">what if</strong>, which is the highest level.</div>
-      </div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-title">Recent worlds</div>
-      <div class="dash-world-row"><div class="dash-world-icon">🌀</div><div class="dash-world-name">Pattern Forest</div><div class="dash-world-dot"></div><div class="dash-world-date">Today</div></div>
-      <div class="dash-world-row"><div class="dash-world-icon">🔢</div><div class="dash-world-name">Number Land</div><div class="dash-world-dot" style="background:#C2E0DE"></div><div class="dash-world-date">Apr 4</div></div>
-      <div class="dash-world-row"><div class="dash-world-icon">✨</div><div class="dash-world-name">Wonder Room</div><div class="dash-world-dot" style="background:#C2E0DE"></div><div class="dash-world-date">Apr 3</div></div>
-      <div class="dash-world-row"><div class="dash-world-icon">📐</div><div class="dash-world-name">Geometry Galaxy</div><div class="dash-world-dot" style="background:#C2E0DE"></div><div class="dash-world-date">Apr 1</div></div>
-    </div>
-    <div class="dash-card">
-      <div class="dash-card-title">This week's plan</div>
-      <div style="font-size:11px;letter-spacing:2px;color:#888780;text-transform:uppercase;margin-bottom:12px">Mathematical detectives</div>
-      <div class="dash-plan-day"><div class="dash-plan-dow">Mon</div><div class="dash-plan-content"><div class="dash-plan-title">The mystery of skip counting patterns</div><div class="dash-plan-desc">Explore what happens when different skip counting patterns overlap.</div></div><div class="dash-plan-type">Investigation</div></div>
-      <div class="dash-plan-day"><div class="dash-plan-dow">Tue</div><div class="dash-plan-content"><div class="dash-plan-title">Factor detective challenges</div><div class="dash-plan-desc">Find all the ways to arrange rectangles with given areas.</div></div><div class="dash-plan-type" style="background:#A0522D18;color:#A0522D">Puzzle</div></div>
-      <div class="dash-plan-day"><div class="dash-plan-dow">Wed</div><div class="dash-plan-content"><div class="dash-plan-title">Kelvi world: Wonder Room</div><div class="dash-plan-desc">Open exploration — follow whatever question comes up.</div></div><div class="dash-plan-type" style="background:#5F5E5A18;color:#5F5E5A">Free explore</div></div>
-      <div class="dash-plan-day"><div class="dash-plan-dow">Thu</div><div class="dash-plan-content"><div class="dash-plan-title">Designing the perfect garden plot</div><div class="dash-plan-desc">Area and perimeter — what shape maximises growing space?</div></div><div class="dash-plan-type" style="background:#185FA518;color:#185FA5">Real world</div></div>
-      <div class="dash-plan-day"><div class="dash-plan-dow">Fri</div><div class="dash-plan-content"><div class="dash-plan-title">Review: what did you discover?</div><div class="dash-plan-desc">Kelvi asks ${name} to explain one thing she learned in her own words.</div></div><div class="dash-plan-type" style="background:#5F5E5A18;color:#5F5E5A">Review</div></div>
-    </div>`;
-}
-
-function switchDashTab(idx) {
-  document.querySelectorAll('.dash-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  document.querySelectorAll('.dash-panel').forEach((p,i) => p.style.display = i===idx ? '' : 'none');
-}
-
-function startChildFromProfile(name) {
-  const profile = getProfile(name);
-  if (!profile) return;
-  childAge = profile.age;
-  currentChildName = name;
-  renderWorlds(profile.age);
-  showScreen('screen-worlds');
-}
-
-function regeneratePlan(name) { generateWeeklyPlan(name); }
-
-function reassessChild(name) {
-  const profile = getProfile(name);
-  if (!profile) return;
-  currentAssessChild = name;
-  startAssessment(name, profile.age);
-}
-
-function removeChild(name) {
-  if (!confirm(`Remove ${name} from your dashboard?`)) return;
-  const profiles = getProfiles().filter(p => p.name !== name);
-  saveProfiles(profiles);
-  renderChildProfiles();
-}
-
-function addChild() { showScreen('screen-add-child'); }
-
-// ── CURRENT CHILD TRACKING ────────────────────────────────────────────────────
-let currentChildName = '';
-
-// Override enterWorld to track current child and update profile after session
-const _originalEnterWorld = enterWorld;
-
-
-// ── PARENT API KEY ────────────────────────────────────────────────────────────
-function saveParentKey() {
-  localStorage.setItem('kelvi-family-api-key', document.getElementById('parent-api-key').value);
-  localStorage.setItem('kelvi-api-key', document.getElementById('parent-api-key').value);
-}
-function loadParentKey() {
-  const k = localStorage.getItem('kelvi-family-api-key') || localStorage.getItem('kelvi-api-key');
-  if (k && document.getElementById('parent-api-key')) document.getElementById('parent-api-key').value = k;
-}
-
-// ── SPEECH ────────────────────────────────────────────────────────────────────
-let recog=null, isL=false, shouldSend=false;
-function toggleSpeech() {
-  if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){alert('Speech recognition works best in Chrome.');return;}
-  if(isL){
-    shouldSend=true;
-    recog.stop();
-    return;
-  }
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();
-  recog.continuous=true;
-  recog.interimResults=true;
-  recog.lang='en-US';
-  const mb=document.getElementById('mic-btn'), ci=document.getElementById('chat-input');
-  let finalTranscript='';
-  shouldSend=false;
-  recog.onstart=()=>{
-    isL=true; mb.classList.add('listening');
-    ci.placeholder='Listening... tap 🎤 to stop and send';
-    finalTranscript='';
-  };
-  recog.onresult=(e)=>{
-    let interim='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal) finalTranscript+=e.results[i][0].transcript+' ';
-      else interim+=e.results[i][0].transcript;
-    }
-    ci.value=(finalTranscript+interim).trim();
-  };
-  recog.onend=()=>{
-    if(isL && !shouldSend){
-      // Browser paused — restart automatically, don't send yet
-      try { recog.start(); } catch(e) {}
-      return;
-    }
-    isL=false; shouldSend=false;
-    mb.classList.remove('listening');
-    ci.placeholder='Tell me what you notice...';
-    if(ci.value.trim()) sendMsg();
-  };
-  recog.onerror=(e)=>{
-    if(e.error==='no-speech') return;
-    isL=false; mb.classList.remove('listening');
-    ci.placeholder='Tell me what you notice...';
-  };
-  recog.start();
-}
-
-// ── READ ALOUD ────────────────────────────────────────────────────────────────
-function readMsg(btn) {
-  const bubble = btn.closest('.message').querySelector('.msg-bubble');
-  if (!bubble) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(bubble.textContent);
-  u.rate = 0.85;
-  u.pitch = 1;
-  btn.textContent = '⏸';
-  u.onend = () => { btn.textContent = '🔊'; };
-  window.speechSynthesis.speak(u);
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-loadParentKey();
-renderSessionLog();
-renderChildProfiles();
-
+bld();
 </script>
 </body>
 </html>
