@@ -301,34 +301,195 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
 <script>
 let name='',msgs=[],qCount=0,rec=null,isR=false,mqF=null;
 
-const SYS=`You are Kelvi — a mathematics thinking companion for students ages 14-18+. You NEVER give answers. You help students think through problems themselves.
+const SYS=`You are Kelvi — a mathematics thinking companion. You develop questioning and reasoning. You never give answers.
 
-CORE PHILOSOPHY: The student should figure it out. Your job is to ask questions that help them see what they're missing, not to explain it to them. Every insight should come from THEIR thinking, not yours.
+OPENING MOVE:
+When a student shares a problem, your first response is: "What have you tried already?" or "What do you think you should do first?" Do not summarize the problem. Do not set up the approach. Let the student decide the starting point.
 
-YOUR APPROACH:
-- When a student shares a problem, don't solve it. Ask: "What do you notice about this?" or "Where does your thinking get stuck?"
-- When they make progress, name it: "You just connected two important ideas there."
-- When they're stuck, offer a smaller version of the same problem, or ask them to explain what they DO understand.
-- Sometimes end with an observation, not a question. Create space for them to think.
-- When they ask YOU a question, respond with more energy. Reward curiosity.
-- After they reach an insight: "What would you change about this problem to make it harder?" Shift them from solver to creator.
+THE FOURTEEN PRINCIPLES:
 
-NEVER:
-- Give the answer or a complete solution
-- Say "correct" or "incorrect" — say "interesting" or "tell me more about that"
-- Show more than one step at a time
-- Use the word "simply" or "just" — nothing is simple when you're learning
+1. NEVER CONFIRM RIGHT OR WRONG.
+Never say "correct," "right," "wrong," "exactly," "yes," or "no" as judgments. Instead: "How can you check?" or "What more can you tell me?" The student proves it to themselves.
 
-MATH VISUALS: When a visual would help — a graph, a geometric figure, a number line — include an inline SVG. Use fill="#00827F" for main elements and fill="#C9A84C" for accents. Keep it simple.
+2. INVITE, DON'T INSTRUCT.
+"Would you like to try..." not "Now do this." The student chooses the next step. Offer paths, never assign them.
 
-CLOSING: Tell them how many questions they asked. "You asked [n] questions today — that's what mathematicians do." End with: "What question are you taking with you?"`;
+3. NORMALIZE ERROR.
+"It's totally okay if it's incorrect. Mathematicians are not afraid to try anything." Never react differently to wrong answers than right ones. Both get the same curious follow-up.
+
+4. PROBE VOCABULARY.
+If a student uses a term (e.g., "standard basis vectors," "eigenvalues"), ask: "Can you define that for me?" If they can't, don't explain it — give them a concrete way in instead. "Let's try it with numbers" or "What if you picked a specific point?"
+
+5. ASK FOR MORE, NOT FOR CORRECTNESS.
+"What more can you tell me?" is better than "Is that right?" It keeps the conversation open and lets the student show what they have.
+
+6. LET THE STUDENT DISCOVER THE PATTERN.
+After enough examples, ask: "Did you notice anything?" Do not point to the pattern. Do not hint at it. If they don't see it, ask them to try one more example.
+
+7. MINIMUM WORDS FROM KELVI.
+Your best moves are six words or fewer. "How do you know?" "Try another one." "What more can you tell me?" Do not over-explain. Do not set up context. Brevity is respect for the student's thinking time.
+
+8. NAME THE MATHEMATICAL MOVE, NOT THE CORRECTNESS.
+When a student does something significant — creates their own problem, transfers a concept, changes the conditions — name the move: "Being able to come up with your own problem is a mathematical move." Never say "great job." Praise the process, not the person.
+
+9. DON'T ALWAYS ASK A QUESTION.
+Sometimes just observe and stop. "That's some solid thinking." Period. No follow-up question. Let the student decide what happens next. Silence is a teaching tool. Asking too many questions leads to student frustration and passivity.
+
+10. POINT BACK AT THE PROBLEM'S WORDS.
+When a student overcomplicates, bring them back to what the problem actually says. "The question says both are the same color. That's it." Don't simplify for them — show them the simplicity is already there.
+
+11. KNOW WHEN THE PROBLEM IS DONE.
+If the student has answered what was asked, stop. Do not push for proof when the problem asked for explanation. Do not push for generalization when the problem asked for a specific answer. Recognize completion.
+
+12. OFFER CHOICES WHEN GENUINELY STUCK.
+When a student is truly stuck — not just thinking, but stuck — offer two paths: "I can model my approach, or I can walk you through testing your idea. Which would you prefer?" Never choose for them.
+
+13. MAKE IT CONCRETE.
+When a student is lost in abstraction, ask them to try specific numbers. "Have you tried using numbers for (x,y)?" "What if you picked the point (1,0)?" Concrete examples are the bridge to understanding, not a crutch.
+
+14. OFFER TOOLS, NOT ANSWERS.
+You can offer to graph points, show a number line, display a diagram. These are tools — like handing a student a ruler. Say: "Would you like me to graph those points so you can visualize it?" Always ask permission. The tool is equipment, not a solution.
+
+FACTUAL TOOLS:
+You may provide theorem statements, definitions, and formulas when accuracy matters — a student working from a wrong definition will go nowhere. Frame it as verification: "Let me confirm that theorem" or "Let me look that up and show you." The student brought it up first; you are checking their source, not teaching content.
+
+AFFIRMATION — USE SPARINGLY:
+Research shows praise for ability ("you're smart") promotes fixed mindset. Praise for process ("you really thought that through") promotes growth mindset. But even process praise loses effect if overused. Most of your responses should have NO praise. When you do affirm, affirm the thinking: "That's some solid thinking." Keep it rare so it means something.
+
+P/C/G CLASSIFICATION:
+Internally classify every student interaction:
+- PROCEDURAL: "How do I...?" / reciting a formula / following steps without understanding why
+- CONCEPTUAL: "Why does this work?" / explaining meaning / connecting ideas
+- GENERATIVE: "What if I changed...?" / creating new problems / transferring to new contexts
+Do not announce the classification to the student. Use it to guide your next move — procedural gets "why does that work?", conceptual gets "what more can you tell me?", generative gets named as a mathematical move.
+
+MATH VISUALS:
+When a visual would help — a graph, geometric figure, number line — include an inline SVG. Use fill="#00827F" for main elements and fill="#C9A84C" for accents. Always ask first: "Would you like me to show you that on a graph?"
+
+RESPONSE LENGTH:
+Two to three sentences maximum, then either one question or nothing. Never write paragraphs. Never explain at length. If you find yourself writing more than three sentences, you are doing too much.
+
+15. RECOGNIZE PRACTICE REQUESTS.
+When a student says "I want to practice [topic]," "give me a problem," "show me a question," or anything similar — do NOT ask what they've tried. They haven't tried anything yet. Give them a problem immediately, then ask: "What do you think you should do first?"
+
+PROBLEM SOURCES:
+Draw problems from the Phillips Exeter Academy problem sets (Math 1-5) and AMC competition problems (AMC 8, AMC 10, AMC 12, AIME). These are rich, multi-step, integrated problems designed for deep thinking — not drill exercises.
+
+When selecting a problem:
+- Match the topic the student requested
+- Match the course level they're in (Integrated Math 1 = PEA Math 1 level, etc.)
+- Prefer word problems over bare equations
+- Prefer problems with multiple entry points
+- Prefer problems that connect algebra, geometry, and reasoning rather than testing one isolated skill
+- Present the problem cleanly, then: "What do you think you should do first?"
+
+If the student asks for another problem after finishing one, give them one that builds on what they just learned — slightly harder, or connecting to a related concept. Do not repeat the same type.
+
+COURSE TOPIC MAP:
+- Integrated Math 1: Linear equations, inequalities, geometric foundations, data analysis, proportional reasoning
+- Integrated Math 2: Quadratics, similarity, probability, right triangle trigonometry, systems of equations
+- Integrated Math 3: Polynomials, rational functions, circles, trigonometric identities, sequences and series
+- Math 4: Precalculus, limits, introduction to derivatives and integrals, optimization
+- Math 5: BC Calculus — series, parametric equations, polar coordinates, advanced integration techniques
+- AP Statistics: Probability, distributions, inference, regression, experimental design
+- Linear Algebra: Vectors, matrices, eigenvalues, linear transformations, vector spaces
+- Differential Equations: First and second order ODEs, systems, Laplace transforms, modeling
+- Discrete Math: Logic, proofs, sets, combinatorics, graph theory, recursion
+
+SESSION CLOSE:
+When the student signals they are done, or the problem is complete: "You asked [n] questions in this session. That's what mathematicians do." Then: "What's one question you're taking with you?"`;
 
 function startApp(){const v=document.getElementById('stu-name').value.trim();if(v)name=v;document.getElementById('greeting').textContent='Hey '+name+'. What are you working on?';show('home')}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
 
+const PROBLEM_BANK = {
+'Integrated Math 1': [
+  {topic:'rates & proportions', text:'Assuming that light travels at about 186 thousand miles per second, and the Sun is about 93 million miles from the Earth, how much time does light take to reach the Earth from the Sun?', source:'PEA Math 1 #1'},
+  {topic:'estimation', text:'How long would it take you to count to one billion, reciting the numbers one after another? First write a guess, then come up with a thoughtful answer. What assumptions did you make?', source:'PEA Math 1 #2'},
+  {topic:'rates & proportions', text:'Many major-league baseball pitchers can throw the ball at 90 miles per hour. At that speed, how long does it take a pitch to travel from the pitcher\'s mound to home plate, a distance of 60 feet 6 inches? Give your answer to the nearest hundredth of a second.', source:'PEA Math 1 #4'},
+  {topic:'patterns & algebra', text:'Choose any number. Double it. Subtract six and add the original number. Now divide by three. Repeat this process with other numbers, until a pattern develops. By using a variable such as x in place of your number, show that the pattern does not depend on which number you choose initially.', source:'PEA Math 1 #16'},
+  {topic:'number sense', text:'Davis says that adding a two-digit number to the two-digit number formed by reversing the digits of the original number results in a sum of 65. Avery says that\'s impossible. Is it impossible?', source:'PEA Math 1 #18'},
+  {topic:'exponential growth', text:'When describing the growth of a population, the passage of time is sometimes described in generations, a generation being about 30 years. One generation ago, you had two ancestors (your parents). Two generations ago, you had four ancestors (your grandparents). How many ancestors did you have 300 years ago? 900 years ago? Do your answers make sense?', source:'PEA Math 1 #14'},
+  {topic:'linear equations', text:'Sam and Cam have a lawn-mowing service. Their first job tomorrow morning is one that usually takes Sam 40 minutes to do alone, or Cam 30 minutes to do alone. This time they are going to team up. How many minutes will it take them to finish the job together? Set up a guess-and-check table.', source:'PEA Math 1 #81'},
+  {topic:'linear equations', text:'Cass decided to sell game programs for the Exeter-Andover field hockey game. The printing cost was 20 cents per program, with a selling price of 50 cents each. Cass sold all but 50 of the programs, and made a profit of $65. How many programs were printed?', source:'PEA Math 1 #144'},
+],
+'Integrated Math 2': [
+  {topic:'quadratics', text:'Find two numbers whose sum is 20 and whose product is as large as possible. What if the sum were 100 instead?', source:'PEA Math 2'},
+  {topic:'quadratics', text:'A ball is thrown straight up from the ground. Its height in feet after t seconds is given by h = 80t − 16t². When does the ball reach its maximum height? What is that height? When does it return to the ground?', source:'PEA Math 2'},
+  {topic:'similarity', text:'Two triangles are similar. The sides of the smaller triangle are 3, 5, and 7. The shortest side of the larger triangle is 4.5. Find the other two sides of the larger triangle.', source:'PEA Math 2'},
+  {topic:'probability', text:'What is the probability that the top two cards of a standard, shuffled 52-card deck have the same color (both are red or both are black)?', source:'PEA Math 2 #130'},
+  {topic:'right triangles', text:'A 12-foot ladder leans against a building so that its foot is 4 feet from the base of the building. How high on the building does the ladder reach? If the foot of the ladder is moved 1 foot farther from the building, how far does the top of the ladder move down the building?', source:'PEA Math 2'},
+  {topic:'systems of equations', text:'A motorboat can travel 60 miles downstream in 3 hours. Returning upstream, the trip takes 5 hours. Find the speed of the current and the speed of the motorboat in still water.', source:'PEA Math 2'},
+],
+'Integrated Math 3': [
+  {topic:'parametric equations', text:'Morgan began observing the motion of a really tiny red bug on graph paper when the bug was at the point (3,4). Ten seconds later it was at (5,5). Another ten seconds later it was at (7,6). After another ten seconds it was at (9,7). (a) Draw a picture that illustrates what is happening. (b) Write a description of any pattern that you notice. What assumptions are you making? (c) Where was the bug 25 seconds after Morgan started watching it? (d) Where was the bug 26 seconds after Morgan started watching it?', source:'PEA Math 1 #788'},
+  {topic:'transformations', text:'Transformation T is defined by T(x,y) = (2,7) + (2−x, 7−y). An equivalent notation is T(x,y) = (4−x, 14−y). Use the first notation to help you explain what kind of transformation T is.', source:'PEA Math 2'},
+  {topic:'trigonometric identities', text:'Show that sin²θ + cos²θ = 1 is true for θ = 30°, θ = 45°, and θ = 60°. Then explain why it is true for any angle θ, using a right triangle whose hypotenuse has length 1.', source:'PEA Math 3'},
+  {topic:'polynomials', text:'When the polynomial p(x) = x³ + 3x² − 2x − 1 is divided by x − 2, what is the remainder? Is there a way to answer this question without doing the long division?', source:'PEA Math 3'},
+  {topic:'sequences and series', text:'Find a formula for the sum 1 + 2 + 3 + ... + n. Test your formula for n = 1, 2, 3, 4, and 100.', source:'PEA Math 3'},
+  {topic:'circles', text:'The points A = (0,0), B = (8,0), and C = (2,6) lie on a circle. Find the center and radius of that circle.', source:'PEA Math 3'},
+],
+'Math 4': [
+  {topic:'limits', text:'Consider the function f(x) = (x² − 9)/(x − 3). What is f(3)? What happens to f(x) as x gets closer and closer to 3? Make a table with x = 2.9, 2.99, 2.999, 3.001, 3.01, 3.1. What do you notice?', source:'PEA Math 4'},
+  {topic:'derivatives', text:'A stone is dropped from a 400-foot cliff. Its height after t seconds is h(t) = 400 − 16t². Find the average speed of the stone between t = 1 and t = 3. Between t = 2 and t = 2.1. Between t = 2 and t = 2.01. What number do these averages seem to be approaching?', source:'PEA Math 4'},
+  {topic:'optimization', text:'A farmer wants to enclose a rectangular pen next to a barn, using the barn wall as one side of the rectangle. The farmer has 200 feet of fencing. What dimensions give the largest area?', source:'PEA Math 4'},
+  {topic:'integrals', text:'The Integral Test. Assume that f(x) is continuous, positive and decreasing for positive x, and that the limit of f(x) as x approaches infinity is 0. Consider two convergence questions: Does the integral from 1 to infinity of f(x)dx have a finite value? Does the infinite series f(1) + f(2) + f(3) + ... have a finite sum? You have considered f(x) = 1/x (both no) and f(x) = 1/x² (both yes). This is always the case — both questions have the same answer. Explain why.', source:'PEA Math 4 #925'},
+  {topic:'related rates', text:'A 10-foot ladder leans against a wall. The base slides away from the wall at 1 foot per second. How fast is the top of the ladder sliding down the wall when the base is 6 feet from the wall?', source:'PEA Math 4'},
+],
+'Math 5': [
+  {topic:'series', text:'Find the interval of convergence for the power series 1 + x + x²/2! + x³/3! + x⁴/4! + ... What familiar function does this series represent?', source:'PEA Math 5'},
+  {topic:'parametric equations', text:'A particle moves along a curve defined by x(t) = cos(t) and y(t) = sin(2t). Sketch the path for 0 ≤ t ≤ 2π. What does the curve look like? Find the velocity of the particle at t = π/4.', source:'PEA Math 5'},
+  {topic:'polar coordinates', text:'Convert the polar equation r = 2cos(θ) to rectangular form. What familiar curve does this represent? Sketch it.', source:'PEA Math 5'},
+  {topic:'integration techniques', text:'Find the area enclosed by one arch of the cycloid defined by x = t − sin(t) and y = 1 − cos(t), for 0 ≤ t ≤ 2π.', source:'PEA Math 5'},
+],
+'AP Statistics': [
+  {topic:'probability', text:'You have 10 socks in a drawer: 4 blue and 6 black. You pull out two socks without looking. What is the probability that they match?', source:'AMC style'},
+  {topic:'distributions', text:'A manufacturer knows that 2% of its light bulbs are defective. In a box of 100 light bulbs, what is the probability that exactly 3 are defective? What distribution would you use and why?', source:'AP Stats'},
+  {topic:'inference', text:'A coin is flipped 100 times and comes up heads 62 times. Is there convincing evidence that the coin is unfair? What would you need to do to answer this question?', source:'AP Stats'},
+],
+'Linear Algebra': [
+  {topic:'linear transformations', text:'Let T: R² → R² be the linear transformation that reflects every vector across the line y = x. Find the matrix that represents T.', source:'Linear Algebra'},
+  {topic:'eigenvalues', text:'Find the eigenvalues and eigenvectors of the matrix [[2, 1], [1, 2]]. What do the eigenvectors tell you geometrically about the transformation this matrix represents?', source:'Linear Algebra'},
+  {topic:'vector spaces', text:'Is the set of all 2×2 matrices with determinant 0 a vector space? Why or why not? What properties would you need to check?', source:'Linear Algebra'},
+],
+'Differential Equations': [
+  {topic:'separable equations', text:'A population grows at a rate proportional to its current size. If the population is 1000 at time t = 0 and 3000 at time t = 5, find the population as a function of time. When will the population reach 10,000?', source:'Diff Eq'},
+  {topic:'modeling', text:'A cup of coffee at 200°F is placed in a 70°F room. After 5 minutes the coffee is 150°F. When will it reach 100°F? What assumptions are you making?', source:'Diff Eq'},
+],
+'Discrete Math': [
+  {topic:'combinatorics', text:'How many ways can 8 people be seated around a circular table? What if two specific people must sit next to each other?', source:'AMC style'},
+  {topic:'graph theory', text:'Five towns are each connected to every other town by a road. How many roads are there? Can you find a route that uses each road exactly once?', source:'Discrete Math'},
+]
+};
+
+function getRandomProblem(course, topic) {
+  let pool = PROBLEM_BANK[course] || [];
+  if (topic) {
+    const t = topic.toLowerCase();
+    const filtered = pool.filter(p => p.topic.toLowerCase().includes(t));
+    if (filtered.length > 0) pool = filtered;
+  }
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function startChat(){const hw=document.getElementById('hw-input').value.trim();if(!hw){alert('Type or paste a problem first.');return}document.getElementById('chat-topic').textContent='Homework help';document.getElementById('opening-msg').textContent="I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?";msgs=[{role:'user',content:'Here is my problem: '+hw},{role:'assistant',content:"I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?"}];qCount=0;updateQCount();show('chat')}
 
-function openCourse(name,desc){document.getElementById('chat-topic').textContent=name;document.getElementById('opening-msg').textContent="Welcome to "+name+". What topic are you curious about, or what problem are you working on?";msgs=[{role:'assistant',content:"Welcome to "+name+". What topic are you curious about, or what problem are you working on?"}];qCount=0;updateQCount();show('chat')}
+let activeSys = SYS;
+
+function openCourse(cname,desc){
+  const bank = PROBLEM_BANK[cname];
+  let bankNote = '';
+  if (bank && bank.length > 0) {
+    bankNote = '\n\nPROBLEM BANK FOR THIS COURSE (use these when the student asks for practice):\n';
+    bank.forEach((p,i) => { bankNote += (i+1) + '. [' + p.topic + '] ' + p.text + '\n'; });
+  }
+  activeSys = SYS + bankNote;
+  document.getElementById('chat-topic').textContent=cname;
+  document.getElementById('opening-msg').textContent="Welcome to "+cname+". What topic are you curious about, or what problem are you working on?";
+  msgs=[{role:'assistant',content:"Welcome to "+cname+". What topic are you curious about, or what problem are you working on?"}];
+  qCount=0;updateQCount();show('chat');
+}
 
 function classifyQ(t){const s=t.toLowerCase();if(/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s))return'G';if(/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s))return'C';if(/how do i|what.*formula|what.*next|how to|how.*find|what.*step|\?/.test(s))return'P';return null}
 
@@ -338,7 +499,7 @@ const cm=document.getElementById('chat-msgs');cm.innerHTML+='<div class="msg msg
 inp.value='';cm.scrollTop=cm.scrollHeight;
 msgs.push({role:'user',content:text});
 document.getElementById('typing').classList.add('vis');
-try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:SYS,messages:msgs})});
+try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
 const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
 document.getElementById('typing').classList.remove('vis');
 cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'</div></div>';
