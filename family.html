@@ -3,194 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kelvi Family helps learners grow through curiosity, reflection, and mathematical wonder at home.">
 <title>Kelvi Family</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{--peacock:#00827F;--peacock-dark:#006B68;--peacock-light:#F0FAF9;--gold:#C9A84C;--gold-light:#FDF6E3;--navy:#1A1A2E;--gray:#5F6B7A;--warm:#FBF9F5;--off:#F3F0EA;--border:#E8E4E0;--amber:#BA7517;--teal-s:#0F6E56;--purple:#534AB7;--coral:#993C1D;--blue:#185FA5;--pink:#D4537E;--neutral:#888780}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--navy);min-height:100vh}
+:root {
+  --bg: #F5F3EE;
+  --surface: #ECE7DC;
+  --deeper: #E0D8C8;
+  --divider: #CDC3B1;
+  --text-primary: #2F2B25;
+  --text-muted: #6F6A61;
+  --accent: #B8784E;
+  --accent-hover: #9E6640;
+  --accent-light: #F5EDE5;
+  --white: #FFFFFF;
+  --green: #3A6B5C;
+  --green-light: #EBF3EF;
+  --font-heading: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  /* strand colors */
+  --amber: #B8784E;
+  --teal-s: #3A6B5C;
+  --purple: #534AB7;
+  --coral: #993C1D;
+  --blue: #185FA5;
+  --pink: #D4537E;
+  --neutral: #6F6A61;
+}
 
-/* NAV - warmer, rounder */
-nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:var(--peacock);border-bottom:3px solid var(--gold)}
-.nav-left{display:flex;align-items:center;gap:10px}
-.nav-mark{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold);font-weight:500}
-.nav-word{font-family:'DM Serif Display',serif;font-size:18px;color:white}
-.nav-fam{font-size:11px;color:rgba(255,255,255,0.6);margin-left:4px}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-link{text-decoration:none;color:rgba(255,255,255,0.7);padding:7px 14px;border-radius:20px;cursor:pointer;transition:all .15s;font-size:12px}
-.nav-link:hover{background:rgba(255,255,255,0.15);color:white}
-.nav-link.active{background:white;color:var(--peacock);font-weight:500}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:white;cursor:pointer;border:2px solid rgba(255,255,255,0.3)}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 64px; background: var(--bg);
+  border-bottom: 1px solid var(--divider); position: sticky; top: 0; z-index: 100;
+}
+.nav-left { display: flex; align-items: center; gap: 8px; }
+.nav-brand {
+  font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+}
+.nav-brand .tamil-k { font-size: 1.8rem; position: relative; top: 1px; }
+.nav-label {
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
+  color: var(--text-muted); margin-left: 0.25rem;
+}
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-link {
+  text-decoration: none; color: var(--text-muted); padding: 7px 14px;
+  border-radius: 8px; cursor: pointer; transition: all .15s; font-size: 0.85rem; font-weight: 500;
+}
+.nav-link:hover { background: var(--surface); color: var(--text-primary); }
+.nav-link.active { background: var(--accent); color: var(--white); }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: var(--white); cursor: pointer;
+  border: 2px solid var(--divider);
+}
 
 /* SCREENS */
-.screen{display:none}.screen.active{display:block}
+.screen { display: none; }
+.screen.active { display: block; }
 
-/* WELCOME - playful, centered */
-.welcome{text-align:center;padding:100px 24px 60px;max-width:460px;margin:0 auto}
-.welcome-k{width:100px;height:100px;margin:0 auto 28px}
-.welcome h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,42px);margin-bottom:10px;color:var(--navy)}
-.welcome p{font-size:16px;color:var(--gray);line-height:1.6;margin-bottom:36px}
-.welcome-input{display:flex;gap:10px;max-width:320px;margin:0 auto}
-.welcome-input input{flex:1;padding:14px 18px;border:2px solid var(--border);border-radius:16px;font-size:16px;font-family:'DM Sans',sans-serif;outline:none;background:white}
-.welcome-input input:focus{border-color:var(--peacock)}
-.btn{background:var(--peacock);color:white;border:none;padding:14px 28px;border-radius:16px;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s}
-.btn:hover{background:var(--peacock-dark);transform:translateY(-1px)}
+/* WELCOME */
+.welcome { text-align: center; padding: 120px 24px 60px; max-width: 460px; margin: 0 auto; }
+.welcome h1 {
+  font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 2.8rem);
+  margin-bottom: 10px; color: var(--text-primary); letter-spacing: -0.02em;
+}
+.welcome p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 2.5rem; }
+.welcome-input { display: flex; gap: 10px; max-width: 320px; margin: 0 auto; }
+.welcome-input input {
+  flex: 1; padding: 14px 18px; border: 1.5px solid var(--divider); border-radius: 8px;
+  font-size: 1rem; font-family: var(--font-body); outline: none; background: var(--white);
+}
+.welcome-input input:focus { border-color: var(--accent); }
+.btn {
+  background: var(--accent); color: var(--white); border: none; padding: 14px 28px;
+  border-radius: 8px; font-size: 1rem; font-family: var(--font-body); cursor: pointer;
+  font-weight: 500; transition: all .15s;
+}
+.btn:hover { background: var(--accent-hover); }
 
-/* THREAD MAP - card-based, not grid */
-.map-wrap{max-width:1000px;margin:0 auto;padding:40px 24px 60px}
-.map-wrap h2{font-family:'DM Serif Display',serif;font-size:clamp(26px,4vw,34px);margin-bottom:6px;text-align:center}
-.map-sub{font-size:14px;color:var(--gray);margin-bottom:32px;text-align:center}
-.strand-cards{display:flex;flex-direction:column;gap:16px}
-.strand-row{background:white;border-radius:20px;border:1.5px solid var(--border);overflow:hidden;transition:all .15s}
-.strand-row:hover{border-color:var(--peacock)}
-.strand-header{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer}
-.strand-icon{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.strand-name{font-size:16px;font-weight:500;flex:1}
-.strand-arrow{font-size:14px;color:var(--gray);transition:transform .2s}
-.strand-row.open .strand-arrow{transform:rotate(90deg)}
-.strand-body{display:none;padding:0 20px 16px}
-.strand-row.open .strand-body{display:block}
-.thread-chips{display:flex;gap:8px;flex-wrap:wrap}
-.thread-chip{background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;cursor:pointer;transition:all .12s;flex:1;min-width:140px}
-.thread-chip:hover{border-color:var(--peacock);background:var(--peacock-light);transform:translateY(-2px)}
-.tc-thread{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:4px}
-.tc-topics{font-size:12px;color:var(--navy);line-height:1.45}
-.tc-topics span{display:block}
+/* THREAD MAP */
+.map-wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; }
+.map-wrap h2 {
+  font-family: var(--font-heading); font-size: clamp(1.6rem, 4vw, 2.2rem);
+  margin-bottom: 6px; text-align: center; letter-spacing: -0.01em;
+}
+.map-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem; text-align: center; }
+.strand-cards { display: flex; flex-direction: column; gap: 12px; }
+.strand-row {
+  background: var(--white); border-radius: 12px; border: 1px solid var(--divider);
+  overflow: hidden; transition: all .15s;
+}
+.strand-row:hover { border-color: var(--accent); }
+.strand-header {
+  display: flex; align-items: center; gap: 10px; padding: 16px 20px; cursor: pointer;
+}
+.strand-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.strand-name { font-size: 1rem; font-weight: 500; flex: 1; }
+.strand-arrow { font-size: 14px; color: var(--text-muted); transition: transform .2s; }
+.strand-row.open .strand-arrow { transform: rotate(90deg); }
+.strand-body { display: none; padding: 0 20px 16px; }
+.strand-row.open .strand-body { display: block; }
+.thread-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.thread-chip {
+  background: var(--surface); border: 1px solid var(--divider); border-radius: 10px;
+  padding: 12px 16px; cursor: pointer; transition: all .12s; flex: 1; min-width: 140px;
+}
+.thread-chip:hover { border-color: var(--accent); background: var(--accent-light); transform: translateY(-2px); }
+.tc-thread { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 4px; }
+.tc-topics { font-size: 12px; color: var(--text-primary); line-height: 1.45; }
+.tc-topics span { display: block; }
 
 /* PROVOCATION VIEW */
-.prov-layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 60px)}
-@media(max-width:860px){.prov-layout{grid-template-columns:1fr}.sb{display:none}}
-.sb{background:white;border-right:1.5px solid var(--border);padding:20px 0}
-.sb-back{display:flex;align-items:center;gap:6px;padding:10px 18px;margin-bottom:12px;font-size:13px;color:var(--peacock);cursor:pointer;border-radius:0 12px 12px 0;transition:background .1s}
-.sb-back:hover{background:var(--peacock-light)}
-.sb-label{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;padding:0 18px;margin-bottom:10px}
-.sb-thread{display:flex;gap:3px;padding:0 18px 16px}
-.sb-tp{height:6px;flex:1;border-radius:3px;background:var(--off)}
-.sb-tp-d{background:var(--peacock)}
-.sb-tp-n{background:#5DCAA5}
-.sb-item{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;cursor:pointer;transition:all .1s;border-radius:0 14px 14px 0;margin-right:8px}
-.sb-item:hover{background:var(--peacock-light)}
-.sb-item.act{background:#E1F5EE;border-right:3px solid var(--peacock)}
-.sb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--border)}
-.sb-dot-d{background:var(--peacock);border-color:var(--peacock)}
-.sb-dot-n{background:#5DCAA5;border-color:#5DCAA5}
-.sb-nm{font-weight:500;font-size:12px}
-.sb-tp2{font-size:10px;color:var(--gray)}
-.sb-ck{font-size:12px;color:var(--teal-s);margin-left:auto}
+.prov-layout { display: grid; grid-template-columns: 240px minmax(0,1fr); min-height: calc(100vh - 64px); }
+@media(max-width:860px) { .prov-layout { grid-template-columns: 1fr; } .sb { display: none; } }
+.sb { background: var(--white); border-right: 1px solid var(--divider); padding: 20px 0; }
+.sb-back {
+  display: flex; align-items: center; gap: 6px; padding: 10px 18px; margin-bottom: 12px;
+  font-size: 13px; color: var(--accent); cursor: pointer; border-radius: 0 8px 8px 0; transition: background .1s;
+}
+.sb-back:hover { background: var(--accent-light); }
+.sb-label { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; padding: 0 18px; margin-bottom: 10px; }
+.sb-thread { display: flex; gap: 3px; padding: 0 18px 16px; }
+.sb-tp { height: 6px; flex: 1; border-radius: 3px; background: var(--surface); }
+.sb-tp-d { background: var(--green); }
+.sb-tp-n { background: #7BAF8E; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 11px 18px; font-size: 13px;
+  cursor: pointer; transition: all .1s; border-radius: 0 8px 8px 0; margin-right: 8px;
+}
+.sb-item:hover { background: var(--accent-light); }
+.sb-item.act { background: var(--green-light); border-right: 3px solid var(--green); }
+.sb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--divider); }
+.sb-dot-d { background: var(--green); border-color: var(--green); }
+.sb-dot-n { background: #7BAF8E; border-color: #7BAF8E; }
+.sb-nm { font-weight: 500; font-size: 12px; }
+.sb-tp2 { font-size: 10px; color: var(--text-muted); }
+.sb-ck { font-size: 12px; color: var(--teal-s); margin-left: auto; }
 
-/* MAIN CONTENT - larger, rounder */
-.pm{padding:32px 40px;overflow-y:auto;background:var(--warm)}
-.pm-badge{font-size:11px;font-weight:500;color:#085041;background:#E1F5EE;display:inline-block;padding:4px 12px;border-radius:10px;margin-bottom:6px}
-.pm-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px}
-.pm-sub{font-size:13px;color:var(--gray);margin-bottom:24px}
-.steps{display:flex;align-items:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
-.st{font-size:11px;padding:6px 14px;border-radius:12px}
-.st-d{background:var(--off);color:var(--gray)}
-.st-n{background:#E1F5EE;color:#085041;font-weight:500}
-.st-f{background:var(--off);color:var(--gray);opacity:.4}
-.st-a{font-size:10px;color:var(--gray)}
+/* MAIN CONTENT */
+.pm { padding: 32px 40px; overflow-y: auto; background: var(--bg); }
+.pm-badge {
+  font-size: 11px; font-weight: 500; color: var(--green);
+  background: var(--green-light); display: inline-block; padding: 4px 12px;
+  border-radius: 8px; margin-bottom: 6px;
+}
+.pm-title { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 4px; }
+.pm-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.steps { display: flex; align-items: center; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+.st { font-size: 11px; padding: 6px 14px; border-radius: 8px; }
+.st-d { background: var(--surface); color: var(--text-muted); }
+.st-n { background: var(--green-light); color: var(--green); font-weight: 500; }
+.st-f { background: var(--surface); color: var(--text-muted); opacity: .4; }
+.st-a { font-size: 10px; color: var(--text-muted); }
 
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+@media(max-width:860px) { .two-col { grid-template-columns: 1fr; } }
 
-/* PROBLEM CARD - warm, illustrated feel */
-.pc{background:white;border:1.5px solid var(--border);border-radius:20px;padding:24px;transition:border-color .15s}
-.pc:hover{border-color:var(--peacock)}
-.pc-emoji{font-size:40px;margin-bottom:12px;display:block}
-.pc-text{font-size:16px;line-height:1.65;font-weight:500;margin-bottom:16px}
-.pc-vis{background:var(--gold-light);border-radius:14px;padding:20px;text-align:center;font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;color:var(--navy);margin-bottom:18px;border:1.5px solid rgba(201,168,76,0.2)}
-.choices{display:flex;flex-direction:column;gap:8px}
-.ch{display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--border);border-radius:14px;font-size:14px;cursor:pointer;transition:all .12s}
-.ch:hover{border-color:var(--peacock);background:var(--peacock-light);transform:translateX(4px)}
-.ch.sel{border-color:var(--peacock);background:#E1F5EE}
-.ch-l{width:28px;height:28px;border-radius:50%;background:var(--off);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--gray);flex-shrink:0}
-.ch.sel .ch-l{background:var(--peacock);color:white}
+/* PROBLEM CARD */
+.pc {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  padding: 24px; transition: border-color .15s;
+}
+.pc:hover { border-color: var(--accent); }
+.pc-emoji { font-size: 40px; margin-bottom: 12px; display: block; }
+.pc-text { font-size: 1rem; line-height: 1.65; font-weight: 500; margin-bottom: 16px; }
+.pc-vis {
+  background: var(--accent-light); border-radius: 10px; padding: 20px; text-align: center;
+  font-family: var(--font-heading); font-size: 2rem; color: var(--text-primary);
+  margin-bottom: 18px; border: 1px solid var(--divider);
+}
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.ch {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  border: 1.5px solid var(--divider); border-radius: 10px; font-size: 14px;
+  cursor: pointer; transition: all .12s;
+}
+.ch:hover { border-color: var(--accent); background: var(--accent-light); transform: translateX(4px); }
+.ch.sel { border-color: var(--green); background: var(--green-light); }
+.ch-l {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: var(--text-muted); flex-shrink: 0;
+}
+.ch.sel .ch-l { background: var(--green); color: var(--white); }
 
-/* CONVERSATION - bubbly */
-.convo{display:flex;flex-direction:column;gap:10px}
-.kb{background:white;border:1.5px solid var(--border);border-radius:18px;border-bottom-left-radius:6px;padding:14px 16px;max-width:95%}
-.kn{font-size:10px;font-weight:500;color:var(--peacock);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.kn::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--peacock)}
-.kt{font-size:14px;line-height:1.55;color:var(--gray)}
-.cb{background:var(--peacock);border-radius:18px;border-bottom-right-radius:6px;padding:14px 16px;max-width:85%;align-self:flex-end}
-.ct2{font-size:14px;line-height:1.55;color:white}
+/* CONVERSATION */
+.convo { display: flex; flex-direction: column; gap: 10px; }
+.kb {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  border-bottom-left-radius: 4px; padding: 14px 16px; max-width: 95%;
+}
+.kn {
+  font-size: 10px; font-weight: 500; color: var(--green); margin-bottom: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+.kn::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.kt { font-size: 14px; line-height: 1.55; color: var(--text-muted); }
+.cb {
+  background: var(--accent); border-radius: 12px; border-bottom-right-radius: 4px;
+  padding: 14px 16px; max-width: 85%; align-self: flex-end;
+}
+.ct2 { font-size: 14px; line-height: 1.55; color: var(--white); }
 
-/* ASK BOX - gold, inviting */
-.ab{border:2.5px solid var(--gold);border-radius:18px;padding:18px;margin-top:14px;background:rgba(253,246,227,0.3)}
-.ab-l{font-size:11px;font-weight:500;color:var(--gold);letter-spacing:.5px;margin-bottom:6px}
-.ab-p{font-size:14px;line-height:1.5;margin-bottom:12px}
-.ab-r{display:flex;gap:6px}
-.ab-i{flex:1;border:2px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14px;background:white;outline:none;font-family:'DM Sans',sans-serif}
-.ab-i:focus{border-color:var(--gold)}
-.ab-b{background:var(--gold);color:white;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.ab-b:hover{transform:translateY(-1px)}
-.mic{background:white;border:2px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;font-size:16px;transition:all .15s;flex-shrink:0}
-.mic:hover{border-color:var(--peacock);background:var(--peacock-light)}
-.mic.rec{border-color:var(--gold);background:var(--gold-light)}
-.ab-h{font-size:11px;color:var(--gray);margin-top:6px;font-style:italic}
+/* ASK BOX */
+.ab {
+  border: 2px solid var(--accent); border-radius: 12px; padding: 18px;
+  margin-top: 14px; background: rgba(245,237,229,0.3);
+}
+.ab-l { font-size: 11px; font-weight: 500; color: var(--accent); letter-spacing: .5px; margin-bottom: 6px; }
+.ab-p { font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
+.ab-r { display: flex; gap: 6px; }
+.ab-i {
+  flex: 1; border: 1.5px solid var(--divider); border-radius: 8px; padding: 12px 14px;
+  font-size: 14px; background: var(--white); outline: none; font-family: var(--font-body);
+}
+.ab-i:focus { border-color: var(--accent); }
+.ab-b {
+  background: var(--accent); color: var(--white); border: none; border-radius: 8px;
+  padding: 12px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
+  font-family: var(--font-body); transition: all .15s;
+}
+.ab-b:hover { background: var(--accent-hover); }
+.mic {
+  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
+  padding: 10px 12px; cursor: pointer; font-size: 16px; transition: all .15s; flex-shrink: 0;
+}
+.mic:hover { border-color: var(--accent); background: var(--accent-light); }
+.mic.rec { border-color: var(--accent); background: var(--accent-light); }
+.ab-h { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
-/* WONDER JOURNAL - warm */
-.jw{max-width:560px;margin:0 auto;padding:40px 24px 60px}
-.jh{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
-.js2{font-size:13px;color:var(--gray);margin-bottom:20px}
-.streak{display:flex;gap:5px;margin-bottom:24px;align-items:center}
-.sd{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:2px solid transparent}
-.sd-d{background:var(--peacock);color:white;border-color:var(--peacock-dark)}
-.sd-n{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
-.sd-f{background:var(--off);color:var(--gray)}
-.sl{font-size:11px;color:var(--gray);margin-left:8px}
-.je{background:white;border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-bottom:12px;transition:border-color .15s}
-.je:hover{border-color:var(--peacock)}
-.je-s{font-size:10px;font-weight:500;padding:3px 8px;border-radius:8px;display:inline-block;margin-bottom:8px}
-.je-q{font-family:'DM Serif Display',serif;font-size:16px;font-style:italic;line-height:1.5;margin-bottom:6px;color:var(--navy)}
-.je-c{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:10px}
-.je-m{font-size:12px;color:var(--teal-s);font-weight:500;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
-.je-m::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal-s);flex-shrink:0;margin-top:4px}
-.ja{background:var(--peacock);border-radius:18px;padding:16px 18px;margin:16px 0}
-.ja-l{font-size:10px;font-weight:500;color:var(--gold);letter-spacing:.5px;margin-bottom:5px}
-.ja-t{font-size:14px;color:white;line-height:1.55}
+/* WONDER JOURNAL */
+.jw { max-width: 560px; margin: 0 auto; padding: 40px 24px 60px; }
+.jh { font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 4px; }
+.js2 { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.streak { display: flex; gap: 5px; margin-bottom: 24px; align-items: center; }
+.sd {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 500; border: 2px solid transparent;
+}
+.sd-d { background: var(--green); color: var(--white); border-color: var(--green); }
+.sd-n { background: var(--green-light); color: var(--green); border-color: #7BAF8E; }
+.sd-f { background: var(--surface); color: var(--text-muted); }
+.sl { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
+.je {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  padding: 18px; margin-bottom: 12px; transition: border-color .15s;
+}
+.je:hover { border-color: var(--accent); }
+.je-s { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px; }
+.je-q {
+  font-family: var(--font-heading); font-size: 1rem; font-style: italic;
+  line-height: 1.5; margin-bottom: 6px; color: var(--text-primary);
+}
+.je-c { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+.je-m {
+  font-size: 12px; color: var(--green); font-weight: 500;
+  display: flex; align-items: flex-start; gap: 6px; line-height: 1.4;
+}
+.je-m::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); flex-shrink: 0; margin-top: 4px;
+}
+.ja {
+  background: var(--accent); border-radius: 12px; padding: 16px 18px; margin: 16px 0;
+}
+.ja-l { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: .5px; margin-bottom: 5px; }
+.ja-t { font-size: 14px; color: var(--white); line-height: 1.55; }
 
 /* GROWTH SNAPSHOT */
-.sw{max-width:560px;margin:0 auto;padding:40px 24px 60px}
-.sh{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
-.sp{font-size:12px;color:var(--gray);margin-bottom:20px}
-.slet{font-family:'DM Serif Display',serif;font-size:15px;line-height:1.75;color:var(--gray);margin-bottom:28px}
-.slet em{font-style:italic;color:var(--navy)}
-.sst{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
-.ss{background:white;border:1.5px solid var(--border);border-radius:16px;padding:16px 12px;text-align:center}
-.ss-n{font-family:'DM Serif Display',serif;font-size:28px;color:var(--peacock)}
-.ss-l{font-size:10px;color:var(--gray);margin-top:2px}
-.sthr{margin-bottom:28px}
-.sthr-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:10px}
-.str{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.str-n{font-size:12px;width:76px;color:var(--gray);flex-shrink:0}
-.str-bg{flex:1;height:10px;background:var(--off);border-radius:5px;overflow:hidden}
-.str-b{height:100%;border-radius:5px}
-.str-p{font-size:11px;color:var(--gray);width:30px;text-align:right}
-.sqr{margin-bottom:28px}
-.sqr-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:10px}
-.sq{font-family:'DM Serif Display',serif;font-style:italic;font-size:14px;padding:10px 0;border-bottom:.5px solid var(--border);color:var(--navy)}
-.sq-d{font-family:'DM Sans',sans-serif;font-style:normal;font-size:10px;color:var(--gray);margin-left:6px}
-.ssf{border-left:4px solid var(--peacock);padding:12px 16px;background:white;border-radius:0 14px 14px 0;margin-bottom:24px;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
-.ssf-l{font-size:10px;font-weight:500;color:#085041;letter-spacing:.5px;margin-bottom:4px}
-.ssf-t{font-size:14px;line-height:1.55}
-.snx{background:white;border:1.5px solid var(--border);border-radius:16px;padding:16px}
-.snx-l{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:.5px;margin-bottom:5px}
-.snx-t{font-size:13px;color:var(--gray);line-height:1.55}
+.sw { max-width: 560px; margin: 0 auto; padding: 40px 24px 60px; }
+.sh { font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 4px; }
+.sp { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+.slet { font-family: var(--font-heading); font-size: 15px; line-height: 1.75; color: var(--text-muted); margin-bottom: 28px; }
+.slet em { font-style: italic; color: var(--text-primary); }
+.sst { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 28px; }
+.ss {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  padding: 16px 12px; text-align: center;
+}
+.ss-n { font-family: var(--font-heading); font-size: 1.75rem; color: var(--accent); }
+.ss-l { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.sthr { margin-bottom: 28px; }
+.sthr-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 10px; }
+.str { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.str-n { font-size: 12px; width: 76px; color: var(--text-muted); flex-shrink: 0; }
+.str-bg { flex: 1; height: 10px; background: var(--surface); border-radius: 5px; overflow: hidden; }
+.str-b { height: 100%; border-radius: 5px; }
+.str-p { font-size: 11px; color: var(--text-muted); width: 30px; text-align: right; }
+.sqr { margin-bottom: 28px; }
+.sqr-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 10px; }
+.sq {
+  font-family: var(--font-heading); font-style: italic; font-size: 14px;
+  padding: 10px 0; border-bottom: .5px solid var(--divider); color: var(--text-primary);
+}
+.sq-d { font-family: var(--font-body); font-style: normal; font-size: 10px; color: var(--text-muted); margin-left: 6px; }
+.ssf {
+  border-left: 3px solid var(--accent); padding: 12px 16px; background: var(--white);
+  border-radius: 0 10px 10px 0; margin-bottom: 24px;
+  border-top: 1px solid var(--divider); border-right: 1px solid var(--divider); border-bottom: 1px solid var(--divider);
+}
+.ssf-l { font-size: 10px; font-weight: 500; color: var(--accent); letter-spacing: .5px; margin-bottom: 4px; }
+.ssf-t { font-size: 14px; line-height: 1.55; }
+.snx { background: var(--white); border: 1px solid var(--divider); border-radius: 12px; padding: 16px; }
+.snx-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 5px; }
+.snx-t { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
 
-footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-spacing:2px;border-top:1.5px solid var(--border)}
+footer {
+  text-align: center; padding: 24px; font-size: 0.75rem; font-weight: 500;
+  color: var(--text-muted); letter-spacing: 1.5px;
+  border-top: 1px solid var(--divider); background: var(--deeper);
+}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fadeUp .5s ease forwards}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}.fade-in{animation:fadeIn 0.6s ease-out}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.fi { animation: fadeUp .5s ease forwards; }
+
+@media(max-width:600px) {
+  nav { padding: 0 1rem; }
+  .map-wrap { padding: 24px 16px 40px; }
+  .pm { padding: 20px 16px; }
+  .two-col { grid-template-columns: 1fr; }
+  .sst { grid-template-columns: 1fr; }
+}
 </style>
 </head>
-<body class="fade-in">
+<body>
 
 <nav>
   <div class="nav-left">
-    <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px"><div class="nav-mark">K</div><span class="nav-word">Kelvi</span></a>
-    <span class="nav-fam">Family</span>
+    <a href="index.html" class="nav-brand"><span class="tamil-k">கே</span>Kelvi</a>
+    <span class="nav-label">Family</span>
   </div>
   <div class="nav-right">
     <span class="nav-link" onclick="show('threads')" id="tab-threads">Threads</span>
@@ -200,61 +355,28 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-sp
   </div>
 </nav>
 
+<!-- WELCOME -->
 <div class="screen active" id="screen-welcome">
-  <div style="max-width:480px;margin:0 auto;padding:24px 16px">
-    <div style="border:3px solid #3D3D3A;border-radius:6px;overflow:hidden;background:white">
-      <div style="background:var(--peacock);padding:18px 24px;text-align:center;border-bottom:3px solid #3D3D3A">
-        <div style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:500;color:white;letter-spacing:2px">Kelvi Family</div>
-        <div style="font-size:12px;color:var(--gold);margin-top:4px;letter-spacing:3px">A math thinking adventure</div>
-      </div>
-      <div style="border-bottom:3px solid #3D3D3A;background:white">
-        <svg width="100%" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="210" width="480" height="70" fill="#E1F5EE"/>
-          <path d="M-5 215 Q60 180 140 190 Q220 198 300 182 Q380 168 490 195 L490 215 L-5 215 Z" fill="#9FE1CB" opacity="0.4"/>
-          <path d="M-5 215 Q60 180 140 190 Q220 198 300 182 Q380 168 490 195" fill="none" stroke="#3D3D3A" stroke-width="1.5"/>
-          <path d="M-5 235 Q100 210 200 220 Q300 228 400 218 Q450 212 490 220" fill="none" stroke="#3D3D3A" stroke-width="1"/>
-          <circle cx="380" cy="45" r="20" fill="#FDF6E3" stroke="#C9A84C" stroke-width="1.2"/><circle cx="380" cy="45" r="7" fill="#C9A84C" opacity="0.3"/>
-          <line x1="380" y1="21" x2="380" y2="15" stroke="#C9A84C" stroke-width="1"/><line x1="380" y1="69" x2="380" y2="75" stroke="#C9A84C" stroke-width="1"/>
-          <line x1="356" y1="45" x2="350" y2="45" stroke="#C9A84C" stroke-width="1"/><line x1="404" y1="45" x2="410" y2="45" stroke="#C9A84C" stroke-width="1"/>
-          <line x1="365" y1="30" x2="361" y2="26" stroke="#C9A84C" stroke-width="0.8"/><line x1="395" y1="30" x2="399" y2="26" stroke="#C9A84C" stroke-width="0.8"/>
-          <path d="M46 95 C46 88 52 82 58 82 C60 78 66 75 72 78 C76 74 84 74 88 78 C94 76 100 80 100 86 C104 88 104 94 100 97 C100 100 96 102 92 102 L56 102 C50 102 46 99 46 95 Z" fill="white" stroke="#3D3D3A" stroke-width="1.3"/>
-          <path d="M310 100 C310 96 314 93 318 93 C319 90 323 89 327 90 C329 88 334 88 336 90 C339 89 343 91 343 94 C345 95 345 98 343 99 L317 99 C313 99 310 98 310 100 Z" fill="white" stroke="#3D3D3A" stroke-width="1"/>
-          <path d="M140 75 C140 73 142 71 144 71 C145 69 148 68 150 69 C152 68 155 69 155 71 C157 71 157 74 155 75 L143 75 C141 75 140 74 140 75 Z" fill="white" stroke="#3D3D3A" stroke-width="0.8"/>
-          <g transform="translate(75,145)"><path d="M-8 48 Q-2 20 4 26 Q10 10 16 24 Q22 16 26 32 Q28 26 32 48" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1.2" opacity="0.7"/></g>
-          <g transform="translate(42,165)"><path d="M-5 28 Q0 12 5 16 Q10 5 15 15 Q18 10 22 28" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1" opacity="0.6"/></g>
-          <g transform="translate(330,148)"><path d="M-6 36 Q0 14 6 20 Q12 4 18 18 Q22 12 26 36" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1" opacity="0.6"/></g>
-          <g transform="translate(415,168)"><path d="M-6 34 Q0 14 6 20 Q12 4 18 16 Q22 10 28 34" fill="#5DCAA5" stroke="#3D3D3A" stroke-width="1.1" opacity="0.5"/></g>
-          <g transform="translate(140,168)"><circle cx="0" cy="0" r="10" fill="#FDF6E3" stroke="#3D3D3A" stroke-width="2"/><circle cx="-3.5" cy="-2" r="3" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="3.5" cy="-2" r="3" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-2.5" cy="-2" r="1.3" fill="#3D3D3A"/><circle cx="4.5" cy="-2" r="1.3" fill="#3D3D3A"/><circle cx="0" cy="5" r="2" fill="#3D3D3A"/><path d="M0 10 L-9 46 L9 46 Z" fill="#F0FAF9" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-5" y="46" width="4" height="4" rx="1" fill="#3D3D3A"/><rect x="1" y="46" width="4" height="4" rx="1" fill="#3D3D3A"/></g>
-          <g transform="translate(200,164)"><circle cx="0" cy="0" r="11" fill="#E8C9A0" stroke="#3D3D3A" stroke-width="2"/><circle cx="-4" cy="-1.5" r="3.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="4" cy="-1.5" r="3.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-3" cy="-1.5" r="1.5" fill="#3D3D3A"/><circle cx="5" cy="-1.5" r="1.5" fill="#3D3D3A"/><path d="M-4 5 Q0 9 4 5" fill="none" stroke="#3D3D3A" stroke-width="1.2" stroke-linecap="round"/><path d="M0 11 L-11 52 L11 52 Z" fill="#E1F5EE" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-6" y="52" width="5" height="4" rx="1" fill="#3D3D3A"/><rect x="2" y="52" width="5" height="4" rx="1" fill="#3D3D3A"/></g>
-          <g transform="translate(270,153)"><circle cx="0" cy="0" r="14" fill="#E2B07E" stroke="#3D3D3A" stroke-width="2"/><circle cx="-5" cy="-1.5" r="4.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="5" cy="-1.5" r="4.5" fill="white" stroke="#3D3D3A" stroke-width="1"/><circle cx="-4" cy="-1.5" r="2" fill="#3D3D3A"/><circle cx="6" cy="-1.5" r="2" fill="#3D3D3A"/><path d="M-5 6 Q0 11 5 6" fill="none" stroke="#3D3D3A" stroke-width="1.5" stroke-linecap="round"/><path d="M0 14 L-15 68 L15 68 Z" fill="#00827F" stroke="#3D3D3A" stroke-width="2" stroke-linejoin="round"/><rect x="-8" y="68" width="6" height="5" rx="1" fill="#3D3D3A"/><rect x="3" y="68" width="6" height="5" rx="1" fill="#3D3D3A"/></g>
-          <g transform="translate(68,130)"><rect x="0" y="0" width="100" height="18" rx="8" fill="white" stroke="#3D3D3A" stroke-width="1.2"/><text x="50" y="13" text-anchor="middle" font-size="7.5" fill="#3D3D3A">But why does it work?</text><path d="M75 18 L78 30" stroke="#3D3D3A" stroke-width="1" fill="none"/></g>
-          <g transform="translate(270,112)"><rect x="0" y="0" width="108" height="18" rx="8" fill="white" stroke="#3D3D3A" stroke-width="1.2"/><text x="54" y="13" text-anchor="middle" font-size="7.5" fill="#3D3D3A">What a great question!</text><path d="M22 18 L16 30" stroke="#3D3D3A" stroke-width="1" fill="none"/></g>
-        </svg>
-      </div>
-      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:12px">
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;text-align:center;color:#3D3D3A;margin-bottom:2px">Parent sign in</div>
-        <div style="text-align:center;font-size:12px;color:#5F6B7A;margin-bottom:8px">Child? <a style="color:#00827F;font-weight:500;cursor:pointer">Sign in here.</a></div>
-        <input type="text" id="cname" placeholder="Username" style="padding:13px 16px;border:2px solid #E8E4E0;border-radius:12px;font-size:14px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')go()">
-        <input type="password" placeholder="Password" style="padding:13px 16px;border:2px solid #E8E4E0;border-radius:12px;font-size:14px;font-family:inherit;outline:none">
-        <button class="btn" onclick="go()" style="width:100%;padding:13px;border-radius:12px;font-size:15px">Sign in</button>
-        <div style="font-size:12px;color:#5F6B7A;display:flex;flex-direction:column;gap:4px">
-          <span>Forgot your password? <a style="color:#00827F;font-weight:500;cursor:pointer">Reset password.</a></span>
-          <span>Don't have an account? <a style="color:#00827F;font-weight:500;cursor:pointer">Enroll now</a> or <a style="color:#00827F;font-weight:500;cursor:pointer">try it out.</a></span>
-        </div>
-      </div>
-      <div style="border-top:3px solid #3D3D3A;padding:8px;text-align:center;font-size:9px;color:#C9A84C;letter-spacing:2px;background:#3D3D3A">The question is the answer.</div>
+  <div class="welcome">
+    <h1>Nurture mathematical wonder at home.</h1>
+    <p>Kelvi Family helps learners explore ideas through provocations, journals, and growth snapshots that value curiosity, language, and reflection.</p>
+    <div class="welcome-input">
+      <input type="text" id="cname" placeholder="Learner's name" value="Arya" onkeydown="if(event.key==='Enter')go()">
+      <button class="btn" onclick="go()">Start</button>
     </div>
   </div>
 </div>
 
+<!-- THREAD MAP -->
 <div class="screen" id="screen-threads">
-  <div class="map-wrap fi">
-    <h2>Choose your thread</h2>
-    <p class="map-sub">Tap a strand to see what's inside, then pick a topic to explore.</p>
+  <div class="map-wrap">
+    <h2>Mathematical threads</h2>
+    <p class="map-sub">Choose a strand. Each one has five threads of increasing depth.</p>
     <div class="strand-cards" id="strand-cards"></div>
   </div>
 </div>
 
+<!-- PROVOCATION -->
 <div class="screen" id="screen-prov">
   <div class="prov-layout">
     <div class="sb" id="sb"></div>
@@ -262,27 +384,28 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-sp
   </div>
 </div>
 
+<!-- WONDER JOURNAL -->
 <div class="screen" id="screen-journal">
   <div class="jw fi">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <div class="nav-mark" style="width:32px;height:32px;font-size:13px;background:var(--peacock);border:2px solid var(--gold)">K</div>
-      <div><div class="jh" id="jn">Arya's wonder journal</div><div class="js2">This week's best questions</div></div>
-    </div>
+    <div class="jh" id="jn">Arya's wonder journal</div>
+    <div class="js2">Questions, reflections, and mathematical moments.</div>
     <div class="streak">
-      <div class="sd sd-d">M</div><div class="sd sd-d">T</div><div class="sd sd-n">W</div><div class="sd sd-f">T</div><div class="sd sd-f">F</div>
-      <div class="sl">3 sessions this week</div>
+      <div class="sd sd-d">M</div><div class="sd sd-d">T</div><div class="sd sd-d">W</div>
+      <div class="sd sd-n">T</div><div class="sd sd-f">F</div><div class="sd sd-f">S</div><div class="sd sd-f">S</div>
+      <span class="sl">3-day streak</span>
     </div>
-    <div class="je"><div class="je-s" style="background:#E1F5EE;color:#085041">Operations</div><div class="je-q">"I wonder why we need calculators at all."</div><div class="je-c">She used algebra to bypass a broken multiply button, then questioned whether the tool was needed at all.</div><div class="je-m">Invented a new strategy instead of scaling up the old one</div></div>
+    <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I wonder why we need calculators at all."</div><div class="je-c">She used algebra to bypass a broken multiply button, then questioned whether the tool was needed at all.</div><div class="je-m">Invented a new strategy instead of scaling up the old one</div></div>
     <div class="ja"><div class="ja-l">Try this at dinner</div><div class="ja-t">Ask her: "Is there a faster way to do this?" while cooking or organizing together. She's already thinking about efficiency.</div></div>
-    <div class="je"><div class="je-s" style="background:#E1F5EE;color:#085041">Operations</div><div class="je-q">"I don't think there is a way to share the marbles equally."</div><div class="je-c">Discovered that 45 marbles can't split evenly among 4 friends. Suggested throwing away the leftover.</div><div class="je-m">Connected division to fairness — not just a calculation but a value</div></div>
+    <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I don't think there is a way to share the marbles equally."</div><div class="je-c">Discovered that 45 marbles can't split evenly among 4 friends. Suggested throwing away the leftover.</div><div class="je-m">Connected division to fairness — not just a calculation but a value</div></div>
     <div class="je"><div class="je-s" style="background:#EEEDFE;color:#3C3489">Geometry</div><div class="je-q">"What if the shape had curved sides instead of straight ones?"</div><div class="je-c">While exploring quadrilaterals, she wondered whether the rules change when lines aren't straight.</div><div class="je-m">First "what if" question in geometry this month</div></div>
   </div>
 </div>
 
+<!-- GROWTH SNAPSHOT -->
 <div class="screen" id="screen-snapshot">
   <div class="sw fi">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <div class="nav-mark" style="width:32px;height:32px;font-size:13px;background:var(--peacock);border:2px solid var(--gold)">K</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-light);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--accent);font-weight:500">K</div>
       <div><div class="sh" id="sn">Arya's growth snapshot</div><div class="sp">March 2026</div></div>
     </div>
     <div class="slet">This month she had <em>14 conversations</em> with Kelvi. She's becoming someone who doesn't just solve problems — she <em>questions them</em>. The biggest shift: she started asking "what if" in geometry, which she'd never done before.</div>
@@ -298,7 +421,7 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gold);letter-sp
 
 <script>
 const ICONS=['&#x1F522;','&#x2795;','&#x1F967;','&#x1F9E9;','&#x1F4D0;','&#x1F4CF;','&#x1F4CA;'];
-const S=[{n:'Number sense',d:'#BA7517',bg:'#FAEEDA',ic:ICONS[0],t:[['Counting to 100','Cardinality','Comparing'],['Place value to 120','Skip counting','Number lines'],['Place value to 1,000','Rounding','Even and odd'],['Place value to 10,000','Comparing large numbers','Roman numerals'],['Place value to millions','Negative integers','Prime and composite']]},{n:'Operations',d:'#0F6E56',bg:'#E1F5EE',ic:ICONS[1],t:[['Addition to 10','Subtraction to 10','Fact families'],['Addition to 100','Subtraction with regrouping','Intro to multiplication'],['Multiplication facts','Division as sharing','Two-digit multiplication'],['Multi-digit multiplication','Long division','Order of operations'],['Multi-digit division','Decimal operations','Estimating products']]},{n:'Fractions',d:'#534AB7',bg:'#EEEDFE',ic:ICONS[2],t:[['Equal shares','Halves and quarters','Fair sharing'],['Unit fractions','Fractions on number line','Comparing fractions'],['Equivalent fractions','Adding like fractions','Mixed numbers'],['Unlike denominators','Multiplying fractions','Fractions as division'],['Dividing fractions','Fraction-decimal-percent','Ratio introduction']]},{n:'Patterns & algebra',d:'#993C1D',bg:'#FAECE7',ic:ICONS[3],t:[['Repeating patterns','Growing patterns','What comes next?'],['Number patterns','Missing numbers','Input-output'],['Properties of operations','Unknown in equations','Two-step problems'],['Expressions','Writing equations','Inequalities'],['Variables','Coordinate graphing','Numerical patterns']]},{n:'Geometry',d:'#185FA5',bg:'#E6F1FB',ic:ICONS[4],t:[['2D shapes','3D shapes','Positional words'],['Attributes of shapes','Partitioning rectangles','Symmetry'],['Quadrilaterals','Area and perimeter','Angles introduction'],['Angle measurement','Lines and rays','Classifying triangles'],['Coordinate plane','Volume','Transformations intro']]},{n:'Measurement',d:'#D4537E',bg:'#FBEAF0',ic:ICONS[5],t:[['Length comparison','Non-standard units','Time to the hour'],['Standard units (cm, m)','Time to 5 minutes','Money (coins)'],['Grams and kilograms','Liters','Elapsed time'],['Unit conversion','Customary and metric','Area of complex shapes'],['Volume of prisms','Converting systems','Measurement problems']]},{n:'Data',d:'#888780',bg:'#F1EFE8',ic:ICONS[6],t:[['Sorting objects','Tally charts','Picture graphs'],['Bar graphs','Line plots','Asking about data'],['Scaled bar graphs','Pictographs','Interpreting data'],['Line graphs','Mean and median','Organizing data'],['Two-way tables','Scatter plots intro','Drawing conclusions']]}];
+const S=[{n:'Number sense',d:'#B8784E',bg:'#F5EDE5',ic:ICONS[0],t:[['Counting to 100','Cardinality','Comparing'],['Place value to 120','Skip counting','Number lines'],['Place value to 1,000','Rounding','Even and odd'],['Place value to 10,000','Comparing large numbers','Roman numerals'],['Place value to millions','Negative integers','Prime and composite']]},{n:'Operations',d:'#3A6B5C',bg:'#EBF3EF',ic:ICONS[1],t:[['Addition to 10','Subtraction to 10','Fact families'],['Addition to 100','Subtraction with regrouping','Intro to multiplication'],['Multiplication facts','Division as sharing','Two-digit multiplication'],['Multi-digit multiplication','Long division','Order of operations'],['Multi-digit division','Decimal operations','Estimating products']]},{n:'Fractions',d:'#534AB7',bg:'#EEEDFE',ic:ICONS[2],t:[['Equal shares','Halves and quarters','Fair sharing'],['Unit fractions','Fractions on number line','Comparing fractions'],['Equivalent fractions','Adding like fractions','Mixed numbers'],['Unlike denominators','Multiplying fractions','Fractions as division'],['Dividing fractions','Fraction-decimal-percent','Ratio introduction']]},{n:'Patterns & algebra',d:'#993C1D',bg:'#FAECE7',ic:ICONS[3],t:[['Repeating patterns','Growing patterns','What comes next?'],['Number patterns','Missing numbers','Input-output'],['Properties of operations','Unknown in equations','Two-step problems'],['Expressions','Writing equations','Inequalities'],['Variables','Coordinate graphing','Numerical patterns']]},{n:'Geometry',d:'#185FA5',bg:'#E6F1FB',ic:ICONS[4],t:[['2D shapes','3D shapes','Positional words'],['Attributes of shapes','Partitioning rectangles','Symmetry'],['Quadrilaterals','Area and perimeter','Angles introduction'],['Angle measurement','Lines and rays','Classifying triangles'],['Coordinate plane','Volume','Transformations intro']]},{n:'Measurement',d:'#D4537E',bg:'#FBEAF0',ic:ICONS[5],t:[['Length comparison','Non-standard units','Time to the hour'],['Standard units (cm, m)','Time to 5 minutes','Money (coins)'],['Grams and kilograms','Liters','Elapsed time'],['Unit conversion','Customary and metric','Area of complex shapes'],['Volume of prisms','Converting systems','Measurement problems']]},{n:'Data',d:'#6F6A61',bg:'#EDEBE6',ic:ICONS[6],t:[['Sorting objects','Tally charts','Picture graphs'],['Bar graphs','Line plots','Asking about data'],['Scaled bar graphs','Pictographs','Interpreting data'],['Line graphs','Mean and median','Organizing data'],['Two-way tables','Scatter plots intro','Drawing conclusions']]}];
 const P=[{n:'The array garden',tp:'Noticing',dn:1},{n:'Fair sharing',tp:'Reasoning',dn:1},{n:'The broken calculator',tp:'Reasoning',dn:0,ac:1},{n:'Doubles and halves',tp:'Noticing',dn:0},{n:'The remainder question',tp:'Creating',dn:0},{n:'Make your own',tp:'Creating',dn:0}];
 let cn='Arya',rec=null,isR=false;
 

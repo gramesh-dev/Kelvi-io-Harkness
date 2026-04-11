@@ -3,133 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kelvi Solo helps independent learners think through hard math with guided Socratic support instead of answer-giving.">
 <title>Kelvi Solo</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <style>
-:root{--peacock:#00827F;--peacock-dark:#006B68;--peacock-light:#F0FAF9;--gold:#C9A84C;--gold-light:#FDF6E3;--navy:#1A1A2E;--gray:#5F6B7A;--warm:#F8F7F4;--off:#F0EDE8;--border:#E8E4E0;--sand:#3D3D3A;--sand-light:#EDE8E0}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+:root {
+  --bg: #F5F3EE;
+  --surface: #ECE7DC;
+  --deeper: #E0D8C8;
+  --divider: #CDC3B1;
+  --text-primary: #2F2B25;
+  --text-muted: #6F6A61;
+  --accent: #5A7080;
+  --accent-dark: #48606E;
+  --accent-light: #E8EEF2;
+  --white: #FFFFFF;
+  --font-heading: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
 
-nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--navy);border-bottom:3px solid var(--gold)}
-.nav-left{display:flex;align-items:center;gap:10px}
-.nav-mark{width:30px;height:30px;border-radius:50%;background:var(--peacock);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold)}
-.nav-word{font-family:'DM Serif Display',serif;font-size:17px;color:white}
-.nav-label{font-size:11px;color:rgba(255,255,255,0.5);margin-left:4px}
-.nav-right{display:flex;align-items:center;gap:12px}
-.nav-link{color:rgba(255,255,255,0.6);font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all .15s;text-decoration:none}
-.nav-link:hover{background:rgba(255,255,255,0.1);color:white}
-.nav-link.active{background:white;color:var(--navy);font-weight:500}
-.nav-api{padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;width:180px}
-.nav-api::placeholder{color:rgba(255,255,255,0.3)}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
 
-.screen{display:none;flex:1}.screen.active{display:flex;flex-direction:column}
+/* NAV */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 64px; background: var(--bg);
+  border-bottom: 1px solid var(--divider); position: sticky; top: 0; z-index: 100;
+}
+.nav-left { display: flex; align-items: center; gap: 8px; }
+.nav-brand {
+  font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+}
+.nav-brand .tamil-k { font-size: 1.8rem; position: relative; top: 1px; }
+.nav-label {
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
+  color: var(--text-muted); margin-left: 0.25rem;
+}
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-link {
+  color: var(--text-muted); font-size: 0.85rem; padding: 6px 14px;
+  border-radius: 8px; cursor: pointer; transition: all .15s; text-decoration: none; font-weight: 500;
+}
+.nav-link:hover { background: var(--surface); color: var(--text-primary); }
+.nav-link.active { background: var(--accent); color: var(--white); }
+.nav-api {
+  padding: 5px 12px; border-radius: 8px; border: 1px solid var(--divider);
+  background: var(--white); color: var(--text-primary); font-size: 11px;
+  font-family: var(--font-body); outline: none; width: 180px;
+}
+.nav-api::placeholder { color: var(--divider); }
+
+.screen { display: none; flex: 1; }
+.screen.active { display: flex; flex-direction: column; }
 
 /* WELCOME */
-.welcome{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px}
-.welcome-inner{text-align:center;max-width:480px}
-.welcome-mark{width:100px;height:100px;margin:0 auto 28px}
-.welcome-inner h1{font-family:'DM Serif Display',serif;font-size:clamp(30px,5vw,40px);margin-bottom:8px}
-.welcome-inner p{font-size:15px;color:var(--gray);line-height:1.6;margin-bottom:32px}
-.welcome-row{display:flex;gap:8px;max-width:340px;margin:0 auto}
-.welcome-row input{flex:1;padding:13px 16px;border:2px solid var(--border);border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none}
-.welcome-row input:focus{border-color:var(--peacock)}
-.btn{background:var(--navy);color:white;border:none;padding:13px 24px;border-radius:14px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s}
-.btn:hover{background:#2a2a4a}
+.welcome { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+.welcome-inner { text-align: center; max-width: 460px; }
+.welcome-inner h1 {
+  font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 2.8rem);
+  margin-bottom: 10px; letter-spacing: -0.02em;
+}
+.welcome-inner p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 2.5rem; }
+.welcome-row { display: flex; gap: 8px; max-width: 340px; margin: 0 auto; }
+.welcome-row input {
+  flex: 1; padding: 13px 16px; border: 1.5px solid var(--divider); border-radius: 8px;
+  font-size: 1rem; font-family: var(--font-body); outline: none; background: var(--white);
+}
+.welcome-row input:focus { border-color: var(--accent); }
+.btn {
+  background: var(--accent); color: var(--white); border: none; padding: 13px 24px;
+  border-radius: 8px; font-size: 0.95rem; font-family: var(--font-body); cursor: pointer;
+  font-weight: 500; transition: all .15s;
+}
+.btn:hover { background: var(--accent-dark); }
 
 /* HOME */
-.home{flex:1;max-width:800px;margin:0 auto;padding:40px 24px 60px;width:100%}
-.home-greeting{font-family:'DM Serif Display',serif;font-size:clamp(24px,4vw,32px);margin-bottom:24px}
-.home-section{margin-bottom:32px}
-.home-label{font-size:10px;font-weight:500;color:var(--gray);letter-spacing:1px;margin-bottom:12px}
+.home { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; width: 100%; }
+.home-greeting { font-family: var(--font-heading); font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 24px; }
+.home-section { margin-bottom: 32px; }
+.home-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 12px; text-transform: uppercase; }
 
 /* HOMEWORK INPUT */
-.hw-box{background:white;border:2px solid var(--border);border-radius:16px;padding:20px;transition:border-color .15s}
-.hw-box:focus-within{border-color:var(--peacock)}
-.hw-textarea{width:100%;border:none;outline:none;font-size:15px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.6;color:var(--navy);background:transparent}
-.hw-textarea::placeholder{color:var(--border)}
-.hw-toolbar{display:flex;align-items:center;gap:4px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
-.hw-tb{padding:4px 8px;border:1px solid var(--border);border-radius:5px;font-size:11px;cursor:pointer;background:white;color:var(--navy);font-family:'DM Sans',sans-serif;transition:all .1s}
-.hw-tb:hover{border-color:var(--peacock);background:var(--peacock-light)}
-.hw-tb sup{font-size:8px;vertical-align:super}
-.hw-tb sub{font-size:8px;vertical-align:sub}
-.hw-mq{flex:1;min-width:200px;min-height:32px;font-size:15px;padding:4px 8px;border:1.5px solid var(--border);border-radius:8px;background:white;margin:4px 0}
-.hw-actions{display:flex;gap:8px;margin-top:12px;align-items:center}
-.hw-go{background:var(--peacock);color:white;border:none;padding:11px 24px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.hw-go:hover{background:var(--peacock-dark)}
-.hw-photo{background:white;border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--gray);transition:all .15s}
-.hw-photo:hover{border-color:var(--peacock)}
-.hw-mic{background:white;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;cursor:pointer;font-size:16px;transition:all .15s}
-.hw-mic:hover{border-color:var(--peacock)}
-.hw-mic.rec{border-color:var(--gold);background:var(--gold-light)}
+.hw-box {
+  background: var(--white); border: 1.5px solid var(--divider); border-radius: 12px;
+  padding: 20px; transition: border-color .15s;
+}
+.hw-box:focus-within { border-color: var(--accent); }
+.hw-textarea {
+  width: 100%; border: none; outline: none; font-size: 15px; font-family: var(--font-body);
+  resize: none; line-height: 1.6; color: var(--text-primary); background: transparent;
+}
+.hw-textarea::placeholder { color: var(--divider); }
+.hw-toolbar {
+  display: flex; align-items: center; gap: 4px; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--divider); flex-wrap: wrap;
+}
+.hw-tb {
+  padding: 4px 8px; border: 1px solid var(--divider); border-radius: 5px; font-size: 11px;
+  cursor: pointer; background: var(--white); color: var(--text-primary); font-family: var(--font-body); transition: all .1s;
+}
+.hw-tb:hover { border-color: var(--accent); background: var(--accent-light); }
+.hw-tb sup { font-size: 8px; vertical-align: super; }
+.hw-tb sub { font-size: 8px; vertical-align: sub; }
+.hw-mq {
+  flex: 1; min-width: 200px; min-height: 32px; font-size: 15px; padding: 4px 8px;
+  border: 1.5px solid var(--divider); border-radius: 8px; background: var(--white); margin: 4px 0;
+}
+.hw-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.hw-go {
+  background: var(--accent); color: var(--white); border: none; padding: 11px 24px;
+  border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
+  font-family: var(--font-body); transition: all .15s;
+}
+.hw-go:hover { background: var(--accent-dark); }
+.hw-photo {
+  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
+  padding: 10px 16px; font-size: 13px; cursor: pointer; font-family: var(--font-body);
+  color: var(--text-muted); transition: all .15s;
+}
+.hw-photo:hover { border-color: var(--accent); }
+.hw-mic {
+  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
+  padding: 10px 14px; cursor: pointer; font-size: 16px; transition: all .15s;
+}
+.hw-mic:hover { border-color: var(--accent); }
+.hw-mic.rec { border-color: var(--accent); background: var(--accent-light); }
 
-/* COURSE CARDS */
-.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.course{background:white;border:1.5px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .15s}
-.course:hover{border-color:var(--peacock);transform:translateY(-2px)}
-.course-icon{font-size:24px;margin-bottom:10px;display:block}
-.course-name{font-size:15px;font-weight:500;margin-bottom:4px}
-.course-desc{font-size:12px;color:var(--gray);line-height:1.45}
-.course-level{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:8px}
+/* COURSES */
+.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.course {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  padding: 18px; cursor: pointer; transition: all .15s;
+}
+.course:hover { border-color: var(--accent); transform: translateY(-2px); }
+.course-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+.course-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.course-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
 
-
-/* CHAT VIEW */
-.chat-layout{flex:1;display:flex;flex-direction:column;max-width:720px;margin:0 auto;width:100%}
-.chat-header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.chat-back{font-size:13px;color:var(--peacock);cursor:pointer;text-decoration:none}
-.chat-topic{font-size:14px;font-weight:500}
-.chat-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:85%;animation:fadeUp .3s ease}
-.msg-k{align-self:flex-start}
-.msg-s{align-self:flex-end}
-.msg-name{font-size:9px;font-weight:500;margin-bottom:3px;padding-left:2px}
-.msg-name-k{color:var(--peacock)}
-.msg-name-s{color:var(--gray);text-align:right}
-.msg-bubble-k{background:white;border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;padding:12px 16px;font-size:14px;line-height:1.55;color:var(--gray)}
-.msg-bubble-s{background:var(--navy);border-radius:16px;border-bottom-right-radius:4px;padding:12px 16px;font-size:14px;line-height:1.55;color:white}
-.chat-input-bar{padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:white}
-.chat-input{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:none;max-height:100px}
-.chat-input:focus{border-color:var(--peacock)}
-.chat-send{background:var(--peacock);color:white;border:none;border-radius:12px;padding:11px 18px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500}
-.chat-send:hover{background:var(--peacock-dark)}
-.chat-mic{background:none;border:1.5px solid var(--border);border-radius:12px;padding:9px 12px;cursor:pointer;font-size:16px;transition:all .15s}
-.chat-mic:hover{border-color:var(--peacock)}
-.chat-mic.rec{border-color:var(--gold);background:var(--gold-light)}
-.chat-footer{padding:8px 24px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--gray);border-top:1px solid var(--border)}
-.q-badge{background:var(--peacock-light);color:var(--peacock-dark);padding:3px 10px;border-radius:6px;font-weight:500}
-.typing{display:none;align-self:flex-start;padding:8px 14px;background:var(--peacock-light);border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center}
-.typing.vis{display:flex}
-.dot{width:5px;height:5px;border-radius:50%;background:var(--peacock);animation:bounce 1.2s infinite}
-.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+/* CHAT */
+.chat-layout { flex: 1; display: flex; flex-direction: column; max-width: 720px; margin: 0 auto; width: 100%; }
+.chat-header {
+  padding: 14px 24px; border-bottom: 1px solid var(--divider);
+  display: flex; align-items: center; gap: 10px;
+}
+.chat-back { font-size: 13px; color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
+.chat-topic { font-size: 14px; font-weight: 500; }
+.chat-msgs { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+.msg { max-width: 85%; animation: fadeUp .3s ease; }
+.msg-k { align-self: flex-start; }
+.msg-s { align-self: flex-end; }
+.msg-name { font-size: 9px; font-weight: 500; margin-bottom: 3px; padding-left: 2px; }
+.msg-name-k { color: var(--accent); }
+.msg-name-s { color: var(--text-muted); text-align: right; }
+.msg-bubble-k {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
+  border-bottom-left-radius: 4px; padding: 12px 16px; font-size: 14px; line-height: 1.55; color: var(--text-muted);
+}
+.msg-bubble-s {
+  background: var(--accent); border-radius: 12px; border-bottom-right-radius: 4px;
+  padding: 12px 16px; font-size: 14px; line-height: 1.55; color: var(--white);
+}
+.chat-input-bar {
+  padding: 12px 24px; border-top: 1px solid var(--divider);
+  display: flex; gap: 8px; align-items: center; background: var(--white);
+}
+.chat-input {
+  flex: 1; border: 1.5px solid var(--divider); border-radius: 8px; padding: 11px 14px;
+  font-size: 14px; font-family: var(--font-body); outline: none; resize: none; max-height: 100px;
+}
+.chat-input:focus { border-color: var(--accent); }
+.chat-send {
+  background: var(--accent); color: var(--white); border: none; border-radius: 8px;
+  padding: 11px 18px; font-size: 14px; cursor: pointer; font-family: var(--font-body); font-weight: 500;
+}
+.chat-send:hover { background: var(--accent-dark); }
+.chat-mic {
+  background: none; border: 1.5px solid var(--divider); border-radius: 8px;
+  padding: 9px 12px; cursor: pointer; font-size: 16px; transition: all .15s;
+}
+.chat-mic:hover { border-color: var(--accent); }
+.chat-mic.rec { border-color: var(--accent); background: var(--accent-light); }
+.chat-footer {
+  padding: 8px 24px; display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--divider);
+}
+.q-badge {
+  background: var(--accent-light); color: var(--accent-dark);
+  padding: 3px 10px; border-radius: 6px; font-weight: 500;
+}
+.typing {
+  display: none; align-self: flex-start; padding: 8px 14px;
+  background: var(--accent-light); border-radius: 12px; border-bottom-left-radius: 4px;
+  gap: 4px; align-items: center;
+}
+.typing.vis { display: flex; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
 
 /* HISTORY */
-.history{flex:1;max-width:700px;margin:0 auto;padding:40px 24px 60px;width:100%}
-.hist-h{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:20px}
-.hist-item{background:white;border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:border-color .12s;display:flex;justify-content:space-between;align-items:center}
-.hist-item:hover{border-color:var(--peacock)}
-.hist-topic{font-size:14px;font-weight:500}
-.hist-date{font-size:11px;color:var(--gray)}
-.hist-q{font-size:11px;color:var(--peacock);margin-top:2px}
+.history { flex: 1; max-width: 700px; margin: 0 auto; padding: 40px 24px 60px; width: 100%; }
+.hist-h { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 20px; }
+.hist-item {
+  background: var(--white); border: 1px solid var(--divider); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 8px; cursor: pointer; transition: border-color .12s;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.hist-item:hover { border-color: var(--accent); }
+.hist-topic { font-size: 14px; font-weight: 500; }
+.hist-date { font-size: 11px; color: var(--text-muted); }
+.hist-q { font-size: 11px; color: var(--accent); margin-top: 2px; }
 
-footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-spacing:2px;border-top:1px solid var(--border)}
+footer {
+  text-align: center; padding: 24px; font-size: 0.75rem; font-weight: 500;
+  color: var(--text-muted); letter-spacing: 1.5px;
+  border-top: 1px solid var(--divider); background: var(--deeper);
+}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}.fade-in{animation:fadeIn 0.6s ease-out}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media(max-width:600px) {
+  nav { padding: 0 1rem; }
+  .home { padding: 24px 16px 40px; }
+  .nav-api { width: 120px; }
+}
 </style>
 </head>
-<body class="fade-in">
+<body>
 
 <nav>
   <div class="nav-left">
-    <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-    <div class="nav-mark">K</div>
-    <span class="nav-word">Kelvi</span>
-    </a>
+    <a href="index.html" class="nav-brand"><span class="tamil-k">கே</span>Kelvi</a>
     <span class="nav-label">Solo</span>
   </div>
   <div class="nav-right">
@@ -143,8 +258,6 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
 <div class="screen active" id="screen-welcome">
   <div class="welcome">
     <div class="welcome-inner">
-      <div class="welcome-mark"><svg width="100" height="100" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"><defs><style>.qmark-path{stroke:#00827F;stroke-width:18;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:400;stroke-dashoffset:400;animation:draw 1.4s cubic-bezier(0.4,0,0.2,1) infinite}.dot-circle{fill:#00827F;animation:dotPop 1.4s cubic-bezier(0.4,0,0.2,1) infinite}.gold-ring{stroke:#C9A84C;stroke-width:3;fill:none;stroke-dasharray:314;stroke-dashoffset:314;animation:ringDraw 1.4s cubic-bezier(0.4,0,0.2,1) infinite}@keyframes draw{0%{stroke-dashoffset:400;opacity:0.2}20%{opacity:1}70%{stroke-dashoffset:0;opacity:1}85%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0.2}}@keyframes dotPop{0%{r:0;opacity:0}65%{r:0;opacity:0}80%{r:12;opacity:1}90%{r:12;opacity:1}100%{r:12;opacity:0}}@keyframes ringDraw{0%{stroke-dashoffset:314;opacity:0}10%{opacity:0.4}70%{stroke-dashoffset:0;opacity:0.4}100%{stroke-dashoffset:0;opacity:0}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.fade-in{animation:fadeIn 0.6s ease-out}
-</style></defs><circle cx="340" cy="155" r="100" class="gold-ring"/><circle cx="340" cy="155" r="88" fill="#F0FAF9" opacity="0.6"/><path class="qmark-path" d="M305,115 C305,90 325,75 340,75 C355,75 378,88 378,110 C378,130 362,140 348,152 C342,158 340,164 340,175 L340,195"/><circle cx="340" cy="222" class="dot-circle"/></svg></div>
       <h1>Think it through.</h1>
       <p>Kelvi helps you work through math problems without giving you the answer. Because figuring it out yourself is the whole point.</p>
       <div class="welcome-row">
@@ -158,15 +271,13 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
 <!-- HOME -->
 <div class="screen" id="screen-home">
   <div class="home" style="animation:fadeUp .5s ease">
-
     <div class="home-greeting" id="greeting">What are you working on?</div>
-
     <div class="home-section">
-      <div class="home-label">HOMEWORK HELP</div>
+      <div class="home-label">Homework help</div>
       <div class="hw-box">
         <textarea class="hw-textarea" id="hw-input" rows="3" placeholder="Paste your problem here, or describe what you're stuck on..."></textarea>
         <div class="hw-toolbar">
-          <span style="font-size:10px;color:var(--gray);margin-right:4px">Math:</span>
+          <span style="font-size:10px;color:var(--text-muted);margin-right:4px">Math:</span>
           <button class="hw-tb" onclick="mqC('\\frac')">a/b</button>
           <button class="hw-tb" onclick="mqC('^')">x<sup>n</sup></button>
           <button class="hw-tb" onclick="mqC('_')">x<sub>n</sub></button>
@@ -183,7 +294,7 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
           <button class="hw-tb" onclick="mqW('\\le ')">&le;</button>
           <button class="hw-tb" onclick="mqW('\\ge ')">&ge;</button>
           <span id="hw-mq" class="hw-mq"></span>
-          <button class="hw-tb" onclick="insertHwMath()" style="background:var(--peacock-light);color:var(--peacock-dark);border-color:var(--peacock)">Add</button>
+          <button class="hw-tb" onclick="insertHwMath()" style="background:var(--accent-light);color:var(--accent-dark);border-color:var(--accent)">Add</button>
         </div>
         <div class="hw-actions">
           <button class="hw-go" onclick="startChat()">Help me think through this</button>
@@ -192,58 +303,20 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
         </div>
       </div>
     </div>
-
     <div class="home-section">
-      <div class="home-label">EXPLORE A TOPIC</div>
+      <div class="home-label">Explore a topic</div>
       <div class="courses">
-        <div class="course" onclick="openCourse('Integrated Math 1','Linear equations, inequalities, intro geometry, data')">
-          <span class="course-icon">&#x2160;</span>
-          <div class="course-name">Integrated Math 1</div>
-          <div class="course-desc">Linear equations, inequalities, geometric foundations, data analysis</div>
-        </div>
-        <div class="course" onclick="openCourse('Integrated Math 2','Quadratics, similarity, probability, right triangles')">
-          <span class="course-icon">&#x2161;</span>
-          <div class="course-name">Integrated Math 2</div>
-          <div class="course-desc">Quadratics, similarity, probability, right triangle trigonometry</div>
-        </div>
-        <div class="course" onclick="openCourse('Integrated Math 3','Polynomials, rational functions, circles, trig identities')">
-          <span class="course-icon">&#x2162;</span>
-          <div class="course-name">Integrated Math 3</div>
-          <div class="course-desc">Polynomials, rational functions, circles, trigonometric identities</div>
-        </div>
-        <div class="course" onclick="openCourse('Math 4','Precalculus, limits, intro to derivatives and integrals')">
-          <span class="course-icon">&#x2163;</span>
-          <div class="course-name">Math 4</div>
-          <div class="course-desc">Precalculus, limits, introduction to derivatives and integrals (AB Calculus)</div>
-        </div>
-        <div class="course" onclick="openCourse('Math 5','BC Calculus: series, parametric, polar, advanced integration')">
-          <span class="course-icon">&#x2164;</span>
-          <div class="course-name">Math 5</div>
-          <div class="course-desc">BC Calculus: series, parametric equations, polar coordinates, advanced integration</div>
-        </div>
-        <div class="course" onclick="openCourse('AP Statistics','Probability, distributions, inference, experimental design')">
-          <span class="course-icon">&#x03C3;</span>
-          <div class="course-name">AP Statistics</div>
-          <div class="course-desc">Probability, distributions, inference, regression, experimental design</div>
-        </div>
-        <div class="course" onclick="openCourse('Linear Algebra','Vectors, matrices, eigenvalues, linear transformations')">
-          <span class="course-icon">&#x27E8;&#x27E9;</span>
-          <div class="course-name">Linear Algebra</div>
-          <div class="course-desc">Vectors, matrices, eigenvalues, linear transformations, vector spaces</div>
-        </div>
-        <div class="course" onclick="openCourse('Differential Equations','First and second order ODEs, systems, Laplace transforms')">
-          <span class="course-icon">&#x2202;</span>
-          <div class="course-name">Differential Equations</div>
-          <div class="course-desc">First and second order ODEs, systems, Laplace transforms</div>
-        </div>
-        <div class="course" onclick="openCourse('Discrete Math','Logic, proofs, sets, combinatorics, graph theory')">
-          <span class="course-icon">&#x2227;</span>
-          <div class="course-name">Discrete Math</div>
-          <div class="course-desc">Logic, proofs, sets, combinatorics, graph theory</div>
-        </div>
+        <div class="course" onclick="openCourse('Integrated Math 1','Linear equations, inequalities, intro geometry, data')"><span class="course-icon">&#x2160;</span><div class="course-name">Integrated Math 1</div><div class="course-desc">Linear equations, inequalities, geometric foundations, data analysis</div></div>
+        <div class="course" onclick="openCourse('Integrated Math 2','Quadratics, similarity, probability, right triangles')"><span class="course-icon">&#x2161;</span><div class="course-name">Integrated Math 2</div><div class="course-desc">Quadratics, similarity, probability, right triangle trigonometry</div></div>
+        <div class="course" onclick="openCourse('Integrated Math 3','Polynomials, rational functions, circles, trig identities')"><span class="course-icon">&#x2162;</span><div class="course-name">Integrated Math 3</div><div class="course-desc">Polynomials, rational functions, circles, trigonometric identities</div></div>
+        <div class="course" onclick="openCourse('Math 4','Precalculus, limits, intro to derivatives and integrals')"><span class="course-icon">&#x2163;</span><div class="course-name">Math 4</div><div class="course-desc">Precalculus, limits, introduction to derivatives and integrals</div></div>
+        <div class="course" onclick="openCourse('Math 5','BC Calculus: series, parametric, polar, advanced integration')"><span class="course-icon">&#x2164;</span><div class="course-name">Math 5</div><div class="course-desc">BC Calculus: series, parametric equations, polar coordinates, advanced integration</div></div>
+        <div class="course" onclick="openCourse('AP Statistics','Probability, distributions, inference, experimental design')"><span class="course-icon">&#x03C3;</span><div class="course-name">AP Statistics</div><div class="course-desc">Probability, distributions, inference, regression, experimental design</div></div>
+        <div class="course" onclick="openCourse('Linear Algebra','Vectors, matrices, eigenvalues, linear transformations')"><span class="course-icon">&#x27E8;&#x27E9;</span><div class="course-name">Linear Algebra</div><div class="course-desc">Vectors, matrices, eigenvalues, linear transformations, vector spaces</div></div>
+        <div class="course" onclick="openCourse('Differential Equations','First and second order ODEs, systems, Laplace transforms')"><span class="course-icon">&#x2202;</span><div class="course-name">Differential Equations</div><div class="course-desc">First and second order ODEs, systems, Laplace transforms</div></div>
+        <div class="course" onclick="openCourse('Discrete Math','Logic, proofs, sets, combinatorics, graph theory')"><span class="course-icon">&#x2227;</span><div class="course-name">Discrete Math</div><div class="course-desc">Logic, proofs, sets, combinatorics, graph theory</div></div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -268,7 +341,7 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
     </div>
     <div class="chat-footer">
       <span id="q-count" class="q-badge" style="display:none"></span>
-      <span style="font-size:10px;color:var(--gray)">Kelvi never gives answers. Only better questions.</span>
+      <span style="font-size:10px;color:var(--text-muted)">Kelvi never gives answers. Only better questions.</span>
     </div>
   </div>
 </div>
@@ -278,22 +351,10 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-sp
   <div class="history" style="animation:fadeUp .5s ease">
     <div class="hist-h">My sessions</div>
     <div id="hist-list">
-      <div class="hist-item">
-        <div><div class="hist-topic">Simplify sin(sin<sup>-1</sup>(x))</div><div class="hist-q">3 questions asked</div></div>
-        <div class="hist-date">Today</div>
-      </div>
-      <div class="hist-item">
-        <div><div class="hist-topic">Factor x<sup>3</sup> - 8</div><div class="hist-q">5 questions asked</div></div>
-        <div class="hist-date">Yesterday</div>
-      </div>
-      <div class="hist-item">
-        <div><div class="hist-topic">AP Calculus: Related rates</div><div class="hist-q">4 questions asked</div></div>
-        <div class="hist-date">Apr 5</div>
-      </div>
-      <div class="hist-item">
-        <div><div class="hist-topic">Linear Algebra: Eigenvalues</div><div class="hist-q">6 questions asked</div></div>
-        <div class="hist-date">Apr 4</div>
-      </div>
+      <div class="hist-item"><div><div class="hist-topic">Simplify sin(sin<sup>-1</sup>(x))</div><div class="hist-q">3 questions asked</div></div><div class="hist-date">Today</div></div>
+      <div class="hist-item"><div><div class="hist-topic">Factor x<sup>3</sup> - 8</div><div class="hist-q">5 questions asked</div></div><div class="hist-date">Yesterday</div></div>
+      <div class="hist-item"><div><div class="hist-topic">AP Calculus: Related rates</div><div class="hist-q">4 questions asked</div></div><div class="hist-date">Apr 5</div></div>
+      <div class="hist-item"><div><div class="hist-topic">Linear Algebra: Eigenvalues</div><div class="hist-q">6 questions asked</div></div><div class="hist-date">Apr 4</div></div>
     </div>
   </div>
 </div>
@@ -366,7 +427,7 @@ Internally classify every student interaction:
 Do not announce the classification to the student. Use it to guide your next move — procedural gets "why does that work?", conceptual gets "what more can you tell me?", generative gets named as a mathematical move.
 
 MATH VISUALS:
-When a visual would help — a graph, geometric figure, number line — include an inline SVG. Use fill="#00827F" for main elements and fill="#C9A84C" for accents. Always ask first: "Would you like me to show you that on a graph?"
+When a visual would help — a graph, geometric figure, number line — include an inline SVG. Use fill="#5A7080" for main elements and fill="#B8784E" for accents. Always ask first: "Would you like me to show you that on a graph?"
 
 SHOW ON REQUEST:
 If a student asks you to show an image, graph, diagram, or visual — do it immediately without asking permission first. They already asked. If a student asks you to show the problem again, repeat it exactly as you originally presented it.
@@ -377,124 +438,39 @@ Two to three sentences maximum, then either one question or nothing. Never write
 15. RECOGNIZE PRACTICE REQUESTS.
 When a student says "I want to practice [topic]," "give me a problem," "show me a question," or anything similar — do NOT ask what they've tried. They haven't tried anything yet. Give them a problem immediately, then ask: "What do you think you should do first?"
 
-PROBLEM SOURCES:
-Draw problems from the Phillips Exeter Academy problem sets (Math 1-5) and AMC competition problems (AMC 8, AMC 10, AMC 12, AIME). These are rich, multi-step, integrated problems designed for deep thinking — not drill exercises.
-
-When selecting a problem:
-- Match the topic the student requested
-- Match the course level they're in (Integrated Math 1 = PEA Math 1 level, etc.)
-- Prefer word problems over bare equations
-- Prefer problems with multiple entry points
-- Prefer problems that connect algebra, geometry, and reasoning rather than testing one isolated skill
-- Present the problem cleanly, then: "What do you think you should do first?"
-
-If the student asks for another problem after finishing one, give them one that builds on what they just learned — slightly harder, or connecting to a related concept. Do not repeat the same type.
-
 COURSE TOPIC MAP:
-- Integrated Math 1: Linear equations, inequalities, geometric foundations, data analysis, proportional reasoning
-- Integrated Math 2: Quadratics, similarity, probability, right triangle trigonometry, systems of equations
-- Integrated Math 3: Polynomials, rational functions, circles, trigonometric identities, sequences and series
-- Math 4: Precalculus, limits, introduction to derivatives and integrals, optimization
-- Math 5: BC Calculus — series, parametric equations, polar coordinates, advanced integration techniques
-- AP Statistics: Probability, distributions, inference, regression, experimental design
-- Linear Algebra: Vectors, matrices, eigenvalues, linear transformations, vector spaces
-- Differential Equations: First and second order ODEs, systems, Laplace transforms, modeling
-- Discrete Math: Logic, proofs, sets, combinatorics, graph theory, recursion
+- Integrated Math 1: Linear equations, inequalities, systems, coordinate geometry, data analysis, sequences
+- Integrated Math 2: Quadratics, similarity, right triangle trig, probability, transformations
+- Integrated Math 3: Polynomials, rational functions, logarithms, trigonometric identities, circles
+- Math 4 (AB Calculus): Limits, continuity, derivatives, applications of derivatives, intro integration
+- Math 5 (BC Calculus): Advanced integration, series, parametric/polar, differential equations
+- AP Statistics: Probability, distributions, confidence intervals, hypothesis testing, regression
+- Linear Algebra: Vectors, matrices, linear transformations, eigenvalues, vector spaces
+- Differential Equations: First-order ODEs, second-order ODEs, systems, Laplace transforms
+- Discrete Math: Logic, proofs, sets, combinatorics, graph theory`;
 
-SESSION CLOSE:
-When the student signals they are done, or the problem is complete: "You asked [n] questions in this session. That's what mathematicians do." Then: "What's one question you're taking with you?"`;
-
-function startApp(){const v=document.getElementById('stu-name').value.trim();if(v)name=v;document.getElementById('greeting').textContent='Hey '+name+'. What are you working on?';show('home')}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
+function startApp(){const n=document.getElementById('stu-name').value.trim();if(n)name=n;document.getElementById('greeting').textContent=name?'Hey '+name+'. What are you working on?':'What are you working on?';show('home')}
 
-const PROBLEM_BANK = {
-'Integrated Math 1': [
-  {topic:'rates & proportions', text:'Assuming that light travels at about 186 thousand miles per second, and the Sun is about 93 million miles from the Earth, how much time does light take to reach the Earth from the Sun?', source:'PEA Math 1 #1'},
-  {topic:'estimation', text:'How long would it take you to count to one billion, reciting the numbers one after another? First write a guess, then come up with a thoughtful answer. What assumptions did you make?', source:'PEA Math 1 #2'},
-  {topic:'rates & proportions', text:'Many major-league baseball pitchers can throw the ball at 90 miles per hour. At that speed, how long does it take a pitch to travel from the pitcher\'s mound to home plate, a distance of 60 feet 6 inches? Give your answer to the nearest hundredth of a second.', source:'PEA Math 1 #4'},
-  {topic:'patterns & algebra', text:'Choose any number. Double it. Subtract six and add the original number. Now divide by three. Repeat this process with other numbers, until a pattern develops. By using a variable such as x in place of your number, show that the pattern does not depend on which number you choose initially.', source:'PEA Math 1 #16'},
-  {topic:'number sense', text:'Davis says that adding a two-digit number to the two-digit number formed by reversing the digits of the original number results in a sum of 65. Avery says that\'s impossible. Is it impossible?', source:'PEA Math 1 #18'},
-  {topic:'exponential growth', text:'When describing the growth of a population, the passage of time is sometimes described in generations, a generation being about 30 years. One generation ago, you had two ancestors (your parents). Two generations ago, you had four ancestors (your grandparents). How many ancestors did you have 300 years ago? 900 years ago? Do your answers make sense?', source:'PEA Math 1 #14'},
-  {topic:'linear equations', text:'Sam and Cam have a lawn-mowing service. Their first job tomorrow morning is one that usually takes Sam 40 minutes to do alone, or Cam 30 minutes to do alone. This time they are going to team up. How many minutes will it take them to finish the job together? Set up a guess-and-check table.', source:'PEA Math 1 #81'},
-  {topic:'linear equations', text:'Cass decided to sell game programs for the Exeter-Andover field hockey game. The printing cost was 20 cents per program, with a selling price of 50 cents each. Cass sold all but 50 of the programs, and made a profit of $65. How many programs were printed?', source:'PEA Math 1 #144'},
-],
-'Integrated Math 2': [
-  {topic:'quadratics', text:'Find two numbers whose sum is 20 and whose product is as large as possible. What if the sum were 100 instead?', source:'PEA Math 2'},
-  {topic:'quadratics', text:'A ball is thrown straight up from the ground. Its height in feet after t seconds is given by h = 80t − 16t². When does the ball reach its maximum height? What is that height? When does it return to the ground?', source:'PEA Math 2'},
-  {topic:'similarity', text:'Two triangles are similar. The sides of the smaller triangle are 3, 5, and 7. The shortest side of the larger triangle is 4.5. Find the other two sides of the larger triangle.', source:'PEA Math 2'},
-  {topic:'probability', text:'What is the probability that the top two cards of a standard, shuffled 52-card deck have the same color (both are red or both are black)?', source:'PEA Math 2 #130'},
-  {topic:'right triangles', text:'A 12-foot ladder leans against a building so that its foot is 4 feet from the base of the building. How high on the building does the ladder reach? If the foot of the ladder is moved 1 foot farther from the building, how far does the top of the ladder move down the building?', source:'PEA Math 2'},
-  {topic:'systems of equations', text:'A motorboat can travel 60 miles downstream in 3 hours. Returning upstream, the trip takes 5 hours. Find the speed of the current and the speed of the motorboat in still water.', source:'PEA Math 2'},
-],
-'Integrated Math 3': [
-  {topic:'parametric equations', text:'Morgan began observing the motion of a really tiny red bug on graph paper when the bug was at the point (3,4). Ten seconds later it was at (5,5). Another ten seconds later it was at (7,6). After another ten seconds it was at (9,7). (a) Draw a picture that illustrates what is happening. (b) Write a description of any pattern that you notice. What assumptions are you making? (c) Where was the bug 25 seconds after Morgan started watching it? (d) Where was the bug 26 seconds after Morgan started watching it?', source:'PEA Math 1 #788'},
-  {topic:'transformations', text:'Transformation T is defined by T(x,y) = (2,7) + (2−x, 7−y). An equivalent notation is T(x,y) = (4−x, 14−y). Use the first notation to help you explain what kind of transformation T is.', source:'PEA Math 2'},
-  {topic:'trigonometric identities', text:'Show that sin²θ + cos²θ = 1 is true for θ = 30°, θ = 45°, and θ = 60°. Then explain why it is true for any angle θ, using a right triangle whose hypotenuse has length 1.', source:'PEA Math 3'},
-  {topic:'polynomials', text:'When the polynomial p(x) = x³ + 3x² − 2x − 1 is divided by x − 2, what is the remainder? Is there a way to answer this question without doing the long division?', source:'PEA Math 3'},
-  {topic:'sequences and series', text:'Find a formula for the sum 1 + 2 + 3 + ... + n. Test your formula for n = 1, 2, 3, 4, and 100.', source:'PEA Math 3'},
-  {topic:'circles', text:'The points A = (0,0), B = (8,0), and C = (2,6) lie on a circle. Find the center and radius of that circle.', source:'PEA Math 3'},
-],
-'Math 4': [
-  {topic:'limits', text:'Consider the function f(x) = (x² − 9)/(x − 3). What is f(3)? What happens to f(x) as x gets closer and closer to 3? Make a table with x = 2.9, 2.99, 2.999, 3.001, 3.01, 3.1. What do you notice?', source:'PEA Math 4'},
-  {topic:'derivatives', text:'A stone is dropped from a 400-foot cliff. Its height after t seconds is h(t) = 400 − 16t². Find the average speed of the stone between t = 1 and t = 3. Between t = 2 and t = 2.1. Between t = 2 and t = 2.01. What number do these averages seem to be approaching?', source:'PEA Math 4'},
-  {topic:'optimization', text:'A farmer wants to enclose a rectangular pen next to a barn, using the barn wall as one side of the rectangle. The farmer has 200 feet of fencing. What dimensions give the largest area?', source:'PEA Math 4'},
-  {topic:'integrals', text:'The Integral Test. Assume that f(x) is continuous, positive and decreasing for positive x, and that the limit of f(x) as x approaches infinity is 0. Consider two convergence questions: Does the integral from 1 to infinity of f(x)dx have a finite value? Does the infinite series f(1) + f(2) + f(3) + ... have a finite sum? You have considered f(x) = 1/x (both no) and f(x) = 1/x² (both yes). This is always the case — both questions have the same answer. Explain why.', source:'PEA Math 4 #925'},
-  {topic:'related rates', text:'A 10-foot ladder leans against a wall. The base slides away from the wall at 1 foot per second. How fast is the top of the ladder sliding down the wall when the base is 6 feet from the wall?', source:'PEA Math 4'},
-],
-'Math 5': [
-  {topic:'series', text:'Find the interval of convergence for the power series 1 + x + x²/2! + x³/3! + x⁴/4! + ... What familiar function does this series represent?', source:'PEA Math 5'},
-  {topic:'parametric equations', text:'A particle moves along a curve defined by x(t) = cos(t) and y(t) = sin(2t). Sketch the path for 0 ≤ t ≤ 2π. What does the curve look like? Find the velocity of the particle at t = π/4.', source:'PEA Math 5'},
-  {topic:'polar coordinates', text:'Convert the polar equation r = 2cos(θ) to rectangular form. What familiar curve does this represent? Sketch it.', source:'PEA Math 5'},
-  {topic:'integration techniques', text:'Find the area enclosed by one arch of the cycloid defined by x = t − sin(t) and y = 1 − cos(t), for 0 ≤ t ≤ 2π.', source:'PEA Math 5'},
-],
-'AP Statistics': [
-  {topic:'probability', text:'You have 10 socks in a drawer: 4 blue and 6 black. You pull out two socks without looking. What is the probability that they match?', source:'AMC style'},
-  {topic:'distributions', text:'A manufacturer knows that 2% of its light bulbs are defective. In a box of 100 light bulbs, what is the probability that exactly 3 are defective? What distribution would you use and why?', source:'AP Stats'},
-  {topic:'inference', text:'A coin is flipped 100 times and comes up heads 62 times. Is there convincing evidence that the coin is unfair? What would you need to do to answer this question?', source:'AP Stats'},
-],
-'Linear Algebra': [
-  {topic:'linear transformations', text:'Let T: R² → R² be the linear transformation that reflects every vector across the line y = x. Find the matrix that represents T.', source:'Linear Algebra'},
-  {topic:'eigenvalues', text:'Find the eigenvalues and eigenvectors of the matrix [[2, 1], [1, 2]]. What do the eigenvectors tell you geometrically about the transformation this matrix represents?', source:'Linear Algebra'},
-  {topic:'vector spaces', text:'Is the set of all 2×2 matrices with determinant 0 a vector space? Why or why not? What properties would you need to check?', source:'Linear Algebra'},
-],
-'Differential Equations': [
-  {topic:'separable equations', text:'A population grows at a rate proportional to its current size. If the population is 1000 at time t = 0 and 3000 at time t = 5, find the population as a function of time. When will the population reach 10,000?', source:'Diff Eq'},
-  {topic:'modeling', text:'A cup of coffee at 200°F is placed in a 70°F room. After 5 minutes the coffee is 150°F. When will it reach 100°F? What assumptions are you making?', source:'Diff Eq'},
-],
-'Discrete Math': [
-  {topic:'combinatorics', text:'How many ways can 8 people be seated around a circular table? What if two specific people must sit next to each other?', source:'AMC style'},
-  {topic:'graph theory', text:'Five towns are each connected to every other town by a road. How many roads are there? Can you find a route that uses each road exactly once?', source:'Discrete Math'},
-]
+const PROBLEM_BANK={
+'Integrated Math 1':[{topic:'linear equations',text:'The sum of two consecutive odd numbers is 156. Write an equation to find the numbers. How does writing an equation help you organize your thinking?',source:'PEA Math 1'},{topic:'systems',text:'A pile of 100 coins worth $12.75 contains only quarters and dimes. How many of each are in the pile?',source:'PEA Math 1'},{topic:'coordinate geometry',text:'A 5 by 5 square has one vertex at (2, 3). Find the coordinates of the other three vertices if the sides of the square are not parallel to the coordinate axes.',source:'PEA Math 1'}],
+'Integrated Math 2':[{topic:'quadratics',text:'A ball is thrown upward from the top of a 64-foot cliff. Its height above the ground after t seconds is h(t) = -16t² + 48t + 64. When does the ball hit the ground? When does it reach maximum height? What is the maximum height?',source:'PEA Math 2'},{topic:'probability',text:'In a group of 30 students, 18 study Spanish and 15 study French. If 5 students study both, how many study neither language? Can you represent this with a diagram?',source:'AMC style'},{topic:'similarity',text:'Two similar triangles have areas in the ratio 9:25. If the perimeter of the smaller triangle is 36 cm, what is the perimeter of the larger triangle?',source:'PEA Math 2'}],
+'Integrated Math 3':[{topic:'polynomials',text:'The polynomial p(x) has roots at x = -2, x = 1, and x = 3. If p(0) = 12, find p(x). What does knowing p(0) tell you that the roots alone don\'t?',source:'PEA Math 3'},{topic:'logarithms',text:'Solve for x: log₂(x) + log₂(x-2) = 3. Are there any values of x you need to reject? Why?',source:'PEA Math 3'},{topic:'trigonometry',text:'Prove that (sin θ + cos θ)² = 1 + sin 2θ. What identity are you using, and why does it work?',source:'PEA Math 3'}],
+'Math 4':[{topic:'limits',text:'Find the limit as x approaches 0 of (sin 3x)/(sin 5x). Can you find this limit without L\'Hôpital\'s Rule? What approach would you use?',source:'PEA Math 4'},{topic:'derivatives',text:'A 10-foot ladder leans against a wall. The bottom slides away from the wall at 2 ft/sec. How fast is the top sliding down when the bottom is 6 feet from the wall?',source:'PEA Math 4'},{topic:'optimization',text:'A farmer has 400 feet of fencing and wants to fence off a rectangular field that borders a straight river. No fence is needed along the river. What dimensions maximize the area?',source:'PEA Math 4'}],
+'Math 5':[{topic:'series',text:'Determine whether the series Σ(n=1 to ∞) of n/(2ⁿ) converges or diverges. If it converges, find the sum. What test would you start with, and why?',source:'PEA Math 5'},{topic:'parametric equations',text:'A particle moves along a curve defined by x(t) = cos(t) and y(t) = sin(2t). Sketch the path for 0 ≤ t ≤ 2π. What does the curve look like? Find the velocity of the particle at t = π/4.',source:'PEA Math 5'},{topic:'polar coordinates',text:'Convert the polar equation r = 2cos(θ) to rectangular form. What familiar curve does this represent? Sketch it.',source:'PEA Math 5'},{topic:'integration techniques',text:'Find the area enclosed by one arch of the cycloid defined by x = t − sin(t) and y = 1 − cos(t), for 0 ≤ t ≤ 2π.',source:'PEA Math 5'}],
+'AP Statistics':[{topic:'probability',text:'You have 10 socks in a drawer: 4 blue and 6 black. You pull out two socks without looking. What is the probability that they match?',source:'AMC style'},{topic:'distributions',text:'A manufacturer knows that 2% of its light bulbs are defective. In a box of 100 light bulbs, what is the probability that exactly 3 are defective? What distribution would you use and why?',source:'AP Stats'},{topic:'inference',text:'A coin is flipped 100 times and comes up heads 62 times. Is there convincing evidence that the coin is unfair? What would you need to do to answer this question?',source:'AP Stats'}],
+'Linear Algebra':[{topic:'linear transformations',text:'Let T: R² → R² be the linear transformation that reflects every vector across the line y = x. Find the matrix that represents T.',source:'Linear Algebra'},{topic:'eigenvalues',text:'Find the eigenvalues and eigenvectors of the matrix [[2, 1], [1, 2]]. What do the eigenvectors tell you geometrically about the transformation this matrix represents?',source:'Linear Algebra'},{topic:'vector spaces',text:'Is the set of all 2×2 matrices with determinant 0 a vector space? Why or why not? What properties would you need to check?',source:'Linear Algebra'}],
+'Differential Equations':[{topic:'separable equations',text:'A population grows at a rate proportional to its current size. If the population is 1000 at time t = 0 and 3000 at time t = 5, find the population as a function of time. When will the population reach 10,000?',source:'Diff Eq'},{topic:'modeling',text:'A cup of coffee at 200°F is placed in a 70°F room. After 5 minutes the coffee is 150°F. When will it reach 100°F? What assumptions are you making?',source:'Diff Eq'}],
+'Discrete Math':[{topic:'combinatorics',text:'How many ways can 8 people be seated around a circular table? What if two specific people must sit next to each other?',source:'AMC style'},{topic:'graph theory',text:'Five towns are each connected to every other town by a road. How many roads are there? Can you find a route that uses each road exactly once?',source:'Discrete Math'}]
 };
 
-function getRandomProblem(course, topic) {
-  let pool = PROBLEM_BANK[course] || [];
-  if (topic) {
-    const t = topic.toLowerCase();
-    const filtered = pool.filter(p => p.topic.toLowerCase().includes(t));
-    if (filtered.length > 0) pool = filtered;
-  }
-  if (pool.length === 0) return null;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
+function getRandomProblem(course,topic){let pool=PROBLEM_BANK[course]||[];if(topic){const t=topic.toLowerCase();const filtered=pool.filter(p=>p.topic.toLowerCase().includes(t));if(filtered.length>0)pool=filtered}if(pool.length===0)return null;return pool[Math.floor(Math.random()*pool.length)]}
 
 function startChat(){const hw=document.getElementById('hw-input').value.trim();if(!hw){alert('Type or paste a problem first.');return}document.getElementById('chat-topic').textContent='Homework help';document.getElementById('opening-msg').textContent="I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?";msgs=[{role:'user',content:'Here is my problem: '+hw},{role:'assistant',content:"I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?"}];qCount=0;updateQCount();show('chat')}
 
-let activeSys = SYS;
+let activeSys=SYS;
 
-function openCourse(cname,desc){
-  const bank = PROBLEM_BANK[cname];
-  let bankNote = '';
-  if (bank && bank.length > 0) {
-    bankNote = '\n\nPROBLEM BANK FOR THIS COURSE (use these when the student asks for practice):\n';
-    bank.forEach((p,i) => { bankNote += (i+1) + '. [' + p.topic + '] ' + p.text + '\n'; });
-  }
-  activeSys = SYS + bankNote;
-  document.getElementById('chat-topic').textContent=cname;
-  document.getElementById('opening-msg').textContent="Welcome to "+cname+". What topic are you curious about, or what problem are you working on?";
-  msgs=[{role:'assistant',content:"Welcome to "+cname+". What topic are you curious about, or what problem are you working on?"}];
-  qCount=0;updateQCount();show('chat');
-}
+function openCourse(cname,desc){const bank=PROBLEM_BANK[cname];let bankNote='';if(bank&&bank.length>0){bankNote='\n\nPROBLEM BANK FOR THIS COURSE (use these when the student asks for practice):\n';bank.forEach((p,i)=>{bankNote+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}activeSys=SYS+bankNote;document.getElementById('chat-topic').textContent=cname;document.getElementById('opening-msg').textContent="Welcome to "+cname+". What topic are you curious about, or what problem are you working on?";msgs=[{role:'assistant',content:"Welcome to "+cname+". What topic are you curious about, or what problem are you working on?"}];qCount=0;updateQCount();show('chat')}
 
 function classifyQ(t){const s=t.toLowerCase();if(/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s))return'G';if(/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s))return'C';if(/how do i|what.*formula|what.*next|how to|how.*find|what.*step|\?/.test(s))return'P';return null}
 

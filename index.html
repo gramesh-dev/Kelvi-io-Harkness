@@ -1,415 +1,746 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kelvi — The Question Is the Answer</title>
-<meta name="description" content="Kelvi develops mathematical questioning and reasoning — not by giving answers, but by helping students ask better questions and think through them. For schools, families, and independent learners.">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --peacock: #00827F; --peacock-dark: #006B68; --peacock-light: #F0FAF9;
-  --gold: #C9A84C; --gold-light: #FDF6E3; --kadi: #C17F24;
-  --guided: #B8860B; --exploration: #A0522D; --kadi: #C17F24;
-  --navy: #3D3D3A; --charcoal: #3D3D3A; --solo-bg: #EDE8E0; --solo-text: #2C2C2A; --gray: #5F6B7A;
-  --warm: #F8F7F4; --off: #F0EDE8; --border: #E8E4E0;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: 'DM Sans', sans-serif; background: var(--warm); color: var(--navy); overflow-x: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kelvi is a platform for mathematical questioning and reasoning that helps learners think through problems through guided Socratic dialogue.">
+  <title>Kelvi — The question is the answer.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --surface: #ECE7DC;
+      --deeper-surface: #E0D8C8;
+      --divider: #CDC3B1;
+      --text-primary: #2F2B25;
+      --text-muted: #6F6A61;
+      --accent: #3A6B5C;
+      --accent-hover: #2D5347;
+      --school: #3A6B5C;
+      --family: #B8784E;
+      --solo: #5A7080;
+      --white: #FFFFFF;
+      --font-heading: 'DM Serif Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; width: 100%; z-index: 100;
-  padding: 0 40px; height: 62px; display: flex; align-items: center;
-  justify-content: space-between; background: rgba(248,247,244,0.94);
-  backdrop-filter: blur(12px); border-bottom: 0.5px solid rgba(0,130,127,0.12);
-}
-.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.nav-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--peacock); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--gold); }
-.nav-wordmark { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--navy); }
-.nav-links { display: flex; align-items: center; gap: 28px; }
-.nav-links a { font-size: 13px; color: var(--gray); text-decoration: none; transition: color 0.2s; }
-.nav-links a:hover { color: var(--peacock); }
-.nav-school { background: var(--peacock); color: white !important; padding: 8px 18px; border-radius: 8px; font-weight: 500 !important; transition: background 0.2s !important; }
-.nav-school:hover { background: var(--peacock-dark) !important; }
-.nav-family { background: var(--guided); color: white !important; padding: 8px 18px; border-radius: 8px; font-weight: 500 !important; }
-.nav-family:hover { opacity: 0.88 !important; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ── HERO ── */
-.hero {
-  min-height: 100vh; display: flex; flex-direction: column;
-  justify-content: center; padding: 120px 64px 80px;
-  position: relative; overflow: hidden;
-}
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
 
-.hero-inner {
-  display: grid; grid-template-columns: 55% 1fr;
-  gap: 48px; align-items: center; max-width: 1200px;
-}
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.hero-mission {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(52px, 7vw, 96px);
-  line-height: 1.0; color: var(--navy);
-  opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
-}
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--divider);
+      transition: box-shadow 0.3s ease;
+    }
 
-.hero-right {
-  display: flex; flex-direction: column; gap: 20px;
-  opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
-}
+    nav.scrolled {
+      box-shadow: 0 1px 12px rgba(47,43,37,0.06);
+    }
 
-.hero-tagline {
-  font-family: 'DM Serif Display', serif; font-size: clamp(16px, 1.8vw, 22px);
-  font-style: italic; color: var(--gray); line-height: 1.5;
-}
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-.hero-sub {
-  font-size: 15px; color: var(--gray); line-height: 1.75;
-}
+    .wordmark {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
 
-@media (max-width: 768px) {
-  .hero { padding: 100px 32px 60px; }
-  .hero-inner { grid-template-columns: 1fr; gap: 32px; }
-}
+    .wordmark .tamil-k {
+      font-size: 1.8rem;
+      margin-right: 0.35rem;
+      position: relative;
+      top: 1px;
+    }
 
-/* Tamil script accent */
+    .wordmark .q {
+      color: var(--accent);
+    }
 
-/* ── SECTIONS ── */
-section { padding: 96px 40px; }
-.section-label { font-size: 11px; letter-spacing: 3px; color: var(--peacock); text-transform: uppercase; margin-bottom: 12px; }
-.section-h { font-family: 'DM Serif Display', serif; font-size: clamp(28px,4vw,44px); line-height: 1.15; color: var(--navy); margin-bottom: 14px; }
-.section-sub { font-size: 15px; color: var(--gray); line-height: 1.7; max-width: 520px; margin-bottom: 52px; }
-.center { text-align: center; }
-.center .section-sub { margin: 0 auto 52px; }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
 
-/* ── PHILOSOPHY ── */
-.philosophy { background: var(--navy); }
-.philosophy .section-label { color: rgba(255,255,255,0.5); }
-.philosophy .section-h { color: white; max-width: 700px; margin: 0 auto 20px; }
-.philosophy .section-sub { color: rgba(255,255,255,0.6); margin: 0 auto 52px; }
+    .nav-links a {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      font-weight: 500;
+    }
 
-.philosophy-pillars {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
-  gap: 20px; max-width: 1000px; margin: 0 auto;
-}
-.pillar {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px; padding: 28px 24px;
-}
-.pillar-num { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--gold); margin-bottom: 12px; line-height: 1; }
-.pillar h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; margin-bottom: 10px; }
-.pillar p { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.65; }
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
 
-/* ── TWO PRODUCTS ── */
-.products-section { background: var(--warm); }
-.products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
-@media (max-width: 900px) { .products-grid { grid-template-columns: 1fr; } }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 28px;
+      height: 20px;
+      position: relative;
+    }
 
-.product-card { border-radius: 20px; overflow: hidden; border: 0.5px solid var(--border); }
-.product-card-header { padding: 32px 28px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.product-card-header.school { background: var(--peacock); }
-.product-card-header.family { background: var(--guided); }
-.product-card-header.solo { background: var(--charcoal); }
-.product-tag.solo { background: var(--solo-bg); color: var(--solo-text); }
-.product-cta.solo { background: var(--charcoal); color: white; }
-.product-cta.solo:hover { opacity: 0.88; }
-.product-card-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: white; margin-top: 16px; margin-bottom: 6px; }
-.product-card-sub { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 2px; text-transform: uppercase; }
-.product-card-body { background: white; padding: 28px; }
-.product-card-body p { font-size: 14px; color: var(--gray); line-height: 1.7; margin-bottom: 20px; }
-.product-tag { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 10px; margin-bottom: 16px; margin-right: 6px; }
-.product-tag.school { background: var(--peacock-light); color: var(--peacock-dark); }
-.product-tag.family { background: #FDF6E3; color: #8B6914; }
-.product-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-.product-list li { font-size: 13px; color: var(--gray); padding-left: 18px; position: relative; line-height: 1.6; }
-.product-list li::before { display: none; }
-.product-list.school li::before { background: var(--peacock); }
-.product-list.family li::before { background: var(--guided); }
-.product-cta { display: block; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.15s; }
-.product-cta.school { background: var(--peacock); color: white; }
-.product-cta.school:hover { background: var(--peacock-dark); }
-.product-cta.family { background: var(--guided); color: white; }
-.product-cta.family:hover { opacity: 0.88; }
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--text-primary);
+      position: absolute;
+      left: 0;
+      transition: all 0.3s ease;
+    }
 
+    .hamburger span:nth-child(1) { top: 0; }
+    .hamburger span:nth-child(2) { top: 9px; }
+    .hamburger span:nth-child(3) { top: 18px; }
 
+    .hamburger.open span:nth-child(1) { top: 9px; transform: rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
 
-/* ── Q TYPES ── */
-.qtypes-section { background: #3D3D3A; }
-.qtypes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; max-width: 860px; margin: 0 auto; }
-@media (max-width: 640px) { .qtypes-grid { grid-template-columns: 1fr; } }
-.qtype { border-radius: 14px; padding: 26px 22px; border: 2px solid; background: transparent; }
-.qtype.P { border-color: #B8860B; }
-.qtype.C { border-color: #00827F; }
-.qtype.G { border-color: #C9A84C; }
-.qtype-letter { font-family: 'DM Serif Display', serif; font-size: 40px; margin-bottom: 8px; line-height: 1; }
-.qtype.P .qtype-letter { color: var(--gold); }
-.qtype.C .qtype-letter { color: #5DCAA5; }
-.qtype.G .qtype-letter { color: var(--gold); }
-.qtype-name { font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; color: rgba(255,255,255,0.5); }
-.qtype-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 14px; }
-.qtype-ex { font-size: 12px; font-style: italic; padding: 8px 12px; border-radius: 8px; line-height: 1.5; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+    /* SECTIONS */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
 
-/* ── BY TEACHERS ── */
-.byteachers { background: var(--peacock); text-align: center; }
-.byteachers .section-label { color: rgba(255,255,255,0.5); }
-.byteachers .section-h { color: white; max-width: 660px; margin: 0 auto 14px; }
-.byteachers .section-sub { color: rgba(255,255,255,0.72); margin: 0 auto 0; }
+    section {
+      padding: 6rem 0;
+    }
 
-/* ── CTA ── */
-.cta-section { background: var(--navy); text-align: center; padding: 100px 40px; }
-.cta-logos { display: flex; gap: 32px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
-.cta-logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.cta-logo-label { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 2px; }
-.cta-section h2 { font-family: 'DM Serif Display', serif; font-size: clamp(30px,5vw,50px); color: white; margin-bottom: 12px; line-height: 1.15; }
-.cta-tagline { font-family: 'DM Serif Display', serif; font-size: 18px; font-style: italic; color: var(--gold); margin-bottom: 16px; }
-.cta-section p { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 460px; margin: 0 auto 44px; line-height: 1.7; }
-.cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-.cta-btn { padding: 14px 30px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.15s; }
-.cta-btn.school { background: var(--peacock); color: white; }
-.cta-btn.school:hover { background: var(--peacock-dark); }
-.cta-btn.family { background: var(--guided); color: white; }
-.cta-btn.family:hover { opacity: 0.88; }
-.email-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto 10px; flex-wrap: wrap; justify-content: center; }
-.email-form input { flex: 1; min-width: 220px; padding: 13px 16px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--navy); outline: none; }
-.email-form button { background: var(--gold); color: var(--navy); padding: 13px 22px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
-.email-form button:hover { background: #E8C96A; }
-.cta-note { font-size: 11px; color: rgba(255,255,255,0.3); }
+    section:first-of-type {
+      padding-top: 10rem;
+    }
 
-/* ── FOOTER ── */
-footer { background: #3D3D3A; padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
-.footer-logo { display: flex; align-items: center; gap: 10px; }
-.footer-mark { width: 28px; height: 28px; border-radius: 50%; background: var(--peacock); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--gold); }
-.footer-name { font-family: 'DM Serif Display', serif; font-size: 15px; color: white; }
-.footer-sub { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 2px; margin-top: 2px; }
-.footer-right { font-size: 11px; color: rgba(255,255,255,0.3); }
+    /* HERO */
+    .hero {
+      padding-top: 11rem;
+      padding-bottom: 5rem;
+    }
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      line-height: 1.15;
+      color: var(--text-primary);
+      max-width: 640px;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
 
-@media (max-width: 600px) {
-  nav { padding: 0 20px; }
-  section { padding: 70px 24px; }
-  .hero { padding: 100px 24px 60px; }
-  footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
-  .nav-links { gap: 12px; }
-  #about > div:first-child { grid-template-columns: 1fr !important; }
-  #about > div:first-child > div { padding: 60px 32px !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  #about > div:last-child { padding: 24px 32px !important; }
-}
-</style>
+    .hero .subhead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-outline {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .support-line {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* SECTION HEADINGS */
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+      max-width: 600px;
+    }
+
+    .section-body {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      max-width: 620px;
+    }
+
+    /* WHY KELVI */
+    .why-section {
+      padding: 5rem 0;
+    }
+
+    .why-card {
+      background: var(--white);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 3.5rem;
+      max-width: 720px;
+    }
+
+    /* HOW IT WORKS */
+    .how-section {
+      padding: 5rem 0;
+    }
+
+    .proof-line {
+      margin-top: 2rem;
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* PRODUCTS */
+    .products-section {
+      padding: 5rem 0;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px rgba(47,43,37,0.08);
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .product-card.school::before { background: var(--school); }
+    .product-card.family::before { background: var(--family); }
+    .product-card.solo::before { background: var(--solo); }
+
+    .product-card h3 {
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .product-card.school h3 { color: var(--school); }
+    .product-card.family h3 { color: var(--family); }
+    .product-card.solo h3 { color: var(--solo); }
+
+    .product-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+
+    .product-card .card-link {
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .product-card .card-link:hover {
+      opacity: 0.75;
+    }
+
+    .product-card.school .card-link { color: var(--school); }
+    .product-card.family .card-link { color: var(--family); }
+    .product-card.solo .card-link { color: var(--solo); }
+
+    /* THINKING PROGRESSION */
+    .progression-section {
+      padding: 5rem 0;
+    }
+
+    .progression-items {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 620px;
+    }
+
+    .progression-item {
+      padding-left: 1.5rem;
+      border-left: 3px solid var(--divider);
+    }
+
+    .progression-item strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .progression-item span {
+      color: var(--text-muted);
+    }
+
+    /* DIFFERENT */
+    .different-section {
+      padding: 5rem 0;
+    }
+
+    .different-card {
+      background: var(--white);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 3.5rem;
+      max-width: 720px;
+    }
+
+    .different-card .no-list {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    /* CREDIBILITY */
+    .credibility-section {
+      padding: 5rem 0;
+      border-top: 1px solid var(--divider);
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--deeper-surface);
+      border-top: 1px solid var(--divider);
+      padding: 5rem 0 3rem;
+    }
+
+    .footer-content {
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-heading);
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-style: italic;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .footer-body {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 400px;
+      margin: 0 auto 3rem;
+    }
+
+    .signup-form input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--divider);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--white);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .signup-form input::placeholder {
+      color: var(--divider);
+    }
+
+    .signup-form input:focus {
+      border-color: var(--accent);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--divider);
+      padding-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-bottom-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-bottom-links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* FADE IN ANIMATIONS */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--divider);
+        flex-direction: column;
+        padding: 1.5rem 2rem;
+        gap: 1.25rem;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .hero {
+        padding-top: 8rem;
+      }
+
+      section {
+        padding: 4rem 0;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .why-card,
+      .different-card {
+        padding: 2rem;
+      }
+
+      .signup-form {
+        flex-direction: column;
+      }
+
+      .cta-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="index.html" class="nav-logo">
-    <div class="nav-mark">கே</div>
-    <span class="nav-wordmark">Kelvi</span>
-  </a>
-  <div class="nav-links">
-    <a href="#products">Three products</a>
-    <a href="#questions">The questioning &amp; reasoning ladder</a>
-    <a href="about.html">Our story</a>
-    <a href="school.html" class="nav-school">Kelvi School</a>
-    <a href="family.html" class="nav-family">Kelvi Family</a>
-    <a href="solo.html" class="nav-solo" style="background:#3D3D3A;color:white !important;padding:8px 18px;border-radius:8px;font-weight:500 !important">Kelvi Solo</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <h1 class="hero-mission">The question<br>is the answer.</h1>
-    <div class="hero-right">
-      <div class="hero-tagline">Developing questioning and reasoning skills for a mathematical mindset.</div>
-      <p class="hero-sub">An AI thinking partner that never gives answers — only better questions. For schools, families, and independent learners across the world.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PHILOSOPHY -->
-<section class="philosophy center" id="philosophy">
-  <div style="max-width:1000px;margin:0 auto">
-    <div class="section-label reveal">What we believe</div>
-    <h2 class="section-h reveal">The question is more important than the answer</h2>
-    <p class="section-sub reveal">The guru-sishya tradition — teacher and student, question and insight — is the oldest and most powerful model of learning we know. Kelvi is built on that foundation.</p>
-    <div class="philosophy-pillars">
-      <div class="pillar reveal">
-        <div class="pillar-num">01</div>
-        <h3>Students who ask better questions become better thinkers</h3>
-        <p>The shift from "how do I?" to "why does this work?" to "what if I changed it?" — that is the shift from procedural to genuine mathematical questioning and reasoning.</p>
-      </div>
-      <div class="pillar reveal">
-        <div class="pillar-num">02</div>
-        <h3>AI should develop thinking, not replace it</h3>
-        <p>Every other AI gives answers. Kelvi never does. It responds to every message with a question that helps the student ask a better one next time.</p>
-      </div>
-      <div class="pillar reveal">
-        <div class="pillar-num">03</div>
-        <h3>Questioning and reasoning belong to everyone</h3>
-        <p>Not just to students in elite schools. Not just to those who can afford tutors. Kelvi is built with equity at its core.</p>
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="wordmark"><span class="tamil-k">கே</span>Kelvi</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="school.html">School</a>
+        <a href="family.html">Family</a>
+        <a href="solo.html">Solo</a>
+        <a href="about.html">Our Story</a>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
 
-<!-- THREE PRODUCTS -->
-<section class="products-section" id="products">
-  <div style="max-width:1100px;margin:0 auto;text-align:center">
-    <div class="section-label reveal">Three products</div>
-    <h2 class="section-h reveal">The same Socratic philosophy, designed for different contexts.</h2>
-    <p class="section-sub reveal" style="margin:0 auto 48px"></p>
-    <div class="products-grid">
-
-      <div class="product-card reveal">
-        <div class="product-card-header school">
-          <div class="product-card-title">Kelvi School</div>
-          <div class="product-card-sub">For teachers &amp; students</div>
-        </div>
-        <div class="product-card-body">
-          <span class="product-tag school">For classrooms worldwide</span>
-          <p>Teachers set up problems, choose a mode, and generate a shareable link for students. Students arrive in a clean interface — no configuration, just questioning and reasoning.</p>
-          <ul class="product-list school">
-            <li>Three pedagogical modes for different ages and contexts</li>
-            <li>P/C/G questioning and reasoning classification on every student message</li>
-            <li>Shareable session links — no accounts needed</li>
-            <li>Full transcript export for teacher review</li>
-            <li>Available for classrooms worldwide</li>
-          </ul>
-          <a href="school.html" class="product-cta school">Open Kelvi School</a>
-        </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="fade-in">Learn to think through math.</h1>
+      <p class="subhead fade-in">Kelvi helps learners ask better questions, explain their reasoning, and make connections that transfer to new problems. Instead of giving answers, Kelvi uses guided Socratic dialogue to build mathematical thinking.</p>
+      <div class="cta-row fade-in">
+        <a href="#products" class="btn-primary">See Kelvi in action</a>
+        <a href="#signup" class="btn-outline">Join the waitlist</a>
       </div>
+      <p class="support-line fade-in">For teachers, families, and independent learners. One platform, three pathways.</p>
+    </div>
+  </section>
 
-      <div class="product-card reveal">
-        <div class="product-card-header family">
-          <div class="product-card-title">Kelvi Family</div>
-          <div class="product-card-sub">For parents &amp; children</div>
-        </div>
-        <div class="product-card-body">
-          <span class="product-tag family">For families worldwide</span>
-          <p>Children choose their age and pick a math world to explore — shapes, patterns, algebra, data, and more. Parents see what their children are discovering each day.</p>
-          <ul class="product-list family">
-            <li>12 illustrated math worlds, age-filtered automatically</li>
-            <li>Exploration mode — no problems, just mathematical questioning and wonder</li>
-            <li>Voice input — no typing needed for young children</li>
-            <li>Parent dashboard with session history</li>
-            <li>Designed for curious minds at home, anywhere in the world</li>
-          </ul>
-          <a href="family.html" class="product-cta family">Open Kelvi Family</a>
-        </div>
+  <!-- WHY KELVI -->
+  <section class="why-section">
+    <div class="container">
+      <div class="why-card fade-in">
+        <p class="section-label">Why Kelvi</p>
+        <h2 class="section-heading">Most math tools make the same mistake.</h2>
+        <p class="section-body">They treat math as content to deliver and answers to check. Students learn to depend on hints, feedback loops, and green checkmarks — and stop thinking the moment the tool stops talking. Kelvi is built on a different premise: the thinking <em>is</em> the math. Not the answer. Not the score. The reasoning.</p>
       </div>
+    </div>
+  </section>
 
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-label">How it works</p>
+        <h2 class="section-heading">Kelvi guides. It doesn't take over.</h2>
+        <p class="section-body">Kelvi's AI follows a Socratic approach: it doesn't jump straight to "correct" or "incorrect" or hand over solutions. Instead, it invites learners to reflect, clarify language, notice patterns, and discover their own next move.</p>
+        <p class="proof-line">From doing steps, to understanding ideas, to creating new connections.</p>
+      </div>
+    </div>
+  </section>
 
-      <div class="product-card reveal">
-        <div class="product-card-header solo">
-          <div class="product-card-title">Kelvi Solo</div>
-          <div class="product-card-sub">For independent learners</div>
+  <!-- THREE PRODUCTS -->
+  <section class="products-section" id="products">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-label">The platform</p>
+        <h2 class="section-heading">Three products, one philosophy.</h2>
+        <p class="section-body">Kelvi meets learners and educators in different contexts, but every experience is built around the same idea: mathematical growth begins with better questions and deeper reasoning.</p>
+      </div>
+      <div class="products-grid">
+        <div class="product-card school fade-in">
+          <h3>Kelvi School</h3>
+          <p>For teachers who want to see thinking, not just answers. Design quests, observe reasoning in real time, and assign homework that builds independence.</p>
+          <a href="school.html" class="card-link">See Kelvi School →</a>
         </div>
-        <div class="product-card-body">
-          <span class="product-tag solo">For students everywhere</span>
-          <p>Students bring their own homework or explore advanced topics. Kelvi develops their questioning and reasoning — never giving the answer, always asking the next question.</p>
-          <ul class="product-list" style="margin-bottom:24px">
-            <li>Homework help that never gives the solution</li>
-            <li>Integrated Math 1-5, AP courses, and beyond</li>
-            <li>Linear algebra, differential equations, discrete math</li>
-            <li>MathQuill visual equation editor</li>
-            <li>Session history with question tracking</li>
-          </ul>
-          <a href="solo.html" class="product-cta solo">Open Kelvi Solo</a>
+        <div class="product-card family fade-in">
+          <h3>Kelvi Family</h3>
+          <p>For families who want to nurture mathematical curiosity early. Playful provocations, a wonder journal, and growth snapshots — no drilling, no scores.</p>
+          <a href="family.html" class="card-link">Explore Kelvi Family →</a>
+        </div>
+        <div class="product-card solo fade-in">
+          <h3>Kelvi Solo</h3>
+          <p>For independent learners who want a thinking partner, not an answer engine. Socratic dialogue across 9 courses.</p>
+          <a href="solo.html" class="card-link">Try Kelvi Solo →</a>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- QUESTION LADDER -->
-<section class="qtypes-section center" id="questions">
-  <div style="max-width:860px;margin:0 auto">
-    <div class="section-label reveal" style="color:rgba(255,255,255,0.4)">The questioning &amp; reasoning ladder</div>
-    <h2 class="section-h reveal" style="color:white">Three levels of thinking. One direction.</h2>
-    <p class="section-sub reveal" style="margin:0 auto 44px;color:rgba(255,255,255,0.55)">Kelvi classifies every level of interaction and coaches students toward deeper questioning and reasoning. This is the heart of a mathematical mindset.</p>
-    <div class="qtypes-grid">
-      <div class="qtype P reveal">
-        <div class="qtype-letter">P</div>
-        <div class="qtype-name">Procedural</div>
-        <p class="qtype-desc">The starting point. Every student begins here. Not the destination — just the door.</p>
-        <div class="qtype-ex" style="margin-bottom:6px"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">QUESTIONING</span><br>"How do I find the area?"</div>
-        <div class="qtype-ex"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">REASONING</span><br>"I multiplied length times width because that's the formula."</div>
+  <!-- THINKING PROGRESSION -->
+  <section class="progression-section">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-label">The framework</p>
+        <h2 class="section-heading">From doing steps to generating ideas.</h2>
+        <p class="section-body">Kelvi is built around a progression from procedural fluency to conceptual understanding to generative thinking. The goal is not only to solve a problem, but to understand why a method works and extend ideas into new contexts.</p>
       </div>
-      <div class="qtype C reveal">
-        <div class="qtype-letter">C</div>
-        <div class="qtype-name">Conceptual</div>
-        <p class="qtype-desc">The target. The student is engaging with the mathematics, not just the calculation.</p>
-        <div class="qtype-ex" style="margin-bottom:6px"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">QUESTIONING</span><br>"Why does dividing by 7 make sense here?"</div>
-        <div class="qtype-ex"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">REASONING</span><br>"If the total is shared equally, each group must be a seventh — so division is really about equal distribution."</div>
-      </div>
-      <div class="qtype G reveal">
-        <div class="qtype-letter">G</div>
-        <div class="qtype-name">Generative</div>
-        <p class="qtype-desc">The highest level. Creating new problems, exploring what changes. Thinking like a mathematician.</p>
-        <div class="qtype-ex" style="margin-bottom:6px"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">QUESTIONING</span><br>"What if there were three people instead of two?"</div>
-        <div class="qtype-ex"><span style="color:rgba(255,255,255,0.35);font-size:9px;letter-spacing:1px;font-style:normal">REASONING</span><br>"Adding a third person changes the ratio, so each share shrinks — but does the relationship between the shares stay the same?"</div>
+      <div class="progression-items fade-in">
+        <div class="progression-item">
+          <strong>Procedural</strong> <span>— can carry out the steps.</span>
+        </div>
+        <div class="progression-item">
+          <strong>Conceptual</strong> <span>— understands why it works.</span>
+        </div>
+        <div class="progression-item">
+          <strong>Generative</strong> <span>— can create, connect, and transfer.</span>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- BUILT BY -->
-<section id="about" style="background:var(--warm);padding:80px 64px">
-  <div style="max-width:900px;margin:0 auto;text-align:center">
-    <div class="section-label reveal" style="color:var(--gray)">Who we are</div>
-    <h2 class="reveal" style="font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);color:#3D3D3A;line-height:1.15;margin-bottom:20px">Built by teachers and parents.<br><em style="color:var(--gold)">For anyone who wants to develop questioning and reasoning.</em></h2>
-    <p class="reveal" style="font-size:15px;color:var(--gray);line-height:1.8;max-width:600px;margin:0 auto 16px">Kelvi was built by practicing mathematics educators and parents who believe that questioning and reasoning are the foundation of mathematical thinking. Every mode, every prompt, every pedagogical decision came from real classrooms and real families.</p>
-    <a href="about.html" class="reveal" style="font-size:14px;color:var(--peacock);font-weight:500;text-decoration:none;display:inline-block;margin-bottom:36px">Read our story &rarr;</a>
-    <p class="reveal" style="font-size:14px;color:var(--gray);opacity:0.7;margin-bottom:20px">Expanding to schools and homes across the world. Leave your email to be first.</p>
-    <div class="reveal" style="max-width:420px;margin:0 auto 10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-      <input type="email" id="email-input" placeholder="your@school.edu or your@email.com" style="flex:1;min-width:220px;padding:13px 16px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);outline:none;background:white">
-      <button onclick="handleSignup()" style="background:var(--gold);color:white;padding:13px 22px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">Stay in touch</button>
+  <!-- WHAT MAKES IT DIFFERENT -->
+  <section class="different-section">
+    <div class="container">
+      <div class="different-card fade-in">
+        <p class="section-label">What makes it different</p>
+        <h2 class="section-heading">Built against the grain of most edtech.</h2>
+        <p class="no-list">No points. No badges. No streaks. No answer-checking.</p>
+        <p class="section-body">Kelvi's product and design choices are intentionally warm, minimal, and reasoning-first because the aim is durable mathematical thinking rather than performative progress.</p>
+      </div>
     </div>
-    <div style="font-size:11px;color:var(--gray);opacity:0.4" id="cta-note">For teachers, school leaders, parents, and students. We will never share your email.</div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">
-    <div class="footer-mark">கே</div>
-    <div>
-      <div class="footer-name">Kelvi</div>
-      <div class="footer-sub">கேள்வி · the question</div>
+  <!-- CREDIBILITY -->
+  <section class="credibility-section">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-label">Who built this</p>
+        <h2 class="section-heading">Built by educators and analytical thinkers.</h2>
+        <p class="section-body">Kelvi is shaped by deep experience in mathematics pedagogy, curriculum, science, data, and technology. Its founders include a co-founder with a PhD in applied mathematics and decades of experience teaching at leading independent schools, and a co-founder with scientific, analytical, and business leadership experience. This isn't another AI tutor. It's a new kind of math platform.</p>
+      </div>
     </div>
-  </div>
-  <div class="footer-right">© 2026 Kelvi-io · Gayatri Ramesh &amp; Padmaja Ganapathy · kelvi.io</div>
-</footer>
+  </section>
 
-<script>
-function handleSignup() {
-  const email = document.getElementById('email-input').value.trim();
-  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
-  document.getElementById('email-input').value = '';
-  const btn = document.querySelector('.email-form button');
-  btn.textContent = "You're on the list!";
-  btn.style.background = '#2E7D32';
-  btn.style.color = 'white';
-  document.getElementById('cta-note').textContent = "Thank you. We will be in touch before 2026.";
-}
+  <!-- FOOTER -->
+  <footer id="signup">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-tagline">The question is the answer.</p>
+        <p class="footer-body">Join the early community of teachers, families, and learners exploring a different kind of math platform — one built for reasoning, not just results.</p>
+        <form class="signup-form" onsubmit="handleSignup(event)">
+          <input type="email" placeholder="your@email.com" required>
+          <button type="submit" class="btn-primary">Join the waitlist</button>
+        </form>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-bottom-links">
+          <a href="school.html">School</a>
+          <a href="family.html">Family</a>
+          <a href="solo.html">Solo</a>
+          <a href="about.html">Our Story</a>
+        </div>
+        <p>© 2026 Kelvi. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 60);
-      observer.unobserve(entry.target);
+  <script>
+    // Nav scroll shadow
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+
+    // Close mobile menu on link click
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // Fade in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Signup handler
+    function handleSignup(e) {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const email = input.value;
+      input.value = '';
+      input.placeholder = 'Thanks! We\'ll be in touch.';
+      setTimeout(() => { input.placeholder = 'your@email.com'; }, 3000);
     }
-  });
-}, { threshold: 0.1 });
-reveals.forEach(el => observer.observe(el));
-</script>
+  </script>
+
 </body>
 </html>
-
-
