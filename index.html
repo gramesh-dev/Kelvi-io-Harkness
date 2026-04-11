@@ -158,17 +158,19 @@
       font-size: clamp(2.5rem, 5vw, 3.8rem);
       line-height: 1.15;
       color: var(--text-primary);
-      max-width: 640px;
-      margin-bottom: 1.5rem;
+      max-width: 780px;
+      margin: 0 auto 1.5rem;
       letter-spacing: -0.02em;
+      text-align: center;
     }
 
     .hero .subhead {
       font-size: 1.15rem;
       color: var(--text-muted);
-      max-width: 560px;
+      max-width: 640px;
       line-height: 1.7;
-      margin-bottom: 2.5rem;
+      margin: 0 auto 2.5rem;
+      text-align: center;
     }
 
     .cta-row {
@@ -177,6 +179,7 @@
       align-items: center;
       flex-wrap: wrap;
       margin-bottom: 2rem;
+      justify-content: center;
     }
 
     .btn-primary {
@@ -221,6 +224,7 @@
     .support-line {
       font-size: 0.9rem;
       color: var(--text-muted);
+      text-align: center;
     }
 
     /* SECTION HEADINGS */
@@ -240,14 +244,14 @@
       color: var(--text-primary);
       margin-bottom: 1.25rem;
       letter-spacing: -0.01em;
-      max-width: 600px;
+      max-width: 780px;
     }
 
     .section-body {
       font-size: 1.05rem;
       color: var(--text-muted);
       line-height: 1.75;
-      max-width: 620px;
+      max-width: 780px;
     }
 
     /* WHY KELVI */
@@ -260,7 +264,8 @@
       border: 1px solid var(--divider);
       border-radius: 16px;
       padding: 3.5rem;
-      max-width: 720px;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     /* HOW IT WORKS */
@@ -359,7 +364,7 @@
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-      max-width: 620px;
+      max-width: 780px;
     }
 
     .progression-item {
@@ -532,6 +537,22 @@
         padding-top: 8rem;
       }
 
+      .hero h1 {
+        text-align: left;
+      }
+
+      .hero .subhead {
+        text-align: left;
+      }
+
+      .cta-row {
+        justify-content: flex-start;
+      }
+
+      .support-line {
+        text-align: left;
+      }
+
       section {
         padding: 4rem 0;
       }
@@ -540,8 +561,7 @@
         grid-template-columns: 1fr;
       }
 
-      .why-card,
-      .different-card {
+      .why-card {
         padding: 2rem;
       }
 
@@ -603,10 +623,10 @@
   <!-- THREE PRODUCTS -->
   <section class="products-section" id="products">
     <div class="container">
-      <div class="fade-in">
+      <div class="fade-in" style="text-align:center">
         <p class="section-label">The platform</p>
-        <h2 class="section-heading">Three products, one philosophy.</h2>
-        <p class="section-body">Kelvi meets learners and educators in different contexts, but every experience is built around the same idea: mathematical growth begins with better questions and deeper reasoning.</p>
+        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">Three products, one philosophy.</h2>
+        <p class="section-body" style="margin-left:auto;margin-right:auto">Kelvi meets learners and educators in different contexts, but every experience is built around the same idea: mathematical growth begins with better questions and deeper reasoning.</p>
       </div>
       <div class="products-grid">
         <div class="product-card school fade-in">
@@ -631,12 +651,12 @@
   <!-- THINKING PROGRESSION -->
   <section class="progression-section">
     <div class="container">
-      <div class="fade-in">
+      <div class="fade-in" style="text-align:center">
         <p class="section-label">The framework</p>
-        <h2 class="section-heading">From doing steps to generating ideas.</h2>
-        <p class="section-body">Kelvi is built around a progression from procedural fluency to conceptual understanding to generative thinking. The goal is not only to solve a problem, but to understand why a method works and extend ideas into new contexts.</p>
+        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">From doing steps to generating ideas.</h2>
+        <p class="section-body" style="margin-left:auto;margin-right:auto">Kelvi is built around a progression from procedural fluency to conceptual understanding to generative thinking. The goal is not only to solve a problem, but to understand why a method works and extend ideas into new contexts.</p>
       </div>
-      <div class="progression-items fade-in">
+      <div class="progression-items fade-in" style="margin-left:auto;margin-right:auto">
         <div class="progression-item">
           <strong>Procedural</strong> <span>— can carry out the steps.</span>
         </div>
@@ -653,10 +673,10 @@
   <!-- THE FOUNDERS -->
   <section class="credibility-section">
     <div class="container">
-      <div class="fade-in">
+      <div class="fade-in" style="text-align:center">
         <p class="section-label">The founders</p>
-        <h2 class="section-heading">Built by Dr. Gayatri Ramesh and Dr. Padmaja Ganapathy.</h2>
-        <p class="section-body">Gayatri (PhD in Applied Mathematics) brings deep experience in pedagogy, curriculum, and student thinking. Padmaja (PhD in Cancer Biology, MBA) brings expertise across science, analytics, business, and technology. Together, they are parents raising — and in Padmaja's case, having raised — children with a strong questioning mindset, and that lived experience shapes Kelvi's belief that good learning begins with good questions.</p>
+        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">Built by Dr. Gayatri Ramesh and Dr. Padmaja Ganapathy.</h2>
+        <p class="section-body" style="margin-left:auto;margin-right:auto">Gayatri (PhD in Applied Mathematics) brings deep experience in pedagogy, curriculum, and student thinking. Padmaja (PhD in Cancer Biology, MBA) brings expertise across science, analytics, business, and technology. Together, they are parents raising — and in Padmaja's case, having raised — children with a strong questioning mindset, and that lived experience shapes Kelvi's belief that good learning begins with good questions.</p>
       </div>
     </div>
   </section>
@@ -731,5 +751,3 @@
 
 </body>
 </html>
-
-
