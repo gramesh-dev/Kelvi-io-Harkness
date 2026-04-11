@@ -230,6 +230,9 @@ footer {
   border-top: 1px solid var(--divider); background: var(--deeper);
 }
 
+body { animation: pageIn 0.5s ease-out; }
+@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -259,7 +262,7 @@ footer {
   <div class="welcome">
     <div class="welcome-inner">
       <h1>Think it through.</h1>
-      <p>Kelvi helps you work through math problems without giving you the answer. Because figuring it out yourself is the whole point.</p>
+      <p>Kelvi is an AI thinking partner that helps you work through math problems without giving you the answer. Because figuring it out yourself is the whole point.</p>
       <div class="welcome-row">
         <input type="text" id="stu-name" placeholder="What's your name?" onkeydown="if(event.key==='Enter')startApp()">
         <button class="btn" onclick="startApp()">Start</button>

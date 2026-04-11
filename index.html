@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Kelvi is a platform for mathematical questioning and reasoning that helps learners think through problems through guided Socratic dialogue.">
+  <meta name="description" content="Kelvi is an AI platform for mathematical questioning and reasoning that helps learners think through problems through guided questioning and reasoning.">
   <title>Kelvi — The question is the answer.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -484,6 +484,15 @@
       color: var(--text-primary);
     }
 
+    /* PAGE TRANSITION */
+    body {
+      animation: pageIn 0.5s ease-out;
+    }
+    @keyframes pageIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     /* FADE IN ANIMATIONS */
     .fade-in {
       opacity: 0;
@@ -568,34 +577,24 @@
   <!-- HERO -->
   <section class="hero">
     <div class="container">
-      <h1 class="fade-in">Learn to think through math.</h1>
-      <p class="subhead fade-in">Kelvi helps learners ask better questions, explain their reasoning, and make connections that transfer to new problems. Instead of giving answers, Kelvi uses guided Socratic dialogue to build mathematical thinking.</p>
+      <h1 class="fade-in">Grow your questioning and reasoning every time you do math.</h1>
+      <p class="subhead fade-in">Kelvi (Tamil for "question") is an AI-math companion that helps learners use their own questioning and reasoning to move forward, instead of being handed answers.</p>
       <div class="cta-row fade-in">
         <a href="#products" class="btn-primary">See Kelvi in action</a>
         <a href="#signup" class="btn-outline">Join the waitlist</a>
       </div>
-      <p class="support-line fade-in">For teachers, families, and independent learners. One platform, three pathways.</p>
+      <p class="support-line fade-in">An AI platform for teachers, families, and independent learners. Three pathways, one philosophy.</p>
     </div>
   </section>
 
-  <!-- WHY KELVI -->
+  <!-- WHAT MAKES KELVI DIFFERENT -->
   <section class="why-section">
     <div class="container">
       <div class="why-card fade-in">
-        <p class="section-label">Why Kelvi</p>
-        <h2 class="section-heading">Most math tools make the same mistake.</h2>
-        <p class="section-body">They treat math as content to deliver and answers to check. Students learn to depend on hints, feedback loops, and green checkmarks — and stop thinking the moment the tool stops talking. Kelvi is built on a different premise: the thinking <em>is</em> the math. Not the answer. Not the score. The reasoning.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="how-section">
-    <div class="container">
-      <div class="fade-in">
-        <p class="section-label">How it works</p>
+        <p class="section-label">What makes Kelvi different</p>
         <h2 class="section-heading">Kelvi guides. It doesn't take over.</h2>
-        <p class="section-body">Kelvi's AI follows a Socratic approach: it doesn't jump straight to "correct" or "incorrect" or hand over solutions. Instead, it invites learners to reflect, clarify language, notice patterns, and discover their own next move.</p>
+        <p class="section-body">Unlike other AI tools, Kelvi doesn't treat math as content to deliver and answers to check. Where most tools build dependence on hints, feedback loops, and green checkmarks, Kelvi is built on a different premise: the thinking <em>is</em> the math. Not the answer. Not the score. The reasoning.</p>
+        <p class="section-body" style="margin-top: 1.25rem;">Kelvi's AI doesn't jump straight to "correct" or "incorrect" or hand over solutions. Instead, it invites learners to reflect, clarify language, notice patterns, and discover their own next move.</p>
         <p class="proof-line">From doing steps, to understanding ideas, to creating new connections.</p>
       </div>
     </div>
@@ -612,17 +611,17 @@
       <div class="products-grid">
         <div class="product-card school fade-in">
           <h3>Kelvi School</h3>
-          <p>For teachers who want to see thinking, not just answers. Design quests, observe reasoning in real time, and assign homework that builds independence.</p>
+          <p>For teachers who want to see thinking, not just answers. Design quests, observe reasoning with AI-powered insights, and assign homework that builds independence.</p>
           <a href="school.html" class="card-link">See Kelvi School →</a>
         </div>
         <div class="product-card family fade-in">
           <h3>Kelvi Family</h3>
-          <p>For families who want to nurture mathematical curiosity early. Playful provocations, a wonder journal, and growth snapshots — no drilling, no scores.</p>
+          <p>For families who want to nurture mathematical curiosity early. AI-guided provocations, a wonder journal, and growth snapshots — no drilling, no scores.</p>
           <a href="family.html" class="card-link">Explore Kelvi Family →</a>
         </div>
         <div class="product-card solo fade-in">
           <h3>Kelvi Solo</h3>
-          <p>For independent learners who want a thinking partner, not an answer engine. Socratic dialogue across 9 courses.</p>
+          <p>For independent learners who want a thinking partner, not an answer engine. AI-guided discussion across 9 courses.</p>
           <a href="solo.html" class="card-link">Try Kelvi Solo →</a>
         </div>
       </div>
@@ -651,25 +650,13 @@
     </div>
   </section>
 
-  <!-- WHAT MAKES IT DIFFERENT -->
-  <section class="different-section">
-    <div class="container">
-      <div class="different-card fade-in">
-        <p class="section-label">What makes it different</p>
-        <h2 class="section-heading">Built against the grain of most edtech.</h2>
-        <p class="no-list">No points. No badges. No streaks. No answer-checking.</p>
-        <p class="section-body">Kelvi's product and design choices are intentionally warm, minimal, and reasoning-first because the aim is durable mathematical thinking rather than performative progress.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CREDIBILITY -->
+  <!-- THE FOUNDERS -->
   <section class="credibility-section">
     <div class="container">
       <div class="fade-in">
-        <p class="section-label">Who built this</p>
-        <h2 class="section-heading">Built by educators and analytical thinkers.</h2>
-        <p class="section-body">Kelvi is shaped by deep experience in mathematics pedagogy, curriculum, science, data, and technology. Its founders include a co-founder with a PhD in applied mathematics and decades of experience teaching at leading independent schools, and a co-founder with scientific, analytical, and business leadership experience. This isn't another AI tutor. It's a new kind of math platform.</p>
+        <p class="section-label">The founders</p>
+        <h2 class="section-heading">Built by Dr. Gayatri Ramesh and Dr. Padmaja Ganapathy.</h2>
+        <p class="section-body">Gayatri (PhD in Applied Mathematics) brings deep experience in pedagogy, curriculum, and student thinking. Padmaja (PhD in Cancer Biology, MBA) brings expertise across science, analytics, business, and technology. Together, they are parents raising — and in Padmaja's case, having raised — children with a strong questioning mindset, and that lived experience shapes Kelvi's belief that good learning begins with good questions.</p>
       </div>
     </div>
   </section>
