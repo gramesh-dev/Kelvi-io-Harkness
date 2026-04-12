@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Kelvi is an AI platform for mathematical questioning and reasoning that helps learners think through problems through guided questioning and reasoning.">
-  <title>Kelvi — The question is the answer.</title>
+  <title>Kelvi Math — The question is the answer.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -12,12 +12,13 @@
     :root {
       --bg: #F5F3EE;
       --surface: #ECE7DC;
-      --deeper-surface: #E0D8C8;
+      --deeper: #E0D8C8;
       --divider: #CDC3B1;
       --text-primary: #2F2B25;
       --text-muted: #6F6A61;
       --accent: #3A6B5C;
       --accent-hover: #2D5347;
+      --accent-light: #EBF3EF;
       --school: #3A6B5C;
       --family: #B8784E;
       --solo: #5A7080;
@@ -27,552 +28,306 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-    }
-
+    html { scroll-behavior: smooth; }
     body {
       font-family: var(--font-body);
       color: var(--text-primary);
       background: var(--bg);
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
+      animation: pageIn 0.5s ease-out;
     }
+    @keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
 
     /* NAV */
     nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       background: var(--bg);
       border-bottom: 1px solid var(--divider);
       transition: box-shadow 0.3s ease;
     }
-
-    nav.scrolled {
-      box-shadow: 0 1px 12px rgba(47,43,37,0.06);
-    }
-
+    nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
     .nav-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      max-width: 1120px; margin: 0 auto; padding: 0 2rem;
+      height: 64px; display: flex; align-items: center; justify-content: space-between;
     }
-
     .wordmark {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      color: var(--accent);
-      text-decoration: none;
-      letter-spacing: -0.01em;
+      font-family: var(--font-heading); font-size: 1.5rem;
+      color: var(--accent); text-decoration: none; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 0.35rem;
     }
-
-    .wordmark .tamil-k {
-      font-size: 1.8rem;
-      margin-right: 0.35rem;
-      position: relative;
-      top: 1px;
-    }
-
-    .wordmark .q {
-      color: var(--accent);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
-
+    .wordmark .tamil-k { font-size: 1.8rem; position: relative; top: 1px; }
+    .nav-links { display: flex; gap: 1.75rem; align-items: center; }
     .nav-links a {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s ease;
-      font-weight: 500;
+      font-size: 0.9rem; color: var(--text-muted); text-decoration: none;
+      transition: color 0.2s ease; font-weight: 500;
     }
-
-    .nav-links a:hover {
-      color: var(--text-primary);
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links .btn-nav {
+      background: var(--accent); color: var(--white);
+      padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+      transition: background 0.2s ease;
     }
+    .nav-links .btn-nav:hover { background: var(--accent-hover); color: var(--white); }
 
     .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 28px;
-      height: 20px;
-      position: relative;
+      display: none; background: none; border: none; cursor: pointer;
+      width: 28px; height: 20px; position: relative;
     }
-
     .hamburger span {
-      display: block;
-      width: 100%;
-      height: 2px;
-      background: var(--text-primary);
-      position: absolute;
-      left: 0;
-      transition: all 0.3s ease;
+      display: block; width: 100%; height: 2px; background: var(--text-primary);
+      position: absolute; left: 0; transition: all 0.3s ease;
     }
-
     .hamburger span:nth-child(1) { top: 0; }
     .hamburger span:nth-child(2) { top: 9px; }
     .hamburger span:nth-child(3) { top: 18px; }
-
     .hamburger.open span:nth-child(1) { top: 9px; transform: rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
 
-    /* SECTIONS */
-    .container {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    section {
-      padding: 6rem 0;
-    }
-
-    section:first-of-type {
-      padding-top: 10rem;
-    }
+    /* LAYOUT */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 2rem; }
 
     /* HERO */
-    .hero {
-      padding-top: 11rem;
-      padding-bottom: 5rem;
-    }
-
+    .hero { padding: 9rem 0 3rem; text-align: center; }
     .hero h1 {
       font-family: var(--font-heading);
-      font-size: clamp(2.5rem, 5vw, 3.8rem);
-      line-height: 1.15;
-      color: var(--text-primary);
-      max-width: 780px;
-      margin: 0 auto 1.5rem;
-      letter-spacing: -0.02em;
-      text-align: center;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      line-height: 1.15; color: var(--text-primary);
+      max-width: 780px; margin: 0 auto 1.25rem; letter-spacing: -0.02em;
     }
-
     .hero .subhead {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 640px;
-      line-height: 1.7;
-      margin: 0 auto 2.5rem;
-      text-align: center;
+      font-size: 1.1rem; color: var(--text-muted);
+      max-width: 600px; line-height: 1.7; margin: 0 auto 2rem;
     }
-
     .cta-row {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-      justify-content: center;
+      display: flex; gap: 1rem; align-items: center;
+      justify-content: center; flex-wrap: wrap; margin-bottom: 1rem;
     }
-
     .btn-primary {
-      display: inline-block;
-      padding: 0.85rem 2rem;
-      background: var(--accent);
-      color: var(--white);
-      border: none;
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 1rem;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s ease;
+      display: inline-block; padding: 0.85rem 2rem;
+      background: var(--accent); color: var(--white); border: none; border-radius: 8px;
+      font-family: var(--font-body); font-size: 1rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; transition: background 0.2s ease;
     }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
+    .btn-primary:hover { background: var(--accent-hover); }
     .btn-outline {
-      display: inline-block;
-      padding: 0.85rem 2rem;
-      background: transparent;
-      color: var(--accent);
-      border: 1.5px solid var(--accent);
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 1rem;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      display: inline-block; padding: 0.85rem 2rem;
+      background: transparent; color: var(--accent);
+      border: 1.5px solid var(--accent); border-radius: 8px;
+      font-family: var(--font-body); font-size: 1rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; transition: all 0.2s ease;
     }
-
-    .btn-outline:hover {
-      background: var(--accent);
-      color: var(--white);
-    }
-
+    .btn-outline:hover { background: var(--accent); color: var(--white); }
     .support-line {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-align: center;
+      font-size: 0.9rem; color: var(--text-muted); text-align: center;
     }
 
-    /* SECTION HEADINGS */
-    .section-label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
+    /* AUDIENCE CARDS */
+    .audience-section { padding: 0 0 4rem; }
+    .audience-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem; margin-top: 2rem;
     }
-
-    .section-heading {
-      font-family: var(--font-heading);
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
-      line-height: 1.2;
-      color: var(--text-primary);
-      margin-bottom: 1.25rem;
-      letter-spacing: -0.01em;
-      max-width: 780px;
+    .audience-card {
+      background: var(--white); border: 1px solid var(--divider);
+      border-radius: 12px; padding: 2rem; position: relative;
+      overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
-    .section-body {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      line-height: 1.75;
-      max-width: 780px;
-    }
-
-    /* WHY KELVI */
-    .why-section {
-      padding: 5rem 0;
-    }
-
-    .why-card {
-      background: var(--white);
-      border: 1px solid var(--divider);
-      border-radius: 16px;
-      padding: 3.5rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    /* HOW IT WORKS */
-    .how-section {
-      padding: 5rem 0;
-    }
-
-    .proof-line {
-      margin-top: 2rem;
-      font-family: var(--font-heading);
-      font-size: 1.25rem;
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    /* PRODUCTS */
-    .products-section {
-      padding: 5rem 0;
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-
-    .product-card {
-      background: var(--surface);
-      border: 1px solid var(--divider);
-      border-radius: 12px;
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .product-card:hover {
+    .audience-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 6px 24px rgba(47,43,37,0.08);
     }
-
-    .product-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
+    .audience-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
     }
-
-    .product-card.school::before { background: var(--school); }
-    .product-card.family::before { background: var(--family); }
-    .product-card.solo::before { background: var(--solo); }
-
-    .product-card h3 {
-      font-family: var(--font-body);
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
+    .audience-card.school::before { background: var(--school); }
+    .audience-card.family::before { background: var(--family); }
+    .audience-card.solo::before { background: var(--solo); }
+    .audience-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
     }
-
-    .product-card.school h3 { color: var(--school); }
-    .product-card.family h3 { color: var(--family); }
-    .product-card.solo h3 { color: var(--solo); }
-
-    .product-card p {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-      margin-bottom: 1.5rem;
+    .audience-card.school .audience-label { color: var(--school); }
+    .audience-card.family .audience-label { color: var(--family); }
+    .audience-card.solo .audience-label { color: var(--solo); }
+    .audience-card h3 {
+      font-family: var(--font-heading); font-size: 1.25rem;
+      color: var(--text-primary); margin-bottom: 0.5rem;
     }
-
-    .product-card .card-link {
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .product-card .card-link:hover {
-      opacity: 0.75;
-    }
-
-    .product-card.school .card-link { color: var(--school); }
-    .product-card.family .card-link { color: var(--family); }
-    .product-card.solo .card-link { color: var(--solo); }
-
-    /* THINKING PROGRESSION */
-    .progression-section {
-      padding: 5rem 0;
-    }
-
-    .progression-items {
-      margin-top: 2.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      max-width: 780px;
-    }
-
-    .progression-item {
-      padding-left: 1.5rem;
-      border-left: 3px solid var(--divider);
-    }
-
-    .progression-item strong {
-      color: var(--text-primary);
-      font-weight: 700;
-    }
-
-    .progression-item span {
-      color: var(--text-muted);
-    }
-
-    /* DIFFERENT */
-    .different-section {
-      padding: 5rem 0;
-    }
-
-    .different-card {
-      background: var(--white);
-      border: 1px solid var(--divider);
-      border-radius: 16px;
-      padding: 3.5rem;
-      max-width: 720px;
-    }
-
-    .different-card .no-list {
-      font-family: var(--font-heading);
-      font-size: 1.35rem;
-      color: var(--text-primary);
-      line-height: 1.5;
+    .audience-card p {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.65;
       margin-bottom: 1.25rem;
     }
-
-    /* CREDIBILITY */
-    .credibility-section {
-      padding: 5rem 0;
-      border-top: 1px solid var(--divider);
+    .audience-card .card-link {
+      font-size: 0.9rem; font-weight: 500; text-decoration: none;
+      transition: opacity 0.2s ease;
     }
+    .audience-card .card-link:hover { opacity: 0.75; }
+    .audience-card.school .card-link { color: var(--school); }
+    .audience-card.family .card-link { color: var(--family); }
+    .audience-card.solo .card-link { color: var(--solo); }
+
+    /* SECTION SHARED */
+    .section-label {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;
+    }
+    .section-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.25; color: var(--text-primary);
+      margin-bottom: 1rem; letter-spacing: -0.01em;
+    }
+    .section-body {
+      font-size: 1.05rem; color: var(--text-muted); line-height: 1.75;
+    }
+    .divider { border: none; border-top: 1px solid var(--divider); margin: 0; }
+
+    /* WHAT MAKES KELVI DIFFERENT */
+    .different-section { padding: 4rem 0; text-align: center; }
+    .different-section .section-heading { max-width: 600px; margin: 0 auto 1rem; }
+    .different-section .section-body { max-width: 640px; margin: 0 auto; }
+    .proof-line {
+      margin-top: 1.5rem; font-family: var(--font-heading);
+      font-size: 1.15rem; font-style: italic; color: var(--accent);
+    }
+
+    /* FRAMEWORK */
+    .framework-section { padding: 4rem 0; text-align: center; }
+    .framework-section .section-heading { max-width: 600px; margin: 0 auto 0.75rem; }
+    .framework-section .section-body { max-width: 640px; margin: 0 auto; }
+    .pcg-row {
+      display: flex; gap: 1.25rem; margin: 2rem auto 0;
+      max-width: 700px; flex-wrap: wrap;
+    }
+    .pcg-item {
+      flex: 1; min-width: 180px;
+      border-left: 3px solid var(--divider); padding: 1rem 1.25rem; text-align: left;
+    }
+    .pcg-letter {
+      font-family: var(--font-heading); font-size: 1.75rem; color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+    .pcg-name {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--text-muted); margin-bottom: 0.25rem;
+    }
+    .pcg-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* TESTIMONIALS */
+    .testimonials-section { background: var(--surface); padding: 4rem 0; }
+    .testimonials-section .section-heading { text-align: center; margin-bottom: 0.5rem; }
+    .coming-badge {
+      display: inline-block; background: var(--accent-light); color: var(--accent);
+      font-size: 0.7rem; font-weight: 500; padding: 0.2rem 0.6rem;
+      border-radius: 4px; margin-left: 0.5rem; vertical-align: middle;
+    }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem; margin-top: 2rem;
+    }
+    .testimonial-card {
+      background: var(--white); border: 1px solid var(--divider);
+      border-radius: 12px; padding: 1.75rem;
+    }
+    .testimonial-quote {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.65;
+      font-style: italic; margin-bottom: 1rem;
+    }
+    .testimonial-who { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+    .testimonial-role { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* FAQ */
+    .faq-section { padding: 4rem 0; }
+    .faq-section .section-heading { text-align: center; margin-bottom: 2rem; }
+    .faq-list { max-width: 700px; margin: 0 auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--divider); cursor: pointer;
+    }
+    .faq-question {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 0; font-size: 1rem; font-weight: 500; color: var(--text-primary);
+    }
+    .faq-arrow {
+      font-size: 1.25rem; color: var(--text-muted); transition: transform 0.2s ease;
+      flex-shrink: 0; margin-left: 1rem;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(90deg); }
+    .faq-answer {
+      display: none; padding: 0 0 1.25rem;
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.75;
+    }
+    .faq-item.open .faq-answer { display: block; }
+
+    /* FOUNDERS */
+    .founders-section { padding: 4rem 0; text-align: center; }
+    .founders-section .section-heading { max-width: 700px; margin: 0 auto 1rem; }
+    .founders-section .section-body { max-width: 700px; margin: 0 auto; }
 
     /* FOOTER */
     footer {
-      background: var(--deeper-surface);
-      border-top: 1px solid var(--divider);
-      padding: 5rem 0 3rem;
+      background: var(--deeper); border-top: 1px solid var(--divider);
+      padding: 4rem 0 2.5rem;
     }
-
-    .footer-content {
-      text-align: center;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
+    .footer-content { text-align: center; max-width: 480px; margin: 0 auto; }
     .footer-tagline {
-      font-family: var(--font-heading);
-      font-size: clamp(1.6rem, 3vw, 2rem);
-      font-style: italic;
-      color: var(--text-primary);
-      margin-bottom: 1rem;
+      font-family: var(--font-heading); font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-style: italic; color: var(--text-primary); margin-bottom: 0.75rem;
     }
-
     .footer-body {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 2rem;
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem;
     }
-
     .signup-form {
-      display: flex;
-      gap: 0.75rem;
-      max-width: 400px;
-      margin: 0 auto 3rem;
+      display: flex; gap: 0.75rem; max-width: 400px; margin: 0 auto 3rem;
     }
-
     .signup-form input {
-      flex: 1;
-      padding: 0.8rem 1rem;
-      border: 1px solid var(--divider);
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      background: var(--white);
-      color: var(--text-primary);
-      outline: none;
+      flex: 1; padding: 0.8rem 1rem;
+      border: 1px solid var(--divider); border-radius: 8px;
+      font-family: var(--font-body); font-size: 0.95rem;
+      background: var(--white); color: var(--text-primary); outline: none;
       transition: border-color 0.2s ease;
     }
-
-    .signup-form input::placeholder {
-      color: var(--divider);
-    }
-
-    .signup-form input:focus {
-      border-color: var(--accent);
-    }
-
+    .signup-form input::placeholder { color: var(--divider); }
+    .signup-form input:focus { border-color: var(--accent); }
     .footer-bottom {
-      border-top: 1px solid var(--divider);
-      padding-top: 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      border-top: 1px solid var(--divider); padding-top: 2rem;
+      text-align: center; font-size: 0.8rem; color: var(--text-muted);
     }
+    .footer-links {
+      display: flex; justify-content: center; gap: 2rem; margin-bottom: 1rem;
+    }
+    .footer-links a {
+      color: var(--text-muted); text-decoration: none; transition: color 0.2s ease;
+    }
+    .footer-links a:hover { color: var(--text-primary); }
 
-    .footer-bottom-links {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .footer-bottom-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    .footer-bottom-links a:hover {
-      color: var(--text-primary);
-    }
-
-    /* PAGE TRANSITION */
-    body {
-      animation: pageIn 0.5s ease-out;
-    }
-    @keyframes pageIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* FADE IN ANIMATIONS */
+    /* FADE */
     .fade-in {
-      opacity: 0;
-      transform: translateY(24px);
+      opacity: 0; transform: translateY(24px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .nav-links {
-        display: none;
-        position: absolute;
-        top: 64px;
-        left: 0;
-        right: 0;
-        background: var(--bg);
-        border-bottom: 1px solid var(--divider);
-        flex-direction: column;
-        padding: 1.5rem 2rem;
-        gap: 1.25rem;
+        display: none; position: absolute; top: 64px; left: 0; right: 0;
+        background: var(--bg); border-bottom: 1px solid var(--divider);
+        flex-direction: column; padding: 1.5rem 2rem; gap: 1.25rem;
       }
-
-      .nav-links.open {
-        display: flex;
-      }
-
-      .hamburger {
-        display: block;
-      }
-
-      .hero {
-        padding-top: 8rem;
-      }
-
-      .hero h1 {
-        text-align: left;
-      }
-
-      .hero .subhead {
-        text-align: left;
-      }
-
-      .cta-row {
-        justify-content: flex-start;
-      }
-
-      .support-line {
-        text-align: left;
-      }
-
-      section {
-        padding: 4rem 0;
-      }
-
-      .products-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .why-card {
-        padding: 2rem;
-      }
-
-      .signup-form {
-        flex-direction: column;
-      }
-
-      .cta-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: block; }
+      .hero { padding-top: 7rem; }
+      .hero h1 { text-align: left; }
+      .hero .subhead { text-align: left; }
+      .cta-row { justify-content: flex-start; }
+      .support-line { text-align: left; }
+      .audience-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .pcg-row { flex-direction: column; }
+      .signup-form { flex-direction: column; }
+      .cta-row { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -581,7 +336,7 @@
   <!-- NAV -->
   <nav id="nav">
     <div class="nav-inner">
-      <a href="index.html" class="wordmark"><span class="tamil-k">கே</span>Kelvi</a>
+      <a href="index.html" class="wordmark"><span class="tamil-k">கே</span>Kelvi Math</a>
       <button class="hamburger" id="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -590,6 +345,7 @@
         <a href="family.html">Family</a>
         <a href="solo.html">Solo</a>
         <a href="about.html">Our Story</a>
+        <a href="#signup" class="btn-nav">Get started</a>
       </div>
     </div>
   </nav>
@@ -603,80 +359,165 @@
         <a href="#products" class="btn-primary">See Kelvi in action</a>
         <a href="#signup" class="btn-outline">Join the waitlist</a>
       </div>
-      <p class="support-line fade-in">An AI platform for teachers, families, and independent learners. Three pathways, one philosophy.</p>
+      <p class="support-line fade-in">An AI platform for teachers, families, and independent learners.</p>
     </div>
   </section>
 
-  <!-- WHAT MAKES KELVI DIFFERENT -->
-  <section class="why-section">
+  <!-- AUDIENCE CARDS -->
+  <section class="audience-section" id="products">
     <div class="container">
-      <div class="why-card fade-in">
-        <p class="section-label">What makes Kelvi different</p>
-        <h2 class="section-heading">Kelvi guides. It doesn't take over.</h2>
-        <p class="section-body">Unlike other AI tools, Kelvi doesn't treat math as content to deliver and answers to check. Where most tools build dependence on hints, feedback loops, and green checkmarks, Kelvi is built on a different premise: the thinking <em>is</em> the math. Not the answer. Not the score. The reasoning.</p>
-        <p class="section-body" style="margin-top: 1.25rem;">Kelvi's AI doesn't jump straight to "correct" or "incorrect" or hand over solutions. Instead, it invites learners to reflect, clarify language, notice patterns, and discover their own next move.</p>
-        <p class="proof-line">From doing steps, to understanding ideas, to creating new connections.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- THREE PRODUCTS -->
-  <section class="products-section" id="products">
-    <div class="container">
-      <div class="fade-in" style="text-align:center">
-        <p class="section-label">The platform</p>
-        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">Three products, one philosophy.</h2>
-        <p class="section-body" style="margin-left:auto;margin-right:auto">Kelvi meets learners and educators in different contexts, but every experience is built around the same idea: mathematical growth begins with better questions and deeper reasoning.</p>
-      </div>
-      <div class="products-grid">
-        <div class="product-card school fade-in">
-          <h3>Kelvi School</h3>
-          <p>For teachers who want to see thinking, not just answers. Design quests, observe reasoning with AI-powered insights, and assign homework that builds independence.</p>
+      <div class="audience-grid">
+        <div class="audience-card school fade-in">
+          <p class="audience-label">For teachers</p>
+          <h3>See your students think.</h3>
+          <p>Design quests, observe reasoning with AI-powered insights, and assign homework that builds independence.</p>
           <a href="school.html" class="card-link">See Kelvi School →</a>
         </div>
-        <div class="product-card family fade-in">
-          <h3>Kelvi Family</h3>
-          <p>For families who want to nurture mathematical curiosity early. AI-guided provocations, a wonder journal, and growth snapshots — no drilling, no scores.</p>
+        <div class="audience-card family fade-in">
+          <p class="audience-label">For families</p>
+          <h3>Nurture curiosity early.</h3>
+          <p>AI-guided provocations, a wonder journal, and growth snapshots — no drilling, no scores.</p>
           <a href="family.html" class="card-link">Explore Kelvi Family →</a>
         </div>
-        <div class="product-card solo fade-in">
-          <h3>Kelvi Solo</h3>
-          <p>For independent learners who want a thinking partner, not an answer engine. AI-guided discussion across 9 courses.</p>
+        <div class="audience-card solo fade-in">
+          <p class="audience-label">For learners</p>
+          <h3>Think it through.</h3>
+          <p>A thinking partner, not an answer engine. AI-guided discussion across 9 courses.</p>
           <a href="solo.html" class="card-link">Try Kelvi Solo →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- THINKING PROGRESSION -->
-  <section class="progression-section">
+  <div class="container"><hr class="divider"></div>
+
+  <!-- WHAT MAKES KELVI DIFFERENT -->
+  <section class="different-section">
     <div class="container">
-      <div class="fade-in" style="text-align:center">
-        <p class="section-label">The framework</p>
-        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">From doing steps to generating ideas.</h2>
-        <p class="section-body" style="margin-left:auto;margin-right:auto">Kelvi is built around a progression from procedural fluency to conceptual understanding to generative thinking. The goal is not only to solve a problem, but to understand why a method works and extend ideas into new contexts.</p>
+      <div class="fade-in">
+        <p class="section-label">What makes Kelvi different</p>
+        <h2 class="section-heading">Kelvi guides. It doesn't take over.</h2>
+        <p class="section-body">Unlike other AI tools, Kelvi doesn't treat math as content to deliver and answers to check. Where most tools build dependence on hints, feedback loops, and green checkmarks, Kelvi is built on a different premise: the thinking <em>is</em> the math. Not the answer. Not the score. The reasoning.</p>
+        <p class="section-body" style="margin-top: 1rem;">Kelvi's AI doesn't jump straight to "correct" or "incorrect" or hand over solutions. Instead, it invites learners to reflect, clarify language, notice patterns, and discover their own next move.</p>
+        <p class="proof-line">From doing steps, to understanding ideas, to creating new connections.</p>
       </div>
-      <div class="progression-items fade-in" style="margin-left:auto;margin-right:auto">
-        <div class="progression-item">
-          <strong>Procedural</strong> <span>— can carry out the steps.</span>
+    </div>
+  </section>
+
+  <div class="container"><hr class="divider"></div>
+
+  <!-- FRAMEWORK -->
+  <section class="framework-section">
+    <div class="container">
+      <div class="fade-in">
+        <p class="section-label">The framework</p>
+        <h2 class="section-heading">From doing steps to generating ideas.</h2>
+        <p class="section-body">Kelvi is built around a progression from procedural fluency to conceptual understanding to generative thinking. The goal is not only to solve a problem, but to understand why a method works and extend ideas into new contexts.</p>
+      </div>
+      <div class="pcg-row fade-in">
+        <div class="pcg-item">
+          <div class="pcg-letter">P</div>
+          <div class="pcg-name">PROCEDURAL</div>
+          <div class="pcg-desc">Can carry out the steps.</div>
         </div>
-        <div class="progression-item">
-          <strong>Conceptual</strong> <span>— understands why it works.</span>
+        <div class="pcg-item">
+          <div class="pcg-letter">C</div>
+          <div class="pcg-name">CONCEPTUAL</div>
+          <div class="pcg-desc">Understands why it works.</div>
         </div>
-        <div class="progression-item">
-          <strong>Generative</strong> <span>— can create, connect, and transfer.</span>
+        <div class="pcg-item">
+          <div class="pcg-letter">G</div>
+          <div class="pcg-name">GENERATIVE</div>
+          <div class="pcg-desc">Can create, connect, and transfer.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- THE FOUNDERS -->
-  <section class="credibility-section">
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section">
     <div class="container">
-      <div class="fade-in" style="text-align:center">
+      <h2 class="section-heading fade-in">What people are saying<span class="coming-badge">coming soon</span></h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-in">
+          <p class="testimonial-quote">"My daughter asked 'what if the shape had curved sides?' — that question came from Kelvi, not a worksheet."</p>
+          <div class="testimonial-who">Parent</div>
+          <div class="testimonial-role">Kelvi Family pilot</div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <p class="testimonial-quote">"I can finally see which students are thinking and which are just following steps."</p>
+          <div class="testimonial-who">Math teacher</div>
+          <div class="testimonial-role">Kelvi School pilot</div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <p class="testimonial-quote">"It didn't give me the answer. It asked me what I noticed. I figured it out myself."</p>
+          <div class="testimonial-who">Student, grade 10</div>
+          <div class="testimonial-role">Kelvi Solo pilot</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <h2 class="section-heading fade-in">Frequently asked questions</h2>
+      <div class="faq-list fade-in">
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>Is Kelvi a tutor?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">No. Kelvi is a thinking partner, not a tutor. It never delivers lessons, explains procedures, or walks students through steps. Instead, it asks questions that help learners examine their own reasoning and discover their next move independently.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>Does Kelvi give answers?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">Never. Kelvi's AI is governed by 15 principles that prevent it from confirming right or wrong, giving solutions, or reacting differently to correct and incorrect responses. It guides learners to validate their own reasoning.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>What ages and levels is Kelvi for?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">Kelvi Family is designed for young learners developing mathematical curiosity and language. Kelvi Solo covers 9 courses from Integrated Math 1 through Linear Algebra, Differential Equations, and Discrete Math. Kelvi School works with any math classroom.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>How is Kelvi different from Khan Academy or ChatGPT?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">Khan Academy delivers content and tracks mastery. ChatGPT answers questions. Kelvi does neither — it develops the learner's ability to ask better questions and reason independently. There are no lessons, no scores, no badges, and no answer-checking.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>Is my data private?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">Yes. Kelvi does not sell or share user data. Student interactions are used only to support the learning experience. We are committed to building trust with families, teachers, and learners.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            <span>What does Kelvi cost?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-answer">Kelvi is currently in early access. Join the waitlist to be among the first to try it. Pricing will be announced when we launch publicly.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><hr class="divider"></div>
+
+  <!-- FOUNDERS -->
+  <section class="founders-section">
+    <div class="container">
+      <div class="fade-in">
         <p class="section-label">The founders</p>
-        <h2 class="section-heading" style="margin-left:auto;margin-right:auto">Built by Dr. Gayatri Ramesh and Dr. Padmaja Ganapathy.</h2>
-        <p class="section-body" style="margin-left:auto;margin-right:auto">Gayatri (PhD in Applied Mathematics) brings deep experience in pedagogy, curriculum, and student thinking. Padmaja (PhD in Cancer Biology, MBA) brings expertise across science, analytics, business, and technology. Together, they are parents raising — and in Padmaja's case, having raised — children with a strong questioning mindset, and that lived experience shapes Kelvi's belief that good learning begins with good questions.</p>
+        <h2 class="section-heading">Built by Dr. Gayatri Ramesh and Dr. Padmaja Ganapathy.</h2>
+        <p class="section-body">Gayatri (PhD in Applied Mathematics) brings deep experience in pedagogy, curriculum, and student thinking. Padmaja (PhD in Cancer Biology, MBA) brings expertise across science, analytics, business, and technology. Together, they are parents raising — and in Padmaja's case, having raised — children with a strong questioning mindset, and that lived experience shapes Kelvi's belief that good learning begins with good questions.</p>
       </div>
     </div>
   </section>
@@ -693,33 +534,29 @@
         </form>
       </div>
       <div class="footer-bottom">
-        <div class="footer-bottom-links">
+        <div class="footer-links">
           <a href="school.html">School</a>
           <a href="family.html">Family</a>
           <a href="solo.html">Solo</a>
           <a href="about.html">Our Story</a>
         </div>
-        <p>© 2026 Kelvi. All rights reserved.</p>
+        <p>&copy; 2026 Kelvi. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
   <script>
-    // Nav scroll shadow
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 10);
     });
 
-    // Hamburger
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
     hamburger.addEventListener('click', () => {
       hamburger.classList.toggle('open');
       navLinks.classList.toggle('open');
     });
-
-    // Close mobile menu on link click
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         hamburger.classList.remove('open');
@@ -727,24 +564,18 @@
       });
     });
 
-    // Fade in on scroll
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    // Signup handler
     function handleSignup(e) {
       e.preventDefault();
       const input = e.target.querySelector('input');
-      const email = input.value;
       input.value = '';
-      input.placeholder = 'Thanks! We\'ll be in touch.';
+      input.placeholder = "Thanks! We'll be in touch.";
       setTimeout(() => { input.placeholder = 'your@email.com'; }, 3000);
     }
   </script>
