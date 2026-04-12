@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Kelvi brand — matches marketing landing (cream, teal, mustard, serif headlines) */
+@theme {
+  --color-kelvi-teal: #007a7c;
+  --color-kelvi-teal-hover: #006266;
+  --color-kelvi-mustard: #b8861b;
+  --color-kelvi-mustard-hover: #9a7315;
+  --color-kelvi-cream: #f9f9f7;
+  --color-kelvi-ink: #1a1a1a;
+  --color-kelvi-slate: #3d3d3d;
+  --color-kelvi-muted: #5c5c5c;
+  --color-kelvi-border: rgba(0, 0, 0, 0.06);
+
+  /* Legacy token aliases → map to brand teal */
+  --color-kelvi-50: #e8f4f4;
+  --color-kelvi-100: #d1e9e9;
+  --color-kelvi-200: #a3d3d4;
+  --color-kelvi-300: #6bbabc;
+  --color-kelvi-400: #3a9b9e;
+  --color-kelvi-500: #0d8d90;
+  --color-kelvi-600: #007a7c;
+  --color-kelvi-700: #006266;
+  --color-kelvi-800: #004f51;
+  --color-kelvi-900: #0a3d3e;
+  --color-kelvi-950: #052829;
+
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f4f4f0;
+  --color-surface-tertiary: #ebebe8;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #3d3d3d;
+  --color-text-muted: #5c5c5c;
+
+  --font-family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-family-serif: var(--font-serif), ui-serif, Georgia, "Times New Roman",
+    serif;
+}
+
+@layer base {
+  body {
+    @apply bg-kelvi-cream text-kelvi-ink antialiased font-sans;
+  }
+}
