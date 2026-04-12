@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Kelvi Family helps learners grow through curiosity, reflection, and mathematical wonder at home.">
 <title>Kelvi Family</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,434 +16,1425 @@
   --text-primary: #2F2B25;
   --text-muted: #6F6A61;
   --accent: #B8784E;
-  --accent-hover: #9E6640;
+  --accent-dark: #9E6640;
   --accent-light: #F5EDE5;
   --white: #FFFFFF;
   --green: #3A6B5C;
   --green-light: #EBF3EF;
+  --gold: #C9A84C;
+  --gold-light: #FBF5E6;
   --font-heading: 'DM Serif Display', serif;
   --font-body: 'DM Sans', sans-serif;
-  /* strand colors */
-  --amber: #B8784E;
-  --teal-s: #3A6B5C;
-  --purple: #534AB7;
-  --coral: #993C1D;
-  --blue: #185FA5;
-  --pink: #D4537E;
-  --neutral: #6F6A61;
+  --amber: #B8784E; --teal-s: #3A6B5C; --purple: #534AB7;
+  --coral: #993C1D; --blue: #185FA5; --pink: #D4537E; --neutral: #6F6A61;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-body); background: var(--bg); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);display:flex;-webkit-font-smoothing:antialiased}
 
-/* NAV */
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 2rem; height: 64px; background: var(--bg);
-  border-bottom: 1px solid var(--divider); position: sticky; top: 0; z-index: 100;
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;background:var(--surface);border-right:1px solid var(--divider);
+  display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;
+  transition:all .25s ease;
 }
-.nav-left { display: flex; align-items: center; gap: 8px; }
-.nav-brand {
-  font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent);
-  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+.sb-brand{
+  padding:18px 20px 14px;font-family:var(--font-heading);font-size:1.35rem;
+  color:var(--accent);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;gap:6px;
 }
-.nav-brand .tamil-k { font-size: 1.8rem; position: relative; top: 1px; }
-.nav-label {
-  font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
-  color: var(--text-muted); margin-left: 0.25rem;
+.sb-brand .kelvi-mark{display:flex;align-items:center;flex-shrink:0}
+.sb-label{font-size:0.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:4px}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:10px 20px;
+  font-size:0.85rem;color:var(--text-muted);cursor:pointer;
+  transition:all .12s;border-radius:0;
 }
-.nav-right { display: flex; align-items: center; gap: 10px; }
-.nav-link {
-  text-decoration: none; color: var(--text-muted); padding: 7px 14px;
-  border-radius: 8px; cursor: pointer; transition: all .15s; font-size: 0.85rem; font-weight: 500;
+.sb-item:hover{background:var(--deeper);color:var(--text-primary)}
+.sb-item.active{background:var(--accent);color:var(--white)}
+.sb-divider{height:1px;background:var(--divider);margin:8px 20px}
+.sb-bottom{border-top:1px solid var(--divider);padding:8px 0}
+.sb-avatar-row{padding:12px 20px;display:flex;align-items:center;gap:10px}
+.sb-avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--accent);
+  color:var(--white);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;
 }
-.nav-link:hover { background: var(--surface); color: var(--text-primary); }
-.nav-link.active { background: var(--accent); color: var(--white); }
-.avatar {
-  width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 500; color: var(--white); cursor: pointer;
-  border: 2px solid var(--divider);
-}
+.sb-uname{font-size:0.8rem;font-weight:500;color:var(--text-primary)}
 
-/* SCREENS */
-.screen { display: none; }
-.screen.active { display: block; }
+/* ── QUEST SIDEBAR MODE ── */
+.sb-quest-mode{display:none;flex-direction:column;flex:1;overflow:hidden}
+.sb-quest-mode.active{display:flex}
+.sb-nav-mode{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.sb-nav-mode.hidden{display:none}
 
-/* WELCOME */
-.welcome { text-align: center; padding: 120px 24px 60px; max-width: 460px; margin: 0 auto; }
-.welcome h1 {
-  font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 2.8rem);
-  margin-bottom: 10px; color: var(--text-primary); letter-spacing: -0.02em;
+.sb-back{
+  display:flex;align-items:center;gap:8px;padding:14px 20px;
+  font-size:13px;color:var(--accent);cursor:pointer;
+  border-bottom:1px solid var(--divider);transition:background .1s;
+  font-weight:500;
 }
-.welcome p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 2.5rem; }
-.welcome-input { display: flex; gap: 10px; max-width: 320px; margin: 0 auto; }
-.welcome-input input {
-  flex: 1; padding: 14px 18px; border: 1.5px solid var(--divider); border-radius: 8px;
-  font-size: 1rem; font-family: var(--font-body); outline: none; background: var(--white);
-}
-.welcome-input input:focus { border-color: var(--accent); }
-.btn {
-  background: var(--accent); color: var(--white); border: none; padding: 14px 28px;
-  border-radius: 8px; font-size: 1rem; font-family: var(--font-body); cursor: pointer;
-  font-weight: 500; transition: all .15s;
-}
-.btn:hover { background: var(--accent-hover); }
+.sb-back:hover{background:var(--accent-light)}
 
-/* THREAD MAP */
-.map-wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; }
-.map-wrap h2 {
-  font-family: var(--font-heading); font-size: clamp(1.6rem, 4vw, 2.2rem);
-  margin-bottom: 6px; text-align: center; letter-spacing: -0.01em;
+/* Rebus strip */
+.rebus-strip{
+  padding:16px 20px;border-bottom:1px solid var(--divider);
+  background:var(--white);
 }
-.map-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem; text-align: center; }
-.strand-cards { display: flex; flex-direction: column; gap: 12px; }
-.strand-row {
-  background: var(--white); border-radius: 12px; border: 1px solid var(--divider);
-  overflow: hidden; transition: all .15s;
+.rebus-label{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px}
+.rebus-pieces{display:flex;flex-wrap:wrap;gap:4px}
+.rebus-piece{
+  font-size:11px;font-weight:600;color:var(--text-primary);
+  background:var(--gold-light);border:1px solid var(--gold);
+  border-radius:5px;padding:3px 7px;transition:all .4s ease;
+  opacity:0;transform:scale(0.8);
 }
-.strand-row:hover { border-color: var(--accent); }
-.strand-header {
-  display: flex; align-items: center; gap: 10px; padding: 16px 20px; cursor: pointer;
-}
-.strand-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
-}
-.strand-name { font-size: 1rem; font-weight: 500; flex: 1; }
-.strand-arrow { font-size: 14px; color: var(--text-muted); transition: transform .2s; }
-.strand-row.open .strand-arrow { transform: rotate(90deg); }
-.strand-body { display: none; padding: 0 20px 16px; }
-.strand-row.open .strand-body { display: block; }
-.thread-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.thread-chip {
-  background: var(--surface); border: 1px solid var(--divider); border-radius: 10px;
-  padding: 12px 16px; cursor: pointer; transition: all .12s; flex: 1; min-width: 140px;
-}
-.thread-chip:hover { border-color: var(--accent); background: var(--accent-light); transform: translateY(-2px); }
-.tc-thread { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 4px; }
-.tc-topics { font-size: 12px; color: var(--text-primary); line-height: 1.45; }
-.tc-topics span { display: block; }
+.rebus-piece.revealed{opacity:1;transform:scale(1)}
+.rebus-piece.locked{opacity:0.15;background:var(--surface);border-color:var(--divider);color:var(--text-muted)}
 
-/* PROVOCATION VIEW */
-.prov-layout { display: grid; grid-template-columns: 240px minmax(0,1fr); min-height: calc(100vh - 64px); }
-@media(max-width:860px) { .prov-layout { grid-template-columns: 1fr; } .sb { display: none; } }
-.sb { background: var(--white); border-right: 1px solid var(--divider); padding: 20px 0; }
-.sb-back {
-  display: flex; align-items: center; gap: 6px; padding: 10px 18px; margin-bottom: 12px;
-  font-size: 13px; color: var(--accent); cursor: pointer; border-radius: 0 8px 8px 0; transition: background .1s;
+/* Quest steps in sidebar */
+.quest-steps{flex:1;padding:12px 0;overflow-y:auto}
+.quest-step{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:11px 18px;font-size:12px;cursor:pointer;
+  transition:all .1s;margin-right:8px;border-radius:0 8px 8px 0;
+  color:var(--text-muted);
 }
-.sb-back:hover { background: var(--accent-light); }
-.sb-label { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; padding: 0 18px; margin-bottom: 10px; }
-.sb-thread { display: flex; gap: 3px; padding: 0 18px 16px; }
-.sb-tp { height: 6px; flex: 1; border-radius: 3px; background: var(--surface); }
-.sb-tp-d { background: var(--green); }
-.sb-tp-n { background: #7BAF8E; }
-.sb-item {
-  display: flex; align-items: center; gap: 10px; padding: 11px 18px; font-size: 13px;
-  cursor: pointer; transition: all .1s; border-radius: 0 8px 8px 0; margin-right: 8px;
+.quest-step:hover:not(.locked-step){background:var(--accent-light)}
+.quest-step.active-step{background:var(--accent-light);border-right:3px solid var(--accent)}
+.quest-step.done-step{color:var(--green)}
+.quest-step.locked-step{opacity:.4;cursor:default}
+.qs-dot{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;margin-top:1px;
+  border:2px solid var(--divider);background:var(--white);color:var(--text-muted);
 }
-.sb-item:hover { background: var(--accent-light); }
-.sb-item.act { background: var(--green-light); border-right: 3px solid var(--green); }
-.sb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--divider); }
-.sb-dot-d { background: var(--green); border-color: var(--green); }
-.sb-dot-n { background: #7BAF8E; border-color: #7BAF8E; }
-.sb-nm { font-weight: 500; font-size: 12px; }
-.sb-tp2 { font-size: 10px; color: var(--text-muted); }
-.sb-ck { font-size: 12px; color: var(--teal-s); margin-left: auto; }
+.qs-dot.done{background:var(--green);border-color:var(--green);color:var(--white)}
+.qs-dot.active{background:var(--accent);border-color:var(--accent);color:var(--white)}
+.qs-dot.locked{background:var(--surface);border-color:var(--divider);color:var(--divider)}
+.qs-info{}
+.qs-name{font-weight:500;font-size:12px;color:inherit;margin-bottom:2px}
+.qs-tag{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.qs-tag.p-tag{color:var(--teal-s)}
+.qs-tag.c-tag{color:var(--purple)}
+.qs-tag.g-tag{color:var(--gold)}
 
-/* MAIN CONTENT */
-.pm { padding: 32px 40px; overflow-y: auto; background: var(--bg); }
-.pm-badge {
-  font-size: 11px; font-weight: 500; color: var(--green);
-  background: var(--green-light); display: inline-block; padding: 4px 12px;
-  border-radius: 8px; margin-bottom: 6px;
+/* ── MAIN AREA ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh}
+.main-header{
+  padding:14px 28px;border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
 }
-.pm-title { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 4px; }
-.pm-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
-.steps { display: flex; align-items: center; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
-.st { font-size: 11px; padding: 6px 14px; border-radius: 8px; }
-.st-d { background: var(--surface); color: var(--text-muted); }
-.st-n { background: var(--green-light); color: var(--green); font-weight: 500; }
-.st-f { background: var(--surface); color: var(--text-muted); opacity: .4; }
-.st-a { font-size: 10px; color: var(--text-muted); }
+.main-title{font-family:var(--font-heading);font-size:1.1rem;color:var(--text-primary)}
 
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-@media(max-width:860px) { .two-col { grid-template-columns: 1fr; } }
+/* ── PANELS ── */
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden}
+.panel.active{display:flex}
 
-/* PROBLEM CARD */
-.pc {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  padding: 24px; transition: border-color .15s;
+/* ── WELCOME ── */
+.welcome-panel{align-items:center;justify-content:center;padding:40px}
+.welcome-inner{text-align:center;max-width:440px}
+.welcome-inner h1{
+  font-family:var(--font-heading);font-size:2.4rem;
+  margin-bottom:10px;letter-spacing:-.02em;
 }
-.pc:hover { border-color: var(--accent); }
-.pc-emoji { font-size: 40px; margin-bottom: 12px; display: block; }
-.pc-text { font-size: 1rem; line-height: 1.65; font-weight: 500; margin-bottom: 16px; }
-.pc-vis {
-  background: var(--accent-light); border-radius: 10px; padding: 20px; text-align: center;
-  font-family: var(--font-heading); font-size: 2rem; color: var(--text-primary);
-  margin-bottom: 18px; border: 1px solid var(--divider);
+.welcome-inner p{font-size:1.05rem;color:var(--text-muted);line-height:1.65;margin-bottom:2rem}
+.welcome-row{display:flex;gap:8px;max-width:320px;margin:0 auto}
+.welcome-row input{
+  flex:1;padding:12px 16px;border:1.5px solid var(--divider);
+  border-radius:8px;font-size:1rem;font-family:var(--font-body);
+  outline:none;background:var(--white);
 }
-.choices { display: flex; flex-direction: column; gap: 8px; }
-.ch {
-  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  border: 1.5px solid var(--divider); border-radius: 10px; font-size: 14px;
-  cursor: pointer; transition: all .12s;
+.welcome-row input:focus{border-color:var(--accent)}
+.btn{
+  background:var(--accent);color:var(--white);border:none;
+  padding:12px 22px;border-radius:8px;font-size:0.95rem;
+  font-family:var(--font-body);cursor:pointer;font-weight:500;transition:all .15s;
 }
-.ch:hover { border-color: var(--accent); background: var(--accent-light); transform: translateX(4px); }
-.ch.sel { border-color: var(--green); background: var(--green-light); }
-.ch-l {
-  width: 28px; height: 28px; border-radius: 50%; background: var(--surface);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 500; color: var(--text-muted); flex-shrink: 0;
-}
-.ch.sel .ch-l { background: var(--green); color: var(--white); }
+.btn:hover{background:var(--accent-dark)}
 
-/* CONVERSATION */
-.convo { display: flex; flex-direction: column; gap: 10px; }
-.kb {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  border-bottom-left-radius: 4px; padding: 14px 16px; max-width: 95%;
+/* ── QUESTS HOME ── */
+.quests-panel{overflow-y:auto}
+.quests-body{max-width:640px;margin:0 auto;padding:40px 28px 60px}
+.quests-body h2{
+  font-family:var(--font-heading);font-size:1.8rem;
+  margin-bottom:6px;letter-spacing:-.01em;
 }
-.kn {
-  font-size: 10px; font-weight: 500; color: var(--green); margin-bottom: 4px;
-  display: flex; align-items: center; gap: 4px;
-}
-.kn::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-.kt { font-size: 14px; line-height: 1.55; color: var(--text-muted); }
-.cb {
-  background: var(--accent); border-radius: 12px; border-bottom-right-radius: 4px;
-  padding: 14px 16px; max-width: 85%; align-self: flex-end;
-}
-.ct2 { font-size: 14px; line-height: 1.55; color: var(--white); }
+.quests-sub{font-size:13px;color:var(--text-muted);margin-bottom:32px}
 
-/* ASK BOX */
-.ab {
-  border: 2px solid var(--accent); border-radius: 12px; padding: 18px;
-  margin-top: 14px; background: rgba(245,237,229,0.3);
+.quest-card{
+  background:var(--white);border:1.5px solid var(--divider);
+  border-radius:14px;padding:24px;margin-bottom:16px;
+  transition:all .15s;cursor:pointer;position:relative;overflow:hidden;
 }
-.ab-l { font-size: 11px; font-weight: 500; color: var(--accent); letter-spacing: .5px; margin-bottom: 6px; }
-.ab-p { font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
-.ab-r { display: flex; gap: 6px; }
-.ab-i {
-  flex: 1; border: 1.5px solid var(--divider); border-radius: 8px; padding: 12px 14px;
-  font-size: 14px; background: var(--white); outline: none; font-family: var(--font-body);
+.quest-card:hover:not(.quest-card-locked){border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(184,120,78,.12)}
+.quest-card-locked{cursor:default;opacity:.55}
+.quest-card-locked .qc-begin{display:none}
+.qc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.qc-name{font-family:var(--font-heading);font-size:1.25rem;color:var(--text-primary)}
+.qc-level{
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 10px;border-radius:20px;
 }
-.ab-i:focus { border-color: var(--accent); }
-.ab-b {
-  background: var(--accent); color: var(--white); border: none; border-radius: 8px;
-  padding: 12px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
-  font-family: var(--font-body); transition: all .15s;
+.level-g{background:var(--gold-light);color:#8B6B1A;border:1px solid var(--gold)}
+.level-c{background:#EEEDFE;color:var(--purple);border:1px solid var(--purple)}
+.level-p{background:var(--green-light);color:var(--green);border:1px solid var(--green)}
+.qc-desc{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:16px}
+.qc-meta{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.qc-meta-item{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+.qc-progress-bar{height:4px;background:var(--surface);border-radius:2px;margin-bottom:18px;overflow:hidden}
+.qc-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+.qc-begin{
+  background:var(--accent);color:var(--white);border:none;
+  padding:10px 22px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);transition:all .15s;
 }
-.ab-b:hover { background: var(--accent-hover); }
-.mic {
-  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
-  padding: 10px 12px; cursor: pointer; font-size: 16px; transition: all .15s; flex-shrink: 0;
-}
-.mic:hover { border-color: var(--accent); background: var(--accent-light); }
-.mic.rec { border-color: var(--accent); background: var(--accent-light); }
-.ab-h { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
-
-/* WONDER JOURNAL */
-.jw { max-width: 560px; margin: 0 auto; padding: 40px 24px 60px; }
-.jh { font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 4px; }
-.js2 { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-.streak { display: flex; gap: 5px; margin-bottom: 24px; align-items: center; }
-.sd {
-  width: 38px; height: 38px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 500; border: 2px solid transparent;
-}
-.sd-d { background: var(--green); color: var(--white); border-color: var(--green); }
-.sd-n { background: var(--green-light); color: var(--green); border-color: #7BAF8E; }
-.sd-f { background: var(--surface); color: var(--text-muted); }
-.sl { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
-.je {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  padding: 18px; margin-bottom: 12px; transition: border-color .15s;
-}
-.je:hover { border-color: var(--accent); }
-.je-s { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px; }
-.je-q {
-  font-family: var(--font-heading); font-size: 1rem; font-style: italic;
-  line-height: 1.5; margin-bottom: 6px; color: var(--text-primary);
-}
-.je-c { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
-.je-m {
-  font-size: 12px; color: var(--green); font-weight: 500;
-  display: flex; align-items: flex-start; gap: 6px; line-height: 1.4;
-}
-.je-m::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); flex-shrink: 0; margin-top: 4px;
-}
-.ja {
-  background: var(--accent); border-radius: 12px; padding: 16px 18px; margin: 16px 0;
-}
-.ja-l { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: .5px; margin-bottom: 5px; }
-.ja-t { font-size: 14px; color: var(--white); line-height: 1.55; }
-
-/* GROWTH SNAPSHOT */
-.sw { max-width: 560px; margin: 0 auto; padding: 40px 24px 60px; }
-.sh { font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 4px; }
-.sp { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
-.slet { font-family: var(--font-heading); font-size: 15px; line-height: 1.75; color: var(--text-muted); margin-bottom: 28px; }
-.slet em { font-style: italic; color: var(--text-primary); }
-.sst { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 28px; }
-.ss {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  padding: 16px 12px; text-align: center;
-}
-.ss-n { font-family: var(--font-heading); font-size: 1.75rem; color: var(--accent); }
-.ss-l { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-.sthr { margin-bottom: 28px; }
-.sthr-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 10px; }
-.str { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.str-n { font-size: 12px; width: 76px; color: var(--text-muted); flex-shrink: 0; }
-.str-bg { flex: 1; height: 10px; background: var(--surface); border-radius: 5px; overflow: hidden; }
-.str-b { height: 100%; border-radius: 5px; }
-.str-p { font-size: 11px; color: var(--text-muted); width: 30px; text-align: right; }
-.sqr { margin-bottom: 28px; }
-.sqr-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 10px; }
-.sq {
-  font-family: var(--font-heading); font-style: italic; font-size: 14px;
-  padding: 10px 0; border-bottom: .5px solid var(--divider); color: var(--text-primary);
-}
-.sq-d { font-family: var(--font-body); font-style: normal; font-size: 10px; color: var(--text-muted); margin-left: 6px; }
-.ssf {
-  border-left: 3px solid var(--accent); padding: 12px 16px; background: var(--white);
-  border-radius: 0 10px 10px 0; margin-bottom: 24px;
-  border-top: 1px solid var(--divider); border-right: 1px solid var(--divider); border-bottom: 1px solid var(--divider);
-}
-.ssf-l { font-size: 10px; font-weight: 500; color: var(--accent); letter-spacing: .5px; margin-bottom: 4px; }
-.ssf-t { font-size: 14px; line-height: 1.55; }
-.snx { background: var(--white); border: 1px solid var(--divider); border-radius: 12px; padding: 16px; }
-.snx-l { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; margin-bottom: 5px; }
-.snx-t { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
-
-footer {
-  text-align: center; padding: 24px; font-size: 0.75rem; font-weight: 500;
-  color: var(--text-muted); letter-spacing: 1.5px;
-  border-top: 1px solid var(--divider); background: var(--deeper);
+.qc-begin:hover{background:var(--accent-dark)}
+.qc-lock-badge{
+  font-size:11px;color:var(--text-muted);
+  display:flex;align-items:center;gap:5px;
 }
 
-body { animation: pageIn 0.5s ease-out; }
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+/* ── QUEST FLOW ── */
+.quest-panel{overflow-y:auto}
+.quest-body{max-width:680px;margin:0 auto;padding:36px 28px 80px}
 
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-.fi { animation: fadeUp .5s ease forwards; }
+.quest-q-header{margin-bottom:28px}
+.quest-q-badge{
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-light);
+  display:inline-block;padding:4px 12px;border-radius:8px;margin-bottom:10px;
+}
+.quest-q-title{
+  font-family:var(--font-heading);font-size:1.6rem;
+  line-height:1.3;margin-bottom:6px;
+}
+.quest-q-sub{font-size:13px;color:var(--text-muted)}
 
-@media(max-width:600px) {
-  nav { padding: 0 1rem; }
-  .map-wrap { padding: 24px 16px 40px; }
-  .pm { padding: 20px 16px; }
-  .two-col { grid-template-columns: 1fr; }
-  .sst { grid-template-columns: 1fr; }
+/* Kelvi speech bubble */
+.kelvi-bubble{
+  background:var(--white);border:1px solid var(--divider);
+  border-radius:16px;border-bottom-left-radius:4px;
+  padding:20px 22px;margin-bottom:24px;position:relative;
+}
+.kelvi-name{
+  font-size:10px;font-weight:700;color:var(--green);letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:5px;
+}
+.kelvi-name::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--green);
+}
+.kelvi-text{font-size:1rem;line-height:1.7;color:var(--text-primary)}
+.kelvi-text strong{font-weight:600}
+
+/* Answer input */
+.answer-box{
+  border:2px solid var(--divider);border-radius:12px;
+  padding:18px;background:var(--white);
+  transition:border-color .15s;margin-bottom:16px;
+}
+.answer-box:focus-within{border-color:var(--accent)}
+.answer-box.submitted{border-color:var(--green);background:var(--green-light)}
+.answer-label{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.answer-textarea{
+  width:100%;border:none;outline:none;font-size:15px;
+  font-family:var(--font-body);resize:none;line-height:1.6;
+  color:var(--text-primary);background:transparent;min-height:80px;
+}
+.answer-textarea::placeholder{color:var(--divider)}
+.answer-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.answer-submit{
+  background:var(--accent);color:var(--white);border:none;
+  padding:10px 24px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);transition:all .15s;
+}
+.answer-submit:hover{background:var(--accent-dark)}
+.answer-submit:disabled{opacity:.4;cursor:default}
+
+/* Kelvi response after answer */
+.kelvi-response{
+  display:none;
+  animation:fadeUp .4s ease forwards;
+}
+.kelvi-response.visible{display:block}
+
+/* Unlock celebration */
+.unlock-banner{
+  display:none;background:var(--gold-light);border:1.5px solid var(--gold);
+  border-radius:12px;padding:16px 20px;margin-bottom:20px;
+  animation:fadeUp .4s ease forwards;
+}
+.unlock-banner.visible{display:flex;align-items:center;gap:12px}
+.unlock-icon{font-size:22px}
+.unlock-text{font-size:14px;font-weight:500;color:#7A5C1A;line-height:1.5}
+.unlock-text strong{color:#5A4010}
+
+.next-btn{
+  background:var(--accent);color:var(--white);border:none;
+  padding:12px 28px;border-radius:8px;font-size:14px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);transition:all .15s;
+  display:none;
+}
+.next-btn.visible{display:inline-flex;align-items:center;gap:8px}
+.next-btn:hover{background:var(--accent-dark)}
+
+/* Quest complete screen */
+.quest-complete{
+  text-align:center;padding:60px 28px;
+  animation:fadeUp .5s ease forwards;display:none;
+}
+.quest-complete.visible{display:block}
+.qc-trophy{font-size:64px;margin-bottom:20px;display:block}
+.qc-complete-title{
+  font-family:var(--font-heading);font-size:2rem;
+  margin-bottom:10px;color:var(--text-primary);
+}
+.qc-complete-sub{font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:32px}
+.rebus-reveal-full{
+  background:var(--gold-light);border:2px solid var(--gold);
+  border-radius:14px;padding:28px;margin-bottom:32px;
+  display:inline-block;min-width:300px;
+}
+.rebus-reveal-label{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
+.rebus-joke{font-family:var(--font-heading);font-size:1.25rem;line-height:1.5;color:var(--text-primary)}
+.rebus-punchline{font-family:var(--font-heading);font-size:1.4rem;color:var(--accent);font-style:italic;margin-top:6px}
+
+/* ── THREADS ── */
+.threads-panel{overflow-y:auto}
+.threads-body{max-width:720px;margin:0 auto;padding:40px 28px 60px}
+.threads-body h2{font-family:var(--font-heading);font-size:1.8rem;margin-bottom:6px;letter-spacing:-.01em}
+.threads-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px}
+.strand-cards{display:flex;flex-direction:column;gap:10px}
+.strand-row{background:var(--white);border-radius:12px;border:1px solid var(--divider);overflow:hidden;transition:all .15s}
+.strand-row:hover{border-color:var(--accent)}
+.strand-header{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer}
+.strand-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.strand-name{font-size:0.95rem;font-weight:500;flex:1}
+.strand-arrow{font-size:12px;color:var(--text-muted);transition:transform .2s}
+.strand-row.open .strand-arrow{transform:rotate(90deg)}
+.strand-body{display:none;padding:0 20px 16px}
+.strand-row.open .strand-body{display:block}
+.thread-chips{display:flex;gap:8px;flex-wrap:wrap}
+.thread-chip{
+  background:var(--surface);border:1px solid var(--divider);border-radius:10px;
+  padding:12px 14px;cursor:pointer;transition:all .12s;flex:1;min-width:140px;
+}
+.thread-chip:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-2px)}
+.tc-thread{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:3px;text-transform:uppercase}
+.tc-topics{font-size:11px;color:var(--text-primary);line-height:1.5}
+.tc-topics span{display:block}
+
+/* ── PROVOCATION ── */
+.prov-panel{overflow-y:auto}
+.prov-body{max-width:680px;margin:0 auto;padding:36px 28px 80px}
+.prov-back{
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;
+  color:var(--accent);cursor:pointer;margin-bottom:24px;
+  padding:6px 0;font-weight:500;
+}
+.prov-back:hover{opacity:.7}
+.pm-badge{
+  font-size:10px;font-weight:700;color:var(--green);
+  background:var(--green-light);display:inline-block;padding:4px 12px;
+  border-radius:8px;margin-bottom:6px;letter-spacing:.05em;
+}
+.pm-title{font-family:var(--font-heading);font-size:1.5rem;margin-bottom:4px}
+.pm-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+.steps{display:flex;align-items:center;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.st{font-size:11px;padding:6px 14px;border-radius:8px}
+.st-d{background:var(--surface);color:var(--text-muted)}
+.st-n{background:var(--green-light);color:var(--green);font-weight:500}
+.st-a{font-size:10px;color:var(--text-muted)}
+.pc{background:var(--white);border:1px solid var(--divider);border-radius:12px;padding:24px;margin-bottom:24px}
+.pc-text{font-size:1rem;line-height:1.65;font-weight:500;margin-bottom:16px}
+.pc-vis{
+  background:var(--accent-light);border-radius:10px;padding:18px;text-align:center;
+  font-family:var(--font-heading);font-size:1.8rem;color:var(--text-primary);
+  margin-bottom:18px;border:1px solid var(--divider);
+}
+.choices{display:flex;flex-direction:column;gap:8px}
+.ch{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border:1.5px solid var(--divider);border-radius:10px;font-size:14px;
+  cursor:pointer;transition:all .12s;
+}
+.ch:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(4px)}
+.ch.sel{border-color:var(--green);background:var(--green-light)}
+.ch-l{
+  width:26px;height:26px;border-radius:50%;background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;color:var(--text-muted);flex-shrink:0;
+}
+.ch.sel .ch-l{background:var(--green);color:var(--white)}
+.convo{display:flex;flex-direction:column;gap:10px}
+.kb{
+  background:var(--white);border:1px solid var(--divider);border-radius:12px;
+  border-bottom-left-radius:4px;padding:14px 16px;max-width:95%;
+}
+.kn{font-size:10px;font-weight:700;color:var(--green);margin-bottom:4px;display:flex;align-items:center;gap:4px;letter-spacing:.05em}
+.kn::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.kt{font-size:14px;line-height:1.55;color:var(--text-muted)}
+.cb{
+  background:var(--accent);border-radius:12px;border-bottom-right-radius:4px;
+  padding:14px 16px;max-width:85%;align-self:flex-end;
+}
+.ct2{font-size:14px;line-height:1.55;color:var(--white)}
+.ab{border:2px solid var(--accent);border-radius:12px;padding:18px;margin-top:14px;background:rgba(245,237,229,0.3)}
+.ab-l{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase}
+.ab-p{font-size:14px;line-height:1.5;margin-bottom:12px}
+.ab-r{display:flex;gap:6px}
+.ab-i{
+  flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:12px 14px;
+  font-size:14px;background:var(--white);outline:none;font-family:var(--font-body);
+}
+.ab-i:focus{border-color:var(--accent)}
+.ab-b{
+  background:var(--accent);color:var(--white);border:none;border-radius:8px;
+  padding:12px 20px;font-size:14px;font-weight:500;cursor:pointer;
+  font-family:var(--font-body);transition:all .15s;
+}
+.ab-b:hover{background:var(--accent-dark)}
+.ab-h{font-size:11px;color:var(--text-muted);margin-top:6px;font-style:italic}
+
+/* ── JOURNAL ── */
+.journal-panel{overflow-y:auto}
+.journal-body{max-width:560px;margin:0 auto;padding:40px 28px 60px}
+.journal-body h2{font-family:var(--font-heading);font-size:1.8rem;margin-bottom:4px}
+.journal-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.streak{display:flex;gap:5px;margin-bottom:24px;align-items:center}
+.sd{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:2px solid transparent}
+.sd-d{background:var(--green);color:var(--white);border-color:var(--green)}
+.sd-n{background:var(--green-light);color:var(--green);border-color:#7BAF8E}
+.sd-f{background:var(--surface);color:var(--text-muted)}
+.sl{font-size:11px;color:var(--text-muted);margin-left:8px}
+.je{background:var(--white);border:1px solid var(--divider);border-radius:12px;padding:18px;margin-bottom:10px;transition:border-color .15s}
+.je:hover{border-color:var(--accent)}
+.je-s{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:.04em}
+.je-q{font-family:var(--font-heading);font-size:1rem;font-style:italic;line-height:1.5;margin-bottom:6px}
+.je-c{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:10px}
+.je-m{font-size:12px;color:var(--green);font-weight:500;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.je-m::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px}
+.ja{background:var(--accent);border-radius:12px;padding:16px 18px;margin:14px 0}
+.ja-l{font-size:10px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase}
+.ja-t{font-size:14px;color:var(--white);line-height:1.55}
+
+/* ── GROWTH ── */
+.growth-panel{overflow-y:auto}
+.growth-body{max-width:560px;margin:0 auto;padding:40px 28px 60px}
+.growth-body h2{font-family:var(--font-heading);font-size:1.8rem;margin-bottom:4px}
+.growth-date{font-size:12px;color:var(--text-muted);margin-bottom:20px}
+.slet{font-family:var(--font-heading);font-size:15px;line-height:1.75;color:var(--text-muted);margin-bottom:28px}
+.slet em{font-style:italic;color:var(--text-primary)}
+.sst{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.ss{background:var(--white);border:1px solid var(--divider);border-radius:12px;padding:16px 12px;text-align:center}
+.ss-n{font-family:var(--font-heading);font-size:1.75rem;color:var(--accent)}
+.ss-l{font-size:10px;color:var(--text-muted);margin-top:2px}
+.sthr{margin-bottom:28px}
+.sthr-l{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase}
+.str{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.str-n{font-size:12px;width:76px;color:var(--text-muted);flex-shrink:0}
+.str-bg{flex:1;height:8px;background:var(--surface);border-radius:4px;overflow:hidden}
+.str-b{height:100%;border-radius:4px}
+.str-p{font-size:11px;color:var(--text-muted);width:30px;text-align:right}
+.sqr{margin-bottom:28px}
+.sqr-l{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase}
+.sq{font-family:var(--font-heading);font-style:italic;font-size:14px;padding:10px 0;border-bottom:.5px solid var(--divider);color:var(--text-primary)}
+.sq-d{font-family:var(--font-body);font-style:normal;font-size:10px;color:var(--text-muted);margin-left:6px}
+.ssf{border-left:3px solid var(--accent);padding:12px 16px;background:var(--white);border-radius:0 10px 10px 0;margin-bottom:24px;border-top:1px solid var(--divider);border-right:1px solid var(--divider);border-bottom:1px solid var(--divider)}
+.ssf-l{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase}
+.ssf-t{font-size:14px;line-height:1.55}
+.snx{background:var(--white);border:1px solid var(--divider);border-radius:12px;padding:16px}
+.snx-l{font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase}
+.snx-t{font-size:13px;color:var(--text-muted);line-height:1.55}
+
+/* ── FOOTER ── */
+.main-footer{
+  padding:14px 28px;border-top:1px solid var(--divider);
+  font-size:11px;color:var(--text-muted);letter-spacing:1.5px;
+  text-align:center;flex-shrink:0;background:var(--deeper);
+}
+
+/* ── QUEST CONVERSATION UI ── */
+.qt-child{display:flex;justify-content:flex-end;margin:10px 0}
+.qt-child-bubble{
+  background:var(--accent);color:var(--white);
+  border-radius:14px;border-bottom-right-radius:4px;
+  padding:12px 16px;max-width:80%;font-size:14px;line-height:1.55;
+}
+.qt-kelvi{display:flex;flex-direction:column;margin:10px 0;max-width:90%}
+.qt-kelvi-bubble{
+  background:var(--white);border:1px solid var(--divider);
+  border-radius:14px;border-bottom-left-radius:4px;
+  padding:14px 16px;font-size:14px;line-height:1.6;color:var(--text-primary);
+}
+.qt-thinking{display:flex;align-items:center;gap:5px;padding:16px !important}
+.qt-thinking span{
+  width:7px;height:7px;border-radius:50%;background:var(--divider);
+  animation:bounce 1.2s ease infinite;
+}
+.qt-thinking span:nth-child(2){animation-delay:.2s}
+.qt-thinking span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* Quest input */
+.quest-input-area{
+  position:sticky;bottom:0;background:var(--bg);
+  padding:16px 0 8px;margin-top:16px;
+}
+.quest-input-box{
+  background:var(--white);border:1.5px solid var(--divider);
+  border-radius:14px;padding:14px 16px;transition:border-color .15s;
+}
+.quest-input-box:focus-within{border-color:var(--accent)}
+.quest-textarea{
+  width:100%;border:none;outline:none;font-size:15px;
+  font-family:var(--font-body);resize:none;line-height:1.55;
+  color:var(--text-primary);background:transparent;
+}
+.quest-textarea::placeholder{color:var(--divider)}
+.quest-input-actions{
+  display:flex;align-items:center;gap:6px;
+  margin-top:10px;justify-content:flex-end;
+}
+.qi-btn{
+  background:none;border:1.5px solid var(--divider);border-radius:8px;
+  padding:7px 10px;cursor:pointer;color:var(--text-muted);
+  transition:all .12s;display:flex;align-items:center;
+}
+.qi-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.qi-btn-active{border-color:var(--accent)!important;color:var(--white)!important;background:var(--accent)!important}
+.qi-send{
+  background:var(--accent);color:var(--white);border:none;
+  padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);transition:all .15s;
+}
+.qi-send:hover{background:var(--accent-dark)}
+.qi-send:disabled{opacity:.4;cursor:default}
+.api-key-row{
+  display:flex;gap:8px;align-items:center;
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--divider);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── CONFETTI ── */
+#confetti-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:9999;
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-left">
-    <a href="index.html" class="nav-brand"><span class="tamil-k">கே</span>Kelvi</a>
-    <span class="nav-label">Family</span>
-  </div>
-  <div class="nav-right">
-    <span class="nav-link" onclick="show('threads')" id="tab-threads">Threads</span>
-    <span class="nav-link" onclick="show('journal')" id="tab-journal">Wonder journal</span>
-    <span class="nav-link" onclick="show('snapshot')" id="tab-snapshot">Growth</span>
-    <div class="avatar" id="av">A</div>
-  </div>
-</nav>
+<canvas id="confetti-canvas"></canvas>
 
-<!-- WELCOME -->
-<div class="screen active" id="screen-welcome">
-  <div class="welcome">
-    <h1>Nurture mathematical wonder at home.</h1>
-    <p>Kelvi Family is an AI-powered space that helps learners explore ideas through provocations, journals, and growth snapshots that value curiosity, language, and reflection.</p>
-    <div class="welcome-input">
-      <input type="text" id="cname" placeholder="Learner's name" value="Arya" onkeydown="if(event.key==='Enter')go()">
-      <button class="btn" onclick="go()">Start</button>
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:7px"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>Kelvi
+    <span class="sb-label">Family</span>
+  </div>
+
+  <!-- Normal nav mode -->
+  <div class="sb-nav-mode" id="sb-nav-mode">
+    <div class="sb-nav" id="sb-nav">
+      <div class="sb-item active" id="nav-quests" onclick="showPanel('quests')">Quests</div>
+      <div class="sb-item" id="nav-threads" onclick="showPanel('threads')">Threads</div>
+      <div class="sb-divider"></div>
+      <div class="sb-item" id="nav-journal" onclick="showPanel('journal')">Wonder journal</div>
+      <div class="sb-item" id="nav-growth" onclick="showPanel('growth')">Growth</div>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-divider"></div>
+      <div class="sb-avatar-row">
+        <div class="sb-avatar" id="sb-av">A</div>
+        <div class="sb-uname" id="sb-name">Arya</div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- THREAD MAP -->
-<div class="screen" id="screen-threads">
-  <div class="map-wrap">
-    <h2>Mathematical threads</h2>
-    <p class="map-sub">Choose a strand. Each one has five threads of increasing depth.</p>
-    <div class="strand-cards" id="strand-cards"></div>
-  </div>
-</div>
-
-<!-- PROVOCATION -->
-<div class="screen" id="screen-prov">
-  <div class="prov-layout">
-    <div class="sb" id="sb"></div>
-    <div class="pm" id="pm"></div>
-  </div>
-</div>
-
-<!-- WONDER JOURNAL -->
-<div class="screen" id="screen-journal">
-  <div class="jw fi">
-    <div class="jh" id="jn">Arya's wonder journal</div>
-    <div class="js2">Questions, reflections, and mathematical moments.</div>
-    <div class="streak">
-      <div class="sd sd-d">M</div><div class="sd sd-d">T</div><div class="sd sd-d">W</div>
-      <div class="sd sd-n">T</div><div class="sd sd-f">F</div><div class="sd sd-f">S</div><div class="sd sd-f">S</div>
-      <span class="sl">3-day streak</span>
+  <!-- Quest tracker mode -->
+  <div class="sb-quest-mode" id="sb-quest-mode">
+    <div class="sb-back" onclick="exitQuest()">&#8592; Back to Quests</div>
+    <div class="rebus-strip">
+      <div class="rebus-label">Rebus clue</div>
+      <div class="rebus-pieces" id="rebus-pieces"></div>
     </div>
-    <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I wonder why we need calculators at all."</div><div class="je-c">She used algebra to bypass a broken multiply button, then questioned whether the tool was needed at all.</div><div class="je-m">Invented a new strategy instead of scaling up the old one</div></div>
-    <div class="ja"><div class="ja-l">Try this at dinner</div><div class="ja-t">Ask her: "Is there a faster way to do this?" while cooking or organizing together. She's already thinking about efficiency.</div></div>
-    <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I don't think there is a way to share the marbles equally."</div><div class="je-c">Discovered that 45 marbles can't split evenly among 4 friends. Suggested throwing away the leftover.</div><div class="je-m">Connected division to fairness — not just a calculation but a value</div></div>
-    <div class="je"><div class="je-s" style="background:#EEEDFE;color:#3C3489">Geometry</div><div class="je-q">"What if the shape had curved sides instead of straight ones?"</div><div class="je-c">While exploring quadrilaterals, she wondered whether the rules change when lines aren't straight.</div><div class="je-m">First "what if" question in geometry this month</div></div>
+    <div class="quest-steps" id="quest-steps-nav"></div>
   </div>
 </div>
 
-<!-- GROWTH SNAPSHOT -->
-<div class="screen" id="screen-snapshot">
-  <div class="sw fi">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-      <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-light);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--accent);font-weight:500">K</div>
-      <div><div class="sh" id="sn">Arya's growth snapshot</div><div class="sp">March 2026</div></div>
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<div class="main">
+  <div class="main-header">
+    <div class="main-title" id="main-title">Quests</div>
+  </div>
+
+  <!-- WELCOME -->
+  <div class="panel active" id="panel-welcome" style="align-items:center;justify-content:center">
+    <div style="text-align:center;max-width:440px;padding:40px">
+      <h1 style="font-family:var(--font-heading);font-size:2.4rem;margin-bottom:10px;letter-spacing:-.02em">Welcome back.</h1>
+      <p style="font-size:1.05rem;color:var(--text-muted);line-height:1.65;margin-bottom:2rem">Mathematics is full of questions. Let's go find some.</p>
+      <div style="display:flex;gap:8px;max-width:300px;margin:0 auto">
+        <input type="text" id="cname" placeholder="Your name" value="Arya"
+          style="flex:1;padding:12px 16px;border:1.5px solid var(--divider);border-radius:8px;font-size:1rem;font-family:var(--font-body);outline:none;background:var(--white)"
+          onkeydown="if(event.key==='Enter')startApp()"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--divider)'">
+        <button class="btn" onclick="startApp()">Start</button>
+      </div>
     </div>
-    <div class="slet">This month she had <em>14 conversations</em> with Kelvi. She's becoming someone who doesn't just solve problems — she <em>questions them</em>. The biggest shift: she started asking "what if" in geometry, which she'd never done before.</div>
-    <div class="sst"><div class="ss"><div class="ss-n">14</div><div class="ss-l">Sessions</div></div><div class="ss"><div class="ss-n">9</div><div class="ss-l">New questions</div></div><div class="ss"><div class="ss-n">4</div><div class="ss-l">"What if" moments</div></div></div>
-    <div class="sthr"><div class="sthr-l">Threads explored</div><div class="str"><div class="str-n">Operations</div><div class="str-bg"><div class="str-b" style="width:83%;background:var(--teal-s)"></div></div><div class="str-p">5/6</div></div><div class="str"><div class="str-n">Geometry</div><div class="str-bg"><div class="str-b" style="width:50%;background:var(--purple)"></div></div><div class="str-p">3/6</div></div><div class="str"><div class="str-n">Patterns</div><div class="str-bg"><div class="str-b" style="width:67%;background:var(--coral)"></div></div><div class="str-p">4/6</div></div><div class="str"><div class="str-n">Fractions</div><div class="str-bg"><div class="str-b" style="width:33%;background:var(--amber)"></div></div><div class="str-p">2/6</div></div></div>
-    <div class="sqr"><div class="sqr-l">Best questions this month</div><div class="sq">"I wonder why we need calculators at all." <span class="sq-d">Apr 2</span></div><div class="sq">"What if the shape had curved sides?" <span class="sq-d">Mar 28</span></div><div class="sq">"Is division always the same no matter what you divide?" <span class="sq-d">Mar 21</span></div></div>
-    <div class="ssf"><div class="ssf-l">Biggest shift</div><div class="ssf-t">Started asking "what if" questions in geometry. In operations, she went from procedural to generative thinking in a single session.</div></div>
-    <div class="snx"><div class="snx-l">What's coming in April</div><div class="snx-t">Kelvi will introduce fractions through fair sharing — she already showed strong intuition about remainders. She's ready to connect division to fractions.</div></div>
   </div>
-</div>
 
-<footer>The question is the answer.</footer>
+  <!-- QUESTS HOME -->
+  <div class="panel" id="panel-quests">
+    <div class="quests-panel" style="flex:1;overflow-y:auto">
+      <div class="quests-body">
+        <h2>Quests</h2>
+        <p class="quests-sub">Each quest is a chain of questions. Solve one to unlock the next clue.</p>
+
+        <!-- Quest 1 -->
+        <div class="quest-card" onclick="beginQuest()">
+          <div class="qc-top">
+            <div class="qc-name">The Multiplication Machine</div>
+            <div class="qc-level level-g">Generative</div>
+          </div>
+          <p class="qc-desc">A machine doubles numbers. But how many times? And what happens when you lose count? Follow the clues to discover something mathematicians use every day.</p>
+          <div class="qc-meta">
+            <div class="qc-meta-item">&#9679; 5 questions</div>
+            <div class="qc-meta-item">&#9679; ~15 min</div>
+            <div class="qc-meta-item">&#9679; Operations</div>
+          </div>
+          <div class="qc-progress-bar"><div class="qc-progress-fill" id="quest1-progress" style="width:0%"></div></div>
+          <button class="qc-begin">Begin Quest &#8594;</button>
+        </div>
+
+        <!-- Quest 2 (locked) -->
+        <div class="quest-card quest-card-locked">
+          <div class="qc-top">
+            <div class="qc-name">The Fraction Forest</div>
+            <div class="qc-level level-c">Conceptual</div>
+          </div>
+          <p class="qc-desc">Something is hiding between the whole numbers. Can you find it?</p>
+          <div class="qc-meta">
+            <div class="qc-meta-item">&#9679; 5 questions</div>
+            <div class="qc-meta-item">&#9679; Coming soon</div>
+          </div>
+          <div class="qc-lock-badge">&#128274; Complete your first quest to unlock</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUEST FLOW -->
+  <div class="panel" id="panel-quest">
+    <div class="quest-panel" style="flex:1;overflow-y:auto" id="quest-scroll">
+      <div class="quest-body" id="quest-body"></div>
+    </div>
+  </div>
+
+  <!-- THREADS -->
+  <div class="panel" id="panel-threads">
+    <div class="threads-panel" style="flex:1;overflow-y:auto">
+      <div class="threads-body">
+        <h2>Mathematical threads</h2>
+        <p class="threads-sub">Choose a strand. Each one has five threads of increasing depth.</p>
+        <div class="strand-cards" id="strand-cards"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROVOCATION -->
+  <div class="panel" id="panel-prov">
+    <div class="prov-panel" style="flex:1;overflow-y:auto">
+      <div class="prov-body" id="prov-body"></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="panel" id="panel-journal">
+    <div class="journal-panel" style="flex:1;overflow-y:auto">
+      <div class="journal-body">
+        <h2 id="journal-title">Arya's wonder journal</h2>
+        <p class="journal-sub">Questions, reflections, and mathematical moments.</p>
+        <div class="streak">
+          <div class="sd sd-d">M</div><div class="sd sd-d">T</div><div class="sd sd-d">W</div>
+          <div class="sd sd-n">T</div><div class="sd sd-f">F</div><div class="sd sd-f">S</div><div class="sd sd-f">S</div>
+          <span class="sl">3-day streak</span>
+        </div>
+        <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I wonder why we need calculators at all."</div><div class="je-c">She used algebra to bypass a broken multiply button, then questioned whether the tool was needed at all.</div><div class="je-m">Invented a new strategy instead of scaling up the old one</div></div>
+        <div class="ja"><div class="ja-l">Try this at dinner</div><div class="ja-t">Ask her: "Is there a faster way to do this?" while cooking or organizing together. She's already thinking about efficiency.</div></div>
+        <div class="je"><div class="je-s" style="background:#EBF3EF;color:#3A6B5C">Operations</div><div class="je-q">"I don't think there is a way to share the marbles equally."</div><div class="je-c">Discovered that 45 marbles can't split evenly among 4 friends. Suggested throwing away the leftover.</div><div class="je-m">Connected division to fairness — not just a calculation but a value</div></div>
+        <div class="je"><div class="je-s" style="background:#EEEDFE;color:#534AB7">Geometry</div><div class="je-q">"What if the shape had curved sides instead of straight ones?"</div><div class="je-c">While exploring quadrilaterals, she wondered whether the rules change when lines aren't straight.</div><div class="je-m">First "what if" question in geometry this month</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROWTH -->
+  <div class="panel" id="panel-growth">
+    <div class="growth-panel" style="flex:1;overflow-y:auto">
+      <div class="growth-body">
+        <h2 id="growth-title">Arya's growth snapshot</h2>
+        <p class="growth-date">April 2026</p>
+        <div class="slet">This month she had <em>14 conversations</em> with Kelvi. She's becoming someone who doesn't just solve problems — she <em>questions them</em>. The biggest shift: she started asking "what if" in geometry, which she'd never done before.</div>
+        <div class="sst">
+          <div class="ss"><div class="ss-n">14</div><div class="ss-l">Sessions</div></div>
+          <div class="ss"><div class="ss-n">9</div><div class="ss-l">New questions</div></div>
+          <div class="ss"><div class="ss-n">4</div><div class="ss-l">"What if" moments</div></div>
+        </div>
+        <div class="sthr">
+          <div class="sthr-l">Threads explored</div>
+          <div class="str"><div class="str-n">Operations</div><div class="str-bg"><div class="str-b" style="width:83%;background:#3A6B5C"></div></div><div class="str-p">5/6</div></div>
+          <div class="str"><div class="str-n">Geometry</div><div class="str-bg"><div class="str-b" style="width:50%;background:#534AB7"></div></div><div class="str-p">3/6</div></div>
+          <div class="str"><div class="str-n">Patterns</div><div class="str-bg"><div class="str-b" style="width:67%;background:#993C1D"></div></div><div class="str-p">4/6</div></div>
+          <div class="str"><div class="str-n">Fractions</div><div class="str-bg"><div class="str-b" style="width:33%;background:#B8784E"></div></div><div class="str-p">2/6</div></div>
+        </div>
+        <div class="sqr">
+          <div class="sqr-l">Best questions this month</div>
+          <div class="sq">"I wonder why we need calculators at all." <span class="sq-d">Apr 2</span></div>
+          <div class="sq">"What if the shape had curved sides?" <span class="sq-d">Mar 28</span></div>
+          <div class="sq">"Is division always the same no matter what you divide?" <span class="sq-d">Mar 21</span></div>
+        </div>
+        <div class="ssf"><div class="ssf-l">Biggest shift</div><div class="ssf-t">Started asking "what if" questions in geometry. In operations, she went from procedural to generative thinking in a single session.</div></div>
+        <div class="snx"><div class="snx-l">What's coming in May</div><div class="snx-t">Kelvi will introduce exponents through doubling — she already showed strong intuition about multiplication patterns. She's ready.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-footer">The question is the answer.</div>
+</div>
 
 <script>
-const ICONS=['&#x1F522;','&#x2795;','&#x1F967;','&#x1F9E9;','&#x1F4D0;','&#x1F4CF;','&#x1F4CA;'];
-const S=[{n:'Number sense',d:'#B8784E',bg:'#F5EDE5',ic:ICONS[0],t:[['Counting to 100','Cardinality','Comparing'],['Place value to 120','Skip counting','Number lines'],['Place value to 1,000','Rounding','Even and odd'],['Place value to 10,000','Comparing large numbers','Roman numerals'],['Place value to millions','Negative integers','Prime and composite']]},{n:'Operations',d:'#3A6B5C',bg:'#EBF3EF',ic:ICONS[1],t:[['Addition to 10','Subtraction to 10','Fact families'],['Addition to 100','Subtraction with regrouping','Intro to multiplication'],['Multiplication facts','Division as sharing','Two-digit multiplication'],['Multi-digit multiplication','Long division','Order of operations'],['Multi-digit division','Decimal operations','Estimating products']]},{n:'Fractions',d:'#534AB7',bg:'#EEEDFE',ic:ICONS[2],t:[['Equal shares','Halves and quarters','Fair sharing'],['Unit fractions','Fractions on number line','Comparing fractions'],['Equivalent fractions','Adding like fractions','Mixed numbers'],['Unlike denominators','Multiplying fractions','Fractions as division'],['Dividing fractions','Fraction-decimal-percent','Ratio introduction']]},{n:'Patterns & algebra',d:'#993C1D',bg:'#FAECE7',ic:ICONS[3],t:[['Repeating patterns','Growing patterns','What comes next?'],['Number patterns','Missing numbers','Input-output'],['Properties of operations','Unknown in equations','Two-step problems'],['Expressions','Writing equations','Inequalities'],['Variables','Coordinate graphing','Numerical patterns']]},{n:'Geometry',d:'#185FA5',bg:'#E6F1FB',ic:ICONS[4],t:[['2D shapes','3D shapes','Positional words'],['Attributes of shapes','Partitioning rectangles','Symmetry'],['Quadrilaterals','Area and perimeter','Angles introduction'],['Angle measurement','Lines and rays','Classifying triangles'],['Coordinate plane','Volume','Transformations intro']]},{n:'Measurement',d:'#D4537E',bg:'#FBEAF0',ic:ICONS[5],t:[['Length comparison','Non-standard units','Time to the hour'],['Standard units (cm, m)','Time to 5 minutes','Money (coins)'],['Grams and kilograms','Liters','Elapsed time'],['Unit conversion','Customary and metric','Area of complex shapes'],['Volume of prisms','Converting systems','Measurement problems']]},{n:'Data',d:'#6F6A61',bg:'#EDEBE6',ic:ICONS[6],t:[['Sorting objects','Tally charts','Picture graphs'],['Bar graphs','Line plots','Asking about data'],['Scaled bar graphs','Pictographs','Interpreting data'],['Line graphs','Mean and median','Organizing data'],['Two-way tables','Scatter plots intro','Drawing conclusions']]}];
-const P=[{n:'The array garden',tp:'Noticing',dn:1},{n:'Fair sharing',tp:'Reasoning',dn:1},{n:'The broken calculator',tp:'Reasoning',dn:0,ac:1},{n:'Doubles and halves',tp:'Noticing',dn:0},{n:'The remainder question',tp:'Creating',dn:0},{n:'Make your own',tp:'Creating',dn:0}];
-let cn='Arya',rec=null,isR=false;
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
 
-function go(){const v=document.getElementById('cname').value.trim();if(v)cn=v;document.getElementById('av').textContent=cn[0].toUpperCase();document.getElementById('jn').textContent=cn+"'s wonder journal";document.getElementById('sn').textContent=cn+"'s growth snapshot";show('threads')}
+const REBUS_PIECES = ['WHY WAS', 'THE MATH', 'BOOK SAD?', 'IT HAD TOO', 'MANY PROBLEMS.'];
 
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
+const QUEST_STEPS = [
+  {
+    id: 0,
+    name: 'The doubling machine',
+    tag: 'P', tagClass: 'p-tag',
+    question: `Kelvi has a machine. You put <strong>2</strong> in. It doubles the number. Then doubles it again. Then doubles it one more time.\n\nWhat comes out?`,
+    placeholder: 'What number comes out of the machine?',
+    kelviResponse: `Yes! 2 → 4 → 8 → 16. You just followed the machine perfectly.\n\nHere's what you actually did: you multiplied 2 by itself, three times over. Hold onto that idea.`,
+    unlockMsg: `You cracked the first clue! The rebus is starting to take shape...`
+  },
+  {
+    id: 1,
+    name: 'Six doublings',
+    tag: 'P', tagClass: 'p-tag',
+    question: `Same machine. This time it doubles <strong>6 times</strong> instead of 3.\n\nWhat comes out?\n\nAnd here's the real question: did you multiply out each step, or did you find a shortcut?`,
+    placeholder: 'What comes out? And how did you get there?',
+    kelviResponse: `64. And the shortcut question is the interesting one.\n\nSome people added up each step. Some people noticed they were just multiplying 2 by itself over and over. Which one were you?`,
+    unlockMsg: `Two clues revealed! You're thinking like a mathematician.`
+  },
+  {
+    id: 2,
+    name: 'Describe it without computing',
+    tag: 'C', tagClass: 'c-tag',
+    question: `Don't compute anything yet.\n\nIf the machine doubles <strong>10 times</strong>, how would you <em>describe</em> what's happening — without using the word "times"?`,
+    placeholder: 'Describe it in your own words...',
+    kelviResponse: `That's exactly the kind of description mathematicians needed to write down.\n\nYou said something like: 2 multiplied by itself, 10 times over. That idea — a number copying itself repeatedly — is one of the most powerful ideas in all of mathematics.`,
+    unlockMsg: `Halfway there! Three clues unlocked. The rebus is almost readable...`
+  },
+  {
+    id: 3,
+    name: 'Make your best guess',
+    tag: 'C', tagClass: 'c-tag',
+    question: `You said something like "2 copied itself 10 times."\n\nWithout a calculator — is the answer closer to <strong>100</strong>, to <strong>1,000</strong>, or to <strong>10,000</strong>?\n\nMake your best guess and tell Kelvi why.`,
+    placeholder: 'My guess is... because...',
+    kelviResponse: `The answer is 1,024 — so 1,000 was the closest.\n\nNotice how fast it grew. From 3 doublings (16) to 6 doublings (64) to 10 doublings (1,024). Numbers that double don't grow slowly. They explode.\n\nThat's why mathematicians needed a shortcut to write this down.`,
+    unlockMsg: `Four clues! One question left between you and the full joke.`
+  },
+  {
+    id: 4,
+    name: 'You invented it',
+    tag: 'G', tagClass: 'g-tag',
+    question: `Mathematicians got tired of writing "2 multiplied by itself 10 times." So they invented a shortcut: <strong>2¹⁰</strong>\n\nUsing that shortcut:\n• How would you write "2 multiplied by itself 6 times"?\n• What about 3 multiplied by itself 4 times?\n• Now make up your own — write a problem for Kelvi using this notation.`,
+    placeholder: 'Write your answers and your own problem for Kelvi...',
+    kelviResponse: `You just invented your own exponent expression. That's not a small thing.\n\nEvery time you write 2¹⁰, you're using a shortcut that took mathematicians centuries to settle on. And you got there by following a doubling machine.\n\nNow — your full reward awaits.`,
+    unlockMsg: `Quest complete! You've earned the whole joke.`
+  }
+];
 
-function bld(){const c=document.getElementById('strand-cards');S.forEach((s,si)=>{const row=document.createElement('div');row.className='strand-row';row.innerHTML='<div class="strand-header" onclick="this.parentElement.classList.toggle(\'open\')"><div class="strand-icon" style="background:'+s.bg+';color:'+s.d+';font-size:20px">'+s.ic+'</div><div class="strand-name" style="color:'+s.d+'">'+s.n+'</div><div class="strand-arrow">&#9654;</div></div><div class="strand-body"><div class="thread-chips">'+s.t.map((tp,ti)=>'<div class="thread-chip" onclick="event.stopPropagation();opn('+si+','+ti+')"><div class="tc-thread">Thread '+(ti+1)+'</div><div class="tc-topics">'+tp.map(t=>'<span>'+t+'</span>').join('')+'</div></div>').join('')+'</div></div>';c.appendChild(row)})}
+const STRANDS = [
+  {n:'Number sense',d:'#B8784E',bg:'#F5EDE5',t:[['Counting to 100','Cardinality','Comparing'],['Place value to 120','Skip counting','Number lines'],['Place value to 1,000','Rounding','Even and odd'],['Place value to 10,000','Comparing large numbers','Roman numerals'],['Place value to millions','Negative integers','Prime and composite']]},
+  {n:'Operations',d:'#3A6B5C',bg:'#EBF3EF',t:[['Addition to 10','Subtraction to 10','Fact families'],['Addition to 100','Subtraction with regrouping','Intro to multiplication'],['Multiplication facts','Division as sharing','Two-digit multiplication'],['Multi-digit multiplication','Long division','Order of operations'],['Multi-digit division','Decimal operations','Estimating products']]},
+  {n:'Fractions',d:'#534AB7',bg:'#EEEDFE',t:[['Equal shares','Halves and quarters','Fair sharing'],['Unit fractions','Fractions on number line','Comparing fractions'],['Equivalent fractions','Adding like fractions','Mixed numbers'],['Unlike denominators','Multiplying fractions','Fractions as division'],['Dividing fractions','Fraction-decimal-percent','Ratio introduction']]},
+  {n:'Patterns & algebra',d:'#993C1D',bg:'#FAECE7',t:[['Repeating patterns','Growing patterns','What comes next?'],['Number patterns','Missing numbers','Input-output'],['Properties of operations','Unknown in equations','Two-step problems'],['Expressions','Writing equations','Inequalities'],['Variables','Coordinate graphing','Numerical patterns']]},
+  {n:'Geometry',d:'#185FA5',bg:'#E6F1FB',t:[['2D shapes','3D shapes','Positional words'],['Attributes of shapes','Partitioning rectangles','Symmetry'],['Quadrilaterals','Area and perimeter','Angles introduction'],['Angle measurement','Lines and rays','Classifying triangles'],['Coordinate plane','Volume','Transformations intro']]},
+  {n:'Measurement',d:'#D4537E',bg:'#FBEAF0',t:[['Length comparison','Non-standard units','Time to the hour'],['Standard units (cm, m)','Time to 5 minutes','Money (coins)'],['Grams and kilograms','Liters','Elapsed time'],['Unit conversion','Customary and metric','Area of complex shapes'],['Volume of prisms','Converting systems','Measurement problems']]},
+  {n:'Data',d:'#6F6A61',bg:'#EDEBE6',t:[['Sorting objects','Tally charts','Picture graphs'],['Bar graphs','Line plots','Asking about data'],['Scaled bar graphs','Pictographs','Interpreting data'],['Line graphs','Mean and median','Organizing data'],['Two-way tables','Scatter plots intro','Drawing conclusions']]}
+];
 
-function opn(si,ti){const s=S[si],sb=document.getElementById('sb');sb.innerHTML='<div class="sb-back" onclick="show(\'threads\')">&larr; All threads</div><div class="sb-label">'+s.n+' &middot; Thread '+(ti+1)+'</div><div class="sb-thread">'+P.map(p=>'<div class="sb-tp'+(p.dn?' sb-tp-d':p.ac?' sb-tp-n':'')+'"></div>').join('')+'</div>';P.forEach((p,i)=>{sb.innerHTML+='<div class="sb-item'+(p.ac?' act':'')+'" onclick="sel('+i+','+si+','+ti+')"><div class="sb-dot'+(p.dn?' sb-dot-d':p.ac?' sb-dot-n':'')+'"></div><div><div class="sb-nm">'+(i+1)+'. '+p.n+'</div><div class="sb-tp2">'+p.tp+'</div></div>'+(p.dn?'<div class="sb-ck">&#10003;</div>':'')+'</div>'});sel(2,si,ti);show('prov')}
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let userName = 'Arya';
+let currentStep = 0;
+let completedSteps = [];
+let questActive = false;
+let currentStrand = null;
+let currentThread = null;
+let apiKey = '';
+let questConversation = []; // full message history for current step
+let isRecording = false;
+let recognition = null;
+let isSpeaking = false;
+let currentSpeech = null;
 
-function sel(pi,si,ti){const s=S[si],p=P[pi],m=document.getElementById('pm');m.innerHTML='<div class="fi"><div class="pm-badge">Thread '+(ti+1)+' &middot; '+s.n+'</div><div class="pm-title">'+p.n+'</div><div class="pm-sub">Provocation '+(pi+1)+' of 6</div><div class="steps"><span class="st st-d">Problem</span><span class="st-a">&rarr;</span><span class="st st-d">Answer</span><span class="st-a">&rarr;</span><span class="st st-d">Thinking</span><span class="st-a">&rarr;</span><span class="st st-n">Your turn to ask</span></div><div class="two-col"><div><div class="pc"><div class="pc-emoji">&#x1F5A9;</div><div class="pc-text">Your calculator\'s multiply button is broken. You can only add. How would you figure out 7 &times; 8?</div><div class="pc-vis">7 &times; 8 = ?</div><div class="choices"><div class="ch" onclick="pick(this)"><div class="ch-l">A</div><div>Add 7 + 8 over and over</div></div><div class="ch sel" onclick="pick(this)"><div class="ch-l">B</div><div>Add 8 seven times</div></div><div class="ch" onclick="pick(this)"><div class="ch-l">C</div><div>Add 7 seven times</div></div><div class="ch" onclick="pick(this)"><div class="ch-l">D</div><div>You can\'t without multiply</div></div></div></div></div><div><div class="convo" id="convo"><div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked B — adding 8 seven times. You could also add 7 eight times. Why did you choose this way?</div></div><div class="cb"><div class="ct2">Less work! 7 additions is fewer than 8.</div></div><div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked the more efficient path — fewer steps, same answer. That\'s how mathematicians think too.</div></div></div><div class="ab"><div class="ab-l">&#10024; Your turn</div><div class="ab-p">Now ask Kelvi one question about this problem. Anything you\'re curious about!</div><div class="ab-r"><input class="ab-i" id="af" placeholder="Type your question..." onkeydown="if(event.key===\'Enter\')sq()"><button class="mic" id="mb" onclick="tv()">&#127908;</button><button class="ab-b" onclick="sq()">Ask</button></div><div class="ab-h">There are no wrong questions. Ask what you\'re wondering!</div></div></div></div></div>'}
+// ═══════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════
+function startApp() {
+  const v = document.getElementById('cname').value.trim();
+  if (v) userName = v;
+  document.getElementById('sb-av').textContent = userName[0].toUpperCase();
+  document.getElementById('sb-name').textContent = userName;
+  document.getElementById('journal-title').textContent = userName + "'s wonder journal";
+  document.getElementById('growth-title').textContent = userName + "'s growth snapshot";
+  showPanel('quests');
+}
 
-function pick(el){document.querySelectorAll('.ch').forEach(c=>c.classList.remove('sel'));el.classList.add('sel')}
+// ═══════════════════════════════════════
+// PANEL NAVIGATION
+// ═══════════════════════════════════════
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
 
-function sq(){const f=document.getElementById('af'),q=f.value.trim();if(!q)return;f.value='';const c=document.getElementById('convo');c.innerHTML+='<div class="cb fi"><div class="ct2">'+q+'</div></div>';setTimeout(()=>{c.innerHTML+='<div class="kb fi"><div class="kn">Kelvi</div><div class="kt">That\'s a question worth pulling on. Hold onto it — we\'ll explore it next time!</div></div>'},800)}
+  const titles = {
+    quests: 'Quests', threads: 'Threads',
+    journal: 'Wonder journal', growth: 'Growth snapshot',
+    prov: 'Provocation', quest: 'The Multiplication Machine'
+  };
+  document.getElementById('main-title').textContent = titles[id] || '';
+}
 
-function tv(){const b=document.getElementById('mb');if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice not supported.');return}if(isR){rec.stop();b.classList.remove('rec');isR=false;return}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.onresult=function(e){let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('af').value=t};rec.onerror=function(){b.classList.remove('rec');isR=false};rec.onend=function(){b.classList.remove('rec');isR=false};rec.start();b.classList.add('rec');isR=true}
+// ═══════════════════════════════════════
+// QUEST SYSTEM
+// ═══════════════════════════════════════
+function beginQuest() {
+  questActive = true;
+  currentStep = 0;
+  completedSteps = [];
 
-bld();
+  // Switch sidebar to quest mode
+  document.getElementById('sb-nav-mode').classList.add('hidden');
+  document.getElementById('sb-quest-mode').classList.add('active');
+
+  // Build rebus pieces
+  buildRebusPieces();
+
+  // Build sidebar steps
+  buildQuestSidebarSteps();
+
+  // Show quest panel
+  showPanel('quest');
+  renderQuestStep(0);
+}
+
+function exitQuest() {
+  questActive = false;
+  document.getElementById('sb-nav-mode').classList.remove('hidden');
+  document.getElementById('sb-quest-mode').classList.remove('active');
+  showPanel('quests');
+
+  // Update progress bar
+  const pct = (completedSteps.length / QUEST_STEPS.length) * 100;
+  document.getElementById('quest1-progress').style.width = pct + '%';
+}
+
+function buildRebusPieces() {
+  const container = document.getElementById('rebus-pieces');
+  container.innerHTML = '';
+  REBUS_PIECES.forEach((piece, i) => {
+    const el = document.createElement('div');
+    el.className = 'rebus-piece locked';
+    el.id = 'rebus-' + i;
+    el.textContent = piece;
+    container.appendChild(el);
+  });
+}
+
+function buildQuestSidebarSteps() {
+  const nav = document.getElementById('quest-steps-nav');
+  nav.innerHTML = '';
+  QUEST_STEPS.forEach((step, i) => {
+    const isDone = completedSteps.includes(i);
+    const isActive = i === currentStep;
+    const isLocked = i > currentStep && !isDone;
+
+    const el = document.createElement('div');
+    el.className = 'quest-step' +
+      (isActive ? ' active-step' : '') +
+      (isDone ? ' done-step' : '') +
+      (isLocked ? ' locked-step' : '');
+    el.id = 'qs-' + i;
+
+    const dotClass = isDone ? 'done' : isActive ? 'active' : 'locked';
+    const dotContent = isDone ? '&#10003;' : (i + 1);
+
+    el.innerHTML = `
+      <div class="qs-dot ${dotClass}">${dotContent}</div>
+      <div class="qs-info">
+        <div class="qs-name">${step.name}</div>
+        <div class="qs-tag ${step.tagClass}">${step.tag === 'P' ? 'Procedural' : step.tag === 'C' ? 'Conceptual' : 'Generative'}</div>
+      </div>
+    `;
+
+    if (!isLocked || isDone) {
+      el.onclick = () => {
+        if (isDone || i <= currentStep) renderQuestStep(i);
+      };
+    }
+
+    nav.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════
+// QUEST SYSTEM PROMPTS
+// ═══════════════════════════════════════
+function buildQuestSystemPrompt(step) {
+  return `You are Kelvi, a warm and playful AI companion for a child named ${userName} (age 10). You are guiding them through a quest called "The Multiplication Machine."
+
+The current question is: "${step.name}"
+
+The question posed to ${userName} was:
+${step.question.replace(/<[^>]+>/g, '')}
+
+YOUR RULES — follow these absolutely:
+1. NEVER confirm whether the answer is right or wrong. Never say "correct", "exactly", "yes that's right", "good job on getting the answer", or give the answer yourself.
+2. Ask one question at a time. Keep responses short — 2-4 sentences maximum.
+3. Be warm, playful, and curious. You are on their side.
+4. Pull on their reasoning. Ask HOW they got there, WHAT they noticed, WHY they think that.
+5. If they seem stuck or frustrated, offer a smaller step: "What do you get if you double 2 just once?"
+6. If they give a wild guess with no reasoning, ask them to walk you through their thinking.
+7. Frame yourself as learning FROM them: "Oh interesting — help me understand how you got that."
+
+UNLOCK DECISION:
+After each of ${userName}'s messages, you must decide whether they have shown genuine engagement — meaning they tried, explained some thinking, or asked a real question. A wrong answer with reasoning counts. A one-word answer with no reasoning does not.
+
+CRITICAL: You must end EVERY response with this exact JSON on its own line, no matter what:
+{"unlock": true} if they showed genuine engagement
+{"unlock": false} if they did not
+
+Example response format:
+"Oh interesting! What made you pick that number? Walk me through what you did step by step.
+{"unlock": false}"
+
+The JSON must always be the last line. Never skip it.`;
+}
+
+// ═══════════════════════════════════════
+// QUEST RENDER
+// ═══════════════════════════════════════
+function renderQuestStep(stepIdx) {
+  currentStep = stepIdx;
+  questConversation = [];
+  buildQuestSidebarSteps();
+
+  const step = QUEST_STEPS[stepIdx];
+  const body = document.getElementById('quest-body');
+
+  const questionHTML = step.question
+    .replace(/\n/g, '<br>')
+    .replace(/•/g, '•');
+
+  body.innerHTML = `
+    <div class="quest-q-header">
+      <div class="quest-q-badge">Question ${stepIdx + 1} of ${QUEST_STEPS.length}</div>
+      <h2 class="quest-q-title">${step.name}</h2>
+      <p class="quest-q-sub">${step.tag === 'P' ? 'Procedural' : step.tag === 'C' ? 'Conceptual' : 'Generative'} thinking</p>
+    </div>
+
+    <div class="kelvi-bubble">
+      <div class="kelvi-name">Kelvi</div>
+      <div class="kelvi-text">${questionHTML}</div>
+    </div>
+
+    <div id="convo-thread"></div>
+
+    <div class="quest-input-area" id="quest-input-area">
+      <div class="quest-input-box" id="quest-input-box">
+        <textarea class="quest-textarea" id="quest-textarea"
+          placeholder="${step.placeholder}"
+          rows="2"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendQuestMessage(${stepIdx})}"
+        ></textarea>
+        <div class="quest-input-actions">
+          <button class="qi-btn" id="mic-btn" onclick="toggleMic()" title="Voice input">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+          <button class="qi-btn" id="speaker-btn" onclick="toggleSpeaker()" title="Read aloud">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+          <button class="qi-send" onclick="sendQuestMessage(${stepIdx})">Send &#8594;</button>
+        </div>
+      </div>
+      <div class="api-key-row" id="api-key-row" style="${apiKey ? 'display:none' : ''}">
+        <input type="password" id="api-key-input" placeholder="Paste Anthropic API key to start..."
+          style="flex:1;padding:8px 12px;border:1px solid var(--divider);border-radius:8px;font-size:12px;font-family:var(--font-body);outline:none;background:var(--white)"
+          onkeydown="if(event.key==='Enter')saveApiKey()"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--divider)'">
+        <button onclick="saveApiKey()"
+          style="background:var(--accent);color:var(--white);border:none;padding:8px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);white-space:nowrap">
+          Set key
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('quest-scroll').scrollTop = 0;
+  setTimeout(() => document.getElementById('quest-textarea')?.focus(), 100);
+}
+
+function saveApiKey() {
+  const input = document.getElementById('api-key-input');
+  const val = input?.value.trim();
+  if (val) {
+    apiKey = val;
+    const row = document.getElementById('api-key-row');
+    if (row) row.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════
+// QUEST CONVERSATION
+// ═══════════════════════════════════════
+async function sendQuestMessage(stepIdx) {
+  const textarea = document.getElementById('quest-textarea');
+  const msg = textarea?.value.trim();
+  if (!msg) return;
+  if (!apiKey) {
+    document.getElementById('api-key-row').style.display = 'flex';
+    document.getElementById('api-key-input')?.focus();
+    return;
+  }
+
+  textarea.value = '';
+  textarea.style.height = 'auto';
+
+  // Add child message to thread
+  appendToThread('child', msg);
+
+  // Add to conversation history
+  questConversation.push({ role: 'user', content: msg });
+
+  // Show Kelvi thinking
+  const thinkingId = 'thinking-' + Date.now();
+  appendToThread('thinking', '...', thinkingId);
+
+  // Disable input while waiting
+  setInputDisabled(true);
+
+  try {
+    const step = QUEST_STEPS[stepIdx];
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: buildQuestSystemPrompt(step),
+        messages: questConversation
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '';
+
+    // Parse out the JSON signal
+    const jsonMatch = raw.match(/\{"unlock":\s*(true|false)\}/);
+    const shouldUnlock = jsonMatch?.[1] === 'true';
+    const cleanText = raw.replace(/\{"unlock":\s*(true|false)\}/, '').trim();
+
+    // Remove thinking bubble
+    document.getElementById(thinkingId)?.remove();
+
+    // Add Kelvi response
+    questConversation.push({ role: 'assistant', content: raw });
+    appendToThread('kelvi', cleanText);
+
+    // Speak if speaker is on
+    if (isSpeaking) speakText(cleanText);
+
+    // Scroll to bottom
+    scrollConvoBottom();
+
+    if (shouldUnlock && !completedSteps.includes(stepIdx)) {
+      setTimeout(() => triggerUnlock(stepIdx), 800);
+    }
+  } catch (err) {
+    document.getElementById(thinkingId)?.remove();
+    appendToThread('kelvi', "Hmm, something went wrong on my end. Try again?");
+  }
+
+  setInputDisabled(false);
+  document.getElementById('quest-textarea')?.focus();
+}
+
+function appendToThread(type, text, id) {
+  const thread = document.getElementById('convo-thread');
+  if (!thread) return;
+  const el = document.createElement('div');
+  if (id) el.id = id;
+
+  if (type === 'child') {
+    el.className = 'qt-child';
+    el.innerHTML = `<div class="qt-child-bubble">${escHtml(text)}</div>`;
+  } else if (type === 'kelvi') {
+    el.className = 'qt-kelvi';
+    el.innerHTML = `<div class="kelvi-name" style="margin-bottom:6px">Kelvi</div><div class="qt-kelvi-bubble">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
+  } else if (type === 'thinking') {
+    el.className = 'qt-kelvi';
+    el.innerHTML = `<div class="kelvi-name" style="margin-bottom:6px">Kelvi</div><div class="qt-kelvi-bubble qt-thinking"><span></span><span></span><span></span></div>`;
+  }
+
+  thread.appendChild(el);
+  scrollConvoBottom();
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function scrollConvoBottom() {
+  const scroll = document.getElementById('quest-scroll');
+  if (scroll) setTimeout(() => scroll.scrollTop = scroll.scrollHeight, 50);
+}
+
+function setInputDisabled(disabled) {
+  const ta = document.getElementById('quest-textarea');
+  const btn = document.querySelector('.qi-send');
+  if (ta) ta.disabled = disabled;
+  if (btn) btn.disabled = disabled;
+}
+
+// ═══════════════════════════════════════
+// UNLOCK
+// ═══════════════════════════════════════
+function triggerUnlock(stepIdx) {
+  if (completedSteps.includes(stepIdx)) return;
+  completedSteps.push(stepIdx);
+
+  // Reveal rebus piece
+  const piece = document.getElementById('rebus-' + stepIdx);
+  if (piece) {
+    piece.classList.remove('locked');
+    piece.classList.add('revealed');
+  }
+
+  // Insert unlock banner inline in thread
+  const thread = document.getElementById('convo-thread');
+  if (thread) {
+    const step = QUEST_STEPS[stepIdx];
+    const banner = document.createElement('div');
+    banner.className = 'unlock-banner visible';
+    banner.innerHTML = `
+      <div class="unlock-icon">&#127881;</div>
+      <div class="unlock-text"><strong>Clue unlocked!</strong> ${step.unlockMsg}</div>
+    `;
+    thread.appendChild(banner);
+
+    // Add next button
+    const isLast = stepIdx === QUEST_STEPS.length - 1;
+    const nextEl = document.createElement('div');
+    nextEl.style.marginTop = '16px';
+    nextEl.innerHTML = isLast
+      ? `<button class="next-btn visible" onclick="showQuestComplete()" style="background:var(--gold)">See your prize &#127881;</button>`
+      : `<button class="next-btn visible" onclick="renderQuestStep(${stepIdx + 1})">Next question &#8594;</button>`;
+    thread.appendChild(nextEl);
+
+    scrollConvoBottom();
+  }
+
+  // Hide input
+  const inputArea = document.getElementById('quest-input-area');
+  if (inputArea) inputArea.style.display = 'none';
+
+  fireConfetti();
+  buildQuestSidebarSteps();
+}
+
+function showQuestComplete() {
+  const body = document.getElementById('quest-body');
+  body.innerHTML = `
+    <div class="quest-complete visible">
+      <span class="qc-trophy">&#127942;</span>
+      <h2 class="qc-complete-title">Quest complete, ${userName}!</h2>
+      <p class="qc-complete-sub">You followed a doubling machine all the way to one of the most powerful ideas in mathematics. You didn't just learn about exponents — you discovered why they exist.</p>
+      <div class="rebus-reveal-full">
+        <div class="rebus-reveal-label">Your reward — the full rebus</div>
+        <div class="rebus-joke">Why was the math book sad?</div>
+        <div class="rebus-punchline">It had too many problems.</div>
+      </div>
+      <button class="btn" onclick="exitQuest()">Back to Quests</button>
+    </div>
+  `;
+  document.getElementById('quest-scroll').scrollTop = 0;
+  fireConfetti(true);
+}
+
+// ═══════════════════════════════════════
+// MIC
+// ═══════════════════════════════════════
+function toggleMic() {
+  const btn = document.getElementById('mic-btn');
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input not supported in this browser.');
+    return;
+  }
+  if (isRecording) {
+    recognition?.stop();
+    isRecording = false;
+    btn?.classList.remove('qi-btn-active');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onresult = (e) => {
+    let t = '';
+    for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+    const ta = document.getElementById('quest-textarea');
+    if (ta) ta.value = t;
+  };
+  recognition.onerror = () => { isRecording = false; btn?.classList.remove('qi-btn-active'); };
+  recognition.onend = () => { isRecording = false; btn?.classList.remove('qi-btn-active'); };
+  recognition.start();
+  isRecording = true;
+  btn?.classList.add('qi-btn-active');
+}
+
+// ═══════════════════════════════════════
+// SPEAKER
+// ═══════════════════════════════════════
+function toggleSpeaker() {
+  const btn = document.getElementById('speaker-btn');
+  isSpeaking = !isSpeaking;
+  if (!isSpeaking) {
+    window.speechSynthesis?.cancel();
+    btn?.classList.remove('qi-btn-active');
+  } else {
+    btn?.classList.add('qi-btn-active');
+  }
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.95;
+  utt.pitch = 1.05;
+  window.speechSynthesis.speak(utt);
+}
+
+// ═══════════════════════════════════════
+// THREADS
+// ═══════════════════════════════════════
+function buildThreads() {
+  const c = document.getElementById('strand-cards');
+  STRANDS.forEach((s, si) => {
+    const row = document.createElement('div');
+    row.className = 'strand-row';
+    row.innerHTML = `
+      <div class="strand-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="strand-icon" style="background:${s.bg};color:${s.d}">&#9670;</div>
+        <div class="strand-name" style="color:${s.d}">${s.n}</div>
+        <div class="strand-arrow">&#9654;</div>
+      </div>
+      <div class="strand-body">
+        <div class="thread-chips">
+          ${s.t.map((tp, ti) => `
+            <div class="thread-chip" onclick="event.stopPropagation();openProv(${si},${ti})">
+              <div class="tc-thread">Thread ${ti + 1}</div>
+              <div class="tc-topics">${tp.map(t => `<span>${t}</span>`).join('')}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    c.appendChild(row);
+  });
+}
+
+const PROVS = [
+  {n:'The array garden',tp:'Noticing',dn:1},
+  {n:'Fair sharing',tp:'Reasoning',dn:1},
+  {n:'The broken calculator',tp:'Reasoning',dn:0,ac:1},
+  {n:'Doubles and halves',tp:'Noticing',dn:0},
+  {n:'The remainder question',tp:'Creating',dn:0},
+  {n:'Make your own',tp:'Creating',dn:0}
+];
+
+function openProv(si, ti) {
+  currentStrand = si; currentThread = ti;
+  const s = STRANDS[si];
+  showPanel('prov');
+  document.getElementById('main-title').textContent = s.n + ' · Thread ' + (ti + 1);
+
+  const body = document.getElementById('prov-body');
+  const steps = PROVS.map((p, i) => `
+    <div class="sb-item ${p.ac ? 'active' : ''}" onclick="selectProv(${i},${si},${ti})"
+      style="border-radius:8px;margin-bottom:2px">
+      ${p.n}
+    </div>
+  `).join('');
+
+  body.innerHTML = `
+    <div class="prov-back" onclick="showPanel('threads')">&#8592; Back to Threads</div>
+    <div class="pm-badge">${s.n} · Thread ${ti + 1}</div>
+    <div id="prov-content"></div>
+  `;
+  selectProv(2, si, ti);
+}
+
+function selectProv(pi, si, ti) {
+  const s = STRANDS[si];
+  const p = PROVS[pi];
+  const content = document.getElementById('prov-content');
+  content.innerHTML = `
+    <div class="pm-title">${p.n}</div>
+    <div class="pm-sub">Provocation ${pi + 1} of 6</div>
+    <div class="steps">
+      <span class="st st-d">Problem</span><span class="st-a">→</span>
+      <span class="st st-d">Answer</span><span class="st-a">→</span>
+      <span class="st st-d">Thinking</span><span class="st-a">→</span>
+      <span class="st st-n">Your turn to ask</span>
+    </div>
+    <div class="pc">
+      <div class="pc-text">Your calculator's multiply button is broken. You can only add. How would you figure out 7 × 8?</div>
+      <div class="pc-vis">7 × 8 = ?</div>
+      <div class="choices">
+        <div class="ch" onclick="pick(this)"><div class="ch-l">A</div><div>Add 7 + 8 over and over</div></div>
+        <div class="ch sel" onclick="pick(this)"><div class="ch-l">B</div><div>Add 8 seven times</div></div>
+        <div class="ch" onclick="pick(this)"><div class="ch-l">C</div><div>Add 7 seven times</div></div>
+        <div class="ch" onclick="pick(this)"><div class="ch-l">D</div><div>You can't without multiply</div></div>
+      </div>
+    </div>
+    <div class="convo">
+      <div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked B — adding 8 seven times. Why did you choose this way?</div></div>
+      <div class="cb"><div class="ct2">Less work! 7 additions is fewer than 8.</div></div>
+      <div class="kb"><div class="kn">Kelvi</div><div class="kt">You picked the more efficient path. That's how mathematicians think too.</div></div>
+    </div>
+    <div class="ab">
+      <div class="ab-l">Your turn</div>
+      <div class="ab-p">Now ask Kelvi one question about this problem.</div>
+      <div class="ab-r">
+        <input class="ab-i" id="af" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sq()">
+        <button class="ab-b" onclick="sq()">Ask</button>
+      </div>
+      <div class="ab-h">There are no wrong questions.</div>
+    </div>
+  `;
+}
+
+function pick(el) {
+  document.querySelectorAll('.ch').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function sq() {
+  const f = document.getElementById('af'), q = f.value.trim();
+  if (!q) return;
+  f.value = '';
+  const ab = f.closest('.ab');
+  const convoEl = ab.previousElementSibling;
+  if (convoEl) {
+    convoEl.innerHTML += `<div class="cb" style="animation:fadeUp .3s ease"><div class="ct2">${q}</div></div>`;
+    setTimeout(() => {
+      convoEl.innerHTML += `<div class="kb" style="animation:fadeUp .3s ease"><div class="kn">Kelvi</div><div class="kt">That's a question worth pulling on. Hold onto it.</div></div>`;
+    }, 700);
+  }
+}
+
+// ═══════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════
+function fireConfetti(big = false) {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#B8784E','#C9A84C','#3A6B5C','#534AB7','#D4537E','#F5EDE5'];
+  const count = big ? 180 : 80;
+  const particles = [];
+
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -10 - Math.random() * 200,
+      w: 6 + Math.random() * 8,
+      h: 4 + Math.random() * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.15,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 2 + Math.random() * 4,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  const maxFrames = big ? 200 : 120;
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotSpeed;
+      p.vy += 0.05; // gravity
+      if (frame > maxFrames * 0.6) p.opacity -= 0.02;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    frame++;
+    if (frame < maxFrames) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+buildThreads();
 </script>
 </body>
 </html>

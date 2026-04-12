@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Kelvi Solo helps independent learners think through hard math with guided Socratic support instead of answer-giving.">
-<title>Kelvi Solo</title>
+<meta name="description" content="Kelvi Solo — an AI thinking partner for independent math learners.">
+<title>Kelvi Solo — Think it through.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -13,301 +13,407 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 <style>
 :root {
-  --bg: #F5F3EE;
-  --surface: #ECE7DC;
-  --deeper: #E0D8C8;
-  --divider: #CDC3B1;
-  --text-primary: #2F2B25;
-  --text-muted: #6F6A61;
-  --accent: #5A7080;
-  --accent-dark: #48606E;
-  --accent-light: #E8EEF2;
+  --bg: #F5F3EE; --surface: #ECE7DC; --deeper: #E0D8C8; --divider: #CDC3B1;
+  --text-primary: #2F2B25; --text-muted: #6F6A61;
+  --accent: #5A7080; --accent-dark: #48606E; --accent-light: #E8EEF2;
   --white: #FFFFFF;
-  --font-heading: 'DM Serif Display', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-heading: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);display:flex;-webkit-font-smoothing:antialiased}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-body); background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--divider);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.sb-brand{padding:18px 20px 14px;font-family:var(--font-heading);font-size:1.35rem;color:var(--accent);border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:6px}
+.sb-brand .kelvi-mark{display:flex;align-items:center;flex-shrink:0}
+.sb-label{font-size:0.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:4px}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.sb-item{display:flex;align-items:center;padding:10px 20px;font-size:0.85rem;color:var(--text-muted);cursor:pointer;transition:all .12s;border-radius:0}
+.sb-item:hover{background:var(--deeper);color:var(--text-primary)}
+.sb-item.active{background:var(--accent);color:var(--white)}
+.sb-badge{font-size:0.6rem;background:var(--accent-light);color:var(--accent-dark);padding:2px 7px;border-radius:3px;margin-left:auto}
+.sb-divider{height:1px;background:var(--divider);margin:8px 20px}
+.sb-bottom{border-top:1px solid var(--divider);padding:8px 0}
+.sb-user{padding:12px 20px;display:flex;align-items:center;gap:10px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.sb-uname{font-size:0.8rem;font-weight:500;color:var(--text-primary)}
 
-/* NAV */
-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 2rem; height: 64px; background: var(--bg);
-  border-bottom: 1px solid var(--divider); position: sticky; top: 0; z-index: 100;
-}
-.nav-left { display: flex; align-items: center; gap: 8px; }
-.nav-brand {
-  font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent);
-  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
-}
-.nav-brand .tamil-k { font-size: 1.8rem; position: relative; top: 1px; }
-.nav-label {
-  font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
-  color: var(--text-muted); margin-left: 0.25rem;
-}
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.nav-link {
-  color: var(--text-muted); font-size: 0.85rem; padding: 6px 14px;
-  border-radius: 8px; cursor: pointer; transition: all .15s; text-decoration: none; font-weight: 500;
-}
-.nav-link:hover { background: var(--surface); color: var(--text-primary); }
-.nav-link.active { background: var(--accent); color: var(--white); }
-.nav-api {
-  padding: 5px 12px; border-radius: 8px; border: 1px solid var(--divider);
-  background: var(--white); color: var(--text-primary); font-size: 11px;
-  font-family: var(--font-body); outline: none; width: 180px;
-}
-.nav-api::placeholder { color: var(--divider); }
+/* MAIN AREA */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh}
+.main-header{padding:14px 28px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main-title{font-family:var(--font-heading);font-size:1.1rem;color:var(--text-primary)}
+.api-input{padding:6px 12px;border:1px solid var(--divider);border-radius:8px;background:var(--white);font-size:11px;font-family:var(--font-body);outline:none;width:180px;color:var(--text-primary)}
+.api-input::placeholder{color:var(--divider)}
+.api-input:focus{border-color:var(--accent)}
 
-.screen { display: none; flex: 1; }
-.screen.active { display: flex; flex-direction: column; }
+/* PANELS — each view fills main */
+.panel{display:none;flex:1;flex-direction:column;opacity:0;transition:opacity .3s ease;overflow:hidden}
+.panel.active{display:flex;opacity:1}
 
 /* WELCOME */
-.welcome { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
-.welcome-inner { text-align: center; max-width: 460px; }
-.welcome-inner h1 {
-  font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 2.8rem);
-  margin-bottom: 10px; letter-spacing: -0.02em;
-}
-.welcome-inner p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 2.5rem; }
-.welcome-row { display: flex; gap: 8px; max-width: 340px; margin: 0 auto; }
-.welcome-row input {
-  flex: 1; padding: 13px 16px; border: 1.5px solid var(--divider); border-radius: 8px;
-  font-size: 1rem; font-family: var(--font-body); outline: none; background: var(--white);
-}
-.welcome-row input:focus { border-color: var(--accent); }
-.btn {
-  background: var(--accent); color: var(--white); border: none; padding: 13px 24px;
-  border-radius: 8px; font-size: 0.95rem; font-family: var(--font-body); cursor: pointer;
-  font-weight: 500; transition: all .15s;
-}
-.btn:hover { background: var(--accent-dark); }
+.welcome-panel{align-items:center;justify-content:center;padding:40px}
+.welcome-inner{text-align:center;max-width:440px}
+.welcome-inner h1{font-family:var(--font-heading);font-size:2.4rem;margin-bottom:10px;letter-spacing:-0.02em}
+.welcome-inner p{font-size:1.05rem;color:var(--text-muted);line-height:1.65;margin-bottom:2rem}
+.welcome-row{display:flex;gap:8px;max-width:320px;margin:0 auto}
+.welcome-row input{flex:1;padding:12px 16px;border:1.5px solid var(--divider);border-radius:8px;font-size:1rem;font-family:var(--font-body);outline:none;background:var(--white)}
+.welcome-row input:focus{border-color:var(--accent)}
+.btn{background:var(--accent);color:var(--white);border:none;padding:12px 22px;border-radius:8px;font-size:0.95rem;font-family:var(--font-body);cursor:pointer;font-weight:500;transition:all .15s}
+.btn:hover{background:var(--accent-dark)}
 
 /* HOME */
-.home { flex: 1; max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; width: 100%; }
-.home-greeting { font-family: var(--font-heading); font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 24px; }
-.home-section { margin-bottom: 32px; }
-.home-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 12px; text-transform: uppercase; }
+.home-panel{overflow:hidden}
+.home-body{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.home-center{text-align:center}
+.greeting{font-family:var(--font-heading);font-size:1.6rem;margin-bottom:10px}
+.home-bottom{padding:0 20px 24px;flex-shrink:0}
+.home-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;justify-content:center}
+.pill{padding:8px 16px;border:1px solid var(--divider);border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--white)}
+.pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.home-input-bar{background:var(--white);border:1.5px solid var(--divider);border-radius:14px;padding:14px 16px;position:relative;transition:border-color .15s}
+.home-input-bar:focus-within{border-color:var(--accent)}
+.home-input-bar.dragover{border-color:var(--accent);background:var(--accent-light)}
+.home-textarea{width:100%;border:none;outline:none;font-size:15px;font-family:var(--font-body);resize:none;line-height:1.5;color:var(--text-primary);background:transparent}
+.home-textarea::placeholder{color:var(--divider)}
+.home-input-actions{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:flex-end}
+.hi-btn{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:6px 8px;border-radius:6px;transition:all .12s}
+.hi-btn:hover{color:var(--accent);background:var(--accent-light)}
+.hi-btn.rec{color:var(--white);background:#B8784E;animation:pulse 1.5s ease infinite}
+.home-mq-wrap{display:flex;align-items:center;gap:6px;margin-right:auto}
+.hi-send{background:var(--accent);color:var(--white);border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .12s}
+/* PLUS MENU */
+.plus-menu-wrap{position:relative}
+.plus-btn{font-size:20px;font-weight:400;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.plus-btn.open{transform:rotate(45deg)}
+.plus-menu{display:none;position:absolute;bottom:40px;left:0;background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:180px;z-index:20}
+.plus-menu.vis{display:block}
+.plus-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .1s}
+.plus-item:hover{background:var(--surface)}
+.plus-item svg{color:var(--text-muted);flex-shrink:0}
 
-/* HOMEWORK INPUT */
-.hw-box {
-  background: var(--white); border: 1.5px solid var(--divider); border-radius: 12px;
-  padding: 20px; transition: border-color .15s;
-}
-.hw-box:focus-within { border-color: var(--accent); }
-.hw-textarea {
-  width: 100%; border: none; outline: none; font-size: 15px; font-family: var(--font-body);
-  resize: none; line-height: 1.6; color: var(--text-primary); background: transparent;
-}
-.hw-textarea::placeholder { color: var(--divider); }
-.hw-toolbar {
-  display: flex; align-items: center; gap: 4px; margin-top: 12px; padding-top: 12px;
-  border-top: 1px solid var(--divider); flex-wrap: wrap;
-}
-.hw-tb {
-  padding: 4px 8px; border: 1px solid var(--divider); border-radius: 5px; font-size: 11px;
-  cursor: pointer; background: var(--white); color: var(--text-primary); font-family: var(--font-body); transition: all .1s;
-}
-.hw-tb:hover { border-color: var(--accent); background: var(--accent-light); }
-.hw-tb sup { font-size: 8px; vertical-align: super; }
-.hw-tb sub { font-size: 8px; vertical-align: sub; }
-.hw-mq {
-  flex: 1; min-width: 200px; min-height: 32px; font-size: 15px; padding: 4px 8px;
-  border: 1.5px solid var(--divider); border-radius: 8px; background: var(--white); margin: 4px 0;
-}
-.hw-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
-.hw-go {
-  background: var(--accent); color: var(--white); border: none; padding: 11px 24px;
-  border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;
-  font-family: var(--font-body); transition: all .15s;
-}
-.hw-go:hover { background: var(--accent-dark); }
-.hw-photo {
-  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
-  padding: 10px 16px; font-size: 13px; cursor: pointer; font-family: var(--font-body);
-  color: var(--text-muted); transition: all .15s;
-}
-.hw-photo:hover { border-color: var(--accent); }
-.hw-mic {
-  background: var(--white); border: 1.5px solid var(--divider); border-radius: 8px;
-  padding: 10px 14px; cursor: pointer; font-size: 16px; transition: all .15s;
-}
-.hw-mic:hover { border-color: var(--accent); }
-.hw-mic.rec { border-color: var(--accent); background: var(--accent-light); }
+/* SUGGESTION PILLS */
+.suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 28px;flex-shrink:0}
+.suggestion{padding:7px 14px;border:1px solid var(--divider);border-radius:18px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--white)}
+.suggestion:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* MATH INPUT CLOSE */
+.math-input-wrap{display:none;flex:1;position:relative;align-items:center;gap:6px}
+.math-input-wrap.vis{display:flex}
+.math-close{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:4px 6px;border-radius:4px;transition:all .1s;flex-shrink:0}
+.math-close:hover{color:var(--accent);background:var(--accent-light)}
+
+/* EQUATION MODAL */
+.eq-modal-overlay{position:fixed;inset:0;background:rgba(47,43,37,0.4);z-index:200;display:flex;align-items:center;justify-content:center}
+.eq-modal{background:var(--white);border-radius:14px;width:90%;max-width:600px;overflow:hidden}
+.eq-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--divider)}
+.eq-modal-close{background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;padding:0 4px;transition:color .1s}
+.eq-modal-close:hover{color:var(--text-primary)}
+.eq-modal-body{padding:20px;min-height:120px}
+.eq-modal-field{width:100%;min-height:80px;font-size:20px;border:2px solid var(--accent);border-radius:8px;padding:12px 16px;--caret-color:var(--accent)}
+.eq-modal-footer{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--divider)}
+.eq-modal-insert{background:var(--accent);color:var(--white);border:none;padding:9px 24px;border-radius:8px;font-size:14px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .12s}
+.eq-modal-insert:hover{background:var(--accent-dark)}
+
+/* CALC FALLBACK */
+.calc-fallback{display:flex;align-items:center;justify-content:center;flex:1;background:var(--surface)}
+
+.hi-send:hover{background:var(--accent-dark)}
+.home-section{margin-bottom:28px}
+.home-label{font-size:0.7rem;font-weight:700;color:var(--text-muted);letter-spacing:0.08em;margin-bottom:10px;text-transform:uppercase}
+
+/* HW BOX */
+.hw-box{background:var(--white);border:1.5px solid var(--divider);border-radius:12px;padding:18px;transition:border-color .15s;position:relative}
+.hw-box:focus-within{border-color:var(--accent)}
+.hw-box.dragover{border-color:var(--accent);background:var(--accent-light)}
+.hw-drop-hint{display:none;position:absolute;inset:0;border-radius:12px;background:rgba(232,238,242,0.85);z-index:5;font-size:14px;color:var(--accent);font-weight:500;justify-content:center;align-items:center}
+.hw-box.dragover .hw-drop-hint{display:flex}
+.hw-textarea{width:100%;border:none;outline:none;font-size:14px;font-family:var(--font-body);resize:none;line-height:1.6;color:var(--text-primary);background:transparent}
+.hw-textarea::placeholder{color:var(--divider)}
+.hw-uploads{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hw-upload-thumb{position:relative;width:72px;height:72px;border-radius:6px;border:1px solid var(--divider);overflow:hidden}
+.hw-upload-thumb img{width:100%;height:100%;object-fit:cover}
+.hw-upload-thumb .remove-upload{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(47,43,37,0.7);color:white;font-size:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hw-preview-wrap{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider)}
+.hw-preview-wrap.vis{display:block}
+.hw-preview-label{font-size:0.65rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
+.hw-preview{font-size:14px;line-height:1.7;color:var(--text-primary)}
+.hw-toolbar{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider);flex-wrap:wrap}
+.hw-tb{padding:4px 7px;border:1px solid var(--divider);border-radius:5px;font-size:11px;cursor:pointer;background:var(--white);color:var(--text-primary);font-family:var(--font-body);transition:all .1s}
+.hw-tb:hover{border-color:var(--accent);background:var(--accent-light)}
+.hw-mq{flex:1;min-width:180px;min-height:30px;font-size:14px;padding:4px 8px;border:1.5px solid var(--divider);border-radius:8px;background:var(--white);margin:4px 0}
+.hw-actions{display:flex;gap:8px;margin-top:10px;align-items:center}
+.hw-go{background:var(--accent);color:var(--white);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.hw-go:hover{background:var(--accent-dark)}
+.hw-btn2{background:var(--white);border:1.5px solid var(--divider);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--font-body);color:var(--text-muted);transition:all .15s}
+.hw-btn2:hover{border-color:var(--accent)}
+.hw-mic{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:14px;transition:all .15s;color:var(--accent)}
+.hw-mic:hover{background:var(--accent);color:var(--white)}
+.hw-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--white);animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+/* QUICK ACTIONS */
+.qa-row{display:flex;align-items:center;gap:8px;padding:10px 0;cursor:pointer;transition:color .12s;font-size:14px;color:var(--text-muted);border-bottom:1px solid var(--divider)}
+.qa-row:last-child{border-bottom:none}
+.qa-row:hover{color:var(--accent)}
+.qa-arrow{font-size:14px;margin-left:auto}
 
 /* COURSES */
-.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.course {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  padding: 18px; cursor: pointer; transition: all .15s;
-}
-.course:hover { border-color: var(--accent); transform: translateY(-2px); }
-.course-icon { font-size: 24px; margin-bottom: 10px; display: block; }
-.course-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
-.course-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.course{background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s}
+.course:hover{border-color:var(--accent);transform:translateY(-2px)}
+.course-icon{font-size:22px;margin-bottom:8px;display:block}
+.course-name{font-size:14px;font-weight:500;margin-bottom:3px}
+.course-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
 
 /* CHAT */
-.chat-layout { flex: 1; display: flex; flex-direction: column; max-width: 720px; margin: 0 auto; width: 100%; }
-.chat-header {
-  padding: 14px 24px; border-bottom: 1px solid var(--divider);
-  display: flex; align-items: center; gap: 10px;
-}
-.chat-back { font-size: 13px; color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
-.chat-topic { font-size: 14px; font-weight: 500; }
-.chat-msgs { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
-.msg { max-width: 85%; animation: fadeUp .3s ease; }
-.msg-k { align-self: flex-start; }
-.msg-s { align-self: flex-end; }
-.msg-name { font-size: 9px; font-weight: 500; margin-bottom: 3px; padding-left: 2px; }
-.msg-name-k { color: var(--accent); }
-.msg-name-s { color: var(--text-muted); text-align: right; }
-.msg-bubble-k {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 12px;
-  border-bottom-left-radius: 4px; padding: 12px 16px; font-size: 14px; line-height: 1.55; color: var(--text-muted);
-}
-.msg-bubble-s {
-  background: var(--accent); border-radius: 12px; border-bottom-right-radius: 4px;
-  padding: 12px 16px; font-size: 14px; line-height: 1.55; color: var(--white);
-}
-.chat-input-bar {
-  padding: 12px 24px; border-top: 1px solid var(--divider);
-  display: flex; gap: 8px; align-items: center; background: var(--white);
-}
-.chat-input {
-  flex: 1; border: 1.5px solid var(--divider); border-radius: 8px; padding: 11px 14px;
-  font-size: 14px; font-family: var(--font-body); outline: none; resize: none; max-height: 100px;
-}
-.chat-input:focus { border-color: var(--accent); }
-.chat-send {
-  background: var(--accent); color: var(--white); border: none; border-radius: 8px;
-  padding: 11px 18px; font-size: 14px; cursor: pointer; font-family: var(--font-body); font-weight: 500;
-}
-.chat-send:hover { background: var(--accent-dark); }
-.chat-mic {
-  background: none; border: 1.5px solid var(--divider); border-radius: 8px;
-  padding: 9px 12px; cursor: pointer; font-size: 16px; transition: all .15s;
-}
-.chat-mic:hover { border-color: var(--accent); }
-.chat-mic.rec { border-color: var(--accent); background: var(--accent-light); }
-.chat-footer {
-  padding: 8px 24px; display: flex; justify-content: space-between; align-items: center;
-  font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--divider);
-}
-.q-badge {
-  background: var(--accent-light); color: var(--accent-dark);
-  padding: 3px 10px; border-radius: 6px; font-weight: 500;
-}
-.typing {
-  display: none; align-self: flex-start; padding: 8px 14px;
-  background: var(--accent-light); border-radius: 12px; border-bottom-left-radius: 4px;
-  gap: 4px; align-items: center;
-}
-.typing.vis { display: flex; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite; }
-.dot:nth-child(2) { animation-delay: .2s; }
-.dot:nth-child(3) { animation-delay: .4s; }
-@keyframes bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+.chat-panel{overflow:hidden}
+.chat-layout{flex:1;display:flex;flex-direction:column;height:100%}
+/* EXPORT */
+.export-wrap{position:relative}
+.export-btn{background:none;border:1px solid var(--divider);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--text-muted);transition:all .12s;display:flex;align-items:center}
+.export-btn:hover{border-color:var(--accent);color:var(--accent)}
+.export-menu{display:none;position:absolute;top:36px;right:0;background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:190px;z-index:20}
+.export-menu.vis{display:block}
+.export-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .1s}
+.export-item:hover{background:var(--surface)}
+.export-item svg{color:var(--text-muted);flex-shrink:0}
+
+.chat-header{padding:12px 28px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-back{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500}
+.chat-topic{font-size:14px;font-weight:500}
+.problem-banner{display:none;padding:10px 28px;background:var(--surface);border-bottom:1px solid var(--divider);font-size:12px;line-height:1.5;color:var(--text-primary);flex-shrink:0}
+.problem-banner.vis{display:block}
+.problem-banner-label{font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.problem-banner img{max-height:70px;border-radius:6px;margin-top:4px}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px 28px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start}
+.msg-s{align-self:flex-end}
+.msg-name{font-size:9px;font-weight:500;margin-bottom:3px;padding-left:2px}
+.msg-name-k{color:var(--accent)}
+.msg-name-s{color:var(--text-muted);text-align:right}
+.msg-bubble-k{background:var(--white);border:1px solid var(--divider);border-radius:12px;border-bottom-left-radius:4px;padding:11px 15px;font-size:14px;line-height:1.55;color:var(--text-muted)}
+.msg-bubble-s{background:var(--accent);border-radius:12px;border-bottom-right-radius:4px;padding:11px 15px;font-size:14px;line-height:1.55;color:var(--white)}
+.msg-bubble-s .katex{color:var(--white)}
+.speak-btn{background:var(--accent-light);border:none;cursor:pointer;font-size:12px;color:var(--accent);padding:3px 7px;border-radius:5px;transition:all .15s;margin-left:6px;vertical-align:middle}
+.speak-btn:hover{background:var(--accent);color:var(--white)}
+.speak-btn.speaking{background:var(--accent);color:var(--white)}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:var(--accent-light);border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+
+/* DESMOS PANEL */
+.calc-panel{display:none;border-top:1px solid var(--divider);flex-shrink:0}
+.calc-panel.vis{display:block}
+.calc-panel iframe{width:100%;height:320px;border:none}
+
+/* CHAT INPUT BAR */
+.chat-input-bar{padding:10px 28px;border-top:1px solid var(--divider);display:flex;gap:6px;align-items:center;background:var(--white);flex-shrink:0}
+.chat-text-input{flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:10px 14px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:90px;background:var(--white);color:var(--text-primary)}
+.chat-text-input:focus{border-color:var(--accent)}
+.chat-math-input{flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:6px 14px;font-size:16px;min-height:40px;background:var(--white);--caret-color:var(--accent)}
+.chat-math-input:focus-within{border-color:var(--accent)}
+.ci-btn{padding:8px 10px;border-radius:7px;font-size:11px;cursor:pointer;transition:all .12s;font-family:var(--font-body);font-weight:500}
+.ci-mode{background:var(--white);border:1px solid var(--divider);color:var(--text-muted)}
+.ci-mode:hover{border-color:var(--accent);color:var(--accent)}
+.ci-mode.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.ci-calc{background:var(--accent-light);border:1.5px solid var(--accent);color:var(--accent)}
+.ci-calc:hover,.ci-calc.open{background:var(--accent);color:var(--white)}
+.ci-mic{background:var(--accent-light);border:1.5px solid var(--accent);color:var(--accent)}
+.ci-mic:hover{background:var(--accent);color:var(--white)}
+.ci-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--white);animation:pulse 1.5s ease infinite}
+.ci-send{background:var(--accent);color:var(--white);border:none;padding:10px 16px}
+.ci-send:hover{background:var(--accent-dark)}
+.chat-footer{padding:6px 28px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-muted);border-top:1px solid var(--divider);flex-shrink:0}
+.q-badge{background:var(--accent-light);color:var(--accent-dark);padding:3px 10px;border-radius:6px;font-weight:500}
+
+/* CALCULATOR PANEL (standalone) */
+.calc-main{flex:1;display:flex;align-items:stretch}
+.calc-main iframe{width:100%;border:none;flex:1}
 
 /* HISTORY */
-.history { flex: 1; max-width: 700px; margin: 0 auto; padding: 40px 24px 60px; width: 100%; }
-.hist-h { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 20px; }
-.hist-item {
-  background: var(--white); border: 1px solid var(--divider); border-radius: 10px;
-  padding: 14px 18px; margin-bottom: 8px; cursor: pointer; transition: border-color .12s;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.hist-item:hover { border-color: var(--accent); }
-.hist-topic { font-size: 14px; font-weight: 500; }
-.hist-date { font-size: 11px; color: var(--text-muted); }
-.hist-q { font-size: 11px; color: var(--accent); margin-top: 2px; }
+.hist-inner{max-width:700px;padding:28px 20px 60px;width:100%}
+.hist-h{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px}
+.hist-item{background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:13px 16px;margin-bottom:7px;cursor:pointer;transition:border-color .12s;display:flex;justify-content:space-between;align-items:center}
+.hist-item:hover{border-color:var(--accent)}
+.hist-topic{font-size:13px;font-weight:500}
+.hist-date{font-size:11px;color:var(--text-muted)}
+.hist-q{font-size:11px;color:var(--accent);margin-top:2px}
 
-footer {
-  text-align: center; padding: 24px; font-size: 0.75rem; font-weight: 500;
-  color: var(--text-muted); letter-spacing: 1.5px;
-  border-top: 1px solid var(--divider); background: var(--deeper);
-}
+/* COURSES PANEL */
+.courses-inner{max-width:760px;padding:28px 20px 60px;width:100%}
+.courses-title{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px}
 
-body { animation: pageIn 0.5s ease-out; }
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-@media(max-width:600px) {
-  nav { padding: 0 1rem; }
-  .home { padding: 24px 16px 40px; }
-  .nav-api { width: 120px; }
+@media(max-width:768px){
+  .sidebar{width:60px;overflow:hidden}
+  .sb-brand span:not(.tk){display:none}
+  .sb-label{display:none}
+  .sb-item{padding:10px;justify-content:center;font-size:0}
+  .sb-badge{display:none}
+  .sb-uname{display:none}
+  .sb-user{justify-content:center}
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-left">
-    <a href="index.html" class="nav-brand"><span class="tamil-k">கே</span>Kelvi</a>
-    <span class="nav-label">Solo</span>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand"><svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:7px"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg> Kelvi <span class="sb-label">Solo</span></div>
+  <nav class="sb-nav">
+    <div class="sb-item active" onclick="showPanel('home')" id="nav-home">Home</div>
+    <div class="sb-item" onclick="showPanel('sessions')" id="nav-sessions">My sessions</div>
+    <div class="sb-item" onclick="showPanel('courses')" id="nav-courses">Courses</div>
+    <div class="sb-item" onclick="showPanel('practice')" id="nav-practice">Practice mode</div>
+    <div class="sb-item" onclick="showPanel('calculator')" id="nav-calculator">Calculator</div>
+    <div class="sb-divider"></div>
+    <div class="sb-item" style="cursor:default;opacity:0.6">Problem bank <span class="sb-badge">soon</span></div>
+    <div class="sb-item" style="cursor:default;opacity:0.6">Formula sheet <span class="sb-badge">soon</span></div>
+    <div class="sb-item" style="cursor:default;opacity:0.6">My progress <span class="sb-badge">soon</span></div>
+    <div class="sb-item" style="cursor:default;opacity:0.6">Bookmarks <span class="sb-badge">soon</span></div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-item" onclick="showPanel('settings')" id="nav-settings">Settings</div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <span class="sb-uname" id="sb-uname">Student</span>
+    </div>
   </div>
-  <div class="nav-right">
-    <span class="nav-link active" onclick="show('home')" id="tab-home">Home</span>
-    <span class="nav-link" onclick="show('history')" id="tab-history">My sessions</span>
-    <input type="password" class="nav-api" id="api-key" placeholder="API key" oninput="saveKey()">
-  </div>
-</nav>
+</aside>
 
-<!-- WELCOME -->
-<div class="screen active" id="screen-welcome">
-  <div class="welcome">
-    <div class="welcome-inner">
+<!-- MAIN -->
+<div class="main">
+  <div class="main-header">
+    <span class="main-title" id="main-title">Home</span>
+    <input type="password" class="api-input" id="api-key" placeholder="API key" oninput="saveKey()">
+  </div>
+
+  <!-- WELCOME -->
+  <div class="panel welcome-panel active" id="panel-welcome">
+    <div class="welcome-inner" style="animation:fadeUp .5s ease">
       <h1>Think it through.</h1>
-      <p>Kelvi is an AI thinking partner that helps you work through math problems without giving you the answer. Because figuring it out yourself is the whole point.</p>
+      <p>Kelvi is an AI thinking partner that helps you work through math problems without giving you the answer.</p>
       <div class="welcome-row">
-        <input type="text" id="stu-name" placeholder="What's your name?" onkeydown="if(event.key==='Enter')startApp()">
+        <input type="text" id="stu-name" placeholder="Your name" onkeydown="if(event.key==='Enter')startApp()">
         <button class="btn" onclick="startApp()">Start</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- HOME -->
-<div class="screen" id="screen-home">
-  <div class="home" style="animation:fadeUp .5s ease">
-    <div class="home-greeting" id="greeting">What are you working on?</div>
-    <div class="home-section">
-      <div class="home-label">Homework help</div>
-      <div class="hw-box">
-        <textarea class="hw-textarea" id="hw-input" rows="3" placeholder="Paste your problem here, or describe what you're stuck on..."></textarea>
-        <div class="hw-toolbar">
-          <span style="font-size:10px;color:var(--text-muted);margin-right:4px">Math:</span>
-          <button class="hw-tb" onclick="mqC('\\frac')">a/b</button>
-          <button class="hw-tb" onclick="mqC('^')">x<sup>n</sup></button>
-          <button class="hw-tb" onclick="mqC('_')">x<sub>n</sub></button>
-          <button class="hw-tb" onclick="mqC('\\sqrt')">&radic;</button>
-          <button class="hw-tb" onclick="mqW('\\pi')">&pi;</button>
-          <button class="hw-tb" onclick="mqW('\\theta')">&theta;</button>
-          <button class="hw-tb" onclick="mqW('\\sin(')">sin</button>
-          <button class="hw-tb" onclick="mqW('\\cos(')">cos</button>
-          <button class="hw-tb" onclick="mqW('\\tan(')">tan</button>
-          <button class="hw-tb" onclick="mqW('\\log(')">log</button>
-          <button class="hw-tb" onclick="mqW('\\int')">&int;</button>
-          <button class="hw-tb" onclick="mqW('\\sum')">&Sigma;</button>
-          <button class="hw-tb" onclick="mqW('\\infty')">&infin;</button>
-          <button class="hw-tb" onclick="mqW('\\le ')">&le;</button>
-          <button class="hw-tb" onclick="mqW('\\ge ')">&ge;</button>
-          <span id="hw-mq" class="hw-mq"></span>
-          <button class="hw-tb" onclick="insertHwMath()" style="background:var(--accent-light);color:var(--accent-dark);border-color:var(--accent)">Add</button>
+  <!-- HOME -->
+  <div class="panel home-panel" id="panel-home">
+    <div class="home-body">
+      <div class="home-center" style="animation:fadeUp .4s ease">
+        <div class="greeting" id="greeting">What are you working on?</div>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.6;max-width:460px">Paste a problem, type a question, upload a photo, or pick a suggestion below.</p>
+      </div>
+    </div>
+    <div class="home-bottom">
+      <div class="home-pills">
+        <span class="pill" onclick="pillToChat('Help me think through my homework problem')">Help me with homework</span>
+        <span class="pill" onclick="showPanel('courses')">Explore a course</span>
+        <span class="pill" onclick="showPanel('practice')">Give me practice problems for fluency</span>
+        <span class="pill" onclick="showPanel('calculator')">Open calculator</span>
+      </div>
+      <div class="home-input-bar" id="hw-box">
+        <div class="hw-drop-hint">Drop your image here</div>
+        <textarea class="home-textarea" id="hw-input" rows="2" placeholder="Type a problem or paste it here..." oninput="updatePreview()" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();startChat()}"></textarea>
+        <div class="hw-uploads" id="hw-uploads"></div>
+        <div class="hw-preview-wrap" id="hw-preview-wrap">
+          <div class="hw-preview-label">Preview</div>
+          <div class="hw-preview" id="hw-preview"></div>
         </div>
-        <div class="hw-actions">
-          <button class="hw-go" onclick="startChat()">Help me think through this</button>
-          <label class="hw-photo"><input type="file" accept="image/*" onchange="handlePhoto(event)" style="display:none">Upload photo</label>
-          <button class="hw-mic" id="hw-mic" onclick="toggleHwVoice()">&#127908;</button>
+        <div class="home-input-actions">
+          <div class="plus-menu-wrap">
+            <button class="hi-btn plus-btn" id="home-plus" onclick="togglePlusMenu('home')">+</button>
+            <div class="plus-menu" id="home-plus-menu">
+              <label class="plus-item" style="cursor:pointer"><input type="file" accept="image/*,.pdf" onchange="handlePhoto(event)" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg> Upload</label>
+              <div class="plus-item" onclick="showPanel('calculator');togglePlusMenu('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Calculator</div>
+              <div class="plus-item" onclick="openEqModal('home');togglePlusMenu('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v2h-4v2h4v2h-6zM4 14l3 6 3-6M14 14h6v2h-4v2h4v2h-6"/></svg> Equation</div>
+            </div>
+          </div>
+          <span style="flex:1"></span>
+          <button class="hi-btn" id="hw-mic" onclick="toggleHwVoice()" title="Dictate"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="15" y1="9" x2="15" y2="15"/></svg></button>
+          <button class="hi-send" onclick="startChat()">Send</button>
         </div>
       </div>
     </div>
-    <div class="home-section">
-      <div class="home-label">Explore a topic</div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="panel chat-panel" id="panel-chat">
+    <div class="chat-layout">
+      <div class="chat-header">
+        <span class="chat-back" onclick="showPanel('home')">&larr; Back</span>
+        <span class="chat-topic" id="chat-topic"></span>
+        <span style="flex:1"></span>
+        <div class="export-wrap">
+          <button class="export-btn" onclick="toggleExportMenu()" title="Export transcript"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          <div class="export-menu" id="export-menu">
+            <div class="export-item" onclick="exportClipboard()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy to clipboard</div>
+            <div class="export-item" onclick="exportText()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Download as text</div>
+            <div class="export-item" onclick="exportPDF()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Save as PDF</div>
+          </div>
+        </div>
+      </div>
+      <div class="problem-banner" id="problem-banner">
+        <div class="problem-banner-label">Your problem</div>
+        <div id="problem-banner-content"></div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" id="opening-msg"></div></div>
+      </div>
+      <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="suggestions" id="suggestions" style="display:none"></div>
+      <div class="calc-panel" id="calc-panel">
+        <div style="text-align:center;padding:20px">
+          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">Open Desmos Calculator</a>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:12px">Opens in a new tab</span>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <div class="plus-menu-wrap">
+          <button class="ci-btn ci-mode plus-btn" id="chat-plus" onclick="togglePlusMenu('chat')">+</button>
+          <div class="plus-menu" id="chat-plus-menu">
+            <label class="plus-item" style="cursor:pointer"><input type="file" accept="image/*,.pdf" onchange="chatPhoto(event)" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg> Upload</label>
+            <div class="plus-item" onclick="toggleCalc();togglePlusMenu('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Calculator</div>
+            <div class="plus-item" onclick="openEqModal('chat');togglePlusMenu('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v2h-4v2h4v2h-6zM4 14l3 6 3-6M14 14h6v2h-4v2h4v2h-6"/></svg> Equation</div>
+          </div>
+        </div>
+        <textarea class="chat-text-input" id="chat-input-text" rows="1" placeholder="Type your thinking..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+        <button class="ci-btn ci-mic" id="chat-mic" onclick="toggleChatVoice()" title="Dictate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="15" y1="9" x2="15" y2="15"/></svg></button>
+        <button class="ci-btn ci-send" onclick="sendMsg()">Send</button>
+      </div>
+      <div class="chat-footer">
+        <span id="q-count" class="q-badge" style="display:none"></span>
+        <span>Kelvi never gives answers. Only better questions.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSIONS -->
+  <div class="panel" id="panel-sessions" style="overflow-y:auto">
+    <div class="hist-inner" style="animation:fadeUp .4s ease">
+      <div class="hist-h">My sessions</div>
+      <div id="hist-list"></div>
+      <div id="hist-empty" style="color:var(--text-muted);font-size:14px;padding:20px 0">No sessions yet. Start a conversation and it will appear here.</div>
+    </div>
+  </div>
+
+  <!-- COURSES -->
+  <div class="panel" id="panel-courses" style="overflow-y:auto">
+    <div class="courses-inner" style="animation:fadeUp .4s ease">
+      <div class="courses-title">Courses</div>
       <div class="courses">
         <div class="course" onclick="openCourse('Integrated Math 1','Linear equations, inequalities, intro geometry, data')"><span class="course-icon">&#x2160;</span><div class="course-name">Integrated Math 1</div><div class="course-desc">Linear equations, inequalities, geometric foundations, data analysis</div></div>
         <div class="course" onclick="openCourse('Integrated Math 2','Quadratics, similarity, probability, right triangles')"><span class="course-icon">&#x2161;</span><div class="course-name">Integrated Math 2</div><div class="course-desc">Quadratics, similarity, probability, right triangle trigonometry</div></div>
@@ -321,125 +427,153 @@ body { animation: pageIn 0.5s ease-out; }
       </div>
     </div>
   </div>
-</div>
 
-<!-- CHAT -->
-<div class="screen" id="screen-chat">
-  <div class="chat-layout">
-    <div class="chat-header">
-      <span class="chat-back" onclick="show('home')">&larr; Back</span>
-      <span class="chat-topic" id="chat-topic"></span>
-    </div>
-    <div class="chat-msgs" id="chat-msgs">
-      <div class="msg msg-k">
-        <div class="msg-name msg-name-k">Kelvi</div>
-        <div class="msg-bubble-k" id="opening-msg"></div>
+  <!-- CALCULATOR -->
+  <div class="panel" id="panel-calculator">
+    <div class="calc-main">
+      <iframe src="https://www.desmos.com/calculator" title="Desmos Graphing Calculator" id="desmos-iframe" style="display:none" onload="this.style.display='block';document.getElementById('calc-fallback').style.display='none'"></iframe>
+      <div class="calc-fallback" id="calc-fallback">
+        <div style="text-align:center;padding:60px 20px">
+          <div style="font-size:48px;margin-bottom:16px;color:var(--divider)">&#x1F4CA;</div>
+          <div style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:8px">Calculator blocked in preview</div>
+          <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px">Desmos will work when deployed to Vercel. For now, open it in a new tab.</p>
+          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500">Open Desmos Calculator</a>
+        </div>
       </div>
     </div>
-    <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <div class="chat-input-bar">
-      <textarea class="chat-input" id="chat-input" rows="1" placeholder="Type your thinking..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
-      <button class="chat-mic" id="chat-mic" onclick="toggleChatVoice()">&#127908;</button>
-      <button class="chat-send" onclick="sendMsg()">Send</button>
-    </div>
-    <div class="chat-footer">
-      <span id="q-count" class="q-badge" style="display:none"></span>
-      <span style="font-size:10px;color:var(--text-muted)">Kelvi never gives answers. Only better questions.</span>
+  </div>
+
+  <!-- PRACTICE -->
+  <div class="panel" id="panel-practice" style="overflow-y:auto">
+    <div class="courses-inner" style="animation:fadeUp .4s ease">
+      <div class="courses-title">Practice mode</div>
+      <p style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">Pick a course and Kelvi will give you problems to build fluency. Work through each one with Kelvi's guidance, then ask for more.</p>
+      <div class="courses">
+        <div class="course" onclick="openPractice('Integrated Math 1')"><span class="course-icon">&#x2160;</span><div class="course-name">Integrated Math 1</div><div class="course-desc">Practice linear equations, systems, coordinate geometry</div></div>
+        <div class="course" onclick="openPractice('Integrated Math 2')"><span class="course-icon">&#x2161;</span><div class="course-name">Integrated Math 2</div><div class="course-desc">Practice quadratics, similarity, probability</div></div>
+        <div class="course" onclick="openPractice('Integrated Math 3')"><span class="course-icon">&#x2162;</span><div class="course-name">Integrated Math 3</div><div class="course-desc">Practice polynomials, logarithms, trig identities</div></div>
+        <div class="course" onclick="openPractice('Math 4')"><span class="course-icon">&#x2163;</span><div class="course-name">Math 4</div><div class="course-desc">Practice limits, derivatives, optimization</div></div>
+        <div class="course" onclick="openPractice('Math 5')"><span class="course-icon">&#x2164;</span><div class="course-name">Math 5</div><div class="course-desc">Practice series, parametric, polar, integration</div></div>
+        <div class="course" onclick="openPractice('AP Statistics')"><span class="course-icon">&#x03C3;</span><div class="course-name">AP Statistics</div><div class="course-desc">Practice probability, distributions, inference</div></div>
+        <div class="course" onclick="openPractice('Linear Algebra')"><span class="course-icon">&#x27E8;&#x27E9;</span><div class="course-name">Linear Algebra</div><div class="course-desc">Practice vectors, matrices, eigenvalues</div></div>
+        <div class="course" onclick="openPractice('Differential Equations')"><span class="course-icon">&#x2202;</span><div class="course-name">Differential Equations</div><div class="course-desc">Practice first-order, second-order ODEs</div></div>
+        <div class="course" onclick="openPractice('Discrete Math')"><span class="course-icon">&#x2227;</span><div class="course-name">Discrete Math</div><div class="course-desc">Practice combinatorics, graph theory, proofs</div></div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- HISTORY -->
-<div class="screen" id="screen-history">
-  <div class="history" style="animation:fadeUp .5s ease">
-    <div class="hist-h">My sessions</div>
-    <div id="hist-list">
-      <div class="hist-item"><div><div class="hist-topic">Simplify sin(sin<sup>-1</sup>(x))</div><div class="hist-q">3 questions asked</div></div><div class="hist-date">Today</div></div>
-      <div class="hist-item"><div><div class="hist-topic">Factor x<sup>3</sup> - 8</div><div class="hist-q">5 questions asked</div></div><div class="hist-date">Yesterday</div></div>
-      <div class="hist-item"><div><div class="hist-topic">AP Calculus: Related rates</div><div class="hist-q">4 questions asked</div></div><div class="hist-date">Apr 5</div></div>
-      <div class="hist-item"><div><div class="hist-topic">Linear Algebra: Eigenvalues</div><div class="hist-q">6 questions asked</div></div><div class="hist-date">Apr 4</div></div>
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings" style="overflow-y:auto">
+    <div class="courses-inner" style="animation:fadeUp .4s ease">
+      <div class="courses-title">Settings</div>
+      <div class="home-section">
+        <div class="home-label">Your name</div>
+        <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--white)" oninput="updateName(this.value)">
+      </div>
+      <div class="home-section">
+        <div class="home-label">API key</div>
+        <input type="password" id="settings-api" placeholder="Anthropic API key" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="document.getElementById('api-key').value=this.value;saveKey()">
+      </div>
     </div>
   </div>
-</div>
+  <!-- EQUATION MODAL -->
+  <div class="eq-modal-overlay" id="eq-modal" style="display:none" onclick="if(event.target===this)closeEqModal()">
+    <div class="eq-modal">
+      <div class="eq-modal-header">
+        <span style="font-weight:500;font-size:15px">Insert equation</span>
+        <button class="eq-modal-close" onclick="closeEqModal()">&times;</button>
+      </div>
+      <div class="eq-modal-body">
+        <math-field class="eq-modal-field" id="eq-modal-field" virtual-keyboard-mode="manual" smart-fence></math-field>
+      </div>
+      <div class="eq-modal-footer">
+        <button class="eq-modal-insert" onclick="insertEquation()">Insert</button>
+      </div>
+    </div>
+  </div>
 
-<footer>The question is the answer.</footer>
+</div>
 
 <script>
-let name='',msgs=[],qCount=0,rec=null,isR=false,mqF=null;
+let userName='',msgs=[],qCount=0,rec=null,isR=false,mqF=null,mathMode=false;
+let uploadedImages=[];
+let dragCounter=0;
 
 const SYS=`You are Kelvi — a mathematics thinking companion. You develop questioning and reasoning. You never give answers.
 
-OPENING MOVE:
-When a student shares a problem, your first response is: "What have you tried already?" or "What do you think you should do first?" Do not summarize the problem. Do not set up the approach. Let the student decide the starting point.
+YOUR MOST IMPORTANT RULE — MATCH YOUR RESPONSE TO WHAT THE STUDENT JUST DID:
+If they showed reasoning, engage with the SPECIFIC reasoning — reference what they wrote, not a generic follow-up. If they self-corrected, name that as a mathematical move. If they're stuck after two attempts, give them a concrete foothold. If they're building correctly, say so briefly and let them continue. If you've already asked a question and they answered it, don't ask another question — respond to their answer first. Your biggest failure mode is asking a question after every response regardless of context. Vary your responses: engage, observe, acknowledge progress, point at something specific, or stay silent. Not every response needs a question at the end.
 
-THE FOURTEEN PRINCIPLES:
+OPENING MOVE:
+When a student shares a problem, your first response is: "What have you tried already?" or "What's one way you might start?" Do not summarize the problem. Do not set up the approach. Let the student decide the starting point. Do not use the same question stem twice in a row — vary your language naturally.
+
+THE PRINCIPLES:
+
+0. NEVER LET A WRONG FACT PASS.
+If a student states an incorrect fact, conversion, formula, or definition — do not accept it and move on. Do not say "you've got a conversion factor" when the number is wrong. Ask the student to verify: "How many feet are in a mile?" If they state it wrong again, supply the correct fact: "A mile is 5,280 feet." Letting a student build on a wrong foundation is worse than telling them the fact. This overrides Principle 1 — factual accuracy is not the same as confirming correctness of reasoning.
 
 1. NEVER CONFIRM RIGHT OR WRONG.
-Never say "correct," "right," "wrong," "exactly," "yes," or "no" as judgments. Instead: "How can you check?" or "What more can you tell me?" The student proves it to themselves.
+Never say "correct," "right," "wrong," "exactly," "yes," or "no" as judgments. The student proves it to themselves.
 
 2. INVITE, DON'T INSTRUCT.
-"Would you like to try..." not "Now do this." The student chooses the next step. Offer paths, never assign them.
+"Would you like to try..." not "Now do this." The student chooses the next step.
 
-3. NORMALIZE ERROR.
-"It's totally okay if it's incorrect. Mathematicians are not afraid to try anything." Never react differently to wrong answers than right ones. Both get the same curious follow-up. Your response to a wrong answer should be indistinguishable in tone and length from your response to a right answer.
+3. NORMALIZE ERROR WITHOUT SIGNALING.
+When a student states something incorrect, don't say "you're close" or "not quite" — those still signal judgment. Just ask a flat question that lets them discover the mismatch: "How many feet are in a mile?" If they can't retrieve the fact after one attempt, supply it.
 
 4. PROBE VOCABULARY.
-If a student uses a term (e.g., "standard basis vectors," "eigenvalues"), ask: "Can you define that for me?" If they can't, don't explain it — give them a concrete way in instead. "Let's try it with numbers" or "What if you picked a specific point?"
+If a student uses a term, ask: "Can you define that for me?" If they can't, give them a concrete way in.
 
-5. ASK FOR MORE, NOT FOR CORRECTNESS.
-"What more can you tell me?" is better than "Is that right?" It keeps the conversation open and lets the student show what they have.
+5. BE SPECIFIC, NOT GENERIC.
+Never ask "What more can you tell me?" or "What do you think?" without referencing something specific from the student's last response. Instead: "What units will x have in that equation?" or "You set up feet per second — what unit do you need to end up with?" Generic follow-ups feel like the AI isn't listening.
 
 6. LET THE STUDENT DISCOVER THE PATTERN.
-After enough examples, ask: "Did you notice anything?" Do not point to the pattern. Do not hint at it. If they don't see it, ask them to try one more example.
+After enough examples, ask: "Did you notice anything?" Do not point to the pattern.
 
 7. MINIMUM WORDS FROM KELVI.
-Your best moves are six words or fewer. "How do you know?" "Try another one." "What more can you tell me?" Do not over-explain. Do not set up context. Brevity is respect for the student's thinking time.
+Your best moves are six words or fewer. Brevity is respect for the student's thinking time.
 
 8. NAME THE MATHEMATICAL MOVE, NOT THE CORRECTNESS.
-When a student does something significant — creates their own problem, transfers a concept, changes the conditions — name the move: "Being able to come up with your own problem is a mathematical move." Never say "great job." Praise the process, not the person.
+When a student self-corrects, creates their own problem, or transfers a concept — name the move: "You just caught your own error. That's what mathematicians do." Never say "great job."
 
 9. DON'T ALWAYS ASK A QUESTION.
-Sometimes just observe and stop. "That's some solid thinking." Period. No follow-up question. Let the student decide what happens next. Silence is a teaching tool. Asking too many questions leads to student frustration and passivity.
+Sometimes just observe and stop. "You've got the distance conversion." Period. No follow-up question. Let the student decide what happens next. If you've asked a question in your last two responses, your next response should NOT end with a question.
 
 10. POINT BACK AT THE PROBLEM'S WORDS.
-When a student overcomplicates, bring them back to what the problem actually says. "The question says both are the same color. That's it." Don't simplify for them — show them the simplicity is already there.
+When a student overcomplicates, bring them back to what the problem actually says.
 
 11. KNOW WHEN THE PROBLEM IS DONE.
-If the student has answered what was asked, stop. Do not push for proof when the problem asked for explanation. Do not push for generalization when the problem asked for a specific answer. Recognize completion.
+If the student has answered what was asked, stop. Recognize completion.
 
 12. OFFER CHOICES WHEN GENUINELY STUCK.
-When a student is truly stuck — not just thinking, but stuck — offer two paths: "I can model my approach, or I can walk you through testing your idea. Which would you prefer?" Never choose for them. If a student asks you to solve or explain three or more times, they are genuinely stuck. This is when Principle 12 fires. Offer two choices. Do not explain the method. Do not teach the procedure.
+"I can model my approach, or I can walk you through testing your idea. Which would you prefer?"
 
 13. MAKE IT CONCRETE.
-When a student is lost in abstraction, ask them to try specific numbers. "Have you tried using numbers for (x,y)?" "What if you picked the point (1,0)?" Concrete examples are the bridge to understanding, not a crutch. When suggesting a specific number to try, never pick the correct answer. Pick a nearby number that won't work — so the student has to adjust and discover the right one.
+When a student is lost in abstraction, ask them to try specific numbers.
 
 14. OFFER TOOLS, NOT ANSWERS.
-You can offer to graph points, show a number line, display a diagram. These are tools — like handing a student a ruler. Say: "Would you like me to graph those points so you can visualize it?" Always ask permission. The tool is equipment, not a solution.
-
-FACTUAL TOOLS:
-You may provide theorem statements, definitions, and formulas when accuracy matters — a student working from a wrong definition will go nowhere. Frame it as verification: "Let me confirm that theorem" or "Let me look that up and show you." The student brought it up first; you are checking their source, not teaching content.
-
-AFFIRMATION — USE SPARINGLY:
-Research shows praise for ability ("you're smart") promotes fixed mindset. Praise for process ("you really thought that through") promotes growth mindset. But even process praise loses effect if overused. Most of your responses should have NO praise. When you do affirm, affirm the thinking: "That's some solid thinking." Keep it rare so it means something.
-
-P/C/G CLASSIFICATION:
-Internally classify every student interaction:
-- PROCEDURAL: "How do I...?" / reciting a formula / following steps without understanding why
-- CONCEPTUAL: "Why does this work?" / explaining meaning / connecting ideas
-- GENERATIVE: "What if I changed...?" / creating new problems / transferring to new contexts
-Do not announce the classification to the student. Use it to guide your next move — procedural gets "why does that work?", conceptual gets "what more can you tell me?", generative gets named as a mathematical move.
-
-MATH VISUALS:
-When a visual would help — a graph, geometric figure, number line — include an inline SVG. Use fill="#5A7080" for main elements and fill="#B8784E" for accents. Always ask first: "Would you like me to show you that on a graph?"
-
-SHOW ON REQUEST:
-If a student asks you to show an image, graph, diagram, or visual — do it immediately without asking permission first. They already asked. If a student asks you to show the problem again, repeat it exactly as you originally presented it.
-
-RESPONSE LENGTH:
-Two to three sentences maximum, then either one question or nothing. Never write paragraphs. Never explain at length. If you find yourself writing more than three sentences, you are doing too much.
+"Would you like me to graph those points?" The tool is equipment, not a solution.
 
 15. RECOGNIZE PRACTICE REQUESTS.
-When a student says "I want to practice [topic]," "give me a problem," "show me a question," or anything similar — do NOT ask what they've tried. They haven't tried anything yet. Give them a problem immediately, then ask: "What do you think you should do first?"
+When a student says "give me a problem" — give them one immediately, then ask: "What's one way you might start?"
+
+16. ANSWER FACTUAL QUESTIONS DIRECTLY.
+When a student asks for a definition, a fact, context, or background information — answer it clearly and briefly. Don't turn factual questions into Socratic moments. The student needs information to think, not more questions about what they already don't know.
+
+17. CLOSE THE LOOP.
+When you've pointed a student in the right direction, help them land. Don't leave it implied. "Can you write that as a fraction in miles?" or "What does the final number come out to?" Help them articulate the result, not just sense the direction.
+
+FACTUAL TOOLS:
+You may provide theorem statements, definitions, and formulas when accuracy matters.
+
+P/C/G CLASSIFICATION:
+Internally classify every interaction: Procedural, Conceptual, or Generative. Do not announce it. Use it to guide your next move.
+
+MATH VISUALS:
+When a visual would help, include inline SVG. Use fill="#5A7080" for main elements and fill="#B8784E" for accents.
+
+RESPONSE LENGTH:
+Two to three sentences maximum. Never write paragraphs. If you find yourself writing more than three sentences, you are doing too much.
 
 COURSE TOPIC MAP:
 - Integrated Math 1: Linear equations, inequalities, systems, coordinate geometry, data analysis, sequences
@@ -452,64 +586,449 @@ COURSE TOPIC MAP:
 - Differential Equations: First-order ODEs, second-order ODEs, systems, Laplace transforms
 - Discrete Math: Logic, proofs, sets, combinatorics, graph theory`;
 
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));const t=document.getElementById('tab-'+id);if(t)t.classList.add('active')}
-function startApp(){const n=document.getElementById('stu-name').value.trim();if(n)name=n;document.getElementById('greeting').textContent=name?'Hey '+name+'. What are you working on?':'What are you working on?';show('home')}
-
 const PROBLEM_BANK={
-'Integrated Math 1':[{topic:'linear equations',text:'The sum of two consecutive odd numbers is 156. Write an equation to find the numbers. How does writing an equation help you organize your thinking?',source:'PEA Math 1'},{topic:'systems',text:'A pile of 100 coins worth $12.75 contains only quarters and dimes. How many of each are in the pile?',source:'PEA Math 1'},{topic:'coordinate geometry',text:'A 5 by 5 square has one vertex at (2, 3). Find the coordinates of the other three vertices if the sides of the square are not parallel to the coordinate axes.',source:'PEA Math 1'}],
-'Integrated Math 2':[{topic:'quadratics',text:'A ball is thrown upward from the top of a 64-foot cliff. Its height above the ground after t seconds is h(t) = -16t² + 48t + 64. When does the ball hit the ground? When does it reach maximum height? What is the maximum height?',source:'PEA Math 2'},{topic:'probability',text:'In a group of 30 students, 18 study Spanish and 15 study French. If 5 students study both, how many study neither language? Can you represent this with a diagram?',source:'AMC style'},{topic:'similarity',text:'Two similar triangles have areas in the ratio 9:25. If the perimeter of the smaller triangle is 36 cm, what is the perimeter of the larger triangle?',source:'PEA Math 2'}],
-'Integrated Math 3':[{topic:'polynomials',text:'The polynomial p(x) has roots at x = -2, x = 1, and x = 3. If p(0) = 12, find p(x). What does knowing p(0) tell you that the roots alone don\'t?',source:'PEA Math 3'},{topic:'logarithms',text:'Solve for x: log₂(x) + log₂(x-2) = 3. Are there any values of x you need to reject? Why?',source:'PEA Math 3'},{topic:'trigonometry',text:'Prove that (sin θ + cos θ)² = 1 + sin 2θ. What identity are you using, and why does it work?',source:'PEA Math 3'}],
-'Math 4':[{topic:'limits',text:'Find the limit as x approaches 0 of (sin 3x)/(sin 5x). Can you find this limit without L\'Hôpital\'s Rule? What approach would you use?',source:'PEA Math 4'},{topic:'derivatives',text:'A 10-foot ladder leans against a wall. The bottom slides away from the wall at 2 ft/sec. How fast is the top sliding down when the bottom is 6 feet from the wall?',source:'PEA Math 4'},{topic:'optimization',text:'A farmer has 400 feet of fencing and wants to fence off a rectangular field that borders a straight river. No fence is needed along the river. What dimensions maximize the area?',source:'PEA Math 4'}],
-'Math 5':[{topic:'series',text:'Determine whether the series Σ(n=1 to ∞) of n/(2ⁿ) converges or diverges. If it converges, find the sum. What test would you start with, and why?',source:'PEA Math 5'},{topic:'parametric equations',text:'A particle moves along a curve defined by x(t) = cos(t) and y(t) = sin(2t). Sketch the path for 0 ≤ t ≤ 2π. What does the curve look like? Find the velocity of the particle at t = π/4.',source:'PEA Math 5'},{topic:'polar coordinates',text:'Convert the polar equation r = 2cos(θ) to rectangular form. What familiar curve does this represent? Sketch it.',source:'PEA Math 5'},{topic:'integration techniques',text:'Find the area enclosed by one arch of the cycloid defined by x = t − sin(t) and y = 1 − cos(t), for 0 ≤ t ≤ 2π.',source:'PEA Math 5'}],
-'AP Statistics':[{topic:'probability',text:'You have 10 socks in a drawer: 4 blue and 6 black. You pull out two socks without looking. What is the probability that they match?',source:'AMC style'},{topic:'distributions',text:'A manufacturer knows that 2% of its light bulbs are defective. In a box of 100 light bulbs, what is the probability that exactly 3 are defective? What distribution would you use and why?',source:'AP Stats'},{topic:'inference',text:'A coin is flipped 100 times and comes up heads 62 times. Is there convincing evidence that the coin is unfair? What would you need to do to answer this question?',source:'AP Stats'}],
-'Linear Algebra':[{topic:'linear transformations',text:'Let T: R² → R² be the linear transformation that reflects every vector across the line y = x. Find the matrix that represents T.',source:'Linear Algebra'},{topic:'eigenvalues',text:'Find the eigenvalues and eigenvectors of the matrix [[2, 1], [1, 2]]. What do the eigenvectors tell you geometrically about the transformation this matrix represents?',source:'Linear Algebra'},{topic:'vector spaces',text:'Is the set of all 2×2 matrices with determinant 0 a vector space? Why or why not? What properties would you need to check?',source:'Linear Algebra'}],
-'Differential Equations':[{topic:'separable equations',text:'A population grows at a rate proportional to its current size. If the population is 1000 at time t = 0 and 3000 at time t = 5, find the population as a function of time. When will the population reach 10,000?',source:'Diff Eq'},{topic:'modeling',text:'A cup of coffee at 200°F is placed in a 70°F room. After 5 minutes the coffee is 150°F. When will it reach 100°F? What assumptions are you making?',source:'Diff Eq'}],
-'Discrete Math':[{topic:'combinatorics',text:'How many ways can 8 people be seated around a circular table? What if two specific people must sit next to each other?',source:'AMC style'},{topic:'graph theory',text:'Five towns are each connected to every other town by a road. How many roads are there? Can you find a route that uses each road exactly once?',source:'Discrete Math'}]
+'Integrated Math 1':[{topic:'linear equations',text:'The sum of two consecutive odd numbers is 156. Write an equation to find the numbers.',source:'PEA'},{topic:'systems',text:'A pile of 100 coins worth $12.75 contains only quarters and dimes. How many of each?',source:'PEA'},{topic:'coordinate geometry',text:'A 5 by 5 square has one vertex at (2, 3). Find the other three vertices if the sides are not parallel to the axes.',source:'PEA'}],
+'Integrated Math 2':[{topic:'quadratics',text:'A ball is thrown upward from a 64-foot cliff. h(t) = -16t\u00B2 + 48t + 64. When does it hit the ground? Maximum height?',source:'PEA'},{topic:'probability',text:'In 30 students, 18 study Spanish, 15 study French, 5 study both. How many study neither?',source:'AMC'},{topic:'similarity',text:'Two similar triangles have areas in ratio 9:25. Smaller perimeter is 36 cm. What is the larger perimeter?',source:'PEA'}],
+'Integrated Math 3':[{topic:'polynomials',text:'p(x) has roots at x = -2, 1, and 3. If p(0) = 12, find p(x).',source:'PEA'},{topic:'logarithms',text:'Solve: log\u2082(x) + log\u2082(x-2) = 3. Any values to reject?',source:'PEA'},{topic:'trigonometry',text:'Prove that (sin \u03B8 + cos \u03B8)\u00B2 = 1 + sin 2\u03B8.',source:'PEA'}],
+'Math 4':[{topic:'limits',text:'Find lim(x\u21920) of sin(3x)/sin(5x) without L\'H\u00F4pital.',source:'PEA'},{topic:'derivatives',text:'10-foot ladder, bottom slides out at 2 ft/sec. How fast does the top slide down when bottom is 6 ft out?',source:'PEA'},{topic:'optimization',text:'400 ft of fencing, rectangular field along a river (no fence on river side). Maximize area.',source:'PEA'}],
+'Math 5':[{topic:'series',text:'Does \u03A3(n=1 to \u221E) n/2\u207F converge? If so, find the sum.',source:'PEA'},{topic:'parametric',text:'x(t)=cos(t), y(t)=sin(2t). Sketch for 0\u2264t\u22642\u03C0. Velocity at t=\u03C0/4?',source:'PEA'},{topic:'polar',text:'Convert r = 2cos(\u03B8) to rectangular form. What curve?',source:'PEA'}],
+'AP Statistics':[{topic:'probability',text:'10 socks: 4 blue, 6 black. Pull 2 without looking. P(match)?',source:'AMC'},{topic:'distributions',text:'2% defective bulbs. Box of 100. P(exactly 3 defective)? Which distribution?',source:'AP'},{topic:'inference',text:'100 flips, 62 heads. Convincing evidence the coin is unfair?',source:'AP'}],
+'Linear Algebra':[{topic:'transformations',text:'T: R\u00B2\u2192R\u00B2 reflects across y=x. Find the matrix.',source:'LA'},{topic:'eigenvalues',text:'Eigenvalues and eigenvectors of [[2,1],[1,2]]. Geometric meaning?',source:'LA'},{topic:'vector spaces',text:'Is the set of 2\u00D72 matrices with det=0 a vector space? Why?',source:'LA'}],
+'Differential Equations':[{topic:'separable',text:'Population proportional to size. 1000 at t=0, 3000 at t=5. Find P(t).',source:'DE'},{topic:'modeling',text:'Coffee at 200\u00B0F in 70\u00B0F room. After 5 min: 150\u00B0F. When 100\u00B0F?',source:'DE'}],
+'Discrete Math':[{topic:'combinatorics',text:'8 people around a circular table. How many arrangements? What if 2 must sit together?',source:'AMC'},{topic:'graph theory',text:'5 towns, each connected to every other. How many roads? Euler circuit?',source:'DM'}]
 };
 
-function getRandomProblem(course,topic){let pool=PROBLEM_BANK[course]||[];if(topic){const t=topic.toLowerCase();const filtered=pool.filter(p=>p.topic.toLowerCase().includes(t));if(filtered.length>0)pool=filtered}if(pool.length===0)return null;return pool[Math.floor(Math.random()*pool.length)]}
+// PANEL NAVIGATION
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active')});
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  const panel=document.getElementById('panel-'+id);
+  if(panel){panel.classList.add('active');requestAnimationFrame(()=>{panel.style.opacity='1'})}
+  const nav=document.getElementById('nav-'+id);
+  if(nav)nav.classList.add('active');
+  const titles={home:'Home',sessions:'My sessions',courses:'Courses',calculator:'Calculator',practice:'Practice mode',settings:'Settings',chat:'Chat',welcome:'Welcome'};
+  document.getElementById('main-title').textContent=titles[id]||'Kelvi Solo';
+  if(id==='sessions')loadSessions();
+}
 
-function startChat(){const hw=document.getElementById('hw-input').value.trim();if(!hw){alert('Type or paste a problem first.');return}document.getElementById('chat-topic').textContent='Homework help';document.getElementById('opening-msg').textContent="I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?";msgs=[{role:'user',content:'Here is my problem: '+hw},{role:'assistant',content:"I see you're working on something. Before I ask anything — what part of this do you understand so far, and where does it get fuzzy?"}];qCount=0;updateQCount();show('chat')}
+function startApp(){
+  const n=document.getElementById('stu-name').value.trim();
+  if(n){userName=n;localStorage.setItem('kelvi-name',n)}
+  document.getElementById('greeting').textContent=userName?'Hey '+userName+'. What are you working on?':'What are you working on?';
+  document.getElementById('sb-avatar').textContent=userName?userName[0].toUpperCase():'?';
+  document.getElementById('sb-uname').textContent=userName||'Student';
+  if(document.getElementById('settings-name'))document.getElementById('settings-name').value=userName;
+  showPanel('home');
+}
 
+function updateName(v){userName=v;localStorage.setItem('kelvi-name',v);document.getElementById('greeting').textContent=userName?'Hey '+userName+'. What are you working on?':'What are you working on?';document.getElementById('sb-avatar').textContent=userName?userName[0].toUpperCase():'?';document.getElementById('sb-uname').textContent=userName||'Student'}
+
+// MATH HELPERS
+function updatePreview(){const ta=document.getElementById('hw-input');const wrap=document.getElementById('hw-preview-wrap');const prev=document.getElementById('hw-preview');const val=ta.value;if(!val.includes('$$')){wrap.classList.remove('vis');return}wrap.classList.add('vis');prev.innerHTML=eh(val);if(typeof renderMathInElement!=='undefined'){renderMathInElement(prev,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})}}
+function eh(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderMath(t){if(typeof katex==='undefined')return t;t=t.replace(/\$\$([\s\S]*?)\$\$/g,function(m,l){try{return katex.renderToString(l.trim(),{throwOnError:false,displayMode:true})}catch(e){return m}});t=t.replace(/\$([^\$\n]+?)\$/g,function(m,l){try{return katex.renderToString(l.trim(),{throwOnError:false,displayMode:false})}catch(e){return m}});return t}
+
+// CHAT
 let activeSys=SYS;
 
-function openCourse(cname,desc){const bank=PROBLEM_BANK[cname];let bankNote='';if(bank&&bank.length>0){bankNote='\n\nPROBLEM BANK FOR THIS COURSE (use these when the student asks for practice):\n';bank.forEach((p,i)=>{bankNote+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}activeSys=SYS+bankNote;document.getElementById('chat-topic').textContent=cname;document.getElementById('opening-msg').textContent="Welcome to "+cname+". What topic are you curious about, or what problem are you working on?";msgs=[{role:'assistant',content:"Welcome to "+cname+". What topic are you curious about, or what problem are you working on?"}];qCount=0;updateQCount();show('chat')}
+function startChat(){
+  const hw=document.getElementById('hw-input').value.trim();
+  const hasUploads=uploadedImages.length>0;
+  if(!hw&&!hasUploads){alert('Type or paste a problem, or drag an image.');return}
+  resetSession();
+  document.getElementById('chat-topic').textContent='Homework help';
+  const banner=document.getElementById('problem-banner');
+  const bc=document.getElementById('problem-banner-content');
+  let bh='';
+  if(hw)bh+=renderMath(eh(hw));
+  uploadedImages.forEach(img=>{bh+='<img src="'+img.dataUrl+'">'});
+  bc.innerHTML=bh;banner.classList.add('vis');
+  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" id="opening-msg">'+renderMath(eh("I see you're working on something. What part do you understand so far, and where does it get fuzzy?"))+'</div></div>';
+  let uc=[];
+  if(hasUploads){uploadedImages.forEach(img=>{uc.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}})})}
+  uc.push({type:'text',text:'Here is my problem: '+(hw||'See the uploaded image.')});
+  msgs=[{role:'user',content:uc.length===1?uc[0].text:uc},{role:'assistant',content:"I see you're working on something. What part do you understand so far, and where does it get fuzzy?"}];
+  qCount=0;updateQCount();showPanel('chat');
+}
+
+function openCourse(cname){
+  resetSession();
+  const bank=PROBLEM_BANK[cname];let bn='';
+  if(bank&&bank.length>0){bn='\n\nPROBLEM BANK FOR THIS COURSE:\n';bank.forEach((p,i)=>{bn+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}
+  activeSys=SYS+bn;
+  document.getElementById('chat-topic').textContent=cname;
+  document.getElementById('problem-banner').classList.remove('vis');
+  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">Welcome to '+cname+'. What topic are you curious about, or what problem are you working on?</div></div>';
+  msgs=[{role:'assistant',content:'Welcome to '+cname+'. What topic are you curious about, or what problem are you working on?'}];
+  qCount=0;updateQCount();showPanel('chat');
+}
+
+function openPractice(cname){
+  resetSession();
+  const bank=PROBLEM_BANK[cname];let bn='';
+  if(bank&&bank.length>0){bn='\n\nPROBLEM BANK FOR THIS COURSE:\n';bank.forEach((p,i)=>{bn+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}
+  activeSys=SYS+'\n\nPRACTICE MODE: The student wants fluency practice. Give them a problem immediately from the problem bank. After they work through it, ask "Want another one?" and give a different problem from the bank or generate a similar one.'+bn;
+  document.getElementById('chat-topic').textContent=cname+' — Practice';
+  document.getElementById('problem-banner').classList.remove('vis');
+  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">Practice mode for '+cname+'. Here\'s your first problem — give it a try.</div></div>';
+  msgs=[{role:'user',content:'I want to practice '+cname+'. Give me a problem.'},{role:'assistant',content:"Practice mode for "+cname+". Here's your first problem — give it a try."}];
+  qCount=0;updateQCount();showPanel('chat');
+  // Auto-send to get the first problem
+  setTimeout(()=>{
+    msgs.push({role:'user',content:'Give me a problem to start.'});
+    autoSend();
+  },500);
+}
+
+function startPractice(){showPanel('practice')}
+
+function quickChat(prompt){
+  activeSys=SYS;
+  document.getElementById('chat-topic').textContent='Kelvi';
+  document.getElementById('problem-banner').classList.remove('vis');
+  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">What are you working on? Paste your problem or describe what you need help with.</div></div>';
+  msgs=[{role:'assistant',content:'What are you working on? Paste your problem or describe what you need help with.'}];
+  qCount=0;updateQCount();showPanel('chat');
+}
+
+function pillToChat(text){
+  document.getElementById('hw-input').value=text;
+  startChat();
+}
+
+function togglePlusMenu(ctx){
+  const menu=document.getElementById(ctx+'-plus-menu');
+  const btn=document.getElementById(ctx+'-plus');
+  menu.classList.toggle('vis');
+  btn.classList.toggle('open');
+}
+
+// Close plus menus on click outside
+document.addEventListener('click',function(e){
+  ['home','chat'].forEach(function(ctx){
+    const wrap=document.querySelector('#'+ctx+'-plus')?.closest('.plus-menu-wrap');
+    if(wrap&&!wrap.contains(e.target)){
+      document.getElementById(ctx+'-plus-menu')?.classList.remove('vis');
+      document.getElementById(ctx+'-plus')?.classList.remove('open');
+    }
+  });
+});
+
+async function autoSend(){
+  const key=document.getElementById('api-key').value.trim();
+  if(!key)return;
+  const cm=document.getElementById('chat-msgs');
+  document.getElementById('typing').classList.add('vis');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
+    const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
+    document.getElementById('typing').classList.remove('vis');
+    cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
+    cm.scrollTop=cm.scrollHeight;
+  }catch(e){document.getElementById('typing').classList.remove('vis')}
+}
 
 function classifyQ(t){const s=t.toLowerCase();if(/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s))return'G';if(/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s))return'C';if(/how do i|what.*formula|what.*next|how to|how.*find|what.*step|\?/.test(s))return'P';return null}
 
-async function sendMsg(){const inp=document.getElementById('chat-input');const text=inp.value.trim();if(!text)return;const key=document.getElementById('api-key').value.trim();if(!key){alert('Please enter your API key.');return}
-const qt=classifyQ(text);if(qt)qCount++;updateQCount();
-const cm=document.getElementById('chat-msgs');cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s">'+eh(text)+'</div></div>';
-inp.value='';cm.scrollTop=cm.scrollHeight;
-msgs.push({role:'user',content:text});
-document.getElementById('typing').classList.add('vis');
-try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
-const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
-document.getElementById('typing').classList.remove('vis');
-cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'</div></div>';
-cm.scrollTop=cm.scrollHeight;
-}catch(e){document.getElementById('typing').classList.remove('vis');cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key.</div></div>'}}
+let eqTarget='home'; // 'home' or 'chat'
 
-function eh(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function renderMath(t){if(typeof katex==='undefined')return t;return t.replace(/\$\$(.*?)\$\$/g,function(m,l){try{return katex.renderToString(l,{throwOnError:false})}catch(e){return m}})}
+function openEqModal(target){
+  eqTarget=target;
+  const modal=document.getElementById('eq-modal');
+  const field=document.getElementById('eq-modal-field');
+  modal.style.display='flex';
+  setTimeout(function(){
+    field.focus();
+    if(field.executeCommand)field.executeCommand('toggleVirtualKeyboard');
+  },100);
+}
+
+function closeEqModal(){
+  document.getElementById('eq-modal').style.display='none';
+  const field=document.getElementById('eq-modal-field');
+  if(typeof mathVirtualKeyboard!=='undefined')try{mathVirtualKeyboard.visible=false}catch(e){}
+  field.value='';
+}
+
+function insertEquation(){
+  const field=document.getElementById('eq-modal-field');
+  const latex=field.value;
+  if(!latex){closeEqModal();return}
+  if(eqTarget==='home'){
+    const ta=document.getElementById('hw-input');
+    const p=ta.selectionStart||ta.value.length;
+    ta.value=ta.value.substring(0,p)+' $$'+latex+'$$ '+ta.value.substring(p);
+    updatePreview();
+  }else{
+    const ta=document.getElementById('chat-input-text');
+    ta.value=(ta.value?ta.value+' ':'')+'$$'+latex+'$$';
+  }
+  closeEqModal();
+}
+
+function toggleCalc(){document.getElementById('calc-panel').classList.toggle('vis')}
+
+function chatPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=function(ev){
+    // Add to chat as user message with image
+    const cm=document.getElementById('chat-msgs');
+    cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s"><img src="'+ev.target.result+'" style="max-width:200px;border-radius:8px"></div></div>';
+    cm.scrollTop=cm.scrollHeight;
+    msgs.push({role:'user',content:[{type:'image',source:{type:'base64',media_type:f.type,data:ev.target.result.split(',')[1]}},{type:'text',text:'Here is my work. What do you notice?'}]});
+  };
+  r.readAsDataURL(f);
+  togglePlusMenu('chat');
+}
+
+function showSuggestions(){
+  const el=document.getElementById('suggestions');
+  const pills=[
+    'I\'m stuck, give me a hint',
+    'Can you show me a similar problem?',
+    'Why does that work?',
+    'I want to try a different approach',
+    'I got an answer — check my reasoning'
+  ];
+  // Pick 3 random suggestions
+  const shuffled=pills.sort(()=>Math.random()-0.5).slice(0,3);
+  el.innerHTML=shuffled.map(p=>'<span class="suggestion" onclick="useSuggestion(this)">'+p+'</span>').join('');
+  el.style.display='flex';
+}
+
+function useSuggestion(el){
+  const text=el.textContent;
+  document.getElementById('chat-input-text').value=text;
+  document.getElementById('suggestions').style.display='none';
+  sendMsg();
+}
+
+async function sendMsg(){
+  const t=document.getElementById('chat-input-text');
+  const text=t.value.trim();
+  if(!text)return;
+  t.value='';
+  const key=document.getElementById('api-key').value.trim();
+  if(!key){alert('Enter your API key in Settings or the header.');return}
+  const qt=classifyQ(text);if(qt)qCount++;updateQCount();
+  document.getElementById('suggestions').style.display='none';
+  const cm=document.getElementById('chat-msgs');
+  cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s">'+renderMath(eh(text))+'</div></div>';
+  cm.scrollTop=cm.scrollHeight;
+  msgs.push({role:'user',content:text});
+  document.getElementById('typing').classList.add('vis');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
+    const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
+    document.getElementById('typing').classList.remove('vis');
+    cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
+    cm.scrollTop=cm.scrollHeight;
+    showSuggestions();
+    saveCurrentSession();
+  }catch(e){
+    document.getElementById('typing').classList.remove('vis');
+    cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key.</div></div>';
+  }
+}
+
 function updateQCount(){const el=document.getElementById('q-count');if(qCount>0){el.style.display='inline-block';el.textContent=qCount+' question'+(qCount===1?'':'s')+' asked'}}
+function getRandomProblem(c,t){let p=PROBLEM_BANK[c]||[];if(t){const tl=t.toLowerCase();const f=p.filter(x=>x.topic.toLowerCase().includes(tl));if(f.length>0)p=f}if(!p.length)return null;return p[Math.floor(Math.random()*p.length)]}
 
+// MATHQUILL (homework toolbar)
 function initMQ(){if(typeof MathQuill==='undefined')return;const MQ=MathQuill.getInterface(2);const el=document.getElementById('hw-mq');if(el&&!mqF){mqF=MQ.MathField(el,{spaceBehavesLikeTab:true,handlers:{enter:function(){insertHwMath()}}})}}
 function mqC(c){if(!mqF)return;mqF.cmd(c);mqF.focus()}
 function mqW(l){if(!mqF)return;mqF.write(l);mqF.focus()}
-function insertHwMath(){if(!mqF)return;const l=mqF.latex();if(!l)return;const ta=document.getElementById('hw-input');const p=ta.selectionStart;ta.value=ta.value.substring(0,p)+'$$'+l+'$$'+ta.value.substring(p);mqF.latex('');ta.focus()}
+function insertHwMath(){if(!mqF)return;const l=mqF.latex();if(!l)return;const ta=document.getElementById('hw-input');const p=ta.selectionStart;ta.value=ta.value.substring(0,p)+' $$'+l+'$$ '+ta.value.substring(p);mqF.latex('');ta.focus();updatePreview()}
 
-function handlePhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){document.getElementById('hw-input').value+=' [Uploaded photo of problem]'};r.readAsDataURL(f)}
-
+// VOICE
 function toggleHwVoice(){voiceToggle('hw-mic','hw-input')}
-function toggleChatVoice(){voiceToggle('chat-mic','chat-input')}
-function voiceToggle(btnId,fieldId){const b=document.getElementById(btnId);if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice not supported.');return}if(isR){rec.stop();b.classList.remove('rec');isR=false;return}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.onresult=function(e){let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById(fieldId).value=t};rec.onerror=function(){b.classList.remove('rec');isR=false};rec.onend=function(){b.classList.remove('rec');isR=false};rec.start();b.classList.add('rec');isR=true}
+function toggleChatVoice(){voiceToggle('chat-mic','chat-input-text')}
+function voiceToggle(bid,fid){const b=document.getElementById(bid);if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice not supported.');return}if(isR){rec.stop();b.classList.remove('rec');isR=false;return}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;rec.onresult=function(e){let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById(fid).value=t};rec.onerror=function(){b.classList.remove('rec');isR=false};rec.onend=function(){b.classList.remove('rec');isR=false};rec.start();b.classList.add('rec');isR=true}
 
+// DRAG AND DROP
+const hwBox=document.getElementById('hw-box');
+hwBox.addEventListener('dragenter',function(e){e.preventDefault();dragCounter++;this.classList.add('dragover')});
+hwBox.addEventListener('dragleave',function(e){e.preventDefault();dragCounter--;if(dragCounter===0)this.classList.remove('dragover')});
+hwBox.addEventListener('dragover',function(e){e.preventDefault()});
+hwBox.addEventListener('drop',function(e){e.preventDefault();dragCounter=0;this.classList.remove('dragover');for(const f of e.dataTransfer.files){if(f.type.startsWith('image/'))addUpload(f)}});
+
+function addUpload(f){const r=new FileReader();r.onload=function(ev){const id='up-'+Date.now();uploadedImages.push({id:id,type:f.type,data:ev.target.result.split(',')[1],dataUrl:ev.target.result});renderUploads()};r.readAsDataURL(f)}
+function removeUpload(id){uploadedImages=uploadedImages.filter(u=>u.id!==id);renderUploads()}
+function renderUploads(){const c=document.getElementById('hw-uploads');if(!uploadedImages.length){c.innerHTML='';return}c.innerHTML=uploadedImages.map(u=>'<div class="hw-upload-thumb"><img src="'+u.dataUrl+'"><button class="remove-upload" onclick="removeUpload(\''+u.id+'\')">&times;</button></div>').join('')}
+function handlePhoto(e){const f=e.target.files[0];if(!f)return;addUpload(f)}
+
+// TEXT-TO-SPEECH
+let currentUtterance=null;
+function speakText(btn){if('speechSynthesis' in window){if(currentUtterance&&speechSynthesis.speaking){speechSynthesis.cancel();document.querySelectorAll('.speak-btn').forEach(b=>b.classList.remove('speaking'));currentUtterance=null;return}const bubble=btn.closest('.msg-bubble-k');const clone=bubble.cloneNode(true);clone.querySelectorAll('.speak-btn').forEach(b=>b.remove());const text=clone.innerText;currentUtterance=new SpeechSynthesisUtterance(text);currentUtterance.rate=0.9;currentUtterance.onend=function(){btn.classList.remove('speaking');currentUtterance=null};btn.classList.add('speaking');speechSynthesis.speak(currentUtterance)}}
+
+// PERSISTENCE
 function saveKey(){localStorage.setItem('kelvi-solo-key',document.getElementById('api-key').value)}
-function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k)document.getElementById('api-key').value=k}
+function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k){document.getElementById('api-key').value=k;if(document.getElementById('settings-api'))document.getElementById('settings-api').value=k}}
+function loadName(){const n=localStorage.getItem('kelvi-name');if(n){userName=n;document.getElementById('sb-avatar').textContent=n[0].toUpperCase();document.getElementById('sb-uname').textContent=n;if(document.getElementById('settings-name'))document.getElementById('settings-name').value=n}}
 
-loadKey();
+// SESSION MANAGEMENT
+let currentSessionId=null;
+
+function generateSessionId(){return 'session-'+Date.now()+'-'+Math.random().toString(36).substr(2,6)}
+
+function saveCurrentSession(){
+  if(!currentSessionId)currentSessionId=generateSessionId();
+  const topic=document.getElementById('chat-topic').textContent||'Kelvi Session';
+  // Only save text content, not images (too large for localStorage)
+  const saveMsgs=msgs.map(function(m){
+    if(typeof m.content==='string')return m;
+    if(Array.isArray(m.content)){
+      const textParts=m.content.filter(c=>c.type==='text');
+      return{role:m.role,content:textParts.map(c=>c.text).join(' ')||'[image]'};
+    }
+    return m;
+  });
+  const session={
+    id:currentSessionId,
+    topic:topic,
+    date:new Date().toISOString(),
+    messages:saveMsgs,
+    qCount:qCount,
+    student:userName||'Anonymous'
+  };
+  // Get existing sessions
+  let sessions=JSON.parse(localStorage.getItem('kelvi-sessions')||'[]');
+  // Update or add
+  const idx=sessions.findIndex(s=>s.id===currentSessionId);
+  if(idx>=0)sessions[idx]=session;
+  else sessions.unshift(session);
+  // Keep max 50 sessions
+  if(sessions.length>50)sessions=sessions.slice(0,50);
+  try{localStorage.setItem('kelvi-sessions',JSON.stringify(sessions))}catch(e){}
+}
+
+function loadSessions(){
+  const sessions=JSON.parse(localStorage.getItem('kelvi-sessions')||'[]');
+  const list=document.getElementById('hist-list');
+  const empty=document.getElementById('hist-empty');
+  if(!sessions.length){list.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  list.innerHTML=sessions.map(function(s){
+    const d=new Date(s.date);
+    const today=new Date();
+    let dateStr;
+    if(d.toDateString()===today.toDateString())dateStr='Today';
+    else if(d.toDateString()===new Date(today-86400000).toDateString())dateStr='Yesterday';
+    else dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return '<div class="hist-item" onclick="loadSession(\''+s.id+'\')"><div><div class="hist-topic">'+eh(s.topic)+'</div><div class="hist-q">'+(s.qCount||0)+' question'+(s.qCount===1?'':'s')+' asked</div></div><div class="hist-date">'+dateStr+'</div></div>';
+  }).join('');
+}
+
+function loadSession(id){
+  const sessions=JSON.parse(localStorage.getItem('kelvi-sessions')||'[]');
+  const session=sessions.find(s=>s.id===id);
+  if(!session)return;
+  currentSessionId=session.id;
+  msgs=session.messages||[];
+  qCount=session.qCount||0;
+  updateQCount();
+  document.getElementById('chat-topic').textContent=session.topic;
+  document.getElementById('problem-banner').classList.remove('vis');
+  // Rebuild chat messages
+  const cm=document.getElementById('chat-msgs');
+  cm.innerHTML='';
+  msgs.forEach(function(m){
+    const content=typeof m.content==='string'?m.content:'[image]';
+    if(m.role==='assistant'){
+      cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(content))+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
+    }else{
+      cm.innerHTML+='<div class="msg msg-s"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s">'+renderMath(eh(content))+'</div></div>';
+    }
+  });
+  cm.scrollTop=cm.scrollHeight;
+  activeSys=SYS;
+  showPanel('chat');
+}
+
+function resetSession(){
+  currentSessionId=null;
+  msgs=[];
+  qCount=0;
+  updateQCount();
+}
+
+// EXPORT TRANSCRIPT
+function toggleExportMenu(){
+  document.getElementById('export-menu').classList.toggle('vis');
+}
+document.addEventListener('click',function(e){
+  const wrap=document.querySelector('.export-wrap');
+  if(wrap&&!wrap.contains(e.target))document.getElementById('export-menu')?.classList.remove('vis');
+});
+
+function getTranscriptText(){
+  const topic=document.getElementById('chat-topic').textContent||'Kelvi Session';
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  let lines=['KELVI SOLO — TRANSCRIPT','Topic: '+topic,'Date: '+date,'Student: '+(userName||'Anonymous'),'','---',''];
+  msgs.forEach(function(m){
+    const role=m.role==='user'?'Student':'Kelvi';
+    const content=typeof m.content==='string'?m.content:(m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ')||'[image]');
+    lines.push(role+': '+content);
+    lines.push('');
+  });
+  lines.push('---');
+  lines.push('Questions asked: '+qCount);
+  lines.push('Exported from Kelvi Solo — kelvi-umber.vercel.app');
+  return lines.join('\n');
+}
+
+function exportClipboard(){
+  const text=getTranscriptText();
+  navigator.clipboard.writeText(text).then(function(){
+    const btn=document.querySelector('.export-btn');
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3A6B5C" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(function(){btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'},2000);
+  });
+  document.getElementById('export-menu').classList.remove('vis');
+}
+
+function exportText(){
+  const text=getTranscriptText();
+  const blob=new Blob([text],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='kelvi-transcript-'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('export-menu').classList.remove('vis');
+}
+
+function exportPDF(){
+  const topic=document.getElementById('chat-topic').textContent||'Kelvi Session';
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  let html='<html><head><meta charset="UTF-8"><title>Kelvi Transcript</title><style>body{font-family:-apple-system,sans-serif;max-width:700px;margin:40px auto;padding:0 20px;color:#2F2B25;font-size:14px;line-height:1.7}h1{font-size:20px;margin-bottom:4px}h2{font-size:14px;color:#6F6A61;font-weight:normal;margin-bottom:24px}.msg{margin-bottom:16px;padding:12px 16px;border-radius:10px}.kelvi{background:#E8EEF2;border-bottom-left-radius:4px}.student{background:#5A7080;color:white;margin-left:20%;border-bottom-right-radius:4px}.role{font-size:11px;font-weight:600;margin-bottom:4px}.role-k{color:#5A7080}.role-s{color:rgba(255,255,255,0.7)}.footer{margin-top:32px;padding-top:16px;border-top:1px solid #CDC3B1;font-size:11px;color:#6F6A61;text-align:center}@media print{body{margin:20px}}</style></head><body>';
+  html+='<h1>'+topic+'</h1>';
+  html+='<h2>'+date+' — '+(userName||'Anonymous')+'</h2>';
+  msgs.forEach(function(m){
+    const isK=m.role==='assistant';
+    const content=typeof m.content==='string'?m.content:(m.content.filter(c=>c.type==='text').map(c=>c.text).join(' ')||'[image]');
+    html+='<div class="msg '+(isK?'kelvi':'student')+'"><div class="role '+(isK?'role-k':'role-s')+'">'+(isK?'Kelvi':'You')+'</div>'+content.replace(/\n/g,'<br>')+'</div>';
+  });
+  html+='<div class="footer">Questions asked: '+qCount+'<br>Exported from Kelvi Solo</div>';
+  html+='</body></html>';
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function(){w.print()},500);
+  document.getElementById('export-menu').classList.remove('vis');
+}
+
+loadKey();loadName();
 setTimeout(initMQ,500);
+setTimeout(function(){var mf=document.getElementById('eq-modal-field');if(mf)mf.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();insertEquation()}})},600);
+
+// Auto-start if name is saved
+if(localStorage.getItem('kelvi-name')){
+  document.getElementById('greeting').textContent='Hey '+localStorage.getItem('kelvi-name')+'. What are you working on?';
+  showPanel('home');
+}
 </script>
 </body>
 </html>
