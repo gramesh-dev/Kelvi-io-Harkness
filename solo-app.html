@@ -162,14 +162,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .qa-row:hover{color:var(--accent)}
 .qa-arrow{font-size:14px;margin-left:auto}
 
-/* COURSES */
-.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
-.course{background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s}
-.course:hover{border-color:var(--accent);transform:translateY(-2px)}
-.course-icon{font-size:22px;margin-bottom:8px;display:block}
-.course-name{font-size:14px;font-weight:500;margin-bottom:3px}
-.course-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
-
 /* CHAT */
 .chat-panel{overflow:hidden}
 .chat-layout{flex:1;display:flex;flex-direction:column;height:100%}
@@ -248,10 +240,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .hist-date{font-size:11px;color:var(--text-muted)}
 .hist-q{font-size:11px;color:var(--accent);margin-top:2px}
 
-/* COURSES PANEL */
-.courses-inner{max-width:760px;padding:28px 20px 60px;width:100%}
-.courses-title{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px}
-
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 @media(max-width:768px){
@@ -273,14 +261,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
   <nav class="sb-nav">
     <div class="sb-item active" onclick="showPanel('home')" id="nav-home">Home</div>
     <div class="sb-item" onclick="showPanel('sessions')" id="nav-sessions">My sessions</div>
-    <div class="sb-item" onclick="showPanel('courses')" id="nav-courses">Courses</div>
-    <div class="sb-item" onclick="showPanel('practice')" id="nav-practice">Practice mode</div>
     <div class="sb-item" onclick="showPanel('calculator')" id="nav-calculator">Calculator</div>
-    <div class="sb-divider"></div>
-    <div class="sb-item" style="cursor:default;opacity:0.6">Problem bank <span class="sb-badge">soon</span></div>
-    <div class="sb-item" style="cursor:default;opacity:0.6">Formula sheet <span class="sb-badge">soon</span></div>
-    <div class="sb-item" style="cursor:default;opacity:0.6">My progress <span class="sb-badge">soon</span></div>
-    <div class="sb-item" style="cursor:default;opacity:0.6">Bookmarks <span class="sb-badge">soon</span></div>
   </nav>
   <div class="sb-bottom">
     <div class="sb-item" onclick="showPanel('settings')" id="nav-settings">Settings</div>
@@ -321,8 +302,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     <div class="home-bottom">
       <div class="home-pills">
         <span class="pill" onclick="pillToChat('Help me think through my homework problem')">Help me with homework</span>
-        <span class="pill" onclick="showPanel('courses')">Explore a course</span>
-        <span class="pill" onclick="showPanel('practice')">Give me practice problems for fluency</span>
         <span class="pill" onclick="showPanel('calculator')">Open calculator</span>
       </div>
       <div class="home-input-bar" id="hw-box">
@@ -410,24 +389,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     </div>
   </div>
 
-  <!-- COURSES -->
-  <div class="panel" id="panel-courses" style="overflow-y:auto">
-    <div class="courses-inner" style="animation:fadeUp .4s ease">
-      <div class="courses-title">Courses</div>
-      <div class="courses">
-        <div class="course" onclick="openCourse('Integrated Math 1','Linear equations, inequalities, intro geometry, data')"><span class="course-icon">&#x2160;</span><div class="course-name">Integrated Math 1</div><div class="course-desc">Linear equations, inequalities, geometric foundations, data analysis</div></div>
-        <div class="course" onclick="openCourse('Integrated Math 2','Quadratics, similarity, probability, right triangles')"><span class="course-icon">&#x2161;</span><div class="course-name">Integrated Math 2</div><div class="course-desc">Quadratics, similarity, probability, right triangle trigonometry</div></div>
-        <div class="course" onclick="openCourse('Integrated Math 3','Polynomials, rational functions, circles, trig identities')"><span class="course-icon">&#x2162;</span><div class="course-name">Integrated Math 3</div><div class="course-desc">Polynomials, rational functions, circles, trigonometric identities</div></div>
-        <div class="course" onclick="openCourse('Math 4','Precalculus, limits, intro to derivatives and integrals')"><span class="course-icon">&#x2163;</span><div class="course-name">Math 4</div><div class="course-desc">Precalculus, limits, introduction to derivatives and integrals</div></div>
-        <div class="course" onclick="openCourse('Math 5','BC Calculus: series, parametric, polar, advanced integration')"><span class="course-icon">&#x2164;</span><div class="course-name">Math 5</div><div class="course-desc">BC Calculus: series, parametric equations, polar coordinates, advanced integration</div></div>
-        <div class="course" onclick="openCourse('AP Statistics','Probability, distributions, inference, experimental design')"><span class="course-icon">&#x03C3;</span><div class="course-name">AP Statistics</div><div class="course-desc">Probability, distributions, inference, regression, experimental design</div></div>
-        <div class="course" onclick="openCourse('Linear Algebra','Vectors, matrices, eigenvalues, linear transformations')"><span class="course-icon">&#x27E8;&#x27E9;</span><div class="course-name">Linear Algebra</div><div class="course-desc">Vectors, matrices, eigenvalues, linear transformations, vector spaces</div></div>
-        <div class="course" onclick="openCourse('Differential Equations','First and second order ODEs, systems, Laplace transforms')"><span class="course-icon">&#x2202;</span><div class="course-name">Differential Equations</div><div class="course-desc">First and second order ODEs, systems, Laplace transforms</div></div>
-        <div class="course" onclick="openCourse('Discrete Math','Logic, proofs, sets, combinatorics, graph theory')"><span class="course-icon">&#x2227;</span><div class="course-name">Discrete Math</div><div class="course-desc">Logic, proofs, sets, combinatorics, graph theory</div></div>
-      </div>
-    </div>
-  </div>
-
   <!-- CALCULATOR -->
   <div class="panel" id="panel-calculator">
     <div class="calc-main">
@@ -443,29 +404,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     </div>
   </div>
 
-  <!-- PRACTICE -->
-  <div class="panel" id="panel-practice" style="overflow-y:auto">
-    <div class="courses-inner" style="animation:fadeUp .4s ease">
-      <div class="courses-title">Practice mode</div>
-      <p style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">Pick a course and Kelvi will give you problems to build fluency. Work through each one with Kelvi's guidance, then ask for more.</p>
-      <div class="courses">
-        <div class="course" onclick="openPractice('Integrated Math 1')"><span class="course-icon">&#x2160;</span><div class="course-name">Integrated Math 1</div><div class="course-desc">Practice linear equations, systems, coordinate geometry</div></div>
-        <div class="course" onclick="openPractice('Integrated Math 2')"><span class="course-icon">&#x2161;</span><div class="course-name">Integrated Math 2</div><div class="course-desc">Practice quadratics, similarity, probability</div></div>
-        <div class="course" onclick="openPractice('Integrated Math 3')"><span class="course-icon">&#x2162;</span><div class="course-name">Integrated Math 3</div><div class="course-desc">Practice polynomials, logarithms, trig identities</div></div>
-        <div class="course" onclick="openPractice('Math 4')"><span class="course-icon">&#x2163;</span><div class="course-name">Math 4</div><div class="course-desc">Practice limits, derivatives, optimization</div></div>
-        <div class="course" onclick="openPractice('Math 5')"><span class="course-icon">&#x2164;</span><div class="course-name">Math 5</div><div class="course-desc">Practice series, parametric, polar, integration</div></div>
-        <div class="course" onclick="openPractice('AP Statistics')"><span class="course-icon">&#x03C3;</span><div class="course-name">AP Statistics</div><div class="course-desc">Practice probability, distributions, inference</div></div>
-        <div class="course" onclick="openPractice('Linear Algebra')"><span class="course-icon">&#x27E8;&#x27E9;</span><div class="course-name">Linear Algebra</div><div class="course-desc">Practice vectors, matrices, eigenvalues</div></div>
-        <div class="course" onclick="openPractice('Differential Equations')"><span class="course-icon">&#x2202;</span><div class="course-name">Differential Equations</div><div class="course-desc">Practice first-order, second-order ODEs</div></div>
-        <div class="course" onclick="openPractice('Discrete Math')"><span class="course-icon">&#x2227;</span><div class="course-name">Discrete Math</div><div class="course-desc">Practice combinatorics, graph theory, proofs</div></div>
-      </div>
-    </div>
-  </div>
-
   <!-- SETTINGS -->
   <div class="panel" id="panel-settings" style="overflow-y:auto">
-    <div class="courses-inner" style="animation:fadeUp .4s ease">
-      <div class="courses-title">Settings</div>
+    <div style="max-width:760px;padding:28px 20px 60px;width:100%;animation:fadeUp .4s ease">
+      <div style="font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px">Settings</div>
       <div class="home-section">
         <div class="home-label">Your name</div>
         <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--white)" oninput="updateName(this.value)">
@@ -573,30 +515,7 @@ MATH VISUALS:
 When a visual would help, include inline SVG. Use fill="#5A7080" for main elements and fill="#B8784E" for accents.
 
 RESPONSE LENGTH:
-Two to three sentences maximum. Never write paragraphs. If you find yourself writing more than three sentences, you are doing too much.
-
-COURSE TOPIC MAP:
-- Integrated Math 1: Linear equations, inequalities, systems, coordinate geometry, data analysis, sequences
-- Integrated Math 2: Quadratics, similarity, right triangle trig, probability, transformations
-- Integrated Math 3: Polynomials, rational functions, logarithms, trigonometric identities, circles
-- Math 4 (AB Calculus): Limits, continuity, derivatives, applications of derivatives, intro integration
-- Math 5 (BC Calculus): Advanced integration, series, parametric/polar, differential equations
-- AP Statistics: Probability, distributions, confidence intervals, hypothesis testing, regression
-- Linear Algebra: Vectors, matrices, linear transformations, eigenvalues, vector spaces
-- Differential Equations: First-order ODEs, second-order ODEs, systems, Laplace transforms
-- Discrete Math: Logic, proofs, sets, combinatorics, graph theory`;
-
-const PROBLEM_BANK={
-'Integrated Math 1':[{topic:'linear equations',text:'The sum of two consecutive odd numbers is 156. Write an equation to find the numbers.',source:'PEA'},{topic:'systems',text:'A pile of 100 coins worth $12.75 contains only quarters and dimes. How many of each?',source:'PEA'},{topic:'coordinate geometry',text:'A 5 by 5 square has one vertex at (2, 3). Find the other three vertices if the sides are not parallel to the axes.',source:'PEA'}],
-'Integrated Math 2':[{topic:'quadratics',text:'A ball is thrown upward from a 64-foot cliff. h(t) = -16t\u00B2 + 48t + 64. When does it hit the ground? Maximum height?',source:'PEA'},{topic:'probability',text:'In 30 students, 18 study Spanish, 15 study French, 5 study both. How many study neither?',source:'AMC'},{topic:'similarity',text:'Two similar triangles have areas in ratio 9:25. Smaller perimeter is 36 cm. What is the larger perimeter?',source:'PEA'}],
-'Integrated Math 3':[{topic:'polynomials',text:'p(x) has roots at x = -2, 1, and 3. If p(0) = 12, find p(x).',source:'PEA'},{topic:'logarithms',text:'Solve: log\u2082(x) + log\u2082(x-2) = 3. Any values to reject?',source:'PEA'},{topic:'trigonometry',text:'Prove that (sin \u03B8 + cos \u03B8)\u00B2 = 1 + sin 2\u03B8.',source:'PEA'}],
-'Math 4':[{topic:'limits',text:'Find lim(x\u21920) of sin(3x)/sin(5x) without L\'H\u00F4pital.',source:'PEA'},{topic:'derivatives',text:'10-foot ladder, bottom slides out at 2 ft/sec. How fast does the top slide down when bottom is 6 ft out?',source:'PEA'},{topic:'optimization',text:'400 ft of fencing, rectangular field along a river (no fence on river side). Maximize area.',source:'PEA'}],
-'Math 5':[{topic:'series',text:'Does \u03A3(n=1 to \u221E) n/2\u207F converge? If so, find the sum.',source:'PEA'},{topic:'parametric',text:'x(t)=cos(t), y(t)=sin(2t). Sketch for 0\u2264t\u22642\u03C0. Velocity at t=\u03C0/4?',source:'PEA'},{topic:'polar',text:'Convert r = 2cos(\u03B8) to rectangular form. What curve?',source:'PEA'}],
-'AP Statistics':[{topic:'probability',text:'10 socks: 4 blue, 6 black. Pull 2 without looking. P(match)?',source:'AMC'},{topic:'distributions',text:'2% defective bulbs. Box of 100. P(exactly 3 defective)? Which distribution?',source:'AP'},{topic:'inference',text:'100 flips, 62 heads. Convincing evidence the coin is unfair?',source:'AP'}],
-'Linear Algebra':[{topic:'transformations',text:'T: R\u00B2\u2192R\u00B2 reflects across y=x. Find the matrix.',source:'LA'},{topic:'eigenvalues',text:'Eigenvalues and eigenvectors of [[2,1],[1,2]]. Geometric meaning?',source:'LA'},{topic:'vector spaces',text:'Is the set of 2\u00D72 matrices with det=0 a vector space? Why?',source:'LA'}],
-'Differential Equations':[{topic:'separable',text:'Population proportional to size. 1000 at t=0, 3000 at t=5. Find P(t).',source:'DE'},{topic:'modeling',text:'Coffee at 200\u00B0F in 70\u00B0F room. After 5 min: 150\u00B0F. When 100\u00B0F?',source:'DE'}],
-'Discrete Math':[{topic:'combinatorics',text:'8 people around a circular table. How many arrangements? What if 2 must sit together?',source:'AMC'},{topic:'graph theory',text:'5 towns, each connected to every other. How many roads? Euler circuit?',source:'DM'}]
-};
+Two to three sentences maximum. Never write paragraphs. If you find yourself writing more than three sentences, you are doing too much.`;
 
 // PANEL NAVIGATION
 function showPanel(id){
@@ -606,7 +525,7 @@ function showPanel(id){
   if(panel){panel.classList.add('active');requestAnimationFrame(()=>{panel.style.opacity='1'})}
   const nav=document.getElementById('nav-'+id);
   if(nav)nav.classList.add('active');
-  const titles={home:'Home',sessions:'My sessions',courses:'Courses',calculator:'Calculator',practice:'Practice mode',settings:'Settings',chat:'Chat',welcome:'Welcome'};
+  const titles={home:'Home',sessions:'My sessions',calculator:'Calculator',settings:'Settings',chat:'Chat',welcome:'Welcome'};
   document.getElementById('main-title').textContent=titles[id]||'Kelvi Solo';
   if(id==='sessions')loadSessions();
 }
@@ -650,37 +569,6 @@ function startChat(){
   msgs=[{role:'user',content:uc.length===1?uc[0].text:uc},{role:'assistant',content:"I see you're working on something. What part do you understand so far, and where does it get fuzzy?"}];
   qCount=0;updateQCount();showPanel('chat');
 }
-
-function openCourse(cname){
-  resetSession();
-  const bank=PROBLEM_BANK[cname];let bn='';
-  if(bank&&bank.length>0){bn='\n\nPROBLEM BANK FOR THIS COURSE:\n';bank.forEach((p,i)=>{bn+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}
-  activeSys=SYS+bn;
-  document.getElementById('chat-topic').textContent=cname;
-  document.getElementById('problem-banner').classList.remove('vis');
-  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">Welcome to '+cname+'. What topic are you curious about, or what problem are you working on?</div></div>';
-  msgs=[{role:'assistant',content:'Welcome to '+cname+'. What topic are you curious about, or what problem are you working on?'}];
-  qCount=0;updateQCount();showPanel('chat');
-}
-
-function openPractice(cname){
-  resetSession();
-  const bank=PROBLEM_BANK[cname];let bn='';
-  if(bank&&bank.length>0){bn='\n\nPROBLEM BANK FOR THIS COURSE:\n';bank.forEach((p,i)=>{bn+=(i+1)+'. ['+p.topic+'] '+p.text+'\n'})}
-  activeSys=SYS+'\n\nPRACTICE MODE: The student wants fluency practice. Give them a problem immediately from the problem bank. After they work through it, ask "Want another one?" and give a different problem from the bank or generate a similar one.'+bn;
-  document.getElementById('chat-topic').textContent=cname+' — Practice';
-  document.getElementById('problem-banner').classList.remove('vis');
-  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">Practice mode for '+cname+'. Here\'s your first problem — give it a try.</div></div>';
-  msgs=[{role:'user',content:'I want to practice '+cname+'. Give me a problem.'},{role:'assistant',content:"Practice mode for "+cname+". Here's your first problem — give it a try."}];
-  qCount=0;updateQCount();showPanel('chat');
-  // Auto-send to get the first problem
-  setTimeout(()=>{
-    msgs.push({role:'user',content:'Give me a problem to start.'});
-    autoSend();
-  },500);
-}
-
-function startPractice(){showPanel('practice')}
 
 function quickChat(prompt){
   activeSys=SYS;
@@ -833,7 +721,6 @@ async function sendMsg(){
 }
 
 function updateQCount(){const el=document.getElementById('q-count');if(qCount>0){el.style.display='inline-block';el.textContent=qCount+' question'+(qCount===1?'':'s')+' asked'}}
-function getRandomProblem(c,t){let p=PROBLEM_BANK[c]||[];if(t){const tl=t.toLowerCase();const f=p.filter(x=>x.topic.toLowerCase().includes(tl));if(f.length>0)p=f}if(!p.length)return null;return p[Math.floor(Math.random()*p.length)]}
 
 // MATHQUILL (homework toolbar)
 function initMQ(){if(typeof MathQuill==='undefined')return;const MQ=MathQuill.getInterface(2);const el=document.getElementById('hw-mq');if(el&&!mqF){mqF=MQ.MathField(el,{spaceBehavesLikeTab:true,handlers:{enter:function(){insertHwMath()}}})}}
