@@ -116,7 +116,7 @@ CREATE TABLE students (
     profile_id      UUID REFERENCES profiles(id) ON DELETE SET NULL,
     full_name       TEXT NOT NULL,
     display_name    TEXT,
-    date_of_birth   DATE,
+    date_of_birth   DATE, -- canonical learner DOB (required for age rules via RPCs)
     grade_level     TEXT,
     avatar_url      TEXT,
     is_active       BOOLEAN NOT NULL DEFAULT true,
@@ -126,6 +126,9 @@ CREATE TABLE students (
 );
 
 CREATE INDEX idx_student_profile ON students(profile_id) WHERE profile_id IS NOT NULL;
+
+CREATE UNIQUE INDEX students_one_profile_id ON students (profile_id)
+  WHERE profile_id IS NOT NULL;
 
 CREATE TRIGGER trg_student_updated BEFORE UPDATE ON students
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -137,11 +140,54 @@ CREATE TABLE student_org_assignments (
     student_id  UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
     org_id      UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     assigned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    parent_school_insights_visible BOOLEAN NOT NULL DEFAULT false,
     UNIQUE(student_id, org_id)
 );
 
 CREATE INDEX idx_soa_student ON student_org_assignments(student_id);
 CREATE INDEX idx_soa_org ON student_org_assignments(org_id);
+
+-- School requests learner/guardian approval to link a student to a school org.
+-- recipient_guardian_profile_id is optional notification routing only.
+CREATE TABLE school_access_requests (
+    id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_org_id               UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    student_id                  UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    requested_by_profile_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    recipient_kind              TEXT NOT NULL CHECK (recipient_kind IN ('guardian', 'learner')),
+    recipient_guardian_profile_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    notify_parent               BOOLEAN NOT NULL DEFAULT false,
+    status                      TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'approved', 'denied', 'cancelled', 'expired')),
+    token                       TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+    expires_at                  TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '14 days'),
+    created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    resolved_at                 TIMESTAMPTZ,
+    resolved_by_profile_id      UUID REFERENCES profiles(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_sar_school_status ON school_access_requests(school_org_id, status);
+CREATE INDEX idx_sar_student_status ON school_access_requests(student_id, status);
+CREATE UNIQUE INDEX sar_one_pending_per_school_student
+    ON school_access_requests(school_org_id, student_id)
+    WHERE (status = 'pending');
+
+-- Optional 14+ learner login attach (token flow); separate from staff invitations.
+CREATE TABLE learner_account_invites (
+    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id              UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    inviting_guardian_id    UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    email                   TEXT NOT NULL,
+    token                   TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+    status                  TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'accepted', 'expired', 'revoked')),
+    expires_at              TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '14 days'),
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    accepted_at             TIMESTAMPTZ
+);
+
+CREATE INDEX idx_lai_token ON learner_account_invites(token);
+CREATE INDEX idx_lai_student ON learner_account_invites(student_id);
 
 -- Guardian links. INSERT requires caller is admin of a shared org
 -- (see rls.sql). Initial guardian created by create_student() RPC.

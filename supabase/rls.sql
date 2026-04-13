@@ -4,7 +4,7 @@
 -- ============================================================
 --
 -- Security principles:
---   • Students have no auth.uid() — access is always via an adult
+--   • Most students have no auth.uid(); linked learners (14+) may equal students.profile_id
 --   • org_id on learning_sessions is the tenant boundary
 --   • FORCE RLS on child-sensitive and system-critical tables
 --   • Service-role only writes for: platform_roles, audit_logs,
@@ -48,6 +48,8 @@ ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE school_access_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE learner_account_invites ENABLE ROW LEVEL SECURITY;
 
 
 -- ── FORCE RLS ON SENSITIVE TABLES ─────────────────────────
@@ -104,6 +106,10 @@ RETURNS BOOLEAN AS $$
     SELECT
         is_platform_admin()
         OR EXISTS (
+            SELECT 1 FROM public.students s
+            WHERE s.id = target_student_id AND s.profile_id = auth.uid()
+        )
+        OR EXISTS (
             SELECT 1 FROM public.student_guardians
             WHERE guardian_id = auth.uid()
               AND student_id = target_student_id
@@ -133,6 +139,48 @@ RETURNS BOOLEAN AS $$
     );
 $$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
 
+CREATE OR REPLACE FUNCTION can_approve_school_access_as_guardian(p_student_id UUID)
+RETURNS BOOLEAN AS $$
+    SELECT
+        EXISTS (
+            SELECT 1 FROM public.student_guardians sg
+            WHERE sg.student_id = p_student_id
+              AND sg.guardian_id = auth.uid()
+        )
+        OR EXISTS (
+            SELECT 1
+            FROM public.student_org_assignments soa
+            JOIN public.organizations o ON o.id = soa.org_id AND o.type = 'family'
+            JOIN public.org_memberships om
+              ON om.org_id = soa.org_id
+             AND om.profile_id = auth.uid()
+             AND om.is_active = true
+             AND om.role = 'family_admin'
+            WHERE soa.student_id = p_student_id
+        );
+$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
+
+CREATE OR REPLACE FUNCTION can_guardian_view_school_insights(
+    p_student_id UUID,
+    p_org_id UUID
+)
+RETURNS BOOLEAN AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM public.student_org_assignments soa
+        JOIN public.organizations o ON o.id = soa.org_id
+        WHERE soa.student_id = p_student_id
+          AND soa.org_id = p_org_id
+          AND soa.parent_school_insights_visible = true
+          AND o.type IN ('school', 'district')
+    )
+    AND EXISTS (
+        SELECT 1 FROM public.student_guardians sg
+        WHERE sg.student_id = p_student_id
+          AND sg.guardian_id = auth.uid()
+    );
+$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
+
 
 -- ── HELPER FUNCTION PERMISSIONS ───────────────────────────
 -- These SECURITY DEFINER functions run with owner privileges.
@@ -144,12 +192,16 @@ REVOKE ALL ON FUNCTION is_org_member(UUID) FROM PUBLIC;
 REVOKE ALL ON FUNCTION is_org_admin(UUID) FROM PUBLIC;
 REVOKE ALL ON FUNCTION can_access_student(UUID) FROM PUBLIC;
 REVOKE ALL ON FUNCTION is_classroom_teacher(UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION can_approve_school_access_as_guardian(UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION can_guardian_view_school_insights(UUID, UUID) FROM PUBLIC;
 
 GRANT EXECUTE ON FUNCTION is_platform_admin() TO authenticated;
 GRANT EXECUTE ON FUNCTION is_org_member(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION is_org_admin(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION can_access_student(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION is_classroom_teacher(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION can_approve_school_access_as_guardian(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION can_guardian_view_school_insights(UUID, UUID) TO authenticated;
 
 
 -- ============================================================
@@ -373,6 +425,7 @@ CREATE POLICY ls_select ON learning_sessions FOR SELECT USING (
     initiated_by = auth.uid()
     OR can_access_student(student_id)
     OR is_platform_admin()
+    OR can_guardian_view_school_insights(student_id, org_id)
 );
 
 CREATE POLICY ls_insert ON learning_sessions FOR INSERT WITH CHECK (
@@ -387,7 +440,11 @@ CREATE POLICY sm_select ON session_messages FOR SELECT USING (
     EXISTS (
         SELECT 1 FROM learning_sessions ls
         WHERE ls.id = session_messages.session_id
-          AND (ls.initiated_by = auth.uid() OR can_access_student(ls.student_id))
+          AND (
+              ls.initiated_by = auth.uid()
+              OR can_access_student(ls.student_id)
+              OR can_guardian_view_school_insights(ls.student_id, ls.org_id)
+          )
     )
     OR is_platform_admin()
 );
@@ -417,7 +474,13 @@ CREATE POLICY aii_select ON ai_interactions FOR SELECT USING (
 -- Write: service-role only (Edge Functions, AI gateway).
 
 CREATE POLICY artifact_select ON ai_artifacts FOR SELECT USING (
-    (student_id IS NOT NULL AND can_access_student(student_id))
+    (
+        student_id IS NOT NULL
+        AND (
+            can_access_student(student_id)
+            OR can_guardian_view_school_insights(student_id, org_id)
+        )
+    )
     OR is_org_admin(org_id)
     OR is_platform_admin()
 );
@@ -456,6 +519,12 @@ CREATE POLICY sub_select ON submissions FOR SELECT USING (
         WHERE a.id = submissions.assignment_id
           AND is_classroom_teacher(a.classroom_id)
     )
+    OR EXISTS (
+        SELECT 1 FROM assignments a2
+        JOIN classrooms c ON c.id = a2.classroom_id
+        WHERE a2.id = submissions.assignment_id
+          AND can_guardian_view_school_insights(submissions.student_id, c.org_id)
+    )
     OR is_platform_admin()
 );
 
@@ -468,6 +537,7 @@ CREATE POLICY ps_select ON progress_snapshots FOR SELECT USING (
     can_access_student(student_id)
     OR is_org_admin(org_id)
     OR is_platform_admin()
+    OR can_guardian_view_school_insights(student_id, org_id)
 );
 
 -- No INSERT/UPDATE/DELETE policies. Service-role only.
@@ -518,6 +588,35 @@ CREATE POLICY inv_select ON invitations FOR SELECT USING (
 
 CREATE POLICY inv_insert ON invitations FOR INSERT WITH CHECK (
     is_org_admin(org_id) OR is_platform_admin()
+);
+
+
+-- ── SCHOOL ACCESS REQUESTS / LEARNER ACCOUNT INVITES ─────
+-- Staff invitations stay on invitations; these are learner/school linking.
+-- Mutations are RPC-first; SELECT allows relevant parties to list rows.
+
+CREATE POLICY sar_select ON school_access_requests FOR SELECT USING (
+    requested_by_profile_id = auth.uid()
+    OR recipient_guardian_profile_id = auth.uid()
+    OR EXISTS (
+        SELECT 1 FROM org_memberships om
+        WHERE om.org_id = school_access_requests.school_org_id
+          AND om.profile_id = auth.uid()
+          AND om.is_active = true
+          AND om.role IN ('school_admin', 'teacher')
+    )
+    OR can_approve_school_access_as_guardian(student_id)
+    OR is_platform_admin()
+);
+
+CREATE POLICY lai_select ON learner_account_invites FOR SELECT USING (
+    inviting_guardian_id = auth.uid()
+    OR EXISTS (
+        SELECT 1 FROM student_guardians sg
+        WHERE sg.student_id = learner_account_invites.student_id
+          AND sg.guardian_id = auth.uid()
+    )
+    OR is_platform_admin()
 );
 
 
