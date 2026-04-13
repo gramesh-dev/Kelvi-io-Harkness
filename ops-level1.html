@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi Family — Operations Level 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3EE;--surface:#ECE7DC;--deeper:#E0D8C8;--divider:#CDC3B1;--text:#2F2B25;--muted:#6F6A61;--clay:#B8784E;--clay-dark:#9E6640;--clay-light:#F5EDE5;--green:#3A6B5C;--green-light:#EBF3EF;--purple:#534AB7;--purple-light:#EEEDFE;--gold:#C9A84C;--gold-light:#FBF5E6;--white:#FFFFFF;--heading:'DM Serif Display',serif;--body:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--divider);padding:0 24px;height:56px;display:flex;align-items:center;gap:12px}
+.nav-back{font-size:13px;color:var(--clay);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;text-decoration:none}.nav-back:hover{opacity:0.7}
+.nav-title{font-family:var(--heading);font-size:1.1rem;color:var(--text);flex:1}
+.nav-settings{background:none;border:1px solid var(--divider);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--muted);transition:all .12s;display:flex;align-items:center}.nav-settings:hover{border-color:var(--clay);color:var(--clay)}
+
+.screen{display:none}.screen.active{display:block}
+
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,0.4);z-index:200;align-items:center;justify-content:center}.settings-overlay.vis{display:flex}
+.settings-modal{background:var(--white);border-radius:14px;width:90%;max-width:420px;padding:28px;position:relative}
+.settings-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer}.settings-close:hover{color:var(--text)}
+.settings-title{font-family:var(--heading);font-size:1.3rem;margin-bottom:18px}
+.settings-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.settings-input{width:100%;padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--body);outline:none;background:var(--white)}.settings-input:focus{border-color:var(--clay)}
+
+.level-hero{max-width:600px;margin:0 auto;padding:48px 24px 24px}
+.level-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.level-title{font-family:var(--heading);font-size:2rem;letter-spacing:-0.02em;margin-bottom:8px}
+.level-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.level-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.level-progress-bar{flex:1;height:4px;background:var(--surface);border-radius:2px;overflow:hidden}
+.level-progress-fill{height:100%;width:0%;background:var(--green);border-radius:2px;transition:width 0.5s ease}
+.level-progress-text{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
+
+.q-grid{max-width:600px;margin:0 auto;padding:0 24px 80px;display:flex;flex-direction:column;gap:12px}
+.q-card{background:var(--white);border:1.5px solid var(--divider);border-radius:14px;padding:20px 22px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden}
+.q-card:hover{border-color:var(--clay);transform:translateY(-2px);box-shadow:0 4px 20px rgba(184,120,78,0.1)}
+.q-card.completed{border-color:var(--green);background:var(--green-light)}
+.q-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.q-card-name{font-family:var(--heading);font-size:1.15rem;color:var(--text);flex:1}
+.q-card-preview{font-size:13px;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.q-card-done{display:none;font-size:11px;color:var(--green);font-weight:500;margin-top:8px;align-items:center;gap:4px}
+.q-card.completed .q-card-done{display:flex}
+.q-card-arrow{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--divider);transition:color 0.15s}
+.q-card:hover .q-card-arrow{color:var(--clay)}.q-card.completed .q-card-arrow{color:var(--green)}
+
+.q-flow{max-width:600px;margin:0 auto;padding:36px 24px 100px}
+.q-flow-title{font-family:var(--heading);font-size:1.6rem;line-height:1.3;margin-bottom:24px}
+
+.kelvi-bubble{background:var(--white);border:1px solid var(--divider);border-radius:16px;border-bottom-left-radius:4px;padding:20px 22px;margin-bottom:16px;animation:fadeUp .4s ease}
+.kelvi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.kelvi-tag{font-size:10px;font-weight:700;color:var(--green);letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.kelvi-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.speak-btn{background:var(--green-light);border:none;cursor:pointer;color:var(--green);padding:4px 7px;border-radius:5px;transition:all .15s;display:flex;align-items:center}
+.speak-btn:hover{background:var(--green);color:var(--white)}.speak-btn.speaking{background:var(--green);color:var(--white)}
+.kelvi-msg{font-size:15px;line-height:1.7;color:var(--text);white-space:pre-line}
+
+
+.child-bubble{background:var(--green-light);border:2px solid var(--green);border-radius:16px;border-bottom-right-radius:4px;padding:16px 20px;margin-bottom:16px;margin-left:15%;animation:fadeUp .3s ease}
+.child-label{font-size:10px;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.child-text{font-size:14px;line-height:1.6;color:var(--text)}
+
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.choice{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--white);border:1.5px solid var(--divider);border-radius:10px;font-size:14px;cursor:pointer;transition:all 0.12s}
+.choice:hover{border-color:var(--clay);background:var(--clay-light);transform:translateX(4px)}
+.choice.selected{border-color:var(--green);background:var(--green-light);cursor:default}
+.choice.disabled{pointer-events:none;opacity:.6}
+.choice-letter{width:28px;height:28px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0}
+.choice.selected .choice-letter{background:var(--green);color:var(--white)}
+
+.input-area{margin-bottom:16px;animation:fadeUp .4s ease}
+.input-box{border:2px solid var(--divider);border-radius:12px;padding:16px;background:var(--white);transition:border-color .15s}
+.input-box:focus-within{border-color:var(--clay)}
+.input-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.input-textarea{width:100%;border:none;outline:none;font-size:15px;font-family:var(--body);resize:none;line-height:1.6;color:var(--text);background:transparent;min-height:70px}
+.input-textarea::placeholder{color:var(--divider)}
+.input-actions{display:flex;align-items:center;gap:8px;margin-top:10px;justify-content:flex-end}
+.mic-btn{background:var(--clay-light);border:1.5px solid var(--clay);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--clay);transition:all .15s;display:flex;align-items:center}
+.mic-btn:hover{background:var(--clay);color:var(--white)}.mic-btn.rec{background:var(--clay);color:var(--white);animation:pulse 1.5s ease infinite}
+.cam-btn{background:var(--clay-light);border:1.5px solid var(--clay);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--clay);transition:all .15s;display:flex;align-items:center}
+.cam-btn:hover{background:var(--clay);color:var(--white)}
+.cam-btn input{display:none}
+.photo-preview{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.photo-thumb{position:relative;width:72px;height:72px;border-radius:8px;border:1px solid var(--divider);overflow:hidden}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-remove{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(47,43,37,0.7);color:white;font-size:11px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.child-photo{max-width:200px;border-radius:8px;margin-top:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.btn-submit{background:var(--clay);color:var(--white);border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--body);transition:all .15s}
+.btn-submit:hover{background:var(--clay-dark)}.btn-submit:disabled{opacity:0.4;cursor:default}
+
+.typing{display:flex;align-items:center;gap:4px;padding:14px 22px;background:var(--white);border:1px solid var(--divider);border-radius:16px;border-bottom-left-radius:4px;margin-bottom:16px;width:fit-content;animation:fadeUp .3s ease}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+.your-turn{border:2px solid var(--clay);border-radius:12px;padding:18px;background:rgba(245,237,229,0.3);margin-bottom:16px;animation:fadeUp .4s ease}
+.yt-label{font-size:10px;font-weight:700;color:var(--clay);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.yt-prompt{font-size:14px;line-height:1.6;margin-bottom:12px}
+.yt-input-row{display:flex;gap:6px;align-items:center}
+.yt-input{flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:12px 14px;font-size:14px;background:var(--white);outline:none;font-family:var(--body)}.yt-input:focus{border-color:var(--clay)}
+.yt-btn{background:var(--clay);color:var(--white);border:none;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--body);transition:all .15s}.yt-btn:hover{background:var(--clay-dark)}
+.yt-note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic}
+
+.done-banner{background:var(--green-light);border:1.5px solid var(--green);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;animation:fadeUp .4s ease}
+.done-text{font-size:14px;font-weight:500;color:var(--green)}.done-text strong{color:#2D5347}
+.btn-back-level{background:var(--clay);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--body);transition:all .15s;display:inline-flex;align-items:center;gap:8px}.btn-back-level:hover{background:var(--clay-dark)}
+
+.error-msg{color:#993C1D;font-size:13px;padding:10px 0}
+.fallback-btns{display:flex;gap:8px;margin-top:8px}
+.fallback-btn{background:var(--surface);border:1px solid var(--divider);border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:var(--body);color:var(--muted);transition:all .12s}
+.fallback-btn:hover{border-color:var(--clay);color:var(--clay);background:var(--clay-light)}
+.continue-choice{display:flex;gap:10px;margin-bottom:16px;animation:fadeUp .4s ease;flex-wrap:wrap}
+.continue-btn{background:var(--white);border:1.5px solid var(--divider);border-radius:10px;padding:14px 20px;font-size:14px;cursor:pointer;font-family:var(--body);color:var(--text);transition:all .12s;flex:1;min-width:140px;text-align:center}
+.continue-btn:hover{border-color:var(--clay);background:var(--clay-light);transform:translateY(-2px)}
+.footer{text-align:center;padding:20px;font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){.level-title{font-size:1.6rem}.q-flow-title{font-size:1.35rem}.q-flow{padding:28px 18px 80px}.q-grid{padding:0 18px 60px}.child-bubble{margin-left:8%}}
+</style>
+</head>
+<body>
+
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <button class="settings-close" onclick="closeSettings()">&times;</button>
+    <div class="settings-title">Settings</div>
+    <div style="margin-bottom:18px"><div class="settings-label">API key</div><input type="password" class="settings-input" id="api-key-input" placeholder="Anthropic API key" oninput="saveApiKey()"></div>
+    <div><div class="settings-label">Your name</div><input type="text" class="settings-input" id="name-input" placeholder="Your name" oninput="saveName()"></div>
+  </div>
+</div>
+
+<div class="screen active" id="screen-level">
+  <nav>
+    <a class="nav-back" onclick="history.back()">&#8592; Operations</a>
+    <span class="nav-title">Level 1</span><span style="flex:1"></span>
+    <button class="nav-settings" onclick="openSettings()" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+  </nav>
+  <div class="level-hero">
+    <div class="level-label">Operations · Level 1</div>
+    <h1 class="level-title">Addition, subtraction &amp; fact families</h1>
+    <p class="level-sub">Six questions. Pick any one that sounds interesting. There's no order — start wherever you're curious.</p>
+    <div class="level-progress-row"><div class="level-progress-bar"><div class="level-progress-fill" id="progress-fill"></div></div><span class="level-progress-text" id="progress-text">0 of 6</span></div>
+  </div>
+  <div class="q-grid" id="q-grid"></div>
+  <div class="footer">The question is the answer.</div>
+</div>
+
+<div class="screen" id="screen-question">
+  <nav>
+    <a class="nav-back" onclick="backToLevel()">&#8592; Back to Level 1</a>
+    <span class="nav-title" id="q-nav-title"></span><span style="flex:1"></span>
+    <button class="nav-settings" onclick="openSettings()" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+  </nav>
+  <div class="q-flow" id="q-flow"></div>
+</div>
+
+<script>
+var SPK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>';
+var MIC='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="15" y1="9" x2="15" y2="15"/></svg>';
+var CAM='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+
+var SYS=`You are Kelvi — a warm, playful mathematics thinking companion for children ages 4–12. You develop questioning and reasoning. You NEVER give answers directly.
+
+RESPONSE FORMAT:
+You MUST respond with valid JSON only. No text outside the JSON. Format:
+{"reply":"What you say to the child","pcg":"P or C or G","note":"Brief observation about the child's thinking for the parent log"}
+
+RULES:
+1. NEVER confirm right or wrong with words like "correct," "right," "wrong," "yes," or "no."
+2. If the child states an INCORRECT FACT (like 4+3=6), do NOT accept it. Ask them to check: "Can you count that again?" or "What do you get when you count 4 and then 3 more?" Supply the fact after one failed attempt.
+3. If the child gives an answer that is PHYSICALLY IMPOSSIBLE or violates the constraints of the problem (like 6 fingers on one hand, or more items than exist), gently point out the constraint: "Wait — how many fingers does one hand have?" Do not move on until the child corrects it.
+4. If the child is correct, push deeper — ask WHY or ask them to try a harder version. Do not praise.
+5. Keep responses to 2-3 sentences. You are talking to a child. Simple words. Short sentences.
+6. Be warm and playful. Use the child's name if available.
+7. When a visual would help, describe what you'd draw but do NOT include SVG in your reply.
+8. After the child has engaged meaningfully (shown reasoning, self-corrected, or extended the problem), you may close with an invitation to ask THEIR question.
+
+P/C/G CLASSIFICATION:
+Classify the child's RESPONSE (not the question) as:
+P (Procedural) — followed steps, computed, recalled facts
+C (Conceptual) — explained why, connected ideas, showed understanding
+G (Generative) — created new questions, extended the problem, transferred to new context
+
+TEACHING DIRECTION:
+You will receive a teaching note with each problem. Use it as guidance for WHERE to steer the conversation, but never read it verbatim. Adapt based on what the child actually says.`;
+
+var QS=[
+{id:0,name:'The cookie jar',preview:'There are 7 cookies in a jar. You eat 3. How many are left?',problem:'There are 7 cookies in a jar. You eat 3.\n\nHow many are left? How do you know?',visual:'open',ph:'How many cookies are left? Tell Kelvi how you figured it out...',teach:'If correct (4), ask the inverse: if 4 were left and 3 were eaten, how many to start? If wrong, ask them to count again — do not say wrong. If they say the right number but no reasoning, ask HOW they figured it out.',turn:'Can you make up a cookie jar problem for Kelvi to solve?'},
+{id:1,name:'Five fingers, two hands',preview:'Show the number 8 using two hands. Is there more than one way?',problem:'Show the number 8 using two hands.\n\nHow many fingers are up on each hand? Is there more than one way?',visual:'open',ph:'How did you show 8? Can you find another way?',teach:'CONSTRAINT: Each hand has exactly 5 fingers. No answer can have more than 5 on one hand. If the child says 6 and 2, ask: how many fingers does one hand have? Valid decompositions of 8 are: 3+5, 4+4, 5+3. (0+8, 1+7, 2+6, 6+2, 7+1, 8+0 are all impossible because no hand has more than 5 fingers.) Push for all three valid ways. Ask how they know they found them all.',turn:'What other number would be interesting to try? Why that one?'},
+{id:2,name:'The broken calculator',preview:'Your calculator\'s subtract button is broken. Can you still solve 9 − 4?',problem:'Your calculator\'s subtract button is broken. You can only add.\n\nYou have 9 stickers and want to know how many are left if you give away 4. How would you figure it out using only addition?',visual:'choices',choices:[{l:'A',t:'Add 9 + 4'},{l:'B',t:'Think "what plus 4 makes 9?"'},{l:'C',t:'You can\'t do it without subtract'},{l:'D',t:'Add 4 + 4 + 1'}],teach:'B is the conceptual insight (missing addend). If they pick B, ask them to explain WHY that works. If A, ask what 9+4 gives and whether that answers the question. If C, gently note that there IS a way. If D, ask them to check: does 4+4+1=9? Then ask how that helps find how many are left.',turn:'What if the add button was broken instead? Could you still solve problems?'},
+{id:3,name:'The number family',preview:'Three numbers: 3, 5, 8. How many true sentences can you write?',problem:'Here are three numbers: 3, 5, 8.\n\nUsing only these three numbers, how many different addition and subtraction sentences can you write that are true?',visual:'open',ph:'Write as many true sentences as you can find...',teach:'Full family is 3+5=8, 5+3=8, 8-3=5, 8-5=3 (four sentences). If they find fewer, ask if they tried flipping the addition or using subtraction. If they find all four, ask WHY three numbers always make four sentences.',turn:'Can you pick three new numbers that make a family like this? What\'s the rule for which three numbers work?'},
+{id:4,name:'The mind reader',preview:'Kelvi is thinking of a number. Two clues. Did you need both?',problem:'Kelvi is thinking of a number.\n\nIf you add 6 to Kelvi\'s number, you get 10.\nIf you subtract 4 from Kelvi\'s number, you get 0.\n\nWhat\'s the number? And here\'s the real question — did you need both clues, or was one enough?',visual:'open',ph:'What\'s the number? And did you need both clues?',teach:'Answer is 4. Both clues independently give 4. The interesting part is whether they needed both. If they say yes, ask which clue they used first. If they say no, ask what the second clue is for (verification). Introduce the idea of checking your work.',turn:'Make up a mind reader puzzle for Kelvi. Give two clues — one to find the number and one to check it.'},
+{id:5,name:'Zero the hero',preview:'Is zero a number? Can you convince Kelvi you\'re right?',problem:'Is zero a number?\n\nKelvi asked 10 kids this question. 6 said yes. 4 said no.\n\nWhat do you think — and can you convince Kelvi you\'re right?',visual:'open',ph:'Is zero a number? Make your argument...',teach:'Zero IS a number. If they say yes, ask for their best argument — what makes it a number? If they say no, ask what zero represents. You can offer: it is the number of elephants in this room. Counting nothing is still counting. Do not shut down a "no" — ask them to think about what would happen if zero did not exist.',turn:'What\'s a question about zero that you don\'t know the answer to?'}
+];
+
+var completed=JSON.parse(localStorage.getItem('kelvi-ops1-done')||'[]');
+var isRec=false,rec=null,curSpeech=null;
+var exchanges=0,maxExchanges=3,currentQ=null,msgs=[];
+var pcgLog=JSON.parse(localStorage.getItem('kelvi-ops1-log')||'[]');
+
+function openSettings(){document.getElementById('settings-overlay').classList.add('vis')}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('vis')}
+function saveApiKey(){localStorage.setItem('kelvi-family-key',document.getElementById('api-key-input').value)}
+function saveName(){localStorage.setItem('kelvi-family-name',document.getElementById('name-input').value)}
+function loadSettings(){var k=localStorage.getItem('kelvi-family-key'),n=localStorage.getItem('kelvi-family-name');if(k)document.getElementById('api-key-input').value=k;if(n)document.getElementById('name-input').value=n}
+function getKey(){return(document.getElementById('api-key-input').value||'').trim()}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById('screen-'+id).classList.add('active');window.scrollTo(0,0)}
+function backToLevel(){renderLevel();showScreen('level')}
+
+function speakText(btn,el){
+  if(!window.speechSynthesis)return;
+  if(curSpeech&&speechSynthesis.speaking){speechSynthesis.cancel();document.querySelectorAll('.speak-btn').forEach(function(b){b.classList.remove('speaking')});curSpeech=null;return}
+  var text=el.innerText||el.textContent||'';
+  curSpeech=new SpeechSynthesisUtterance(text);curSpeech.rate=0.9;curSpeech.pitch=1.05;
+  curSpeech.onend=function(){btn.classList.remove('speaking');curSpeech=null};
+  btn.classList.add('speaking');speechSynthesis.speak(curSpeech);
+}
+
+function toggleMic(btn,tid){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Voice input not supported.');return}
+  if(isRec){rec.stop();btn.classList.remove('rec');isRec=false;return}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=true;rec.interimResults=true;
+  rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;var el=document.getElementById(tid);el.value=t;el.dispatchEvent(new Event('input'))};
+  rec.onerror=function(){btn.classList.remove('rec');isRec=false};rec.onend=function(){btn.classList.remove('rec');isRec=false};
+  rec.start();btn.classList.add('rec');isRec=true;
+}
+
+function renderLevel(){
+  var g=document.getElementById('q-grid');g.innerHTML='';
+  QS.forEach(function(q){
+    var done=completed.includes(q.id);
+    var c=document.createElement('div');c.className='q-card'+(done?' completed':'');
+    c.onclick=function(){openQuestion(q.id)};
+    c.innerHTML='<div class="q-card-top"><div class="q-card-name">'+q.name+'</div></div><div class="q-card-preview">'+q.preview+'</div><div class="q-card-done">Completed</div><div class="q-card-arrow">&#8594;</div>';
+    g.appendChild(c);
+  });
+  var pct=(completed.length/QS.length)*100;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-text').textContent=completed.length+' of '+QS.length;
+}
+
+function openQuestion(id){
+  currentQ=QS.find(function(x){return x.id===id});if(!currentQ)return;
+  exchanges=0;
+  msgs=[{role:'user',content:'PROBLEM: '+currentQ.problem+'\n\nTEACHING DIRECTION: '+currentQ.teach}];
+  document.getElementById('q-nav-title').textContent=currentQ.name;
+  var f=document.getElementById('q-flow');
+  f.innerHTML='<h2 class="q-flow-title">'+currentQ.name+'</h2><div id="convo"></div>';
+  addKelviBubble(currentQ.problem);
+  if(currentQ.visual==='choices'){addChoices()}else{addInputBox()}
+  showScreen('question');
+}
+
+function addKelviBubble(text){
+  var c=document.getElementById('convo');
+  var id='kb-'+Date.now();
+  var d=document.createElement('div');d.className='kelvi-bubble';
+  d.innerHTML='<div class="kelvi-top"><div class="kelvi-tag">Kelvi</div><button class="speak-btn" onclick="speakText(this,document.getElementById(\''+id+'\'))" title="Listen">'+SPK+'</button></div><div class="kelvi-msg" id="'+id+'">'+text+'</div>';
+  c.appendChild(d);
+  setTimeout(function(){d.scrollIntoView({behavior:'smooth',block:'center'})},100);
+}
+
+function addChildBubble(text){
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');d.className='child-bubble';
+  d.innerHTML='<div class="child-label">You</div><div class="child-text">'+text.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+  c.appendChild(d);
+}
+
+function addChoices(){
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');d.className='choices';d.id='choices-area';
+  currentQ.choices.forEach(function(ch){
+    d.innerHTML+='<div class="choice" onclick="pickChoice(this,\''+ch.l+'\',\''+ch.t.replace(/'/g,"\\'")+'\')" ><div class="choice-letter">'+ch.l+'</div><div>'+ch.t+'</div></div>';
+  });
+  c.appendChild(d);
+}
+
+function addInputBox(){
+  var c=document.getElementById('convo');
+  var uid='inp-'+Date.now();
+  var d=document.createElement('div');d.className='input-area';d.id='area-'+uid;
+  d.innerHTML='<div class="input-box"><div class="input-label">Your thinking</div><textarea class="input-textarea" id="'+uid+'" placeholder="'+currentQ.ph+'" oninput="checkInputReady(\''+uid+'\')" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();submitText(\''+uid+'\')}"></textarea><div class="photo-preview" id="photos-'+uid+'"></div></div><div class="input-actions"><div class="fallback-btns"><button class="fallback-btn" onclick="sendHint(this)">I need a hint</button><button class="fallback-btn" onclick="sendDontKnow(this)">I don\'t know</button></div><span style="flex:1"></span><label class="cam-btn" title="Upload a photo of your work">'+CAM+'<input type="file" accept="image/*" onchange="addPhoto(event,\''+uid+'\')"></label><button class="mic-btn" onclick="toggleMic(this,\''+uid+'\')" title="Dictate">'+MIC+'</button><button class="btn-submit" id="btn-'+uid+'" disabled onclick="submitText(\''+uid+'\')">Share with Kelvi</button></div>';
+  c.appendChild(d);
+  setTimeout(function(){document.getElementById(uid).focus()},200);
+}
+
+function addYourTurn(){
+  var c=document.getElementById('convo');
+  var uid='yt-'+Date.now();
+  var d=document.createElement('div');d.className='your-turn';
+  d.innerHTML='<div class="yt-label">Your turn</div><div class="yt-prompt">Now you ask Kelvi a question. Any question.</div><div class="yt-input-row"><input class="yt-input" id="'+uid+'" placeholder="Type your question..." onkeydown="if(event.key===\'Enter\')submitYT(\''+uid+'\')"><button class="mic-btn" onclick="toggleMic(this,\''+uid+'\')" title="Dictate">'+MIC+'</button><button class="yt-btn" onclick="submitYT(\''+uid+'\')">Ask</button></div><div class="yt-note">There are no wrong questions.</div>';
+  c.appendChild(d);
+  setTimeout(function(){d.scrollIntoView({behavior:'smooth',block:'center'})},100);
+}
+
+function addDone(){
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');
+  d.innerHTML='<div class="done-banner"><span class="done-text">You asked a question worth thinking about. <strong>That\'s what mathematicians do.</strong></span></div><div style="margin-top:12px"><button class="btn-back-level" onclick="backToLevel()">Back to Level 1 &#8594;</button></div>';
+  c.appendChild(d);
+  setTimeout(function(){d.scrollIntoView({behavior:'smooth',block:'center'})},100);
+  if(!completed.includes(currentQ.id)){completed.push(currentQ.id);localStorage.setItem('kelvi-ops1-done',JSON.stringify(completed))}
+}
+
+function addTyping(){
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');d.className='typing';d.id='typing';
+  d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  c.appendChild(d);
+  d.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function removeTyping(){var t=document.getElementById('typing');if(t)t.remove()}
+
+function pickChoice(el,letter,text){
+  document.querySelectorAll('.choice').forEach(function(c){c.classList.remove('selected');c.classList.add('disabled')});
+  el.classList.add('selected');el.classList.remove('disabled');
+  sendToKelvi('I picked '+letter+': '+text);
+}
+
+// Photo state per input
+var pendingPhotos={};
+
+function addPhoto(event,uid){
+  var f=event.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    if(!pendingPhotos[uid])pendingPhotos[uid]=[];
+    var pid='ph-'+Date.now();
+    pendingPhotos[uid].push({id:pid,type:f.type,data:ev.target.result.split(',')[1],dataUrl:ev.target.result});
+    renderPhotoPreviews(uid);
+    checkInputReady(uid);
+  };
+  r.readAsDataURL(f);
+}
+
+function removePhoto(uid,pid){
+  if(!pendingPhotos[uid])return;
+  pendingPhotos[uid]=pendingPhotos[uid].filter(function(p){return p.id!==pid});
+  renderPhotoPreviews(uid);
+  checkInputReady(uid);
+}
+
+function renderPhotoPreviews(uid){
+  var c=document.getElementById('photos-'+uid);if(!c)return;
+  if(!pendingPhotos[uid]||!pendingPhotos[uid].length){c.innerHTML='';return}
+  c.innerHTML=pendingPhotos[uid].map(function(p){
+    return '<div class="photo-thumb"><img src="'+p.dataUrl+'"><button class="photo-remove" onclick="removePhoto(\''+uid+'\',\''+p.id+'\')">&times;</button></div>';
+  }).join('');
+}
+
+function checkInputReady(uid){
+  var ta=document.getElementById(uid);
+  var hasText=ta&&ta.value.trim();
+  var hasPhotos=pendingPhotos[uid]&&pendingPhotos[uid].length>0;
+  var btn=document.getElementById('btn-'+uid);
+  if(btn)btn.disabled=!(hasText||hasPhotos);
+}
+
+function submitText(uid){
+  var ta=document.getElementById(uid);
+  var text=ta?ta.value.trim():'';
+  var photos=pendingPhotos[uid]||[];
+  if(!text&&!photos.length)return;
+
+  var area=document.getElementById('area-'+uid);
+
+  // Build child bubble with text and/or photo
+  var bubbleHtml='';
+  if(text)bubbleHtml+=text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  photos.forEach(function(p){bubbleHtml+='<img class="child-photo" src="'+p.dataUrl+'">'});
+
+  if(area)area.remove();
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');d.className='child-bubble';
+  d.innerHTML='<div class="child-label">You</div><div class="child-text">'+bubbleHtml+'</div>';
+  c.appendChild(d);
+
+  // Build API content
+  if(photos.length>0){
+    var content=[];
+    photos.forEach(function(p){content.push({type:'image',source:{type:'base64',media_type:p.type,data:p.data}})});
+    content.push({type:'text',text:text||'Here is my work.'});
+    sendToKelviMulti(content);
+  }else{
+    sendToKelvi(text);
+  }
+
+  // Clean up
+  delete pendingPhotos[uid];
+}
+
+function sendHint(btn){
+  var area=btn.closest('.input-area');
+  if(area)area.remove();
+  addChildBubble('I need a hint');
+  sendToKelvi('I\'m stuck. Can you give me a hint?');
+}
+
+function sendDontKnow(btn){
+  var area=btn.closest('.input-area');
+  if(area)area.remove();
+  addChildBubble('I don\'t know');
+  sendToKelvi('I don\'t know the answer.');
+}
+
+function addContinueChoice(){
+  var c=document.getElementById('convo');
+  var d=document.createElement('div');d.className='continue-choice';d.id='continue-choice';
+  d.innerHTML='<button class="continue-btn" onclick="chooseContinue()">I want to keep going</button><button class="continue-btn" onclick="chooseAskQuestion()">I want to ask my own question</button>';
+  c.appendChild(d);
+  setTimeout(function(){d.scrollIntoView({behavior:'smooth',block:'center'})},100);
+}
+
+function chooseContinue(){
+  document.getElementById('continue-choice').remove();
+  maxExchanges++;
+  addInputBox();
+}
+
+function chooseAskQuestion(){
+  document.getElementById('continue-choice').remove();
+  addYourTurn();
+}
+
+function submitYT(uid){
+  var input=document.getElementById(uid);
+  var text=input.value.trim();if(!text)return;
+  input.closest('.your-turn').remove();
+  addChildBubble(text);
+  pcgLog.push({qId:currentQ.id,qName:currentQ.name,childQuestion:text,date:new Date().toISOString()});
+  localStorage.setItem('kelvi-ops1-log',JSON.stringify(pcgLog));
+  answerYourTurn(text);
+}
+
+async function answerYourTurn(childText){
+  var key=getKey();
+  if(!key){addDone();return}
+  msgs.push({role:'user',content:'The child is now asking YOU a question. Answer it clearly and model good mathematical thinking. Show your work step by step in a way a child can follow. Keep it to 3-4 sentences. Still respond in JSON format.\n\nChild\'s question: '+childText});
+  addTyping();
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:SYS,messages:msgs})
+    });
+    var data=await res.json();
+    removeTyping();
+    var raw=data.content[0].text;
+    var parsed;
+    try{var cleaned=raw.replace(/```json\s*/g,'').replace(/```/g,'').trim();parsed=JSON.parse(cleaned)}catch(e){parsed={reply:raw,pcg:'G',note:'Child asked their own question'}}
+    var reply=parsed.reply||raw;
+    msgs.push({role:'assistant',content:raw});
+    pcgLog.push({qId:currentQ.id,qName:currentQ.name,pcg:parsed.pcg,note:parsed.note,exchange:'your-turn-answer',date:new Date().toISOString()});
+    localStorage.setItem('kelvi-ops1-log',JSON.stringify(pcgLog));
+    addKelviBubble(reply);
+    setTimeout(function(){addDone()},600);
+  }catch(e){
+    removeTyping();
+    addDone();
+  }
+}
+
+async function sendToKelvi(childText){
+  var key=getKey();
+  if(!key){var c=document.getElementById('convo');c.innerHTML+='<div class="error-msg">Enter your API key in Settings (gear icon) to talk with Kelvi.</div>';return}
+  exchanges++;
+  msgs.push({role:'user',content:childText});
+  await callKelviAPI(key);
+}
+
+async function sendToKelviMulti(contentArray){
+  var key=getKey();
+  if(!key){var c=document.getElementById('convo');c.innerHTML+='<div class="error-msg">Enter your API key in Settings (gear icon) to talk with Kelvi.</div>';return}
+  exchanges++;
+  msgs.push({role:'user',content:contentArray});
+  await callKelviAPI(key);
+}
+
+async function callKelviAPI(key){
+  addTyping();
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:SYS,messages:msgs})
+    });
+    var data=await res.json();
+    removeTyping();
+    var raw=data.content[0].text;
+
+    // Parse JSON response
+    var parsed;
+    try{
+      var cleaned=raw.replace(/```json\s*/g,'').replace(/```/g,'').trim();
+      parsed=JSON.parse(cleaned);
+    }catch(e){
+      // Fallback if Claude didn't return JSON
+      parsed={reply:raw,pcg:'P',note:''};
+    }
+
+    var reply=parsed.reply||raw;
+    msgs.push({role:'assistant',content:raw});
+
+    // Log P/C/G
+    pcgLog.push({qId:currentQ.id,qName:currentQ.name,pcg:parsed.pcg,note:parsed.note,exchange:exchanges,date:new Date().toISOString()});
+    localStorage.setItem('kelvi-ops1-log',JSON.stringify(pcgLog));
+
+    // Show response
+    if(exchanges>=maxExchanges){
+      addKelviBubble(reply);
+      addContinueChoice();
+    }else{
+      addKelviBubble(reply);
+      addInputBox();
+    }
+
+  }catch(e){
+    removeTyping();
+    var c=document.getElementById('convo');
+    c.innerHTML+='<div class="error-msg">Something went wrong. Check your API key.</div>';
+  }
+}
+
+loadSettings();renderLevel();
+</script>
+</body>
+</html>
