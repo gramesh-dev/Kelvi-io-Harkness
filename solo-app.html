@@ -165,6 +165,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 /* CHAT */
 .chat-panel{overflow:hidden}
 .chat-layout{flex:1;display:flex;flex-direction:column;height:100%}
+.chat-msgs.dragover{outline:2px dashed var(--accent);outline-offset:-4px;background:var(--accent-light)}
 /* EXPORT */
 .export-wrap{position:relative}
 .export-btn{background:none;border:1px solid var(--divider);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--text-muted);transition:all .12s;display:flex;align-items:center}
@@ -261,7 +262,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
   <nav class="sb-nav">
     <div class="sb-item active" onclick="showPanel('home')" id="nav-home">Home</div>
     <div class="sb-item" onclick="showPanel('sessions')" id="nav-sessions">My sessions</div>
-    <div class="sb-item" onclick="showPanel('calculator')" id="nav-calculator">Desmos</div>
+    <div class="sb-item" onclick="showPanel('calculator')" id="nav-calculator">Calculator</div>
   </nav>
   <div class="sb-bottom">
     <div class="sb-item" onclick="showPanel('settings')" id="nav-settings">Settings</div>
@@ -276,8 +277,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 <div class="main">
   <div class="main-header">
     <span class="main-title" id="main-title">Home</span>
-    <input type="password" class="api-input" id="api-key" placeholder="API key" oninput="saveKey()">
   </div>
+
 
   <!-- WELCOME -->
   <div class="panel welcome-panel active" id="panel-welcome">
@@ -301,8 +302,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     </div>
     <div class="home-bottom">
       <div class="home-pills">
-        <span class="pill" onclick="quickChat()">Help me with homework</span>
-        <span class="pill" onclick="showPanel('calculator')">Open Desmos</span>
+        <span class="pill" onclick="pillToChat('Help me think through my homework problem')">Help me with homework</span>
+        <span class="pill" onclick="showPanel('calculator')">Open calculator</span>
       </div>
       <div class="home-input-bar" id="hw-box">
         <div class="hw-drop-hint">Drop your image here</div>
@@ -317,7 +318,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
             <button class="hi-btn plus-btn" id="home-plus" onclick="togglePlusMenu('home')">+</button>
             <div class="plus-menu" id="home-plus-menu">
               <label class="plus-item" style="cursor:pointer"><input type="file" accept="image/*,.pdf" onchange="handlePhoto(event)" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg> Upload</label>
-              <div class="plus-item" onclick="showPanel('calculator');togglePlusMenu('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Desmos</div>
+              <div class="plus-item" onclick="showPanel('calculator');togglePlusMenu('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Calculator</div>
               <div class="plus-item" onclick="openEqModal('home');togglePlusMenu('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v2h-4v2h4v2h-6zM4 14l3 6 3-6M14 14h6v2h-4v2h4v2h-6"/></svg> Equation</div>
             </div>
           </div>
@@ -356,7 +357,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
       <div class="suggestions" id="suggestions" style="display:none"></div>
       <div class="calc-panel" id="calc-panel">
         <div style="text-align:center;padding:20px">
-          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">Open Desmos</a>
+          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">Open Desmos Calculator</a>
           <span style="font-size:12px;color:var(--text-muted);margin-left:12px">Opens in a new tab</span>
         </div>
       </div>
@@ -365,7 +366,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
           <button class="ci-btn ci-mode plus-btn" id="chat-plus" onclick="togglePlusMenu('chat')">+</button>
           <div class="plus-menu" id="chat-plus-menu">
             <label class="plus-item" style="cursor:pointer"><input type="file" accept="image/*,.pdf" onchange="chatPhoto(event)" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg> Upload</label>
-            <div class="plus-item" onclick="toggleCalc();togglePlusMenu('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Desmos</div>
+            <div class="plus-item" onclick="toggleCalc();togglePlusMenu('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg> Calculator</div>
             <div class="plus-item" onclick="openEqModal('chat');togglePlusMenu('chat')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v2h-4v2h4v2h-6zM4 14l3 6 3-6M14 14h6v2h-4v2h4v2h-6"/></svg> Equation</div>
           </div>
         </div>
@@ -391,16 +392,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 
   <!-- CALCULATOR -->
   <div class="panel" id="panel-calculator">
-    <div style="padding:10px 20px;border-bottom:1px solid var(--divider);flex-shrink:0">
-      <span style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:500" onclick="showPanel('home')">&larr; Back to Home</span>
-    </div>
     <div class="calc-main">
       <iframe src="https://www.desmos.com/calculator" title="Desmos Graphing Calculator" id="desmos-iframe" style="display:none" onload="this.style.display='block';document.getElementById('calc-fallback').style.display='none'"></iframe>
       <div class="calc-fallback" id="calc-fallback">
         <div style="text-align:center;padding:60px 20px">
-          <div style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:8px">Desmos blocked in preview</div>
+          <div style="font-size:48px;margin-bottom:16px;color:var(--divider)">&#x1F4CA;</div>
+          <div style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:8px">Calculator blocked in preview</div>
           <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px">Desmos will work when deployed to Vercel. For now, open it in a new tab.</p>
-          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500">Open Desmos</a>
+          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500">Open Desmos Calculator</a>
         </div>
       </div>
     </div>
@@ -415,8 +414,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
         <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--white)" oninput="updateName(this.value)">
       </div>
       <div class="home-section">
-        <div class="home-label">API key</div>
-        <input type="password" id="settings-api" placeholder="Anthropic API key" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="document.getElementById('api-key').value=this.value;saveKey()">
+        <div class="home-label">Anthropic API key</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used for Kelvi's AI responses. Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.</div>
+        <input type="password" id="settings-api" placeholder="sk-ant-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="saveKey()">
+      </div>
+      <div class="home-section">
+        <div class="home-label">OpenAI API key</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used as a fallback if Anthropic is unavailable. Get yours at <a href="https://platform.openai.com" target="_blank" style="color:var(--accent)">platform.openai.com</a>.</div>
+        <input type="password" id="settings-openai" placeholder="sk-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="saveOpenAIKey()">
       </div>
     </div>
   </div>
@@ -527,7 +532,7 @@ function showPanel(id){
   if(panel){panel.classList.add('active');requestAnimationFrame(()=>{panel.style.opacity='1'})}
   const nav=document.getElementById('nav-'+id);
   if(nav)nav.classList.add('active');
-  const titles={home:'Home',sessions:'My sessions',calculator:'Desmos',settings:'Settings',chat:'Chat',welcome:'Welcome'};
+  const titles={home:'Home',sessions:'My sessions',calculator:'Calculator',settings:'Settings',chat:'Chat',welcome:'Welcome'};
   document.getElementById('main-title').textContent=titles[id]||'Kelvi Solo';
   if(id==='sessions')loadSessions();
 }
@@ -564,20 +569,21 @@ function startChat(){
   if(hw)bh+=renderMath(eh(hw));
   uploadedImages.forEach(img=>{bh+='<img src="'+img.dataUrl+'">'});
   bc.innerHTML=bh;banner.classList.add('vis');
-  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" id="opening-msg">'+renderMath(eh("I see you're working on something. What part do you understand so far, and where does it get fuzzy?"))+'</div></div>';
+  document.getElementById('chat-msgs').innerHTML='';
   let uc=[];
   if(hasUploads){uploadedImages.forEach(img=>{uc.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}})})}
   uc.push({type:'text',text:'Here is my problem: '+(hw||'See the uploaded image.')});
-  msgs=[{role:'user',content:uc.length===1?uc[0].text:uc},{role:'assistant',content:"I see you're working on something. What part do you understand so far, and where does it get fuzzy?"}];
+  msgs=[{role:'user',content:uc.length===1?uc[0].text:uc}];
   qCount=0;updateQCount();showPanel('chat');
+  autoSend();
 }
 
-function quickChat(){
+function quickChat(prompt){
   activeSys=SYS;
-  document.getElementById('chat-topic').textContent='Homework help';
+  document.getElementById('chat-topic').textContent='Kelvi';
   document.getElementById('problem-banner').classList.remove('vis');
-  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">What problem are you working on? Type it, paste it, or take a photo.</div></div>';
-  msgs=[{role:'assistant',content:'What problem are you working on? Type it, paste it, or take a photo.'}];
+  document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">What are you working on? Paste your problem or describe what you need help with.</div></div>';
+  msgs=[{role:'assistant',content:'What are you working on? Paste your problem or describe what you need help with.'}];
   qCount=0;updateQCount();showPanel('chat');
 }
 
@@ -605,17 +611,23 @@ document.addEventListener('click',function(e){
 });
 
 async function autoSend(){
-  const key=document.getElementById('api-key').value.trim();
+  const key=anthropicKey;
   if(!key)return;
   const cm=document.getElementById('chat-msgs');
   document.getElementById('typing').classList.add('vis');
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
-    const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
+    const data=await res.json();
     document.getElementById('typing').classList.remove('vis');
+    if(!data.content||data.error){
+      const errMsg=data.error?.type==='invalid_request_error'&&data.error?.message?.includes('image')?'That image format isn\'t supported. Try uploading a PNG or JPEG.':'Something went wrong. Check your API key in Settings.';
+      cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">'+errMsg+'</div></div>';
+      cm.scrollTop=cm.scrollHeight;return;
+    }
+    const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
     cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
     cm.scrollTop=cm.scrollHeight;
-  }catch(e){document.getElementById('typing').classList.remove('vis')}
+  }catch(e){document.getElementById('typing').classList.remove('vis');cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key in Settings.</div></div>'}
 }
 
 function classifyQ(t){const s=t.toLowerCase();if(/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s))return'G';if(/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s))return'C';if(/how do i|what.*formula|what.*next|how to|how.*find|what.*step|\?/.test(s))return'P';return null}
@@ -660,15 +672,13 @@ function toggleCalc(){document.getElementById('calc-panel').classList.toggle('vi
 
 function chatPhoto(e){
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=function(ev){
-    // Add to chat as user message with image
+  normalizeImage(f,function(dataUrl,mimeType){
     const cm=document.getElementById('chat-msgs');
-    cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s"><img src="'+ev.target.result+'" style="max-width:200px;border-radius:8px"></div></div>';
+    cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s"><img src="'+dataUrl+'" style="max-width:200px;border-radius:8px"></div></div>';
     cm.scrollTop=cm.scrollHeight;
-    msgs.push({role:'user',content:[{type:'image',source:{type:'base64',media_type:f.type,data:ev.target.result.split(',')[1]}},{type:'text',text:'Here is my work. What do you notice?'}]});
-  };
-  r.readAsDataURL(f);
+    msgs.push({role:'user',content:[{type:'image',source:{type:'base64',media_type:mimeType,data:dataUrl.split(',')[1]}},{type:'text',text:'Here is my work. What do you notice?'}]});
+    autoSend();
+  });
   togglePlusMenu('chat');
 }
 
@@ -699,8 +709,8 @@ async function sendMsg(){
   const text=t.value.trim();
   if(!text)return;
   t.value='';
-  const key=document.getElementById('api-key').value.trim();
-  if(!key){alert('Enter your API key in Settings or the header.');return}
+  const key=anthropicKey;
+  if(!key){alert('Enter your Anthropic API key in Settings.');return}
   const qt=classifyQ(text);if(qt)qCount++;updateQCount();
   document.getElementById('suggestions').style.display='none';
   const cm=document.getElementById('chat-msgs');
@@ -710,15 +720,21 @@ async function sendMsg(){
   document.getElementById('typing').classList.add('vis');
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:activeSys,messages:msgs})});
-    const data=await res.json();const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
+    const data=await res.json();
     document.getElementById('typing').classList.remove('vis');
+    if(!data.content||data.error){
+      const errMsg=data.error?.type==='invalid_request_error'&&data.error?.message?.includes('image')?'That image format isn\'t supported. Try uploading a PNG or JPEG.':'Something went wrong. Check your API key in Settings.';
+      cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">'+errMsg+'</div></div>';
+      cm.scrollTop=cm.scrollHeight;return;
+    }
+    const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
     cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderMath(eh(reply))+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
     cm.scrollTop=cm.scrollHeight;
     showSuggestions();
     saveCurrentSession();
   }catch(e){
     document.getElementById('typing').classList.remove('vis');
-    cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key.</div></div>';
+    cm.innerHTML+='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" style="color:#993C1D">Something went wrong. Check your API key in Settings.</div></div>';
   }
 }
 
@@ -742,7 +758,45 @@ hwBox.addEventListener('dragleave',function(e){e.preventDefault();dragCounter--;
 hwBox.addEventListener('dragover',function(e){e.preventDefault()});
 hwBox.addEventListener('drop',function(e){e.preventDefault();dragCounter=0;this.classList.remove('dragover');for(const f of e.dataTransfer.files){if(f.type.startsWith('image/'))addUpload(f)}});
 
-function addUpload(f){const r=new FileReader();r.onload=function(ev){const id='up-'+Date.now();uploadedImages.push({id:id,type:f.type,data:ev.target.result.split(',')[1],dataUrl:ev.target.result});renderUploads()};r.readAsDataURL(f)}
+// Drag-and-drop onto chat message area
+let chatDragCounter=0;
+const chatMsgs=document.getElementById('chat-msgs');
+chatMsgs.addEventListener('dragenter',function(e){e.preventDefault();chatDragCounter++;this.classList.add('dragover')});
+chatMsgs.addEventListener('dragleave',function(e){e.preventDefault();chatDragCounter--;if(chatDragCounter===0)this.classList.remove('dragover')});
+chatMsgs.addEventListener('dragover',function(e){e.preventDefault()});
+chatMsgs.addEventListener('drop',function(e){
+  e.preventDefault();chatDragCounter=0;this.classList.remove('dragover');
+  const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+  files.forEach(function(f){
+    normalizeImage(f,function(dataUrl,mimeType){
+      const cm=document.getElementById('chat-msgs');
+      cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s"><img src="'+dataUrl+'" style="max-width:200px;border-radius:8px"></div></div>';
+      cm.scrollTop=cm.scrollHeight;
+      msgs.push({role:'user',content:[{type:'image',source:{type:'base64',media_type:mimeType,data:dataUrl.split(',')[1]}},{type:'text',text:'Here is my work. What do you notice?'}]});
+      autoSend();
+    });
+  });
+});
+
+const SUPPORTED_IMG_TYPES=['image/jpeg','image/png','image/gif','image/webp'];
+function normalizeImage(file,callback){
+  const r=new FileReader();
+  r.onload=function(ev){
+    const dataUrl=ev.target.result;
+    if(SUPPORTED_IMG_TYPES.includes(file.type)){callback(dataUrl,file.type);return}
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
+      callback(canvas.toDataURL('image/jpeg',0.92),'image/jpeg');
+    };
+    img.onerror=function(){callback(dataUrl,file.type)};
+    img.src=dataUrl;
+  };
+  r.readAsDataURL(file);
+}
+function addUpload(f){normalizeImage(f,function(dataUrl,mimeType){const id='up-'+Date.now();uploadedImages.push({id:id,type:mimeType,data:dataUrl.split(',')[1],dataUrl:dataUrl});renderUploads()})}
 function removeUpload(id){uploadedImages=uploadedImages.filter(u=>u.id!==id);renderUploads()}
 function renderUploads(){const c=document.getElementById('hw-uploads');if(!uploadedImages.length){c.innerHTML='';return}c.innerHTML=uploadedImages.map(u=>'<div class="hw-upload-thumb"><img src="'+u.dataUrl+'"><button class="remove-upload" onclick="removeUpload(\''+u.id+'\')">&times;</button></div>').join('')}
 function handlePhoto(e){const f=e.target.files[0];if(!f)return;addUpload(f)}
@@ -752,9 +806,12 @@ let currentUtterance=null;
 function speakText(btn){if('speechSynthesis' in window){if(currentUtterance&&speechSynthesis.speaking){speechSynthesis.cancel();document.querySelectorAll('.speak-btn').forEach(b=>b.classList.remove('speaking'));currentUtterance=null;return}const bubble=btn.closest('.msg-bubble-k');const clone=bubble.cloneNode(true);clone.querySelectorAll('.speak-btn').forEach(b=>b.remove());const text=clone.innerText;currentUtterance=new SpeechSynthesisUtterance(text);currentUtterance.rate=0.9;currentUtterance.onend=function(){btn.classList.remove('speaking');currentUtterance=null};btn.classList.add('speaking');speechSynthesis.speak(currentUtterance)}}
 
 // PERSISTENCE
-function saveKey(){localStorage.setItem('kelvi-solo-key',document.getElementById('api-key').value)}
-function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k){document.getElementById('api-key').value=k;if(document.getElementById('settings-api'))document.getElementById('settings-api').value=k}}
+let anthropicKey='',openaiKey='';
+function saveKey(){anthropicKey=document.getElementById('settings-api').value.trim();localStorage.setItem('kelvi-solo-key',anthropicKey)}
+function saveOpenAIKey(){openaiKey=document.getElementById('settings-openai').value.trim();localStorage.setItem('kelvi-openai-key',openaiKey)}
+function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k){anthropicKey=k;if(document.getElementById('settings-api'))document.getElementById('settings-api').value=k}}
 function loadName(){const n=localStorage.getItem('kelvi-name');if(n){userName=n;document.getElementById('sb-avatar').textContent=n[0].toUpperCase();document.getElementById('sb-uname').textContent=n;if(document.getElementById('settings-name'))document.getElementById('settings-name').value=n}}
+function loadOpenAIKey(){const k=localStorage.getItem('kelvi-openai-key');if(k){openaiKey=k;if(document.getElementById('settings-openai'))document.getElementById('settings-openai').value=k}}
 
 // SESSION MANAGEMENT
 let currentSessionId=null;
@@ -909,7 +966,7 @@ function exportPDF(){
   document.getElementById('export-menu').classList.remove('vis');
 }
 
-loadKey();loadName();
+loadKey();loadName();loadOpenAIKey();
 setTimeout(initMQ,500);
 setTimeout(function(){var mf=document.getElementById('eq-modal-field');if(mf)mf.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();insertEquation()}})},600);
 
