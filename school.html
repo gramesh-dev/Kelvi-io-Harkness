@@ -3,494 +3,1999 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Kelvi School helps teachers design mathematical quests and make student reasoning visible in real time.">
-<title>Kelvi School — For Teachers</title>
+<title>Kelvi School</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <style>
 :root {
-  --bg: #F5F3EE;
-  --surface: #ECE7DC;
-  --deeper: #E0D8C8;
-  --divider: #CDC3B1;
-  --text-primary: #2F2B25;
-  --text-muted: #6F6A61;
-  --accent: #3A6B5C;
-  --accent-hover: #2D5347;
-  --white: #FFFFFF;
+  --bg:           #FFFFFF;
+  --surface:      #F7F7F7;
+  --surface2:     #F0F0F0;
+  --divider:      #E8E8E8;
+  --divider2:     #D4D4D4;
+  --text-primary: #1A1A1A;
+  --text-muted:   #737373;
+  --text-faint:   #A3A3A3;
+  --sidebar-bg:   #FAFAFA;
+  --sidebar-w:    232px;
+  --topbar-h:     52px;
   --font-heading: 'DM Serif Display', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --radius:       8px;
+  --danger:       #DC2626;
+  --danger-light: #FEF2F2;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--font-body);
-  color: var(--text-primary);
-  background: var(--bg);
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── LOGIN ──────────────────────────────────────────── */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+.login-box{width:100%;max-width:340px;padding:0 24px;}
+.login-logo{display:flex;align-items:center;gap:8px;margin-bottom:32px;}
+.login-logo-text{font-family:var(--font-heading);font-size:1.4rem;color:var(--text-primary);}
+.login-logo-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.login-heading{font-family:var(--font-heading);font-size:1.5rem;margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.5;}
+.login-label{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:5px;display:block;}
+.login-input{
+  width:100%;padding:10px 12px;border:1px solid var(--divider2);border-radius:var(--radius);
+  font-size:14px;font-family:var(--font-body);outline:none;margin-bottom:12px;
+  background:var(--bg);color:var(--text-primary);transition:border-color .15s;
+}
+.login-input:focus{border-color:var(--text-primary);}
+.login-btn{
+  width:100%;padding:11px;border:none;border-radius:var(--radius);
+  background:#3A6B5C;color:#fff;font-size:14px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);margin-top:4px;margin-bottom:12px;
+  transition:opacity .15s;
+}
+.login-btn:hover{opacity:.85;}
+.login-note{font-size:11px;color:var(--text-faint);text-align:center;}
+
+/* ── APP SHELL ──────────────────────────────────────── */
+.app{display:none;height:100vh;overflow:hidden;}
+.app.active{display:flex;}
+
+/* ── SIDEBAR ────────────────────────────────────────── */
+.sidebar{
+  width:var(--sidebar-w);background:var(--sidebar-bg);border-right:1px solid var(--divider);
+  display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s ease;
+}
+.sidebar.collapsed{width:0;border-right:none;}
+.sb-top{padding:14px 12px 8px;border-bottom:1px solid var(--divider);flex-shrink:0;}
+.sb-brand{display:flex;align-items:center;gap:7px;padding:4px 4px 4px 6px;border-radius:var(--radius);cursor:pointer;text-decoration:none;}
+.sb-brand:hover{background:var(--surface2);}
+.sb-brand-text{font-family:var(--font-heading);font-size:1.1rem;color:var(--text-primary);white-space:nowrap;}
+.sb-brand-sub{font-size:10px;color:var(--text-muted);white-space:nowrap;margin-top:1px;}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 8px;}
+.sb-section-label{
+  font-size:10px;font-weight:600;color:var(--text-faint);letter-spacing:.8px;
+  text-transform:uppercase;padding:12px 8px 4px;white-space:nowrap;
+}
+.sb-item{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--radius);
+  font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;
+  transition:background .1s,color .1s;white-space:nowrap;user-select:none;
+}
+.sb-item:hover{background:var(--surface2);color:var(--text-primary);}
+.sb-item.active{background:var(--surface2);color:var(--text-primary);font-weight:500;}
+.sb-item svg{flex-shrink:0;opacity:.6;}
+.sb-item.active svg{opacity:1;}
+.sb-class-dot{width:6px;height:6px;border-radius:50%;background:var(--divider2);flex-shrink:0;}
+.sb-add-btn{
+  display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:var(--radius);
+  font-size:12px;color:var(--text-faint);cursor:pointer;margin-top:2px;
+}
+.sb-add-btn:hover{background:var(--surface2);color:var(--text-primary);}
+.sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--divider);flex-shrink:0;}
+.sb-bottom-item{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--radius);
+  font-size:12px;color:var(--text-muted);cursor:pointer;
+}
+.sb-bottom-item:hover{background:var(--surface2);color:var(--text-primary);}
+
+/* ── MAIN AREA ──────────────────────────────────────── */
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* ── TOPBAR ─────────────────────────────────────────── */
+.topbar{
+  height:var(--topbar-h);border-bottom:1px solid var(--divider);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;flex-shrink:0;background:var(--bg);
+}
+.topbar-left{display:flex;align-items:center;gap:6px;}
+.topbar-toggle{
+  width:30px;height:30px;border-radius:6px;border:none;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);
+}
+.topbar-toggle:hover{background:var(--surface2);}
+.topbar-crumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
+.topbar-crumb span{color:var(--text-primary);font-weight:500;}
+.topbar-crumb-sep{color:var(--text-faint);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-user{font-size:12px;color:var(--text-muted);}
+.topbar-api{
+  padding:5px 10px;border-radius:6px;border:1px solid var(--divider2);
+  background:var(--bg);color:var(--text-primary);font-size:11px;
+  font-family:var(--font-body);outline:none;width:160px;
+}
+.topbar-api:focus{border-color:var(--text-primary);}
+
+/* ── CONTENT AREA ───────────────────────────────────── */
+.content{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.view{display:none;padding:28px 40px 0;width:100%;max-width:100%;}
+.view.active{display:flex;flex-direction:column;flex:1;animation:viewIn .25s ease-out;}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HOME VIEW ──────────────────────────────────────── */
+.home-greeting{margin-bottom:24px;}
+.home-greeting h1{font-family:var(--font-heading);font-size:1.5rem;margin-bottom:4px;}
+.home-greeting p{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.home-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;max-width:780px;}
+.home-prompt{
+  background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);
+  padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s;
+  display:flex;align-items:flex-start;gap:9px;
+}
+.home-prompt:hover{border-color:var(--divider2);background:var(--surface2);}
+.home-prompt-icon{font-size:14px;flex-shrink:0;margin-top:1px;color:var(--text-muted);}
+.home-prompt-text{font-size:12px;font-weight:500;color:var(--text-primary);line-height:1.4;}
+.home-prompt-sub{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+
+/* ── CHAT ───────────────────────────────────────────── */
+.chat-scroll{flex:1;overflow-y:auto;padding-bottom:8px;}
+.chat-wrap{display:flex;flex-direction:column;gap:24px;max-width:760px;padding:0 0 16px;}
+.msg{width:100%;}
+.msg-k{align-self:flex-start;}
+.msg-t{align-self:flex-end;display:flex;justify-content:flex-end;}
+.msg-label{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:6px;color:var(--text-faint);}
+.label-t{text-align:right;}
+.bub-k{
+  font-size:14px;line-height:1.75;color:var(--text-primary);
+  padding:0;background:none;border:none;
+}
+.bub-t{
+  background:var(--surface);border:1px solid var(--divider);border-radius:16px;
+  padding:10px 16px;font-size:14px;line-height:1.7;color:var(--text-primary);
+  max-width:72%;
+}
+.bub-img{max-width:100px;border-radius:5px;margin:4px 4px 0 0;display:inline-block;}
+.typing{display:none;gap:5px;align-items:center;padding:4px 0;}
+.typing.vis{display:flex;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+
+/* ── ACTION ICONS ───────────────────────────────────── */
+.dl-bar{display:flex;gap:2px;margin-top:12px;}
+.dl-btn{
+  width:30px;height:30px;border-radius:6px;border:none;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-faint);transition:background .1s,color .1s;position:relative;
+}
+.dl-btn:hover{background:var(--surface2);color:var(--text-primary);}
+.dl-btn svg{width:15px;height:15px;pointer-events:none;}
+.dl-btn[data-tip]:hover::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);background:var(--text-primary);color:#fff;
+  font-size:10px;padding:3px 7px;border-radius:4px;white-space:nowrap;
+  font-family:var(--font-body);pointer-events:none;z-index:10;
 }
 
-/* NAV */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: var(--bg);
-  border-bottom: 1px solid var(--divider);
-  transition: box-shadow 0.3s ease;
+/* ── INPUT ──────────────────────────────────────────── */
+.input-sticky{
+  position:sticky;bottom:0;background:var(--bg);
+  padding:12px 40px 20px;margin:0 -40px;
 }
-nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
-.nav-inner {
-  max-width: 1120px; margin: 0 auto; padding: 0 2rem;
-  height: 64px; display: flex; align-items: center; justify-content: space-between;
+.input-outer{
+  background:var(--bg);border:1px solid var(--divider2);border-radius:16px;
+  overflow:hidden;transition:border-color .15s;max-width:760px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);
 }
-.wordmark {
-  font-family: var(--font-heading); font-size: 1.5rem;
-  color: var(--accent); text-decoration: none; letter-spacing: -0.01em;
-  display: flex; align-items: center; gap: 0.35rem;
+.input-outer:focus-within{border-color:var(--divider2);}
+.input-outer.dragover{border-color:var(--text-primary);background:var(--surface);}
+.preview-bar{display:none;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--divider);gap:6px;flex-wrap:wrap;}
+.preview-bar.vis{display:flex;}
+.file-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--divider);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--text-muted);}
+.file-chip img{height:26px;border-radius:3px;}
+.file-chip .x{cursor:pointer;font-size:12px;margin-left:2px;}
+textarea.inp{
+  width:100%;border:none;outline:none;font-size:14px;font-family:var(--font-body);
+  resize:none;line-height:1.6;color:var(--text-primary);background:transparent;
+  padding:14px 16px 4px;min-height:52px;max-height:200px;
 }
-.wordmark .kelvi-mark { display:flex; align-items:center; flex-shrink:0; }
-.wordmark .product-label {
-  font-family: var(--font-body); font-size: 0.75rem;
-  font-weight: 500; color: var(--text-muted); margin-left: 0.25rem;
+textarea.inp::placeholder{color:var(--text-faint);}
+.inp-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 8px;}
+.icon-btn{
+  width:30px;height:30px;border-radius:6px;border:none;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);
 }
-.nav-links { display: flex; gap: 2rem; align-items: center; }
-.nav-links a {
-  font-size: 0.9rem; color: var(--text-muted); text-decoration: none;
-  transition: color 0.2s ease; font-weight: 500;
+.icon-btn:hover{background:var(--surface2);}
+.plus-menu{
+  display:none;position:absolute;bottom:38px;left:0;background:var(--bg);
+  border:1px solid var(--divider2);border-radius:10px;padding:4px 0;
+  min-width:180px;box-shadow:0 4px 16px rgba(0,0,0,.07);z-index:20;
 }
-.nav-links a:hover { color: var(--text-primary); }
-.nav-links .btn-sm {
-  background: var(--accent); color: var(--white);
-  padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
-  transition: background 0.2s ease;
+.plus-menu.vis{display:block;}
+.plus-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;color:var(--text-primary);cursor:pointer;}
+.plus-item:hover{background:var(--surface);}
+.send-btn{
+  width:32px;height:32px;border-radius:8px;border:none;
+  background:#3A6B5C;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:opacity .15s;
 }
-.nav-links .btn-sm:hover { background: var(--accent-hover); color: var(--white); }
+.send-btn:hover{opacity:.8;}
+.send-btn svg{width:15px;height:15px;}
 
-.hamburger {
-  display: none; background: none; border: none; cursor: pointer;
-  width: 28px; height: 20px; position: relative;
+/* ── CLASS VIEW ─────────────────────────────────────── */
+.view-header{margin-bottom:24px;}
+.view-title{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:3px;}
+.view-sub{font-size:12px;color:var(--text-muted);}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:14px 16px;}
+.stat-label{font-size:10px;color:var(--text-muted);margin-bottom:6px;font-weight:500;letter-spacing:.3px;}
+.stat-val{font-size:1.5rem;font-weight:300;font-family:var(--font-heading);color:var(--text-primary);}
+.stat-pct{font-size:11px;color:var(--text-faint);margin-top:2px;}
+.section-head{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.pcg-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.pcg-bar-row{display:flex;align-items:center;gap:10px;}
+.pcg-bar-name{font-size:12px;color:var(--text-muted);width:80px;flex-shrink:0;}
+.pcg-bar-track{flex:1;height:8px;border-radius:4px;background:var(--surface2);}
+.pcg-bar-fill{height:100%;border-radius:4px;background:var(--text-primary);transition:width .4s ease;}
+.pcg-bar-pct{font-size:11px;color:var(--text-faint);width:32px;text-align:right;flex-shrink:0;}
+.alert-card{
+  background:var(--danger-light);border:1px solid #FCA5A5;border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:20px;display:flex;gap:10px;
 }
-.hamburger span {
-  display: block; width: 100%; height: 2px; background: var(--text-primary);
-  position: absolute; left: 0; transition: all 0.3s ease;
-}
-.hamburger span:nth-child(1) { top: 0; }
-.hamburger span:nth-child(2) { top: 9px; }
-.hamburger span:nth-child(3) { top: 18px; }
-.hamburger.open span:nth-child(1) { top: 9px; transform: rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
+.alert-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);margin-top:5px;flex-shrink:0;}
+.alert-text{font-size:12px;color:#991B1B;line-height:1.6;}
+.moments-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+.moment-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:14px 16px;}
+.moment-quote{font-size:13px;font-style:italic;line-height:1.65;color:var(--text-primary);margin-bottom:5px;}
+.moment-meta{font-size:10px;color:var(--text-faint);}
 
-/* LAYOUT */
-.container { max-width: 1120px; margin: 0 auto; padding: 0 2rem; }
-section { padding: 5rem 0; }
-
-/* HERO */
-.hero { padding: 10rem 0 5rem; }
-.hero h1 {
-  font-family: var(--font-heading);
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  line-height: 1.15; color: var(--text-primary);
-  max-width: 600px; margin-bottom: 1.5rem; letter-spacing: -0.02em;
+/* ── STUDENT TABLE ──────────────────────────────────── */
+.stu-table{width:100%;border-collapse:collapse;}
+.stu-table th{
+  text-align:left;font-size:10px;font-weight:600;color:var(--text-faint);
+  letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--divider);
+  text-transform:uppercase;
 }
-.hero .subhead {
-  font-size: 1.15rem; color: var(--text-muted);
-  max-width: 540px; line-height: 1.7; margin-bottom: 2.5rem;
-}
-.cta-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-.btn-primary {
-  display: inline-block; padding: 0.85rem 2rem;
-  background: var(--accent); color: var(--white); border: none; border-radius: 8px;
-  font-family: var(--font-body); font-size: 1rem; font-weight: 500;
-  text-decoration: none; cursor: pointer; transition: background 0.2s ease;
-}
-.btn-primary:hover { background: var(--accent-hover); }
-.btn-outline {
-  display: inline-block; padding: 0.85rem 2rem;
-  background: transparent; color: var(--accent);
-  border: 1.5px solid var(--accent); border-radius: 8px;
-  font-family: var(--font-body); font-size: 1rem; font-weight: 500;
-  text-decoration: none; cursor: pointer; transition: all 0.2s ease;
-}
-.btn-outline:hover { background: var(--accent); color: var(--white); }
-
-/* SECTION ELEMENTS */
-.section-label {
-  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
-}
-.section-heading {
-  font-family: var(--font-heading);
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  line-height: 1.2; color: var(--text-primary);
-  margin-bottom: 1.25rem; letter-spacing: -0.01em; max-width: 600px;
-}
-.section-body {
-  font-size: 1.05rem; color: var(--text-muted);
-  line-height: 1.75; max-width: 620px;
+.stu-table td{padding:11px 12px;border-bottom:1px solid var(--divider);font-size:13px;color:var(--text-muted);}
+.stu-table tbody tr{cursor:pointer;transition:background .1s;}
+.stu-table tbody tr:hover td{background:var(--surface);}
+.stu-name{font-weight:500;color:var(--text-primary)!important;}
+.pill{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:600;}
+.pill-p{background:var(--surface2);color:var(--text-muted);}
+.pill-c{background:#FEF3C7;color:#92400E;}
+.pill-g{background:#F0FDF4;color:#166534;}
+.trend-up{color:#16A34A;}
+.trend-flat{color:var(--text-faint);}
+.trend-stuck{color:var(--danger);}
+.intervention-flag{
+  display:inline-flex;align-items:center;gap:4px;font-size:10px;
+  color:var(--danger);font-weight:500;
 }
 
-/* CONTENT CARD */
-.content-card {
-  background: var(--white); border: 1px solid var(--divider);
-  border-radius: 16px; padding: 3rem; max-width: 720px;
+/* ── STUDENT DETAIL VIEW ────────────────────────────── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);
+  cursor:pointer;margin-bottom:20px;padding:5px 0;
 }
+.back-btn:hover{color:var(--text-primary);}
+.stu-detail-name{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:3px;}
+.stu-detail-sub{font-size:12px;color:var(--text-muted);margin-bottom:24px;}
+.trajectory{display:flex;gap:8px;margin-bottom:24px;align-items:flex-end;}
+.traj-block{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.traj-bar-wrap{width:100%;display:flex;flex-direction:column;align-items:center;}
+.traj-bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s;min-height:4px;}
+.traj-assign{font-size:9px;color:var(--text-faint);text-align:center;margin-top:4px;}
+.traj-level{font-size:9px;font-weight:600;text-align:center;color:var(--text-muted);}
+.stu-moments{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
 
-/* STEPS */
-.steps-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem; margin-top: 2.5rem;
-}
-.step-card {
-  background: var(--white); border: 1px solid var(--divider);
-  border-radius: 12px; padding: 1.75rem;
-}
-.step-num {
-  font-family: var(--font-heading); font-size: 1.75rem;
-  color: var(--divider); margin-bottom: 0.5rem;
-}
-.step-title {
-  font-size: 1rem; font-weight: 700; color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-.step-desc {
-  font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;
-}
+/* ── ANALYTICS VIEW ─────────────────────────────────── */
+.analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.analytics-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:18px 20px;}
+.analytics-label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.analytics-big{font-family:var(--font-heading);font-size:2.2rem;font-weight:400;color:var(--text-primary);line-height:1;}
+.analytics-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.chart-area{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:20px;margin-bottom:24px;}
+.chart-title{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:16px;}
+.chart-bars{display:flex;gap:8px;align-items:flex-end;height:140px;}
+.chart-col{flex:1;display:flex;flex-direction:column;gap:2px;align-items:center;height:100%;justify-content:flex-end;}
+.chart-seg{width:100%;border-radius:3px 3px 0 0;transition:opacity .2s;}
+.chart-seg:hover{opacity:.8;}
+.chart-x-label{font-size:9px;color:var(--text-faint);text-align:center;margin-top:6px;white-space:nowrap;}
 
-/* P/C/G */
-.pcg-cards {
-  display: flex; gap: 1.25rem; margin-top: 2rem;
-  flex-wrap: wrap; max-width: 720px;
+/* ── MATERIALS VIEW ─────────────────────────────────── */
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.mat-card{
+  background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);
+  padding:16px;cursor:pointer;transition:border-color .15s;
 }
-.pcg-chip {
-  flex: 1; min-width: 200px;
-  border-left: 3px solid var(--divider);
-  padding: 1.25rem 1.5rem;
+.mat-card:hover{border-color:var(--divider2);}
+.mat-name{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--text-primary);}
+.mat-meta{font-size:10px;color:var(--text-faint);}
+.mat-upload{
+  border:1.5px dashed var(--divider2);border-radius:var(--radius);
+  padding:24px;text-align:center;cursor:pointer;color:var(--text-faint);
+  font-size:13px;transition:all .15s;
 }
-.pcg-letter {
-  font-family: var(--font-heading); font-size: 1.75rem;
-  color: var(--text-primary); margin-bottom: 0.25rem;
-}
-.pcg-name {
-  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
-  color: var(--text-muted); margin-bottom: 0.35rem;
-}
-.pcg-desc {
-  font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;
-}
-.pcg-note {
-  margin-top: 1.5rem; font-size: 0.95rem;
-  font-style: italic; color: var(--accent);
-}
+.mat-upload:hover{border-color:var(--text-muted);color:var(--text-muted);}
 
-/* FEATURES */
-.features-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; margin-top: 2rem;
+/* ── SETTINGS VIEW ──────────────────────────────────── */
+.settings-section{margin-bottom:28px;}
+.settings-section h3{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--divider);}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--divider);}
+.settings-label{font-size:13px;color:var(--text-primary);}
+.settings-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.settings-input{
+  padding:7px 10px;border:1px solid var(--divider2);border-radius:6px;
+  font-size:13px;font-family:var(--font-body);outline:none;width:240px;
+  color:var(--text-primary);background:var(--bg);
 }
-.feat {
-  background: var(--surface); border: 1px solid var(--divider);
-  border-radius: 12px; padding: 1.75rem;
+.settings-input:focus{border-color:var(--text-primary);}
+.settings-btn{
+  padding:7px 16px;border-radius:6px;border:1px solid var(--divider2);
+  background:var(--bg);font-size:12px;font-weight:500;cursor:pointer;
+  font-family:var(--font-body);color:var(--text-primary);transition:all .1s;
 }
-.feat-title {
-  font-size: 1rem; font-weight: 700; color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-.feat-desc {
-  font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;
-}
+.settings-btn:hover{border-color:var(--text-primary);}
+.settings-btn.primary{background:var(--text-primary);color:#fff;border-color:var(--text-primary);}
+.settings-btn.primary:hover{opacity:.85;}
 
-/* BRIDGE */
-.bridge-card {
-  background: var(--white); border: 1px solid var(--divider);
-  border-radius: 16px; padding: 3rem; max-width: 720px;
-  text-align: center;
+/* ── LEARN PANEL ────────────────────────────────────── */
+.learn-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:100;align-items:center;justify-content:center;}
+.learn-overlay.vis{display:flex;}
+.learn-panel{
+  background:var(--bg);border:1px solid var(--divider);border-radius:12px;
+  width:520px;max-width:90vw;max-height:80vh;overflow-y:auto;
+  padding:28px 32px;position:relative;
 }
-.bridge-card .section-heading { margin: 0 auto 1rem; text-align: center; }
-.bridge-card .section-body { margin: 0 auto 2rem; text-align: center; }
+.learn-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:none;background:transparent;cursor:pointer;font-size:18px;color:var(--text-muted);border-radius:5px;}
+.learn-close:hover{background:var(--surface2);}
+.learn-title{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:6px;}
+.learn-sub{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;}
+.learn-section{margin-bottom:18px;}
+.learn-section h4{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:6px;}
+.learn-section p{font-size:13px;color:var(--text-muted);line-height:1.65;}
 
-/* FOOTER */
-footer {
-  background: var(--deeper); border-top: 1px solid var(--divider);
-  padding: 4rem 0 2.5rem;
+/* ── MISC ────────────────────────────────────────────── */
+.action-row{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;}
+.action-btn{
+  padding:9px 16px;border-radius:7px;font-size:12px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);border:1px solid var(--divider2);
+  background:var(--bg);color:var(--text-primary);transition:all .12s;
 }
-.footer-content { text-align: center; max-width: 480px; margin: 0 auto; }
-.footer-tagline {
-  font-family: var(--font-heading); font-size: clamp(1.4rem, 3vw, 1.8rem);
-  font-style: italic; color: var(--text-primary); margin-bottom: 1rem;
-}
-.footer-body {
-  font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem;
-}
-.signup-form {
-  display: flex; gap: 0.75rem; max-width: 400px; margin: 0 auto 3rem;
-}
-.signup-form input {
-  flex: 1; padding: 0.8rem 1rem;
-  border: 1px solid var(--divider); border-radius: 8px;
-  font-family: var(--font-body); font-size: 0.95rem;
-  background: var(--white); color: var(--text-primary); outline: none;
-  transition: border-color 0.2s ease;
-}
-.signup-form input::placeholder { color: var(--divider); }
-.signup-form input:focus { border-color: var(--accent); }
-.footer-bottom {
-  border-top: 1px solid var(--divider); padding-top: 2rem;
-  text-align: center; font-size: 0.8rem; color: var(--text-muted);
-}
-.footer-links {
-  display: flex; justify-content: center; gap: 2rem; margin-bottom: 1rem;
-}
-.footer-links a {
-  color: var(--text-muted); text-decoration: none; transition: color 0.2s ease;
-}
-.footer-links a:hover { color: var(--text-primary); }
+.action-btn:hover{border-color:var(--text-primary);}
+.action-btn.primary{background:var(--text-primary);color:#fff;border-color:var(--text-primary);}
+.action-btn.primary:hover{opacity:.85;}
 
-/* PAGE TRANSITION */
-body { animation: pageIn 0.5s ease-out; }
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* FADE */
-.fade-in {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+/* ── QUEST BUILDER VIEW ─────────────────────────────── */
+.qb-layout{display:grid;grid-template-columns:300px 1fr;gap:0;min-height:100%;}
+.qb-left{border-right:1px solid var(--divider);padding:24px 20px 40px;overflow-y:auto;}
+.qb-heading{font-family:var(--font-heading);font-size:1.2rem;margin-bottom:4px;}
+.qb-sub{font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;}
+.qb-field{margin-bottom:18px;}
+.qb-label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:block;}
+.qb-week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:5px;}
+.qb-day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.qb-pick{
+  padding:8px 4px;border-radius:6px;border:1px solid var(--divider);
+  background:var(--bg);color:var(--text-muted);font-family:var(--font-body);
+  font-size:11px;text-align:center;cursor:pointer;transition:all .12s;
 }
-.fade-in.visible { opacity: 1; transform: translateY(0); }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .nav-links {
-    display: none; position: absolute; top: 64px; left: 0; right: 0;
-    background: var(--bg); border-bottom: 1px solid var(--divider);
-    flex-direction: column; padding: 1.5rem 2rem; gap: 1.25rem;
-  }
-  .nav-links.open { display: flex; }
-  .hamburger { display: block; }
-  .hero { padding-top: 8rem; }
-  section { padding: 3.5rem 0; }
-  .steps-grid { grid-template-columns: 1fr 1fr; }
-  .features-grid { grid-template-columns: 1fr; }
-  .content-card, .bridge-card { padding: 2rem; }
-  .signup-form { flex-direction: column; }
-  .cta-row { flex-direction: column; align-items: flex-start; }
+.qb-pick:hover{border-color:var(--divider2);color:var(--text-primary);}
+.qb-pick.selected{background:var(--text-primary);color:#fff;border-color:var(--text-primary);}
+.qb-pick.disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.qb-range-row{display:flex;align-items:center;gap:10px;}
+.qb-range-input{
+  width:70px;padding:7px 10px;border:1px solid var(--divider);border-radius:6px;
+  font-size:13px;font-family:var(--font-body);outline:none;color:var(--text-primary);text-align:center;
 }
-@media (max-width: 480px) {
-  .steps-grid { grid-template-columns: 1fr; }
+.qb-range-input:focus{border-color:var(--text-primary);}
+.qb-notes{
+  width:100%;padding:10px 12px;border:1px solid var(--divider);border-radius:7px;
+  font-size:13px;font-family:var(--font-body);outline:none;resize:vertical;
+  min-height:68px;color:var(--text-primary);line-height:1.5;
+}
+.qb-notes:focus{border-color:var(--text-primary);}
+.qb-hint{font-size:11px;color:var(--text-faint);margin-top:5px;line-height:1.5;}
+.qb-gen-btn{
+  width:100%;padding:12px;background:#3A6B5C;color:#fff;border:none;
+  border-radius:var(--radius);font-family:var(--font-heading);font-size:15px;
+  cursor:pointer;transition:opacity .15s;margin-top:6px;
+}
+.qb-gen-btn:hover{opacity:.88;}
+.qb-pacing{
+  background:#EBF3EF;border:1px solid #C3DDD6;border-radius:7px;
+  padding:10px 12px;font-size:11px;color:#2D5347;line-height:1.6;margin-top:14px;
+}
+.qb-right{padding:28px 28px;overflow-y:auto;}
+.qb-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:360px;text-align:center;color:var(--text-faint);
+}
+.qb-empty-icon{font-size:36px;margin-bottom:10px;opacity:.4;}
+.qb-empty-text{font-size:13px;line-height:1.6;max-width:260px;}
+.qb-loading{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:360px;gap:14px;}
+.qb-loading.vis{display:flex;}
+.qb-dots{display:flex;gap:7px;}
+.qb-dot{width:8px;height:8px;border-radius:50%;background:#3A6B5C;animation:bounce 1.4s ease-in-out infinite;}
+.qb-dot:nth-child(2){animation-delay:.2s;background:var(--text-faint);}
+.qb-dot:nth-child(3){animation-delay:.4s;}
+.qb-load-text{font-family:var(--font-heading);font-size:14px;color:var(--text-muted);font-style:italic;}
+.qb-output{display:none;}
+.qb-output.vis{display:block;}
+.qb-out-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:14px;}
+.qb-out-title{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:3px;}
+.qb-out-meta{font-size:12px;color:var(--text-muted);}
+.qb-out-actions{display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0;}
+.qb-btn{
+  padding:7px 13px;border:1px solid var(--divider2);border-radius:6px;
+  font-size:11px;font-family:var(--font-body);cursor:pointer;background:var(--bg);
+  color:var(--text-primary);transition:all .12s;white-space:nowrap;
+}
+.qb-btn:hover{border-color:var(--text-primary);}
+.qb-btn.green{border-color:#3A6B5C;color:#3A6B5C;}
+.qb-btn.green:hover{background:#3A6B5C;color:#fff;}
+.qb-btn.dark{background:var(--text-primary);color:#fff;border-color:var(--text-primary);}
+.qb-btn.dark:hover{opacity:.85;}
+.qb-section{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;margin-top:24px;padding-bottom:7px;border-bottom:1px solid var(--divider);}
+.qb-hw-list{display:flex;flex-direction:column;gap:9px;}
+.qb-hw-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:14px 16px;}
+.qb-hw-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;}
+.qb-hw-num{font-size:11px;font-weight:600;color:#3A6B5C;}
+.qb-hw-why{font-size:11px;color:var(--text-faint);font-style:italic;text-align:right;max-width:200px;}
+.qb-hw-text{font-size:13px;color:var(--text-primary);line-height:1.7;}
+.qb-hw-actions{display:flex;gap:6px;margin-top:9px;}
+.qb-link-btn{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid #3A6B5C;color:#3A6B5C;cursor:pointer;background:transparent;font-family:var(--font-body);transition:all .12s;}
+.qb-link-btn:hover{background:#3A6B5C;color:#fff;}
+.qb-copy-btn{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--divider2);color:var(--text-muted);cursor:pointer;background:transparent;font-family:var(--font-body);transition:all .12s;}
+.qb-copy-btn:hover{border-color:var(--text-primary);color:var(--text-primary);}
+.qb-pcg{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;margin-left:7px;}
+.qb-pcg-P{background:var(--surface2);color:var(--text-muted);}
+.qb-pcg-C{background:#FEF3C7;color:#92400E;}
+.qb-pcg-G{background:#F0FDF4;color:#166534;}
+.qb-class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+.qb-class-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:14px 16px;}
+.qb-class-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.qb-group-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;}
+.qb-class-text{font-size:13px;color:var(--text-primary);line-height:1.7;margin-bottom:8px;}
+.qb-class-note{font-size:11px;color:var(--text-faint);font-style:italic;}
+.qb-print-btn{font-size:11px;padding:3px 9px;border-radius:5px;border:1px solid var(--divider2);color:var(--text-muted);cursor:pointer;background:transparent;font-family:var(--font-body);transition:all .12s;}
+.qb-print-btn:hover{border-color:#3A6B5C;color:#3A6B5C;}
+.qb-kelvi-note{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);padding:13px 15px;margin-top:18px;}
+.qb-kelvi-note-label{font-size:10px;font-weight:600;color:var(--text-faint);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase;}
+.qb-kelvi-note-text{font-size:13px;color:var(--text-muted);line-height:1.7;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+body{animation:pageIn .3s ease;}
+@media(max-width:680px){
+  .sidebar{display:none;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .analytics-grid{grid-template-columns:1fr;}
+  .home-prompts{grid-template-columns:1fr;}
+  .qb-layout{grid-template-columns:1fr;}
+  .qb-left{border-right:none;border-bottom:1px solid var(--divider);}
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="wordmark"><svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:6px"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>Kelvi
-      <span class="product-label">School</span>
-    </a>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="nav-links" id="navLinks">
-      <a href="index.html">Home</a>
-      <a href="family.html">Family</a>
-      <a href="solo.html">Solo</a>
-      <a href="school-app.html" class="btn-sm">Teacher workspace →</a>
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="6" r="5" fill="#B8784E"/>
+        <circle cx="6" cy="21" r="5" fill="#3A6B5C"/>
+        <circle cx="22" cy="21" r="5" fill="#5A7080"/>
+      </svg>
+      <div>
+        <div class="login-logo-text">Kelvi School</div>
+        <div class="login-logo-sub">Teacher workspace</div>
+      </div>
     </div>
+    <div class="login-heading">Sign in</div>
+    <div class="login-sub">Your AI-powered window into how students think.</div>
+    <label class="login-label">Email</label>
+    <input class="login-input" id="login-email" type="email" placeholder="you@school.edu" value="gramesh@exeter.edu">
+    <label class="login-label">Password</label>
+    <input class="login-input" id="login-pass" type="password" placeholder="Password" value="demo">
+    <button class="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-note">Demo mode — any credentials will work</div>
   </div>
-</nav>
+</div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <h1 class="fade-in">Make student thinking visible.</h1>
-    <p class="subhead fade-in">Kelvi helps teachers design richer mathematical conversations, observe student reasoning with AI-powered insights, and move learners from recall to explanation to transfer.</p>
-    <div class="cta-row fade-in">
-      <a href="school-app.html" class="btn-primary">See Kelvi School</a>
-      <a href="#signup" class="btn-outline">Join the waitlist</a>
-    </div>
-  </div>
-</section>
+<!-- APP -->
+<div class="app" id="app">
 
-<!-- THE CHALLENGE -->
-<section>
-  <div class="container">
-    <div class="content-card fade-in">
-      <p class="section-label">The challenge</p>
-      <h2 class="section-heading">Many math tools show whether students got the answer.</h2>
-      <p class="section-body">Fewer help teachers see how students are thinking. Kelvi School is designed to surface reasoning, not just correctness.</p>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <a href="index.html" class="sb-brand">
+        <svg width="20" height="20" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+        <div>
+          <div class="sb-brand-text">Kelvi</div>
+        </div>
+      </a>
     </div>
-  </div>
-</section>
 
-<!-- HOW IT WORKS -->
-<section>
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">How it works</p>
-      <h2 class="section-heading">From your classroom to their kitchen table.</h2>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card fade-in">
-        <div class="step-num">1</div>
-        <div class="step-title">You create</div>
-        <div class="step-desc">Design an assignment or assessment your way. Kelvi helps if you want — or stay with what you know works.</div>
+    <div class="sb-nav">
+      <div class="sb-item active" id="nav-home" onclick="showView('home')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
       </div>
-      <div class="step-card fade-in">
-        <div class="step-num">2</div>
-        <div class="step-title">Students discuss</div>
-        <div class="step-desc">Students work the problem in class. The assignment generates mathematical conversation — at tables, in pairs, on paper.</div>
+      <div class="sb-item" id="nav-chats" onclick="showView('home')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        My chats
       </div>
-      <div class="step-card fade-in">
-        <div class="step-num">3</div>
-        <div class="step-title">Home continues</div>
-        <div class="step-desc">Share a homework link. Students open Kelvi at home and continue working with an AI thinking partner that never gives full solutions.</div>
+      <div class="sb-item" id="nav-analytics" onclick="showView('analytics')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
       </div>
-      <div class="step-card fade-in">
-        <div class="step-num">4</div>
-        <div class="step-title">You see it all</div>
-        <div class="step-desc">The dashboard visualizes student thinking — from class work and home sessions. No student falls through the cracks.</div>
+      <div class="sb-item" id="nav-materials" onclick="showView('materials')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Materials
       </div>
-    </div>
-  </div>
-</section>
+      <div class="sb-item" id="nav-settings" onclick="showView('settings')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
 
-<!-- P/C/G -->
-<section>
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">The framework</p>
-      <h2 class="section-heading">P/C/G — how Kelvi reads student thinking.</h2>
-      <p class="section-body">Kelvi's default framework classifies student thinking from following steps to creating new mathematics. It's how the dashboard sees — not how you have to teach.</p>
-    </div>
-    <div class="pcg-cards fade-in">
-      <div class="pcg-chip">
-        <div class="pcg-letter">P</div>
-        <div class="pcg-name">PROCEDURAL</div>
-        <div class="pcg-desc">Following steps. Applying formulas. "How do I do this?"</div>
+      <div class="sb-section-label">My classes</div>
+      <div class="sb-item" id="cls-0" onclick="selectClass(0)">
+        <div class="sb-class-dot"></div>MAT 311 Honors
       </div>
-      <div class="pcg-chip">
-        <div class="pcg-letter">C</div>
-        <div class="pcg-name">CONCEPTUAL</div>
-        <div class="pcg-desc">Explaining meaning. Connecting ideas. "Why does this work?"</div>
+      <div class="sb-item" id="cls-1" onclick="selectClass(1)">
+        <div class="sb-class-dot"></div>MAT 210
       </div>
-      <div class="pcg-chip">
-        <div class="pcg-letter">G</div>
-        <div class="pcg-name">GENERATIVE</div>
-        <div class="pcg-desc">Creating and extending. "What if I changed this?"</div>
+      <div class="sb-item" id="nav-quest" onclick="showView('quest')" style="padding-left:26px;font-size:12px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Quest Builder
+      </div>
+      <div class="sb-item" id="cls-2" onclick="selectClass(2)">
+        <div class="sb-class-dot"></div>MAT 110 Transition
+      </div>
+      <div class="sb-add-btn" onclick="">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add class
       </div>
     </div>
-    <p class="pcg-note fade-in">Your district uses a different framework? Kelvi adapts.</p>
-  </div>
-</section>
 
-<!-- DASHBOARD -->
-<section>
-  <div class="container">
-    <div class="fade-in">
-      <p class="section-label">The dashboard</p>
-      <h2 class="section-heading">The most powerful tool is seeing your students think.</h2>
-      <p class="section-body">Upload classwork. Connect home sessions. Kelvi's AI reads every student's work so you can focus on the ones who need you most.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feat fade-in">
-        <div class="feat-title">Class view</div>
-        <div class="feat-desc">Thinking distribution at a glance. How many students are at each level on every assignment. See the shape of your class.</div>
+    <div class="sb-bottom">
+      <div class="sb-bottom-item" onclick="showLearn()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Learn about Kelvi
       </div>
-      <div class="feat fade-in">
-        <div class="feat-title">Student view</div>
-        <div class="feat-desc">Individual trajectory over time. Strongest moments quoted from their actual work. Where they grew, where they're stuck.</div>
+      <div class="sb-bottom-item" onclick="showFeedback()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Send feedback
       </div>
-      <div class="feat fade-in">
-        <div class="feat-title">Intervention alerts</div>
-        <div class="feat-desc">Students who have been stuck for multiple assignments. You know exactly who needs you — before they fall behind.</div>
-      </div>
-      <div class="feat fade-in">
-        <div class="feat-title">Assignment builder</div>
-        <div class="feat-desc">Tell Kelvi what you need. It helps you create assignments worth discussing — or you build your own. Your classroom, your call.</div>
-      </div>
-      <div class="feat fade-in">
-        <div class="feat-title">Rubrics</div>
-        <div class="feat-desc">Assess questioning and reasoning, not just content mastery. Build rubrics that match your framework — P/C/G or your own.</div>
-      </div>
-      <div class="feat fade-in">
-        <div class="feat-title">Home connection</div>
-        <div class="feat-desc">Share a homework link. Students continue on Kelvi Solo at home. You see both classroom and home sessions in one place.</div>
+      <div class="sb-bottom-item" id="user-name-bottom" style="margin-top:4px;border-top:1px solid var(--divider);padding-top:10px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="user-name">Dr. Ramesh</span>
       </div>
     </div>
   </div>
-</section>
 
-<!-- BRIDGE -->
-<section>
-  <div class="container">
-    <div class="bridge-card fade-in">
-      <p class="section-label">The bridge</p>
-      <h2 class="section-heading">Classroom thinking doesn't stop at the door.</h2>
-      <p class="section-body">When students go home, they open Kelvi Solo — the same Socratic partner, the same problem. You see both sessions in one dashboard.</p>
-      <a href="solo.html" class="btn-outline">See Kelvi Solo →</a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer id="signup">
-  <div class="container">
-    <div class="footer-content">
-      <p class="footer-tagline">Every student is seen and heard.</p>
-      <p class="footer-body">Join the early community of teachers exploring a different kind of math platform — one built for reasoning, not just results.</p>
-      <form class="signup-form" onsubmit="handleSignup(event)">
-        <input type="email" placeholder="your@school.edu" required>
-        <button type="submit" class="btn-primary">Join the waitlist</button>
-      </form>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-links">
-        <a href="index.html">Home</a>
-        <a href="family.html">Family</a>
-        <a href="solo.html">Solo</a>
-        <a href="about.html">About</a>
+  <!-- MAIN -->
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-crumb" id="topbar-crumb">
+          <span>Home</span>
+        </div>
       </div>
-      <p>© 2026 Kelvi. All rights reserved.</p>
+      <div class="topbar-right">
+        <span class="topbar-user" id="user-name-top">gramesh@exeter.edu</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- HOME / CHAT VIEW -->
+      <div class="view active" id="view-home">
+        <div class="home-greeting">
+          <h1>Good morning, Dr. Ramesh.</h1>
+          <p>What would you like to work on today?</p>
+        </div>
+        <div class="home-prompts" id="home-prompts">
+          <div class="home-prompt" onclick="startWorksheetIntake()">
+            <div class="home-prompt-icon">◻</div>
+            <div><div class="home-prompt-text">Create a worksheet</div><div class="home-prompt-sub">Any grade, any topic — ready to print</div></div>
+          </div>
+          <div class="home-prompt" onclick="prefill('Grade these student responses using the P/C/G framework.')">
+            <div class="home-prompt-icon">◈</div>
+            <div><div class="home-prompt-text">Grade student responses</div><div class="home-prompt-sub">Upload work, get P/C/G analysis</div></div>
+          </div>
+          <div class="home-prompt" onclick="prefill('Create differentiated follow-up problems for grade        — one version for procedural students, one for conceptual, one for generative.')">
+            <div class="home-prompt-icon">◇</div>
+            <div><div class="home-prompt-text">Differentiate for my class</div><div class="home-prompt-sub">Targeted follow-ups by P/C/G level</div></div>
+          </div>
+          <div class="home-prompt" onclick="prefill('Build a P/C/G rubric for ')">
+            <div class="home-prompt-icon">◈</div>
+            <div><div class="home-prompt-text">Build a rubric</div><div class="home-prompt-sub">Assess thinking, not just answers</div></div>
+          </div>
+          <div class="home-prompt" onclick="prefill('Write a bell ringer for grade       on the topic of ')">
+            <div class="home-prompt-icon">◎</div>
+            <div><div class="home-prompt-text">Bell ringer / exit ticket</div><div class="home-prompt-sub">Quick warm-up or close for any grade</div></div>
+          </div>
+          <div class="home-prompt" onclick="prefill('')">
+            <div class="home-prompt-icon">⊹</div>
+            <div><div class="home-prompt-text">Something else</div><div class="home-prompt-sub">Lesson plans, parent notes, pacing guides…</div></div>
+          </div>
+        </div>
+        <div class="chat-scroll" id="chat-scroll">
+          <div class="chat-wrap" id="chat"></div>
+          <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div class="input-sticky">
+          <div class="input-outer" id="input-outer">
+            <div class="preview-bar" id="preview-bar"></div>
+            <textarea class="inp" id="inp" placeholder="Ask a follow-up…" rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+              oninput="autoGrow(this)"></textarea>
+            <div class="inp-footer">
+              <div style="position:relative">
+                <button class="icon-btn" id="plus-btn" title="Attach">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <div id="plus-menu" class="plus-menu">
+                  <label class="plus-item"><input type="file" accept="image/*" multiple onchange="pickFiles(event);closePlus()" style="display:none">Upload images</label>
+                  <label class="plus-item"><input type="file" accept=".pdf" onchange="pickFiles(event);closePlus()" style="display:none">Upload PDF</label>
+                  <div class="plus-item" onclick="pasteClip();closePlus()">Paste from clipboard</div>
+                </div>
+              </div>
+              <button class="send-btn" onclick="sendMsg()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLASS VIEW -->
+      <div class="view" id="view-class" style="max-width:900px">
+        <div class="view-header">
+          <div class="view-title" id="class-title">MAT 311 Honors</div>
+          <div class="view-sub" id="class-sub">12 students · Last assignment: Trig &amp; Geometry Test · Dec 19, 2024</div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-label">Students</div><div class="stat-val" id="m-total">12</div></div>
+          <div class="stat-card"><div class="stat-label">Procedural</div><div class="stat-val" id="m-p">3</div><div class="stat-pct" id="m-p-pct">25%</div></div>
+          <div class="stat-card"><div class="stat-label">Conceptual</div><div class="stat-val" id="m-c">6</div><div class="stat-pct" id="m-c-pct">50%</div></div>
+          <div class="stat-card"><div class="stat-label">Generative</div><div class="stat-val" id="m-g">3</div><div class="stat-pct" id="m-g-pct">25%</div></div>
+        </div>
+
+        <div class="section-head">Thinking distribution</div>
+        <div class="pcg-bars" style="margin-bottom:24px">
+          <div class="pcg-bar-row"><div class="pcg-bar-name">Procedural</div><div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-p" style="width:25%"></div></div><div class="pcg-bar-pct" id="bar-p-pct">25%</div></div>
+          <div class="pcg-bar-row"><div class="pcg-bar-name">Conceptual</div><div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-c" style="width:50%"></div></div><div class="pcg-bar-pct" id="bar-c-pct">50%</div></div>
+          <div class="pcg-bar-row"><div class="pcg-bar-name">Generative</div><div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-g" style="width:25%"></div></div><div class="pcg-bar-pct" id="bar-g-pct">25%</div></div>
+        </div>
+
+        <div id="alert-area"></div>
+
+        <div class="section-head" style="margin-bottom:10px">Strongest moments</div>
+        <div class="moments-list" id="moments-area"></div>
+
+        <div class="section-head" style="margin-top:4px;margin-bottom:10px">Students</div>
+        <table class="stu-table">
+          <thead><tr><th>Name</th><th>Level</th><th>Trajectory</th><th>Strongest moment</th></tr></thead>
+          <tbody id="stu-tbody"></tbody>
+        </table>
+
+        <div class="action-row">
+          <button class="action-btn primary" onclick="showView('home');prefill('Upload student work')">↑ Upload student work</button>
+          <button class="action-btn" onclick="showView('home');prefill('Create differentiated follow-up problems for my class based on the P/C/G results.')">Differentiate</button>
+          <button class="action-btn" onclick="showView('home');prefill('Create a new Question Circle problem for ')">New assignment</button>
+        </div>
+      </div>
+
+      <!-- STUDENT DETAIL VIEW -->
+      <div class="view" id="view-student" style="max-width:900px">
+        <div class="back-btn" onclick="showView('class')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to class
+        </div>
+        <div class="stu-detail-name" id="stu-detail-name">Priya S.</div>
+        <div class="stu-detail-sub" id="stu-detail-sub">MAT 311 Honors · Current level: Generative</div>
+
+        <div class="section-head" style="margin-bottom:12px">Thinking trajectory</div>
+        <div class="trajectory" id="stu-trajectory" style="height:140px;margin-bottom:24px;"></div>
+
+        <div class="section-head" style="margin-bottom:10px">Strongest moments</div>
+        <div class="stu-moments" id="stu-moments"></div>
+
+        <div class="action-row">
+          <button class="action-btn primary" onclick="showView('home');prefill('Create a personalized follow-up problem for a student currently at generative level in MAT 311.')">Create follow-up</button>
+          <button class="action-btn" onclick="showView('home');prefill('Write a parent note summarizing this student\'s P/C/G progress.')">Write parent note</button>
+        </div>
+      </div>
+
+      <!-- ANALYTICS VIEW -->
+      <div class="view" id="view-analytics" style="max-width:900px">
+        <div class="view-header">
+          <div class="view-title">Analytics</div>
+          <div class="view-sub">P/C/G thinking levels across all classes</div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="analytics-label">Class average</div>
+            <div class="analytics-big">Conceptual</div>
+            <div class="analytics-sub">Across all three classes</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-label">Students flagged</div>
+            <div class="analytics-big">4</div>
+            <div class="analytics-sub">Stuck at procedural 2+ assignments</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-label">Generative moments</div>
+            <div class="analytics-big">6</div>
+            <div class="analytics-sub">This month across all classes</div>
+          </div>
+        </div>
+
+        <div class="chart-area">
+          <div class="chart-title">P/C/G distribution by class — last assignment</div>
+          <div class="chart-bars" id="analytics-chart"></div>
+        </div>
+
+        <div class="section-head" style="margin-bottom:10px">Intervention alerts</div>
+        <div id="analytics-alerts"></div>
+      </div>
+
+      <!-- MATERIALS VIEW -->
+      <div class="view" id="view-materials" style="max-width:900px">
+        <div class="view-header">
+          <div class="view-title">My materials</div>
+          <div class="view-sub">Worksheets, problem sets, and references</div>
+        </div>
+        <div class="mat-grid" id="mat-grid">
+          <div class="mat-card"><div class="mat-name">Math 3-4 Problem Set</div><div class="mat-meta">PDF · Uploaded Dec 15</div></div>
+          <div class="mat-card"><div class="mat-name">Trig Unit Overview</div><div class="mat-meta">PDF · Uploaded Nov 28</div></div>
+          <div class="mat-card"><div class="mat-name">PEA Math 3 (Full)</div><div class="mat-meta">PDF · Uploaded Sep 4</div></div>
+          <div class="mat-card"><div class="mat-name">P/C/G Standard Rubric</div><div class="mat-meta">Rubric · Default</div></div>
+          <div class="mat-card"><div class="mat-name">Unit 4: Trig &amp; Vectors</div><div class="mat-meta">Rubric · Dec 10</div></div>
+          <label class="mat-upload"><input type="file" accept="image/*,.pdf" multiple onchange="uploadMaterial(event)" style="display:none">+ Upload material</label>
+        </div>
+      </div>
+
+      <!-- SETTINGS VIEW -->
+      <div class="view" id="view-settings" style="max-width:700px">
+        <div class="view-header">
+          <div class="view-title">Settings</div>
+        </div>
+        <div class="settings-section">
+          <h3>Account</h3>
+          <div class="settings-row">
+            <div><div class="settings-label">Name</div><div class="settings-sub">Displayed in the workspace</div></div>
+            <input class="settings-input" value="Dr. Gayatri Ramesh" id="settings-name">
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Email</div><div class="settings-sub">Your school email</div></div>
+            <input class="settings-input" value="gramesh@exeter.edu">
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>AI model</h3>
+          <div class="settings-row">
+            <div><div class="settings-label">Active model</div><div class="settings-sub">Claude is primary. GPT-4o is the fallback if Claude is unavailable.</div></div>
+            <div style="display:flex;gap:6px;">
+              <button class="settings-btn primary" id="model-claude-btn" onclick="setModel('claude')">Claude</button>
+              <button class="settings-btn" id="model-gpt-btn" onclick="setModel('gpt')">GPT-4o</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">Anthropic API key</div><div class="settings-sub">For Claude — will move to backend soon</div></div>
+            <input class="settings-input" type="password" id="settings-api" placeholder="sk-ant-…" oninput="syncKeys()">
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">OpenAI API key</div><div class="settings-sub">For GPT-4o fallback</div></div>
+            <input class="settings-input" type="password" id="settings-oai" placeholder="sk-…" oninput="syncKeys()">
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Kelvi Homework</h3>
+          <div class="settings-row">
+            <div><div class="settings-label">Student homework link</div><div class="settings-sub">Share with students so they can continue at home on Kelvi Homework</div></div>
+            <button class="settings-btn" onclick="navigator.clipboard.writeText('https://kelvi-umber.vercel.app/solo.html').then(()=>alert('Link copied!'))">Copy link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUEST BUILDER VIEW -->
+      <div class="view" id="view-quest" style="max-width:100%;padding:0;">
+        <div class="qb-layout">
+          <!-- LEFT: CONTROLS -->
+          <div class="qb-left">
+            <div class="qb-heading">Build today’s plan</div>
+            <div class="qb-sub">Kelvi suggests tonight’s homework and tomorrow’s in-class problems based on where you are in MAT 2.</div>
+
+            <div class="qb-field">
+              <span class="qb-label">Week</span>
+              <div class="qb-week-grid" id="qb-week-grid"></div>
+            </div>
+            <div class="qb-field">
+              <span class="qb-label">Day in week</span>
+              <div class="qb-day-grid" id="qb-day-grid"></div>
+            </div>
+            <div class="qb-field">
+              <span class="qb-label">Last problem covered in class</span>
+              <div class="qb-range-row">
+                <input type="number" class="qb-range-input" id="qb-last" min="1" max="274" placeholder="e.g. 43">
+                <span style="font-size:12px;color:var(--text-faint);">of 274</span>
+              </div>
+              <div class="qb-hint">Leave blank and Kelvi will estimate from the week/day.</div>
+            </div>
+            <div class="qb-field">
+              <span class="qb-label">Notes for Kelvi <span style="font-size:10px;color:var(--text-faint);text-transform:none;letter-spacing:0">(optional)</span></span>
+              <textarea class="qb-notes" id="qb-notes" placeholder="e.g. We spent extra time on parametric equations. Students are strong on distance but shaky on vectors."></textarea>
+              <div class="qb-hint">Tell Kelvi what clicked, what didn’t, where to push.</div>
+            </div>
+            <button class="qb-gen-btn" onclick="qbBuildPlan()">Suggest today’s plan →</button>
+            <div class="qb-pacing" id="qb-pacing" style="display:none"></div>
+          </div>
+
+          <!-- RIGHT: OUTPUT -->
+          <div class="qb-right">
+            <div class="qb-empty" id="qb-empty">
+              <div class="qb-empty-icon">◎</div>
+              <div class="qb-empty-text">Select the week and day, tell Kelvi where you are, and it will suggest tonight’s homework and tomorrow’s in-class problems.</div>
+            </div>
+            <div class="qb-loading" id="qb-loading">
+              <div class="qb-dots"><div class="qb-dot"></div><div class="qb-dot"></div><div class="qb-dot"></div></div>
+              <div class="qb-load-text" id="qb-load-text">Reading the pacing map…</div>
+            </div>
+            <div class="qb-output" id="qb-output">
+              <div class="qb-out-header">
+                <div>
+                  <div class="qb-out-title" id="qb-out-title">Week 2, Day 3</div>
+                  <div class="qb-out-meta" id="qb-out-meta">Problems 29–43 · Parametric equations</div>
+                </div>
+                <div class="qb-out-actions">
+                  <button class="qb-btn" onclick="qbBuildPlan()">Regenerate</button>
+                  <button class="qb-btn green" onclick="qbPrintAllCards()">Print group cards</button>
+                  <button class="qb-btn dark" onclick="qbCopyHomeworkLinks()">Copy homework links</button>
+                </div>
+              </div>
+              <div class="qb-section">Tonight’s homework — 4 problems with Kelvi</div>
+              <div class="qb-hw-list" id="qb-hw-list"></div>
+              <div class="qb-section">In-class group problems — 5 problems for the board</div>
+              <div class="qb-class-grid" id="qb-class-grid"></div>
+              <div class="qb-kelvi-note">
+                <div class="qb-kelvi-note-label">Kelvi’s note</div>
+                <div class="qb-kelvi-note-text" id="qb-kelvi-note"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- HIDDEN API KEY FIELD (used by sendMsg) -->
+<input type="hidden" id="api-key" value="">
+<input type="hidden" id="oai-key" value="">
+
+<!-- FEEDBACK PANEL -->
+<div class="learn-overlay" id="feedback-overlay" onclick="if(event.target===this)hideFeedback()">
+  <div class="learn-panel" style="max-width:460px">
+    <button class="learn-close" onclick="hideFeedback()">&times;</button>
+    <div class="learn-title">Send feedback</div>
+    <div class="learn-sub">Help us make Kelvi School better. All feedback goes directly to the Kelvi team.</div>
+    <div id="feedback-form-wrap">
+      <div style="margin-bottom:12px">
+        <label class="login-label" style="margin-bottom:5px;display:block">What type of feedback?</label>
+        <select id="fb-type" style="width:100%;padding:9px 12px;border:1px solid var(--divider2);border-radius:var(--radius);font-size:13px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);">
+          <option>Something isn't working</option>
+          <option>Feature request</option>
+          <option>The AI response was wrong or unhelpful</option>
+          <option>General feedback</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="login-label" style="margin-bottom:5px;display:block">Your feedback</label>
+        <textarea id="fb-msg" placeholder="Describe what happened or what you'd like to see…" style="width:100%;padding:10px 12px;border:1px solid var(--divider2);border-radius:var(--radius);font-size:13px;font-family:var(--font-body);outline:none;resize:vertical;min-height:100px;background:var(--bg);color:var(--text-primary);"></textarea>
+      </div>
+      <button class="login-btn" style="margin-top:0" onclick="submitFeedback()">Send feedback</button>
+    </div>
+    <div id="feedback-thanks" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:1.2rem;margin-bottom:8px">Thank you.</div>
+      <div style="font-size:13px;color:var(--text-muted)">We read every message.</div>
     </div>
   </div>
-</footer>
+</div>
+<div class="learn-overlay" id="learn-overlay" onclick="if(event.target===this)hideLearn()">
+  <div class="learn-panel">
+    <button class="learn-close" onclick="hideLearn()">&times;</button>
+    <div class="learn-title">About Kelvi School</div>
+    <div class="learn-sub">An AI teaching partner that shows you how your students think — not just what they get right.</div>
+    <div class="learn-section">
+      <h4>The P/C/G framework</h4>
+      <p>Every student interaction is classified as Procedural (knows the steps), Conceptual (understands why), or Generative (creates new questions from answers). This maps directly to Hattie's Surface/Deep/Transfer learning model.</p>
+    </div>
+    <div class="learn-section">
+      <h4>The Question Circle</h4>
+      <p>A five-step classroom discussion protocol: Problem Drop → Small Group → Kelvi enters as a group resource → Whole Class → Individual Close. Runs in 30–35 minutes inside Kelvi School.</p>
+    </div>
+    <div class="learn-section">
+      <h4>Kelvi Homework</h4>
+      <p>Students continue at home on Kelvi Homework. Their sessions feed back into your dashboard — you see classroom and home thinking in one place.</p>
+    </div>
+    <div class="learn-section">
+      <h4>What Kelvi never does</h4>
+      <p>Kelvi never gives answers. It asks the question the student needed to ask themselves. Mistakes are treated as thinking in progress, not failures.</p>
+    </div>
+  </div>
+</div>
 
 <script>
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 10);
-});
+// ── DATA ────────────────────────────────────────────────────────
+const CLASSES=[
+  {
+    name:'MAT 311 Honors',
+    sub:'12 students · Last assignment: Trig & Geometry Test · Dec 19, 2024',
+    total:12,p:3,c:6,g:3,
+    alerts:['James K., Sofia R., and Tyler M. have been at procedural for 2 consecutive assignments.'],
+    moments:[
+      {quote:'The Law of Sines makes sense because the ratio stays constant — it\'s like the triangle is scaling but keeping its shape.',who:'Priya S.',where:'Problem 8',level:'Generative'},
+      {quote:'I checked my answer by plugging back into both equations and they matched, so the triangle must be right.',who:'Marcus L.',where:'Problem 5',level:'Conceptual'}
+    ],
+    students:[
+      {name:'Priya S.',level:'G',trend:'C → G',trendClass:'trend-up',moment:'Connected Law of Sines to similarity',history:['P','C','G'],stuck:false},
+      {name:'Marcus L.',level:'C',trend:'P → C',trendClass:'trend-up',moment:'Verified answer with substitution',history:['P','P','C'],stuck:false},
+      {name:'Anika T.',level:'G',trend:'G → G',trendClass:'trend-flat',moment:'Created own probability problem',history:['C','G','G'],stuck:false},
+      {name:'David W.',level:'C',trend:'C → C',trendClass:'trend-flat',moment:'Explained dot product geometrically',history:['C','C','C'],stuck:false},
+      {name:'Emma J.',level:'C',trend:'P → C',trendClass:'trend-up',moment:'Drew diagram to justify answer',history:['P','P','C'],stuck:false},
+      {name:'Liam H.',level:'C',trend:'C → C',trendClass:'trend-flat',moment:'Connected arc length to circumference',history:['P','C','C'],stuck:false},
+      {name:'Olivia P.',level:'C',trend:'C → C',trendClass:'trend-flat',moment:'Used two methods for area',history:['C','C','C'],stuck:false},
+      {name:'Noah D.',level:'G',trend:'C → G',trendClass:'trend-up',moment:'Asked what happens in 3D',history:['C','C','G'],stuck:false},
+      {name:'Chloe F.',level:'C',trend:'P → C',trendClass:'trend-up',moment:'Explained why cos(90)=0 matters',history:['P','P','C'],stuck:false},
+      {name:'James K.',level:'P',trend:'P → P',trendClass:'trend-stuck',moment:'Applied formula correctly',history:['P','P','P'],stuck:true},
+      {name:'Sofia R.',level:'P',trend:'P → P',trendClass:'trend-stuck',moment:'Set up equation but didn\'t explain',history:['P','P','P'],stuck:true},
+      {name:'Tyler M.',level:'P',trend:'P → P',trendClass:'trend-stuck',moment:'Followed steps without justification',history:['P','P','P'],stuck:true}
+    ]
+  },
+  {
+    name:'MAT 210',
+    sub:'14 students · Last assignment: Linear Functions Quiz · Dec 18, 2024',
+    total:14,p:5,c:7,g:2,
+    alerts:['5 students at procedural — consider a targeted review before break.'],
+    moments:[
+      {quote:'If the slope is negative, the line goes down — but it also means the output decreases as input increases.',who:'Raj P.',where:'Problem 3',level:'Conceptual'}
+    ],
+    students:[
+      {name:'Raj P.',level:'C',trend:'P → C',trendClass:'trend-up',moment:'Connected slope to rate of change',history:['P','P','C'],stuck:false},
+      {name:'Mia L.',level:'G',trend:'C → G',trendClass:'trend-up',moment:'Created a real-world linear model',history:['C','C','G'],stuck:false},
+      {name:'Ben T.',level:'P',trend:'P → P',trendClass:'trend-stuck',moment:'Calculated slope from two points',history:['P','P','P'],stuck:true}
+    ]
+  },
+  {
+    name:'MAT 110 Transition',
+    sub:'10 students · Last assignment: Fraction Operations · Dec 17, 2024',
+    total:10,p:6,c:3,g:1,
+    alerts:['6 of 10 students are procedural. This class needs targeted conceptual scaffolding.'],
+    moments:[
+      {quote:'Dividing by a fraction is the same as multiplying by its flip — because you\'re asking how many groups fit.',who:'Ana M.',where:'Problem 5',level:'Conceptual'}
+    ],
+    students:[
+      {name:'Ana M.',level:'C',trend:'P → C',trendClass:'trend-up',moment:'Explained fraction division conceptually',history:['P','P','C'],stuck:false},
+      {name:'Carlos D.',level:'G',trend:'C → G',trendClass:'trend-up',moment:'Made his own fraction word problem',history:['C','C','G'],stuck:false},
+      {name:'Emily W.',level:'P',trend:'P → P',trendClass:'trend-stuck',moment:'Applied procedure correctly',history:['P','P','P'],stuck:true}
+    ]
+  }
+];
 
-const hamburger = document.getElementById('hamburger');
-const navLinks = document.getElementById('navLinks');
-hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('open');
-  navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    navLinks.classList.remove('open');
-  });
-});
+let currentClass=0, currentStudent=null, msgs=[], pendingFiles=[];
+const ASSIGNMENTS=['Assignment 1','Assignment 2','Assignment 3'];
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) entry.target.classList.add('visible');
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-function handleSignup(e) {
-  e.preventDefault();
-  const input = e.target.querySelector('input');
-  input.value = '';
-  input.placeholder = "You're on the list. We'll be in touch.";
-  setTimeout(() => { input.placeholder = 'your@school.edu'; }, 3000);
+// ── INIT ────────────────────────────────────────────────────────
+function doLogin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('active');
+  const email=document.getElementById('login-email').value||'teacher@school.edu';
+  document.getElementById('user-name').textContent=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
+  document.getElementById('user-name-top').textContent=email;
+  loadKey();
+  renderClass();
+  renderAnalytics();
 }
-</script>
 
+// ── NAVIGATION ──────────────────────────────────────────────────
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  // update sidebar active
+  document.querySelectorAll('.sb-item[id^="nav-"]').forEach(i=>i.classList.remove('active'));
+  const ni=document.getElementById('nav-'+id);
+  if(ni)ni.classList.add('active');
+  // breadcrumb
+  const labels={home:'Home',class:'Class view',student:'Student view',analytics:'Analytics',materials:'Materials',settings:'Settings',quest:'Quest Builder'};
+  const cls=CLASSES[currentClass];
+  let crumb='<span>'+(labels[id]||id)+'</span>';
+  if(id==='class') crumb='<span style="color:var(--text-muted);cursor:pointer" onclick="showView(\'home\')">Home</span><span class="topbar-crumb-sep"> / </span><span>'+cls.name+'</span>';
+  if(id==='student') crumb='<span style="color:var(--text-muted);cursor:pointer" onclick="showView(\'home\')">Home</span><span class="topbar-crumb-sep"> / </span><span style="color:var(--text-muted);cursor:pointer" onclick="showView(\'class\')">'+cls.name+'</span><span class="topbar-crumb-sep"> / </span><span>'+(currentStudent?currentStudent.name:'')+'</span>';
+  if(id==='quest') crumb='<span style="color:var(--text-muted);cursor:pointer" onclick="showView(\'home\')">Home</span><span class="topbar-crumb-sep"> / </span><span>MAT 2 · Quest Builder</span>';
+  document.getElementById('topbar-crumb').innerHTML=crumb;
+  if(id==='quest') qbInitWeeks();
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function selectClass(idx){
+  currentClass=idx;
+  document.querySelectorAll('.sb-item[id^="cls-"]').forEach(i=>i.classList.remove('active'));
+  document.getElementById('cls-'+idx).classList.add('active');
+  renderClass();
+  showView('class');
+}
+
+function openStudent(stu){
+  currentStudent=stu;
+  document.getElementById('stu-detail-name').textContent=stu.name;
+  document.getElementById('stu-detail-sub').textContent=CLASSES[currentClass].name+' · Current level: '+({P:'Procedural',C:'Conceptual',G:'Generative'}[stu.level]);
+  // trajectory
+  const container=document.getElementById('stu-trajectory');
+  const lvlH={P:33,C:66,G:100};
+  const lvlColors={P:'var(--surface2)',C:'#FEF3C7',G:'#F0FDF4'};
+  container.innerHTML=ASSIGNMENTS.map((a,i)=>{
+    const lvl=stu.history[i]||'P';
+    const h=lvlH[lvl];
+    return `<div class="traj-block">
+      <div class="traj-bar-wrap" style="height:100%;justify-content:flex-end;display:flex;flex-direction:column;align-items:center;width:100%">
+        <div class="traj-bar" style="height:${h}%;background:${lvlColors[lvl]};border:1px solid var(--divider2);width:70%"></div>
+      </div>
+      <div class="traj-level">${{P:'Proc.',C:'Conc.',G:'Gen.'}[lvl]}</div>
+      <div class="traj-assign">${a}</div>
+    </div>`;
+  }).join('');
+  // moments
+  document.getElementById('stu-moments').innerHTML=`<div class="moment-card"><div class="moment-quote">"${stu.moment}"</div><div class="moment-meta">${stu.name} · Most recent assignment</div></div>`;
+  showView('student');
+}
+
+// ── RENDER CLASS ─────────────────────────────────────────────────
+function renderClass(){
+  const c=CLASSES[currentClass];
+  document.getElementById('class-title').textContent=c.name;
+  document.getElementById('class-sub').textContent=c.sub;
+  document.getElementById('m-total').textContent=c.total;
+  document.getElementById('m-p').textContent=c.p;
+  document.getElementById('m-c').textContent=c.c;
+  document.getElementById('m-g').textContent=c.g;
+  const pp=Math.round(c.p/c.total*100),cp=Math.round(c.c/c.total*100),gp=Math.round(c.g/c.total*100);
+  document.getElementById('m-p-pct').textContent=pp+'%';
+  document.getElementById('m-c-pct').textContent=cp+'%';
+  document.getElementById('m-g-pct').textContent=gp+'%';
+  document.getElementById('bar-p').style.width=pp+'%';
+  document.getElementById('bar-p-pct').textContent=pp+'%';
+  document.getElementById('bar-c').style.width=cp+'%';
+  document.getElementById('bar-c-pct').textContent=cp+'%';
+  document.getElementById('bar-g').style.width=gp+'%';
+  document.getElementById('bar-g-pct').textContent=gp+'%';
+  // alerts
+  document.getElementById('alert-area').innerHTML=c.alerts.map(a=>`
+    <div class="alert-card"><div class="alert-dot"></div><div class="alert-text">${a}</div></div>
+  `).join('');
+  // moments
+  document.getElementById('moments-area').innerHTML=c.moments.map(m=>`
+    <div class="moment-card">
+      <div class="moment-quote">"${m.quote}"</div>
+      <div class="moment-meta">${m.who} · ${m.where} · ${m.level}</div>
+    </div>
+  `).join('');
+  // students
+  document.getElementById('stu-tbody').innerHTML=c.students.map((s,i)=>{
+    const pillClass=s.level==='P'?'pill-p':s.level==='C'?'pill-c':'pill-g';
+    const flag=s.stuck?'<span class="intervention-flag">⚑ Needs attention</span>':'';
+    return `<tr onclick="openStudent(CLASSES[${currentClass}].students[${i}])">
+      <td class="stu-name">${s.name}</td>
+      <td><span class="pill ${pillClass}">${{P:'Procedural',C:'Conceptual',G:'Generative'}[s.level]}</span></td>
+      <td class="${s.trendClass}">${s.trend} ${flag}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${s.moment}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── RENDER ANALYTICS ─────────────────────────────────────────────
+function renderAnalytics(){
+  const chart=document.getElementById('analytics-chart');
+  chart.innerHTML=CLASSES.map(c=>{
+    const tot=c.total;
+    const ph=Math.round(c.p/tot*100),ch=Math.round(c.c/tot*100),gh=Math.round(c.g/tot*100);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+      <div style="flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px">
+        <div title="Generative ${gh}%" style="height:${gh}%;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:3px;min-height:${gh?3:0}px"></div>
+        <div title="Conceptual ${ch}%" style="height:${ch}%;background:#FEF3C7;border:1px solid #FDE68A;border-radius:3px;min-height:${ch?3:0}px"></div>
+        <div title="Procedural ${ph}%" style="height:${ph}%;background:var(--surface2);border:1px solid var(--divider2);border-radius:3px;min-height:${ph?3:0}px"></div>
+      </div>
+      <div class="chart-x-label">${c.name.replace('MAT ','MAT\u00a0')}</div>
+    </div>`;
+  }).join('');
+  // alerts
+  const allAlerts=CLASSES.flatMap(c=>c.alerts.map(a=>`<div class="alert-card"><div class="alert-dot"></div><div class="alert-text"><strong>${c.name}:</strong> ${a}</div></div>`));
+  document.getElementById('analytics-alerts').innerHTML=allAlerts.join('');
+}
+
+// ── LEARN ────────────────────────────────────────────────────────
+function showLearn(){document.getElementById('learn-overlay').classList.add('vis');}
+function hideLearn(){document.getElementById('learn-overlay').classList.remove('vis');}
+
+// ── SYSTEM PROMPTS ───────────────────────────────────────────────
+const SYS_TEACHER=`You are Kelvi School — an AI teaching partner for K-12 mathematics teachers, grades 1 through 12.
+
+You work with teachers across all levels: elementary (grades 1-5), middle school (grades 6-8), and high school (grades 9-12). Always match the grade level and mathematical sophistication the teacher specifies. If no grade is given, ask before generating content.
+
+WHAT YOU DO:
+1. CREATE WORKSHEETS & PROBLEM SETS — Generate rich, contextualized problems appropriate to the grade level specified. For elementary: concrete, visual, story-based. For middle: relational, pattern-finding, multi-step. For high school: abstract, proof-oriented, multi-representational. Always include a mix of P/C/G levels. Never generate bare equations without context.
+2. GRADE STUDENT WORK — Analyze thinking using P/C/G: Procedural (following steps, applying algorithms), Conceptual (explaining meaning, making connections), Generative (creating, extending, asking new questions). Quote student work directly. Name the thinking level. Be specific about what in the work reveals the level.
+3. BATCH GRADE — For multiple uploads, give brief P/C/G analysis for each, keep a running tally, then a class summary. End by asking about differentiated follow-ups.
+4. DIFFERENTIATE — Create follow-up problems: P students get bridges toward conceptual understanding, C students get generalization pushes, G students get open extensions.
+5. BUILD RUBRICS — Default lens is P/C/G. Assess questioning and reasoning, not just content mastery. Adapt to the teacher's framework if they have one.
+6. SOLUTION GUIDES — Complete worked-out steps when asked. Show multiple solution paths where they exist.
+7. ANYTHING ELSE — Lesson plans, bell ringers, exit tickets, pacing guides, parent notes, assessment design. Whatever the teacher needs.
+
+STYLE:
+- Concise, practical, specific. Never generic.
+- Treat the teacher as a colleague, not a client.
+- Never add unrequested commentary or suggestions after completing a task.
+- Always confirm grade level before generating student-facing content if not specified.
+
+LATEX RULES — when generating printable content:
+- Respond with TWO sections separated by ===LATEX=== on its own line.
+- Section 1: brief message (2-3 sentences max).
+- Section 2: complete, compilable LaTeX source.
+- Use packages: geometry (margins=1in), fancyhdr (school name header, page number footer), enumitem (for problem lists), amsmath, amssymb.
+- For problem lists: use \\begin{enumerate}[leftmargin=*, label=\\textbf{\\arabic*.}] with each problem as \\item.
+- For answer lines: use \\underline{\\hspace{6cm}} inline or \\vspace{1.5cm} for work space.
+- For tables/grids: use \\begin{tabular} with explicit column separators.
+- NEVER use TikZ for simple tables or grids — use tabular instead.
+- Only use TikZ for geometric diagrams, coordinate planes, or graphs.
+- Always include \\begin{document} and \\end{document}.
+- Test your LaTeX mentally: every \\begin must have a matching \\end.
+
+IF THE TEACHER ASKS FOR A QUEST:
+Do not generate one. Reply only with this exact sentence: "Let me ask you a few things first so I can build the right quest." Then stop.`;
+
+const SYS_QUEST_INTAKE=`You are Kelvi School in Quest Builder mode. Your only job is to generate one quest card when you receive a QUEST INTAKE COMPLETE message.
+
+When you receive a message starting with "QUEST INTAKE COMPLETE", generate the quest card immediately using this exact format — no preamble, no introduction:
+
+---
+QUEST: [Topic — one line]
+Class: [Class name]
+
+THE PROBLEM
+[One rich, contextualized problem. Real world. Specific. Low floor — any student can start here. The problem should be completable at a procedural level but reward deeper thinking. Never a bare equation. Always a story or situation. 3-5 sentences maximum.]
+
+GO FURTHER
+[One sentence that pushes into conceptual territory. Same scenario. Asks why, or what would change if, or whether this always works. One sentence only.]
+
+YOUR QUESTION
+What question does this problem make you want to ask?
+
+---
+TEACHER NOTES (not printed for students)
+Procedural entry: [what a P-level student will do with this problem]
+Conceptual push: [what the GO FURTHER is targeting — the understanding it reveals]
+Generative opening: [what a G-level student might ask that goes beyond the problem]
+Estimated Question Circle time: 30–35 minutes
+---
+
+Then output ===LATEX=== followed by complete LaTeX source for the student-facing printout. The LaTeX version must NOT include Teacher Notes. Use a clean layout with the school name as header, the quest title, and the three sections (THE PROBLEM, GO FURTHER, YOUR QUESTION) clearly spaced. Use geometry, fancyhdr, and setspace packages.
+
+RULES:
+- Generate exactly one quest card. No introduction, no preamble, no commentary after.
+- Low floor, high ceiling. Every student starts. The best students cannot exhaust it quickly.
+- Never use bare equations as the problem. Always embed in a situation.
+- GO FURTHER is one sentence maximum. Never more.
+- YOUR QUESTION is always exactly: "What question does this problem make you want to ask?" — never change this.
+- Teacher Notes are always included in the chat version, never in the LaTeX printout.
+- If the entry point is teacher-supplied, build the P/C/G arc around the existing mathematical structure. Do not change the core problem.
+- If asked to modify, regenerate the complete card with the change applied. No explanation of what changed.`;
+
+const SYS_QUEST_REFINE=`You are Kelvi School in Quest Refinement mode. A quest card has already been generated. The teacher wants to modify it.
+
+Your job: regenerate the complete quest card with the requested change applied. Always output the full card — never a partial update or a description of what changed.
+
+Use the same format as the original:
+---
+QUEST: [Topic]
+Class: [Class name]
+
+THE PROBLEM
+[...]
+
+GO FURTHER
+[One sentence]
+
+YOUR QUESTION
+What question does this problem make you want to ask?
+
+---
+TEACHER NOTES (not printed for students)
+Procedural entry: [...]
+Conceptual push: [...]
+Generative opening: [...]
+Estimated Question Circle time: 30–35 minutes
+---
+
+Then ===LATEX=== followed by the student-facing LaTeX (no Teacher Notes).
+
+MODIFICATION RULES:
+- Lower floor request: simpler numbers, more scaffolded context, same mathematical structure.
+- Higher ceiling request: more complex relationships, less obvious entry, GO FURTHER pushes toward generalization.
+- Context change: rewrite THE PROBLEM in the new context, preserve the mathematical structure.
+- Never add commentary before or after the card.
+- Never ask a clarifying question — make your best interpretation and generate.
+- YOUR QUESTION never changes.`;
+
+// ── MODE STATE MACHINE ───────────────────────────────────────────
+let currentMode='teacher';
+const PROMPTS={teacher:SYS_TEACHER,quest_intake:SYS_QUEST_INTAKE,quest_refine:SYS_QUEST_REFINE};
+
+function setMode(mode,clearHistory=true){
+  currentMode=mode;
+  if(clearHistory)msgs=[];
+}
+
+// ── QUEST INTAKE STATE ───────────────────────────────────────────
+const QUEST_STEPS=[
+  {
+    key:'class',
+    question:'Which class is this quest for?',
+    options:()=>CLASSES.map(c=>c.name).concat('A different class')
+  },
+  {
+    key:'stage',
+    question:'Where are you in the unit?',
+    options:()=>['Just introduced the concept','A few lessons in — students have the basics','Wrapping up — students need to go deeper','Review or assessment prep']
+  },
+  {
+    key:'entry',
+    question:'Do you have a problem in mind, or should Kelvi generate one?',
+    options:()=>['Generate one for me','I have a problem — I\'ll type it']
+  }
+];
+
+let questState={};
+let questStep=0;
+let questActive=false;
+
+function startQuestIntake(){
+  // warn if there are existing messages
+  if(msgs.length>0){
+    const chat=document.getElementById('chat');
+    chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k" style="font-size:13px;color:var(--text-muted)">Starting Quest Builder — your current conversation will be saved to My Chats when that feature is ready.</div></div>`;
+  }
+  setMode('quest_intake',true);
+  questState={};
+  questStep=0;
+  questActive=true;
+  document.getElementById('home-prompts').style.display='none';
+  showView('home');
+  // clear chat and show first question
+  document.getElementById('chat').innerHTML='';
+  showQuestStep();
+}
+
+function showQuestStep(){
+  const chat=document.getElementById('chat');
+  if(questStep>=QUEST_STEPS.length){
+    // all answered — if entry is "Generate one for me", ask for topic
+    if(questState.entry==='Generate one for me'){
+      chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k">What topic? One sentence is enough — I'll handle the rest.<br><span style="font-size:11px;color:var(--text-faint)">e.g. "We're working on ratios" or "Students just learned about fractions"</span></div></div>`;
+      chatScrollBottom();
+      // next send will be the topic — handled in sendMsg quest flow
+      questStep='awaiting_topic';
+    } else {
+      // teacher supplies problem
+      chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k">Type your problem below and I'll build the P/C/G arc around it.</div></div>`;
+      chatScrollBottom();
+      questStep='awaiting_problem';
+    }
+    return;
+  }
+  const step=QUEST_STEPS[questStep];
+  const opts=step.options();
+  const btns=opts.map(o=>`<button onclick="questAnswer('${o.replace(/'/g,"\\'")}',this)" style="display:block;width:100%;text-align:left;padding:8px 12px;margin-bottom:6px;border:1px solid var(--divider2);border-radius:7px;background:var(--bg);font-size:13px;font-family:var(--font-body);cursor:pointer;color:var(--text-primary);transition:background .1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='var(--bg)'">${o}</button>`).join('');
+  chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k">${step.question}<div style="margin-top:10px">${btns}</div></div></div>`;
+  chatScrollBottom();
+}
+
+function questAnswer(answer, btn){
+  // disable all buttons in this bubble
+  const bub=btn.closest('.bub-k');
+  bub.querySelectorAll('button').forEach(b=>{
+    b.disabled=true;
+    b.style.opacity=b.textContent===answer?'1':'0.4';
+    b.style.cursor='default';
+    if(b.textContent===answer){b.style.background='var(--surface2)';b.style.fontWeight='500';}
+  });
+  // record answer
+  const step=QUEST_STEPS[questStep];
+  questState[step.key]=answer;
+  questStep++;
+  // show teacher's choice as a message
+  const chat=document.getElementById('chat');
+  chat.innerHTML+=`<div class="msg msg-t" style="animation:fadeUp .25s ease"><div class="msg-label label-t">You</div><div class="bub-t">${answer}</div></div>`;
+  chatScrollBottom();
+  setTimeout(()=>showQuestStep(),400);
+}
+
+function buildIntakeMessage(topicOrProblem){
+  const isGenerated=questState.entry==='Generate one for me';
+  return `QUEST INTAKE COMPLETE
+Class: ${questState.class||'Not specified'}
+Stage: ${questState.stage||'Not specified'}
+Entry point: ${isGenerated?'Kelvi-generated':'Teacher-supplied'}
+${isGenerated?'Topic: '+topicOrProblem:'Problem: '+topicOrProblem}`;
+}
+
+function regenLast(){
+  if(!msgs.length)return;
+  // remove last assistant message from history and resend
+  if(msgs[msgs.length-1].role==='assistant')msgs.pop();
+  callAPI(null,null,false);
+}
+
+function chatScrollBottom(){
+  const s=document.getElementById('chat-scroll');
+  if(s)s.scrollTop=s.scrollHeight;
+}
+
+function saveQuestToMaterials(btn){
+  const cardText=decodeURIComponent(escape(atob(msg.dataset.reply||'')));
+  const topicMatch=cardText.match(/QUEST:\s*(.+)/);
+  const topic=topicMatch?topicMatch[1].trim():'Quest';
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const grid=document.getElementById('mat-grid');
+  const card=document.createElement('div');
+  card.className='mat-card';
+  card.dataset.questText=cardText;
+  card.innerHTML=`<div class="mat-name">${topic}</div><div class="mat-meta">Quest · Saved ${dateStr}</div>`;
+  grid.insertBefore(card,grid.lastElementChild);
+  btn.textContent='Saved!';
+  btn.style.opacity='0.6';
+  btn.disabled=true;
+}
+
+function prefill(t){
+  // reset to teacher mode if we were in a quest flow
+  if(currentMode!=='teacher'){setMode('teacher',true);}
+  questActive=false;
+  wsActive=false;
+  document.getElementById('home-prompts').style.display='none';
+  showView('home');
+  const inp=document.getElementById('inp');
+  inp.value=t;inp.focus();autoGrow(inp);
+}
+
+// ── WORKSHEET INTAKE ─────────────────────────────────────────────
+let wsState={};
+let wsStep=0;
+let wsActive=false;
+
+const WS_STEPS=[
+  {
+    key:'gradeAndTopic',
+    question:'What grade and topic?',
+    hint:'e.g. "Grade 6, linear equations" or "Grade 2, place value"',
+    options:null,
+    freeText:true
+  },
+  {
+    key:'context',
+    question:'Real-world context to anchor the problems?',
+    options:['Sports','Cricket','Current events','Nature & science','Food & cooking','No preference'],
+    allowCustom:true,
+    freeText:false
+  },
+  {
+    key:'differentiation',
+    question:'What level of differentiation?',
+    options:['Entry level (foundational, accessible to all)','Core (grade level, mixed depth)','Extension (challenging, open-ended)','Mixed — include all three levels'],
+    freeText:false
+  },
+  {
+    key:'state',
+    question:'State standards alignment?',
+    hint:'e.g. "New Hampshire" or "California"',
+    options:null,
+    freeText:true,
+    optional:true
+  }
+];
+
+function startWorksheetIntake(){
+  if(currentMode!=='teacher'){setMode('teacher',true);}
+  wsState={};wsStep=0;wsActive=false;questActive=false;
+  document.getElementById('home-prompts').style.display='none';
+  showView('home');
+  document.getElementById('chat').innerHTML='';
+
+  const inpStyle=`width:100%;padding:6px 0;border:none;border-bottom:1.5px solid var(--divider2);font-size:13px;font-family:var(--font-body);outline:none;color:var(--text-primary);background:transparent;margin-bottom:16px;`;
+  const labelStyle=`font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:4px;`;
+  const pillStyle=`display:inline-block;padding:5px 12px;margin:0 5px 6px 0;border:1.5px solid var(--divider2);border-radius:20px;background:var(--bg);font-size:12px;font-family:var(--font-body);cursor:pointer;color:var(--text-muted);transition:all .12s;white-space:nowrap;`;
+
+  const html=`
+    <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:18px;">Let's build your worksheet.</div>
+
+    <label style="${labelStyle}">Grade & topic</label>
+    <input id="ws-grade" type="text" placeholder="e.g. Grade 6, linear equations" style="${inpStyle}">
+
+    <label style="${labelStyle}">Real-world context</label>
+    <div id="ws-context-pills" style="margin-bottom:6px;">
+      ${['Sports','Cricket','Current events','Nature & science','Food & cooking','No preference'].map(o=>`<button type="button" onclick="wsPillSelect('ws-context-pills','${o}',this)" style="${pillStyle}">${o}</button>`).join('')}
+    </div>
+    <input id="ws-context-custom" type="text" placeholder="Or type your own context…" style="${inpStyle}margin-top:4px;">
+
+    <label style="${labelStyle}">Differentiation</label>
+    <div id="ws-diff-pills" style="margin-bottom:16px;">
+      ${['Entry level','Core','Extension','Mixed P/C/G'].map(o=>`<button type="button" onclick="wsPillSelect('ws-diff-pills','${o}',this)" style="${pillStyle}">${o}</button>`).join('')}
+    </div>
+
+    <label style="${labelStyle}">State standards <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;">(optional)</span></label>
+    <input id="ws-state" type="text" placeholder="e.g. New Hampshire, California…" style="${inpStyle}">
+
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button onclick="wsSubmit()" style="padding:9px 20px;background:#3A6B5C;color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-size:13px;cursor:pointer;">Build worksheet</button>
+      <button onclick="wsCancel()" style="padding:9px 16px;background:transparent;color:var(--text-muted);border:1px solid var(--divider2);border-radius:8px;font-family:var(--font-body);font-size:13px;cursor:pointer;">Cancel</button>
+    </div>`;
+
+  document.getElementById('chat').innerHTML=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k">${html}</div></div>`;
+  setTimeout(()=>document.getElementById('ws-grade')?.focus(),120);
+  chatScrollBottom();
+}
+
+function wsPillSelect(groupId, value, btn){
+  document.querySelectorAll(`#${groupId} button`).forEach(b=>{
+    b.style.borderColor='var(--divider2)';
+    b.style.background='var(--bg)';
+    b.style.color='var(--text-muted)';
+    b.style.fontWeight='400';
+  });
+  btn.style.borderColor='var(--text-primary)';
+  btn.style.background='var(--surface2)';
+  btn.style.color='var(--text-primary)';
+  btn.style.fontWeight='600';
+  btn.dataset.selected=value;
+}
+
+function wsCancel(){
+  wsActive=false;
+  document.getElementById('chat').innerHTML='';
+  document.getElementById('home-prompts').style.display='grid';
+}
+
+function wsSubmit(){
+  const grade=document.getElementById('ws-grade')?.value.trim();
+  if(!grade){document.getElementById('ws-grade').focus();document.getElementById('ws-grade').style.borderBottomColor='var(--danger)';return;}
+
+  const contextPill=document.querySelector('#ws-context-pills button[data-selected]')?.dataset.selected;
+  const contextCustom=document.getElementById('ws-context-custom')?.value.trim();
+  const context=contextCustom||contextPill||'No preference';
+
+  const diff=document.querySelector('#ws-diff-pills button[data-selected]')?.dataset.selected||'Mixed P/C/G';
+  const state=document.getElementById('ws-state')?.value.trim()||'';
+
+  const prompt=`Create a mathematics worksheet with the following specifications:
+Grade and topic: ${grade}
+Real-world context: ${context}
+Differentiation: ${diff}
+${state?'State standards: '+state:''}
+
+Include 8–10 problems with a clear P/C/G arc — procedural problems build fluency, conceptual problems develop understanding, generative problems invite original thinking. Anchor every problem in the real-world context. Format for print.`;
+
+  // hide the form bubble entirely
+  const formMsg=document.getElementById('chat').querySelector('.msg');
+  if(formMsg)formMsg.style.display='none';
+
+  msgs.push({role:'user',content:prompt});
+  callAPI(null,null,false);
+}
+
+function showWsStep(){} // legacy stub — no longer used
+function autoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,180)+'px';}
+
+function pickFiles(e){for(const f of e.target.files)loadFile(f);}
+function loadFile(f){
+  if(f.type.startsWith('image/')&&f.size>500000){compressImage(f,1200,0.7,addToQueue);}
+  else{const r=new FileReader();r.onload=ev=>addToQueue({name:f.name,type:f.type,data:ev.target.result.split(',')[1],dataUrl:ev.target.result});r.readAsDataURL(f);}
+}
+function compressImage(f,maxDim,q,cb){
+  const r=new FileReader();r.onload=ev=>{
+    const img=new Image();img.onload=()=>{
+      const canvas=document.createElement('canvas');let w=img.width,h=img.height;
+      if(w>maxDim||h>maxDim){if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}}
+      canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const d=canvas.toDataURL('image/jpeg',q);cb({name:f.name,type:'image/jpeg',data:d.split(',')[1],dataUrl:d});
+    };img.src=ev.target.result;
+  };r.readAsDataURL(f);
+}
+function addToQueue(o){o.id='f-'+Date.now()+Math.random().toString(36).slice(2,5);pendingFiles.push(o);renderPreviews();}
+function removeFile(id){pendingFiles=pendingFiles.filter(f=>f.id!==id);renderPreviews();}
+function renderPreviews(){
+  const bar=document.getElementById('preview-bar');
+  if(!pendingFiles.length){bar.classList.remove('vis');bar.innerHTML='';return;}
+  bar.classList.add('vis');
+  bar.innerHTML=pendingFiles.map(f=>`<div class="file-chip">${f.type.startsWith('image/')?`<img src="${f.dataUrl}">`:''}
+    <span>${f.name}</span><span class="x" onclick="removeFile('${f.id}')">&times;</span></div>`).join('');
+}
+function clearFiles(){pendingFiles=[];renderPreviews();}
+function closePlus(){document.getElementById('plus-menu').classList.remove('vis');}
+async function pasteClip(){
+  try{const items=await navigator.clipboard.read();for(const item of items){const t=item.types.find(t=>t.startsWith('image/'));if(t){const blob=await item.getType(t);loadFile(new File([blob],'clipboard.png',{type:t}));return;}}alert('No image on clipboard.');}
+  catch(e){alert('Could not read clipboard.');}
+}
+
+const inputOuter=document.getElementById('input-outer');
+inputOuter.addEventListener('dragover',e=>{e.preventDefault();inputOuter.classList.add('dragover');});
+inputOuter.addEventListener('dragleave',()=>inputOuter.classList.remove('dragover'));
+inputOuter.addEventListener('drop',e=>{e.preventDefault();inputOuter.classList.remove('dragover');for(const f of e.dataTransfer.files)loadFile(f);});
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('plus-menu');const btn=document.getElementById('plus-btn');
+  if(btn&&btn.contains(e.target)){e.stopPropagation();menu.classList.toggle('vis');return;}
+  if(menu&&!menu.contains(e.target))menu.classList.remove('vis');
+});
+
+function eh(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderMd(raw){
+  let t=eh(raw);
+  if(typeof katex!=='undefined'){
+    t=t.replace(/\$\$(.*?)\$\$/g,(m,l)=>{try{return katex.renderToString(l,{throwOnError:false,displayMode:true});}catch(e){return m;}});
+    t=t.replace(/\$([^\$\n]+?)\$/g,(m,l)=>{try{return katex.renderToString(l,{throwOnError:false});}catch(e){return m;}});
+  }
+  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre style="background:var(--surface);padding:10px 14px;border-radius:6px;font-size:11px;font-family:monospace;overflow-x:auto;margin:6px 0">$2</pre>');
+  t=t.replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--divider);margin:12px 0">');
+  t=t.replace(/^### (.+)$/gm,'<h3 style="font-size:14px;font-weight:500;margin:12px 0 4px">$1</h3>');
+  t=t.replace(/^## (.+)$/gm,'<h2 style="font-size:15px;font-weight:600;margin:14px 0 5px">$1</h2>');
+  t=t.replace(/^# (.+)$/gm,'<h1 style="font-size:17px;font-weight:600;margin:16px 0 7px">$1</h1>');
+  t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  t=t.replace(/`([^`]+)`/g,'<code style="background:var(--surface);padding:1px 4px;border-radius:3px;font-size:11px;font-family:monospace">$1</code>');
+  t=t.replace(/\n/g,'<br>');
+  t=t.replace(/(<\/h[1-3]>)<br>/g,'$1');t=t.replace(/(<hr[^>]*>)<br>/g,'$1');t=t.replace(/(<\/pre>)<br>/g,'$1');
+  return t;
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('inp');let text=inp.value.trim();
+  if(!text&&!pendingFiles.length)return;
+
+  const claudeKey=document.getElementById('api-key').value.trim();
+  const oaiKey=document.getElementById('oai-key').value.trim();
+  const useGPT=currentModel==='gpt';
+  const activeKey=useGPT?oaiKey:claudeKey;
+  if(!activeKey){showView('settings');alert('Please enter your '+(useGPT?'OpenAI':'Anthropic')+' API key in Settings.');return;}
+
+  // ── QUEST INTAKE INTERCEPTION ────────────────────────────────
+  if(questActive&&(questStep==='awaiting_topic'||questStep==='awaiting_problem')){
+    const chat=document.getElementById('chat');
+    chat.innerHTML+=`<div class="msg msg-t" style="animation:fadeUp .25s ease"><div class="msg-label label-t">You</div><div class="bub-t">${eh(text)}</div></div>`;
+    inp.value='';autoGrow(inp);
+    chatScrollBottom();
+    const intakeMsg=buildIntakeMessage(text);
+    const savedStep=questStep;
+    questActive=false;
+    questStep=0;
+    const ok=await callAPI(intakeMsg,[],true);
+    if(!ok){
+      // restore state if call failed
+      questActive=true;
+      questStep=savedStep;
+    }
+    return;
+  }
+
+  document.getElementById('home-prompts').style.display='none';
+  const chat=document.getElementById('chat');
+  let dh='';if(text)dh+=eh(text);
+  if(pendingFiles.length){dh+='<br>';pendingFiles.forEach(f=>{if(f.type.startsWith('image/'))dh+=`<img class="bub-img" src="${f.dataUrl}">`;else dh+=`[${eh(f.name)}]`;});}
+  chat.innerHTML+=`<div class="msg msg-t" style="animation:fadeUp .25s ease"><div class="msg-label label-t">You</div><div class="bub-t">${dh}</div></div>`;
+
+  let content=[];
+  pendingFiles.forEach(f=>{if(f.type.startsWith('image/'))content.push({type:'image',source:{type:'base64',media_type:f.type,data:f.data}});});
+  if(text)content.push({type:'text',text});
+  else if(pendingFiles.length)content.push({type:'text',text:'Please analyze these uploads.'});
+  if(content.length===1&&content[0].type==='text')content=content[0].text;
+  msgs.push({role:'user',content});
+  inp.value='';autoGrow(inp);clearFiles();
+  chatScrollBottom();
+  await callAPI(null,null,false);
+}
+
+async function callAPI(overrideText,overrideMsgs,isQuestIntake){
+  const claudeKey=document.getElementById('api-key').value.trim();
+  const oaiKey=document.getElementById('oai-key').value.trim();
+  const useGPT=currentModel==='gpt';
+
+  const chat=document.getElementById('chat');
+  document.getElementById('typing').classList.add('vis');
+
+  // Build message array for this call
+  let callMsgs=overrideMsgs||msgs;
+  if(overrideText){
+    callMsgs=[{role:'user',content:overrideText}];
+  }
+  const activePrompt=PROMPTS[currentMode];
+
+  try{
+    let reply;
+    if(useGPT){
+      const gptMsgs=callMsgs.map(m=>({role:m.role,content:typeof m.content==='string'?m.content:m.content.filter(c=>c.type==='text').map(c=>c.text).join('\n')}));
+      const res=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+oaiKey},
+        body:JSON.stringify({model:'gpt-4o',max_tokens:4000,messages:[{role:'system',content:activePrompt},...gptMsgs]})
+      });
+      const data=await res.json();
+      if(data.error)throw new Error(data.error.message);
+      reply=data.choices[0].message.content;
+    } else {
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,system:activePrompt,messages:callMsgs})
+      });
+      const data=await res.json();if(data.error)throw new Error(data.error.message);
+      reply=data.content[0].text;
+    }
+
+    // push to history if not a one-off intake call
+    if(!overrideText)msgs.push({role:'assistant',content:reply});
+
+    document.getElementById('typing').classList.remove('vis');
+
+    // detect if Kelvi said "Let me ask you a few things" — trigger intake
+    if(reply.trim().startsWith('Let me ask you a few things')){
+      chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease"><div class="msg-label label-k">Kelvi</div><div class="bub-k">${renderMd(reply)}</div></div>`;
+      chatScrollBottom();
+      setTimeout(()=>startQuestIntake(),600);
+      return;
+    }
+
+    let fmt,latexSrc=null;
+    if(reply.includes('===LATEX===')){
+      const parts=reply.split('===LATEX===');
+      latexSrc=parts[1].trim().replace(/^```(?:latex|tex)?\n?/,'').replace(/\n?```$/,'');
+      fmt=renderMd(parts[0].trim());
+      fmt+=`<div style="margin-top:10px;padding:12px;background:var(--surface);border:1px solid var(--divider);border-radius:7px;font-size:12px;color:var(--text-muted)">LaTeX document ready</div>`;
+    }else{fmt=renderMd(reply);}
+
+    let dl='<div class="dl-bar">';
+    if(latexSrc){
+      dl+=`<button class="dl-btn" style="background:#3A6B5C;color:#fff;" onclick="compilePDF(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg></button>`;
+      dl+=`<button class="dl-btn" data-tip="Copy LaTeX" onclick="copyLatex(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>`;
+    }
+    if(isQuestIntake||currentMode==='quest_refine'){
+      dl+=`<button class="dl-btn" data-tip="Save quest" onclick="saveQuestToMaterials(this)" style="color:#3A6B5C;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button>`;
+      if(isQuestIntake) setMode('quest_refine',false);
+    }
+    dl+=`<button class="dl-btn" data-tip="Copy text" onclick="copyText(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`;
+    dl+=`<button class="dl-btn" data-tip="Regenerate" onclick="regenLast()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></button>`;
+    dl+='</div>';
+
+    // encode both latex and raw reply on the element
+    const encodedReply=btoa(unescape(encodeURIComponent(reply)));
+    chat.innerHTML+=`<div class="msg msg-k" style="animation:fadeUp .25s ease" data-latex="${latexSrc?btoa(unescape(encodeURIComponent(latexSrc))):''}" data-reply="${encodedReply}"><div class="msg-label label-k">Kelvi</div><div class="bub-k">${fmt}${dl}</div></div>`;
+    chatScrollBottom();
+    return true;
+
+  }catch(e){
+    document.getElementById('typing').classList.remove('vis');
+    if(!useGPT&&oaiKey&&e.message&&(e.message.includes('401')||e.message.includes('529')||e.message.includes('overload'))){
+      chat.innerHTML+=`<div class="msg msg-k"><div class="msg-label label-k">Kelvi</div><div class="bub-k" style="color:var(--text-muted);font-size:12px">Claude is unavailable. <button class="dl-btn" onclick="setModel('gpt');callAPI()" style="display:inline;margin-left:6px">Try GPT-4o instead</button></div></div>`;
+    } else {
+      chat.innerHTML+=`<div class="msg msg-k"><div class="msg-label label-k">Kelvi</div><div class="bub-k" style="color:var(--danger)">${eh(e.message||'Something went wrong.')}</div></div>`;
+    }
+    return false;
+  }
+}
+
+function copyText(btn){const b=btn.closest('.bub-k');const c=b.cloneNode(true);c.querySelector('.dl-bar')?.remove();navigator.clipboard.writeText(c.innerText).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy text',2000);});}
+function copyLatex(btn){const m=btn.closest('.msg');const l=decodeURIComponent(escape(atob(m.dataset.latex)));navigator.clipboard.writeText(l).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy LaTeX',2000);});}
+async function compilePDF(btn){
+  const m=btn.closest('.msg');const latex=decodeURIComponent(escape(atob(m.dataset.latex)));
+  if(!latex){alert('No LaTeX found.');return;}
+  const origBg=btn.style.background;
+  btn.style.background='#2D5347';btn.style.opacity='0.7';btn.disabled=true;
+  try{
+    const res=await fetch('https://latex.ytotech.com/builds/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({compiler:'pdflatex',resources:[{main:true,content:latex}]})});
+    if(!res.ok)throw new Error('Compilation failed');
+    const blob=await res.blob();window.open(URL.createObjectURL(blob),'_blank');
+    btn.style.background='#2D5347';btn.style.opacity='1';btn.disabled=false;
+  }catch(e){
+    btn.style.background=origBg;btn.style.opacity='1';btn.disabled=false;
+    if(confirm('PDF compilation failed. Copy LaTeX for Overleaf?'))navigator.clipboard.writeText(latex).then(()=>alert('LaTeX copied!'));
+  }
+}
+
+function uploadMaterial(e){
+  const grid=document.getElementById('mat-grid');
+  for(const f of e.target.files){
+    const card=document.createElement('div');card.className='mat-card';
+    card.innerHTML=`<div class="mat-name">${f.name}</div><div class="mat-meta">${f.type.split('/')[1]?.toUpperCase()||'FILE'} · Uploaded just now</div>`;
+    grid.insertBefore(card,grid.lastElementChild);
+  }
+}
+
+// ── MODEL TOGGLE ────────────────────────────────────────────────
+let currentModel='claude';
+function setModel(m){
+  currentModel=m;
+  document.getElementById('model-claude-btn').className='settings-btn'+(m==='claude'?' primary':'');
+  document.getElementById('model-gpt-btn').className='settings-btn'+(m==='gpt'?' primary':'');
+  localStorage.setItem('kelvi-model',m);
+}
+
+// ── KEY MANAGEMENT ───────────────────────────────────────────────
+function syncKeys(){
+  document.getElementById('api-key').value=document.getElementById('settings-api').value;
+  document.getElementById('oai-key').value=document.getElementById('settings-oai').value;
+  localStorage.setItem('kelvi-school-key',document.getElementById('settings-api').value);
+  localStorage.setItem('kelvi-oai-key',document.getElementById('settings-oai').value);
+}
+function loadKey(){
+  const k=localStorage.getItem('kelvi-school-key');
+  const ok=localStorage.getItem('kelvi-oai-key');
+  const m=localStorage.getItem('kelvi-model')||'claude';
+  if(k){document.getElementById('api-key').value=k;document.getElementById('settings-api').value=k;}
+  if(ok){document.getElementById('oai-key').value=ok;document.getElementById('settings-oai').value=ok;}
+  setModel(m);
+}
+
+// ── FEEDBACK ─────────────────────────────────────────────────────
+function showFeedback(){
+  document.getElementById('feedback-overlay').classList.add('vis');
+  document.getElementById('feedback-form-wrap').style.display='block';
+  document.getElementById('feedback-thanks').style.display='none';
+}
+function hideFeedback(){document.getElementById('feedback-overlay').classList.remove('vis');}
+async function submitFeedback(){
+  const type=document.getElementById('fb-type').value;
+  const msg=document.getElementById('fb-msg').value.trim();
+  if(!msg){alert('Please enter your feedback.');return;}
+  try{
+    await fetch('https://formspree.io/f/YOUR_FORM_ID',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({type,message:msg,user:document.getElementById('user-name-top').textContent})
+    });
+  }catch(e){/* silent — show thanks regardless */}
+  document.getElementById('feedback-form-wrap').style.display='none';
+  document.getElementById('feedback-thanks').style.display='block';
+  document.getElementById('fb-msg').value='';
+  setTimeout(hideFeedback,2000);
+}
+
+// ── QUEST BUILDER ────────────────────────────────────────────────
+const QB_PACING={
+  1:{problems:[1,30],  topics:'Distance, Pythagorean theorem, equilateral figures, perpendicular bisectors, midpoints'},
+  2:{problems:[31,60], topics:'Point-slope form, parametric equations, linear motion, vectors intro, translations'},
+  3:{problems:[61,95], topics:'Vectors, parametric motion with speed, congruence (SSS, SAS, ASA), transformations'},
+  4:{problems:[96,130],topics:'Perpendicular vectors, distance from point to line, parallelograms, angle bisectors'},
+  5:{problems:[131,165],topics:'Exterior angles, parallel lines, transversals, alternate interior angles, triangle angle sum'},
+  6:{problems:[166,200],topics:'Similar triangles, dilations, area, trigonometry intro (sin, cos, tan), special triangles'},
+  7:{problems:[201,230],topics:'Trigonometry in context, circle equations, tangent lines, central angles'},
+  8:{problems:[231,252],topics:'Parabolas, focus-directrix, conic sections, intro to 3D'},
+  9:{problems:[253,265],topics:'3D coordinates, vectors in 3D, distance in 3D, rectangular solids'},
+  10:{problems:[266,274],topics:'Transformations, linear regression, course synthesis and review'}
+};
+let qbSelectedWeek=0,qbSelectedDay=0,qbLastPlan=null,qbInitDone=false;
+
+function qbInitWeeks(){
+  if(qbInitDone)return;
+  qbInitDone=true;
+  const wg=document.getElementById('qb-week-grid');
+  wg.innerHTML='';
+  for(let w=1;w<=10;w++){
+    const btn=document.createElement('button');
+    btn.className='qb-pick';btn.textContent='Wk '+w;
+    btn.onclick=()=>qbSelectWeek(w,btn);
+    wg.appendChild(btn);
+  }
+  qbRenderDays(5);
+}
+
+function qbSelectWeek(w,btn){
+  qbSelectedWeek=w;qbSelectedDay=0;
+  document.querySelectorAll('#qb-week-grid .qb-pick').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  qbRenderDays(w===1?5:4);
+  document.querySelectorAll('#qb-day-grid .qb-pick').forEach(b=>b.classList.remove('selected'));
+  qbUpdatePacing();
+}
+
+function qbRenderDays(count){
+  const dg=document.getElementById('qb-day-grid');dg.innerHTML='';
+  for(let d=1;d<=5;d++){
+    const btn=document.createElement('button');
+    btn.className='qb-pick'+(d>count?' disabled':'');
+    btn.textContent='Day '+d;
+    if(d<=count)btn.onclick=()=>qbSelectDay(d,btn);
+    dg.appendChild(btn);
+  }
+}
+
+function qbSelectDay(d,btn){
+  qbSelectedDay=d;
+  document.querySelectorAll('#qb-day-grid .qb-pick').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  qbUpdatePacing();
+}
+
+function qbUpdatePacing(){
+  const hint=document.getElementById('qb-pacing');
+  if(!qbSelectedWeek){hint.style.display='none';return;}
+  const p=QB_PACING[qbSelectedWeek];
+  const dpw=qbSelectedWeek===1?5:4;
+  const ppd=Math.round((p.problems[1]-p.problems[0])/dpw);
+  const est=p.problems[0]+(qbSelectedDay?(qbSelectedDay-1)*ppd:0);
+  hint.style.display='block';
+  hint.textContent='Week '+qbSelectedWeek+' covers problems '+p.problems[0]+'–'+p.problems[1]+': '+p.topics+'. Estimated position: around problem '+Math.min(est,p.problems[1])+'.';
+}
+
+async function qbBuildPlan(){
+  const key=document.getElementById('api-key').value.trim();
+  if(!key){showView('settings');alert('Please enter your Anthropic API key in Settings.');return;}
+  if(!qbSelectedWeek){alert('Please select a week.');return;}
+  const lastProblem=document.getElementById('qb-last').value.trim();
+  const notes=document.getElementById('qb-notes').value.trim();
+  const p=QB_PACING[qbSelectedWeek];
+  const dpw=qbSelectedWeek===1?5:4;
+  const ppd=Math.round((p.problems[1]-p.problems[0])/dpw);
+  const estLast=lastProblem?parseInt(lastProblem):Math.min(p.problems[0]+(qbSelectedDay?(qbSelectedDay-1)*ppd:0),p.problems[1]);
+  const nextStart=estLast+1;
+  const nextEnd=Math.min(nextStart+14,p.problems[1]);
+  document.getElementById('qb-empty').style.display='none';
+  document.getElementById('qb-output').classList.remove('vis');
+  const loading=document.getElementById('qb-loading');loading.classList.add('vis');
+  const phrases=['Reading the pacing map…','Selecting homework problems…','Building group card problems…','Writing Kelvi’s note…','Almost ready…'];
+  let pi=0;const lt=document.getElementById('qb-load-text');lt.textContent=phrases[0];
+  const iv=setInterval(()=>{pi=(pi+1)%phrases.length;lt.textContent=phrases[pi];},1800);
+  const prompt=`You are Kelvi School, AI teaching partner for Dr. Gayatri Ramesh’s MAT 2 class at Phillips Exeter Academy.
+
+MAT 2 is a Harkness mathematics course — no lectures, students discover mathematics through problems discussed at a Harkness table. The problem set (274 problems) weaves coordinate geometry, vectors, parametric equations, congruence, similarity, trigonometry, and circles. No chapter breaks.
+
+COURSE CONTEXT:
+- Week: ${qbSelectedWeek} of 10. Day: ${qbSelectedDay||'not specified'}.
+- Last problem covered: approximately ${estLast}
+- Current topics: ${p.topics}
+- Next range to draw from: ${nextStart}–${nextEnd}
+${notes?'- Teacher notes: '+notes:''}
+
+HARKNESS STRUCTURE:
+- 4 homework problems: students work each one in a Kelvi conversation (Socratic, no answers given). Must sustain 10–15 min of genuine dialogue.
+- 5 in-class group problems: one per group (3–4 students). Groups work together, then present to the class. Goal: visualize thinking, transfer knowledge to peers.
+
+PROBLEM SET KNOWLEDGE: You know the PEA Mathematics 2 (August 2025) problem set thoroughly. Problems ${nextStart}–${nextEnd} are in the following topic areas: ${p.topics}. Select real problems from this range that match the Harkness spirit — rich context, multiple entry points, problems that reward thinking over procedure.
+
+HOMEWORK SELECTION (4 problems):
+- Sequence so they build on each other
+- Each rich enough for a 10–15 min Kelvi dialogue
+- Label P/C/G: the primary thinking type invited
+- One sentence: why this problem, why now
+
+IN-CLASS SELECTION (5 problems):
+- Self-contained enough for one group to own
+- Together they form a coherent mathematical story for the class
+- Include a presentation note: what should this group help the class discover?
+
+Respond ONLY with valid JSON, no markdown, no preamble:
+{"week":${qbSelectedWeek},"day":${qbSelectedDay||1},"lastProblem":${estLast},"topicSummary":"2-4 word focus","kelviNote":"2-3 sentences to Gayatri about the mathematical arc, what connects the selections, where students typically struggle.","homework":[{"number":42,"text":"Full problem text exactly as in problem set.","pcg":"P","why":"One sentence."}],"classProblems":[{"number":44,"group":1,"text":"Full problem text.","presentationNote":"What this group helps the class discover."}]}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();if(data.error)throw new Error(data.error.message);
+    const raw=data.content[0].text.replace(/```json|```/g,'').trim();
+    const plan=JSON.parse(raw);qbLastPlan=plan;
+    clearInterval(iv);loading.classList.remove('vis');
+    qbRenderPlan(plan);
+  }catch(err){
+    clearInterval(iv);loading.classList.remove('vis');
+    document.getElementById('qb-empty').style.display='flex';
+    alert('Something went wrong: '+err.message);
+  }
+}
+
+function qbRenderPlan(plan){
+  document.getElementById('qb-out-title').textContent='Week '+plan.week+', Day '+plan.day;
+  document.getElementById('qb-out-meta').textContent='Around problem '+plan.lastProblem+' · '+plan.topicSummary;
+  // Homework
+  document.getElementById('qb-hw-list').innerHTML=plan.homework.map((p,i)=>`
+    <div class="qb-hw-card">
+      <div class="qb-hw-top">
+        <div class="qb-hw-num">Problem ${p.number}<span class="qb-pcg qb-pcg-${p.pcg}">${{P:'Procedural',C:'Conceptual',G:'Generative'}[p.pcg]}</span></div>
+        <div class="qb-hw-why">${p.why}</div>
+      </div>
+      <div class="qb-hw-text">${p.text}</div>
+      <div class="qb-hw-actions">
+        <button class="qb-link-btn" onclick="qbOpenKelvi(${p.number})">Open in Kelvi Homework →</button>
+        <button class="qb-copy-btn" onclick="qbCopyLink(${p.number},this)">Copy link</button>
+      </div>
+    </div>`).join('');
+  // Class problems
+  document.getElementById('qb-class-grid').innerHTML=plan.classProblems.map((p,i)=>`
+    <div class="qb-class-card">
+      <div class="qb-class-top">
+        <span class="qb-group-label">Group ${p.group} · #${p.number}</span>
+        <button class="qb-print-btn" onclick="qbPrintCardByIndex(${i})">Print card</button>
+      </div>
+      <div class="qb-class-text">${p.text}</div>
+      <div class="qb-class-note">Presentation goal: ${p.presentationNote}</div>
+    </div>`).join('');
+  document.getElementById('qb-kelvi-note').textContent=plan.kelviNote;
+  document.getElementById('qb-output').classList.add('vis');
+}
+
+function qbOpenKelvi(n){window.open('solo-app.html?problem='+n,'_blank');}
+function qbCopyLink(n,btn){
+  navigator.clipboard.writeText(window.location.origin+'/solo-app.html?problem='+n).then(()=>{btn.textContent='\u2713 Copied';setTimeout(()=>btn.textContent='Copy link',2000);});
+}
+function qbCopyHomeworkLinks(){
+  if(!qbLastPlan)return;
+  const lines=qbLastPlan.homework.map(p=>'Problem '+p.number+': '+window.location.origin+'/solo-app.html?problem='+p.number);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{event.target.textContent='\u2713 Copied!';setTimeout(()=>event.target.textContent='Copy homework links',2000);});
+}
+function qbPrintCardByIndex(i){if(!qbLastPlan)return;qbPrintCards([qbLastPlan.classProblems[i]]);}
+function qbPrintAllCards(){if(!qbLastPlan)return;qbPrintCards(qbLastPlan.classProblems);}
+function qbPrintCards(problems){
+  const cards=problems.map(p=>`<div class="card">
+    <div class="card-header"><div class="card-group">Group ${p.group}</div><div class="card-num">Problem ${p.number}</div></div>
+    <div class="card-rule"></div>
+    <div class="card-problem">${p.text}</div>
+    <div class="card-section">WHAT DO YOU NOTICE?</div>
+    <div class="lines"><div class="line"></div><div class="line"></div></div>
+    <div class="card-section">WHAT QUESTION DOES THIS MAKE YOU WANT TO ASK?</div>
+    <div class="lines"><div class="line"></div><div class="line"></div></div>
+    <div class="card-section">OUR WORKING</div>
+    <div class="lines lg"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
+    <div class="card-section">WHAT WE WANT THE CLASS TO UNDERSTAND</div>
+    <div class="lines"><div class="line"></div><div class="line"></div></div>
+    <div class="card-footer"><em>The question is the answer.</em> &middot; Kelvi &middot; MAT 2</div>
+  </div>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MAT 2 Group Cards</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',sans-serif;padding:32px;}
+  .card{border:1.5px solid #1A1A1A;border-radius:10px;padding:28px 32px;max-width:640px;margin:0 auto 48px;page-break-after:always;}
+  .card:last-child{page-break-after:auto;}.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .card-group{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#737373;}
+  .card-num{font-family:'DM Serif Display',serif;font-size:20px;color:#1A1A1A;}
+  .card-rule{border-top:2px solid #3A6B5C;margin-bottom:20px;}.card-problem{font-size:15px;line-height:1.85;margin-bottom:24px;}
+  .card-section{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#A8A8A8;margin-bottom:10px;}
+  .lines{margin-bottom:20px;}.line{border-bottom:1px solid #E0E0E0;height:36px;margin-bottom:2px;}
+  .lines.lg .line{height:48px;}.card-footer{font-size:11px;color:#A8A8A8;text-align:center;padding-top:14px;border-top:1px solid #E8E8E8;margin-top:8px;}
+  @media print{body{padding:16px;}.card{page-break-after:always;margin-bottom:0;}.no-print{display:none;}}
+  </style></head><body>${cards}
+  <div class="no-print" style="text-align:center;margin-top:24px">
+    <button onclick="window.print()" style="padding:10px 24px;background:#3A6B5C;color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Print all cards</button>
+  </div></body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),600);
+}
+
+if(localStorage.getItem('kelvi-logged-in')){doLogin();}
+</script>
 </body>
 </html>
