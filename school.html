@@ -136,6 +136,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .home-greeting h1{font-family:var(--font-heading);font-size:1.5rem;margin-bottom:4px;}
 .home-greeting p{font-size:13px;color:var(--text-muted);line-height:1.6;}
 .home-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px;max-width:780px;}
+.home-center-wrap{max-width:780px;width:100%;margin:0 auto;}
 .home-prompt{
   background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);
   padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s;
@@ -608,6 +609,7 @@ body{animation:pageIn .3s ease;}
 
       <!-- HOME / CHAT VIEW -->
       <div class="view active" id="view-home">
+        <div class="home-center-wrap">
         <div class="home-greeting">
           <h1>Good morning, Dr. Ramesh.</h1>
           <p>What would you like to work on today?</p>
@@ -642,7 +644,9 @@ body{animation:pageIn .3s ease;}
           <div class="chat-wrap" id="chat"></div>
           <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
+        </div><!-- /home-center-wrap -->
         <div class="input-sticky">
+          <div style="max-width:780px;margin:0 auto;">
           <div class="input-outer" id="input-outer">
             <div class="preview-bar" id="preview-bar"></div>
             <textarea class="inp" id="inp" placeholder="Ask a follow-up…" rows="1"
@@ -663,11 +667,9 @@ body{animation:pageIn .3s ease;}
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
-          </div>
+          </div><!-- /max-width center -->
         </div>
       </div>
-
-      <!-- CLASS VIEW -->
       <div class="view" id="view-class" style="max-width:900px">
         <div class="view-header">
           <div class="view-title" id="class-title">MAT 311 Honors</div>
@@ -1995,7 +1997,7 @@ function qbPrintCards(problems){
   const w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),600);
 }
 
-if(localStorage.getItem('kelvi-logged-in')){doLogin();}
+// Always show login screen — no auto-login
 </script>
 </body>
 </html>

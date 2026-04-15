@@ -10,12 +10,12 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F5F3EE;
-  --surface: #ECE7DC;
-  --deeper: #E0D8C8;
-  --divider: #CDC3B1;
-  --text-primary: #2F2B25;
-  --text-muted: #6F6A61;
+  --bg: #FFFFFF;
+  --surface: #F7F7F7;
+  --deeper: #F7F7F7;
+  --divider: #E8E8E8;
+  --text-primary: #1A1A1A;
+  --text-muted: #737373;
   --accent: #3A6B5C;
   --accent-hover: #2D5347;
   --white: #FFFFFF;
@@ -31,7 +31,9 @@ body {
   background: var(--bg);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  animation: pageIn 0.4s ease-out;
 }
+@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* NAV */
 nav {
@@ -74,7 +76,7 @@ nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
 .hamburger.open span:nth-child(3) { top: 9px; transform: rotate(-45deg); }
 
 /* LAYOUT */
-.container { max-width: 1120px; margin: 0 auto; padding: 0 2rem; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 2rem; }
 
 /* HERO */
 .story-hero {
@@ -93,7 +95,7 @@ nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
 
 /* PROSE */
 .prose {
-  max-width: 640px; padding: 2rem 0;
+  max-width: 100%; padding: 2rem 0;
 }
 .prose h2 {
   font-family: var(--font-heading);
@@ -110,14 +112,14 @@ nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
 /* DIVIDER */
 .section-divider {
   border: none; border-top: 1px solid var(--divider);
-  margin: 0; max-width: 640px;
+  margin: 0; max-width: 100%;
 }
 
 /* FOUNDERS */
 .founders-section { padding: 2rem 0; }
 .founders-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 2rem; max-width: 640px; margin-top: 2rem;
+  gap: 2rem; max-width: 100%; margin-top: 2rem;
 }
 .founder-card {
   background: var(--white); border: 1px solid var(--divider);
@@ -137,7 +139,7 @@ nav.scrolled { box-shadow: 0 1px 12px rgba(47,43,37,0.06); }
 
 /* PULL QUOTE */
 .pull-quote {
-  max-width: 640px; padding: 2rem 0;
+  max-width: 100%; padding: 2rem 0;
 }
 .pull-quote blockquote {
   font-family: var(--font-heading); font-style: italic;
