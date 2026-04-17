@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School — Dashboard</title>
+<link rel="stylesheet" href="../shared/kelvi.css">
+<style>
+.dash-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-lg); padding: 18px 20px; }
+.stat-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.stat-value { font-size: 2rem; font-weight: 500; color: var(--text-primary); font-family: var(--font-heading); }
+.stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 400; }
+.class-card { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: all var(--t-fast); }
+.class-card:hover { border-color: var(--accent); transform: translateX(3px); }
+.class-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.class-info { flex: 1; }
+.class-name { font-weight: 500; font-size: 14px; color: var(--text-primary); margin-bottom: 2px; }
+.class-meta { font-size: 12px; color: var(--text-muted); }
+.class-pcg { display: flex; gap: 6px; align-items: center; }
+.activity-item { padding: 12px 0; border-bottom: 1px solid var(--divider); display: flex; align-items: center; gap: 12px; }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.activity-text { flex: 1; font-size: 13px; color: var(--text-primary); }
+.activity-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+.pcg-bar-wrap { margin-bottom: 8px; }
+.pcg-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+.pcg-bar-track { height: 6px; background: var(--deeper); border-radius: 3px; overflow: hidden; }
+.pcg-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+.add-class-btn { border: 1.5px dashed var(--divider); background: transparent; border-radius: var(--radius-lg); padding: 16px 20px; width: 100%; text-align: left; color: var(--text-muted); font-size: 13px; font-family: var(--font-body); cursor: pointer; transition: all var(--t-fast); display: flex; align-items: center; gap: 8px; }
+.add-class-btn:hover { border-color: var(--accent); color: var(--accent); }
+.modal-overlay { display: none; }
+.modal-overlay.open { display: flex; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div style="padding:16px;border-bottom:1px solid var(--divider)">
+      <a href="../index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+        <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+        <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi</span>
+        <span style="font-size:0.65rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body)">School</span>
+      </a>
+    </div>
+    <div class="sb-section-label">Workspace</div>
+    <div class="sb-item active" onclick="location.href='dashboard.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="sb-item" onclick="location.href='upload.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Grade work
+    </div>
+    <div class="sb-item" onclick="location.href='results.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Results
+    </div>
+    <div class="sb-item" onclick="location.href='quest.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Quest builder
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section-label">Classes</div>
+    <div id="sb-classes"></div>
+    <div class="sb-bottom">
+      <div class="sb-item" onclick="location.href='settings.html'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        Settings
+      </div>
+      <div style="padding:10px 16px;display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600" id="sb-avatar">G</div>
+        <div style="font-size:12px;font-weight:500;color:var(--text-primary)" id="sb-name">Teacher</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="font-family:var(--font-heading);font-size:1.05rem;color:var(--text-primary)" id="welcome-msg">Good morning</div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="location.href='upload.html'">+ Grade work</button>
+        <button class="btn btn-secondary btn-sm" onclick="location.href='quest.html'">Build quest</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="page-wide">
+
+        <!-- STATS -->
+        <div class="dash-grid" id="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Students graded</div>
+            <div class="stat-value" id="stat-graded">0</div>
+            <div class="stat-sub">across all classes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Quests built</div>
+            <div class="stat-value" id="stat-quests">0</div>
+            <div class="stat-sub">this term</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Class average</div>
+            <div class="stat-value" id="stat-avg">—</div>
+            <div class="stat-sub" id="stat-avg-sub">No results yet</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+          <!-- CLASSES -->
+          <div>
+            <div class="section-head">
+              <div class="section-title">My classes</div>
+              <button class="btn btn-ghost btn-sm" onclick="openAddClass()">+ Add class</button>
+            </div>
+            <div id="classes-list"></div>
+            <button class="add-class-btn" onclick="openAddClass()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Add a class
+            </button>
+          </div>
+
+          <!-- THINKING DISTRIBUTION + RECENT -->
+          <div>
+            <div class="section-head">
+              <div class="section-title">Class thinking</div>
+            </div>
+            <div class="card" style="margin-bottom:16px">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">P/C/G distribution across all recent results</div>
+              <div class="pcg-bar-wrap">
+                <div class="pcg-bar-label"><span>Procedural</span><span id="pct-p">—</span></div>
+                <div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-p" style="width:0;background:var(--student)"></div></div>
+              </div>
+              <div class="pcg-bar-wrap">
+                <div class="pcg-bar-label"><span>Conceptual</span><span id="pct-c">—</span></div>
+                <div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-c" style="width:0;background:var(--family)"></div></div>
+              </div>
+              <div class="pcg-bar-wrap">
+                <div class="pcg-bar-label"><span>Generative</span><span id="pct-g">—</span></div>
+                <div class="pcg-bar-track"><div class="pcg-bar-fill" id="bar-g" style="width:0;background:var(--accent)"></div></div>
+              </div>
+              <div id="pcg-empty" style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px 0">Grade some work to see the distribution.</div>
+            </div>
+
+            <div class="section-head">
+              <div class="section-title">Recent activity</div>
+              <a href="results.html" style="font-size:12px;color:var(--accent)">See all →</a>
+            </div>
+            <div class="card">
+              <div id="recent-list">
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:16px 0">No activity yet. Start by grading student work.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CLASS MODAL -->
+<div class="modal-overlay" id="add-class-modal">
+  <div class="modal">
+    <div class="modal-title">Add a class</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Add the classes you teach. Kelvi will use this to organize your student work.</p>
+    <div class="ob-field">
+      <label class="input-label">Class name</label>
+      <input class="input" id="new-class-name" placeholder="e.g. MAT 210 — Calculus" onkeydown="if(event.key==='Enter')addClass()">
+    </div>
+    <div class="ob-field">
+      <label class="input-label">Grade level</label>
+      <input class="input" id="new-class-grade" placeholder="e.g. Grade 10, AP Calculus">
+    </div>
+    <div class="ob-field">
+      <label class="input-label">Number of students</label>
+      <input class="input" id="new-class-size" type="number" placeholder="e.g. 25">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn btn-ghost" onclick="closeAddClass()">Cancel</button>
+      <button class="btn btn-primary" onclick="addClass()">Add class</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/kelvi.js"></script>
+<script>
+// Class colors
+const CLASS_COLORS = ['#3A6B5C','#B8784E','#5A7080','#C9A84C','#8B5CF6','#EC4899'];
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!KelviAuth.requireAuth()) return;
+
+  const teacher = KelviSchool.getTeacher();
+  const user = KelviAuth.getUser();
+  const name = teacher?.name || user?.name || 'Teacher';
+
+  // Welcome message
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcome-msg').textContent = greeting + ', ' + name.split(' ')[0];
+
+  // Avatar
+  document.getElementById('sb-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('sb-name').textContent = name;
+
+  // Load data
+  loadClasses();
+  loadStats();
+  loadRecentActivity();
+});
+
+function loadClasses() {
+  const classes = KelviSchool.getClasses();
+  const list = document.getElementById('classes-list');
+  const sbList = document.getElementById('sb-classes');
+
+  if (!classes.length) {
+    list.innerHTML = '';
+    sbList.innerHTML = '';
+    return;
+  }
+
+  list.innerHTML = classes.map((cls, i) => {
+    const color = CLASS_COLORS[i % CLASS_COLORS.length];
+    return `<div class="class-card" onclick="location.href='upload.html?class=${cls.id}'">
+      <div class="class-dot" style="background:${color}"></div>
+      <div class="class-info">
+        <div class="class-name">${escHtml(cls.name)}</div>
+        <div class="class-meta">${escHtml(cls.grade || '')}${cls.size ? ' · ' + cls.size + ' students' : ''}</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  }).join('');
+
+  sbList.innerHTML = classes.slice(0, 5).map((cls, i) => {
+    const color = CLASS_COLORS[i % CLASS_COLORS.length];
+    return `<div class="sb-item" style="gap:8px" onclick="location.href='upload.html?class=${cls.id}'">
+      <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      ${escHtml(cls.name)}
+    </div>`;
+  }).join('');
+}
+
+function loadStats() {
+  const results = KelviSchool.getResults();
+  let totalStudents = 0, totalGrade = 0, p = 0, c = 0, g = 0;
+
+  results.forEach(r => {
+    if (r.students) {
+      r.students.forEach(s => {
+        totalStudents++;
+        totalGrade += s.grade || 0;
+        if (s.pcg === 'G') g++;
+        else if (s.pcg === 'C') c++;
+        else p++;
+      });
+    }
+  });
+
+  document.getElementById('stat-graded').textContent = totalStudents || '0';
+
+  if (totalStudents > 0) {
+    const avg = (totalGrade / totalStudents).toFixed(1);
+    document.getElementById('stat-avg').textContent = avg + '/4';
+    document.getElementById('stat-avg-sub').textContent = totalStudents + ' students graded';
+    document.getElementById('pcg-empty').style.display = 'none';
+
+    const total = p + c + g;
+    const pp = Math.round(p / total * 100);
+    const cp = Math.round(c / total * 100);
+    const gp = Math.round(g / total * 100);
+    document.getElementById('pct-p').textContent = pp + '%';
+    document.getElementById('pct-c').textContent = cp + '%';
+    document.getElementById('pct-g').textContent = gp + '%';
+    setTimeout(() => {
+      document.getElementById('bar-p').style.width = pp + '%';
+      document.getElementById('bar-c').style.width = cp + '%';
+      document.getElementById('bar-g').style.width = gp + '%';
+    }, 200);
+  }
+
+  // Quest count (from localStorage)
+  const quests = JSON.parse(localStorage.getItem('kelvi_quests') || '[]');
+  document.getElementById('stat-quests').textContent = quests.length;
+}
+
+function loadRecentActivity() {
+  const results = KelviSchool.getResults().slice(0, 5);
+  const list = document.getElementById('recent-list');
+  if (!results.length) return;
+
+  list.innerHTML = results.map(r => `
+    <div class="activity-item">
+      <div class="activity-icon">📋</div>
+      <div class="activity-text">
+        <strong>${escHtml(r.topic || 'Grading session')}</strong><br>
+        <span style="color:var(--text-muted);font-size:12px">${r.studentCount || 0} students · ${r.className || 'Class'}</span>
+      </div>
+      <div class="activity-time">${formatDate(r.date)}</div>
+    </div>
+  `).join('');
+}
+
+function openAddClass() {
+  document.getElementById('add-class-modal').classList.add('open');
+  document.getElementById('new-class-name').focus();
+}
+
+function closeAddClass() {
+  document.getElementById('add-class-modal').classList.remove('open');
+}
+
+function addClass() {
+  const name = document.getElementById('new-class-name').value.trim();
+  const grade = document.getElementById('new-class-grade').value.trim();
+  const size = document.getElementById('new-class-size').value.trim();
+  if (!name) { alert('Please enter a class name.'); return; }
+  KelviSchool.addClass({ name, grade, size: parseInt(size) || 0 });
+  closeAddClass();
+  document.getElementById('new-class-name').value = '';
+  document.getElementById('new-class-grade').value = '';
+  document.getElementById('new-class-size').value = '';
+  loadClasses();
+}
+
+// Close modal on overlay click
+document.getElementById('add-class-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddClass();
+});
+</script>
+</body>
+</html>

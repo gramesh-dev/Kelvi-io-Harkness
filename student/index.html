@@ -17,10 +17,10 @@
 <script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 <style>
 :root {
-  --bg: #FFFFFF; --surface: #F7F7F7; --deeper: #F0F0F0; --divider: #E8E8E8;
-  --text-primary: #1A1A1A; --text-muted: #737373; --text-faint: #A3A3A3;
-  --accent: #5A7080; --accent-dark: #48606E; --accent-light: #E8EEF2;
-  --white: #FFFFFF;
+  --bg: #F8F7F4; --surface: #F0EDE6; --deeper: #E8E3DA; --divider: #D9D4C9;
+  --text-primary: #2F2B25; --text-muted: #6F6A61; --text-faint: #9A9488;
+  --accent: #3A6B5C; --accent-dark: #2D5347; --accent-light: #EBF3EF;
+  --student: #5A7080; --student-dark: #48606E; --student-light: #E8EEF2;
   --font-heading: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,32 +28,38 @@ html,body{height:100%}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);display:flex;-webkit-font-smoothing:antialiased}
 
 /* SIDEBAR */
-.sidebar{width:232px;background:#FAFAFA;border-right:1px solid var(--divider);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
-.sb-brand{padding:14px 12px 10px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:7px;text-decoration:none}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--divider);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.sb-brand{padding:18px 20px 14px;font-family:var(--font-heading);font-size:1.35rem;color:var(--accent);border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:6px}
 .sb-brand .kelvi-mark{display:flex;align-items:center;flex-shrink:0}
-.sb-label{font-size:10px;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:2px;margin-top:1px}
-.sb-nav{flex:1;padding:8px 8px;overflow-y:auto}
-.sb-item{display:flex;align-items:center;padding:7px 9px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .12s;border-radius:7px;margin-bottom:1px;gap:9px}0}
-.sb-item:hover{background:#F0F0F0;color:var(--text-primary)}
-.sb-item.active{background:#F0F0F0;color:var(--text-primary);font-weight:500}
+.sb-label{font-size:0.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:4px}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.sb-item{display:flex;align-items:center;padding:10px 20px;font-size:0.85rem;color:var(--text-muted);cursor:pointer;transition:all .12s;border-radius:0}
+.sb-item:hover{background:var(--deeper);color:var(--text-primary)}
+.sb-item.active{background:var(--accent);color:var(--bg)}
 .sb-badge{font-size:0.6rem;background:var(--accent-light);color:var(--accent-dark);padding:2px 7px;border-radius:3px;margin-left:auto}
 .sb-divider{height:1px;background:var(--divider);margin:8px 20px}
 .sb-bottom{border-top:1px solid var(--divider);padding:8px 0}
 .sb-user{padding:12px 20px;display:flex;align-items:center;gap:10px}
-.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
 .sb-uname{font-size:0.8rem;font-weight:500;color:var(--text-primary)}
 
+/* SIDEBAR — hidden */
+.sidebar{display:none}
 /* MAIN AREA */
-.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh}
-.main-header{height:52px;padding:0 20px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#FFFFFF}
-.main-title{font-size:13px;font-weight:500;color:var(--text-primary)}
-.api-input{padding:6px 12px;border:1px solid var(--divider);border-radius:8px;background:var(--white);font-size:11px;font-family:var(--font-body);outline:none;width:180px;color:var(--text-primary)}
-.api-input::placeholder{color:var(--divider)}
-.api-input:focus{border-color:var(--accent)}
+.main{display:flex;flex-direction:column;min-width:0;height:100vh;width:100%}
+.main-header{padding:0 24px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;height:56px;background:var(--bg);position:sticky;top:0;z-index:50}
+.main-title{font-family:var(--font-heading);font-size:1.1rem;color:var(--text-primary)}
+.topbar-brand{font-family:var(--font-heading);font-size:1.25rem;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar-tab{font-size:12px;color:var(--text-muted);cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .12s;font-weight:500;background:none;border:none;font-family:var(--font-body)}
+.topbar-tab:hover{color:var(--text-primary);background:var(--surface)}
+.topbar-tab.active{color:var(--accent);background:var(--accent-light)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-user{font-size:12px;color:var(--text-muted);font-weight:500}
 
 /* PANELS — each view fills main */
-.panel{position:absolute;inset:0;display:flex;flex:1;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .25s ease;}
-.panel.active{opacity:1;pointer-events:all;position:relative;}
+.panel{display:none;flex:1;flex-direction:column;opacity:0;transition:opacity .3s ease;overflow:hidden}
+.panel.active{display:flex;opacity:1}
 
 /* WELCOME */
 .welcome-panel{align-items:center;justify-content:center;padding:40px}
@@ -61,9 +67,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .welcome-inner h1{font-family:var(--font-heading);font-size:2.4rem;margin-bottom:10px;letter-spacing:-0.02em}
 .welcome-inner p{font-size:1.05rem;color:var(--text-muted);line-height:1.65;margin-bottom:2rem}
 .welcome-row{display:flex;gap:8px;max-width:320px;margin:0 auto}
-.welcome-row input{flex:1;padding:12px 16px;border:1.5px solid var(--divider);border-radius:8px;font-size:1rem;font-family:var(--font-body);outline:none;background:var(--white)}
+.welcome-row input{flex:1;padding:12px 16px;border:1.5px solid var(--divider);border-radius:8px;font-size:1rem;font-family:var(--font-body);outline:none;background:var(--bg)}
 .welcome-row input:focus{border-color:var(--accent)}
-.btn{background:var(--accent);color:var(--white);border:none;padding:12px 22px;border-radius:8px;font-size:0.95rem;font-family:var(--font-body);cursor:pointer;font-weight:500;transition:all .15s}
+.btn{background:var(--accent);color:var(--bg);border:none;padding:12px 22px;border-radius:8px;font-size:0.95rem;font-family:var(--font-body);cursor:pointer;font-weight:500;transition:all .15s}
 .btn:hover{background:var(--accent-dark)}
 
 /* HOME */
@@ -71,34 +77,34 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .home-body{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
 .home-center{text-align:center}
 .greeting{font-family:var(--font-heading);font-size:1.6rem;margin-bottom:10px}
-.home-bottom{padding:0 20px 24px;flex-shrink:0;max-width:680px;width:100%;margin:0 auto;}
+.home-bottom{padding:0 20px 24px;flex-shrink:0}
 .home-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;justify-content:center}
-.pill{padding:8px 16px;border:1px solid var(--divider);border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--white)}
+.pill{padding:8px 16px;border:1px solid var(--divider);border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--bg)}
 .pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.home-input-bar{background:var(--white);border:1.5px solid var(--divider);border-radius:14px;padding:14px 16px;position:relative;transition:border-color .15s}
+.home-input-bar{background:var(--bg);border:1.5px solid var(--divider);border-radius:14px;padding:14px 16px;position:relative;transition:border-color .15s}
 .home-input-bar:focus-within{border-color:var(--accent)}
 .home-input-bar.dragover{border-color:var(--accent);background:var(--accent-light)}
 .home-textarea{width:100%;border:none;outline:none;font-size:15px;font-family:var(--font-body);resize:none;line-height:1.5;color:var(--text-primary);background:transparent}
-.home-textarea::placeholder{color:var(--divider)}
+.home-textarea::placeholder{color:var(--text-faint)}
 .home-input-actions{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:flex-end}
 .hi-btn{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:6px 8px;border-radius:6px;transition:all .12s}
 .hi-btn:hover{color:var(--accent);background:var(--accent-light)}
-.hi-btn.rec{color:var(--white);background:#B8784E;animation:pulse 1.5s ease infinite}
+.hi-btn.rec{color:var(--bg);background:#B8784E;animation:pulse 1.5s ease infinite}
 .home-mq-wrap{display:flex;align-items:center;gap:6px;margin-right:auto}
-.hi-send{background:#5A7080;color:#fff;border:none;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .12s;flex-shrink:0}
+.hi-send{background:var(--accent);color:var(--bg);border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .12s}
 /* PLUS MENU */
 .plus-menu-wrap{position:relative}
 .plus-btn{font-size:20px;font-weight:400;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
 .plus-btn.open{transform:rotate(45deg)}
-.plus-menu{display:none;position:absolute;bottom:40px;left:0;background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:180px;z-index:20}
+.plus-menu{display:none;position:absolute;bottom:40px;left:0;background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:180px;z-index:20}
 .plus-menu.vis{display:block}
 .plus-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .1s}
 .plus-item:hover{background:var(--surface)}
 .plus-item svg{color:var(--text-muted);flex-shrink:0}
 
 /* SUGGESTION PILLS */
-.suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 28px;flex-shrink:0}
-.suggestion{padding:7px 14px;border:1px solid var(--divider);border-radius:18px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--white)}
+.suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 20px 4px;flex-shrink:0}
+.suggestion{padding:7px 14px;border:1px solid var(--divider);border-radius:18px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--bg)}
 .suggestion:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
 
 /* MATH INPUT CLOSE */
@@ -109,14 +115,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 
 /* EQUATION MODAL */
 .eq-modal-overlay{position:fixed;inset:0;background:rgba(47,43,37,0.4);z-index:200;display:flex;align-items:center;justify-content:center}
-.eq-modal{background:var(--white);border-radius:14px;width:90%;max-width:600px;overflow:hidden}
+.eq-modal{background:var(--bg);border-radius:14px;width:90%;max-width:600px;overflow:hidden}
 .eq-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--divider)}
 .eq-modal-close{background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;padding:0 4px;transition:color .1s}
 .eq-modal-close:hover{color:var(--text-primary)}
 .eq-modal-body{padding:20px;min-height:120px}
 .eq-modal-field{width:100%;min-height:80px;font-size:20px;border:2px solid var(--accent);border-radius:8px;padding:12px 16px;--caret-color:var(--accent)}
 .eq-modal-footer{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--divider)}
-.eq-modal-insert{background:var(--accent);color:var(--white);border:none;padding:9px 24px;border-radius:8px;font-size:14px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .12s}
+.eq-modal-insert{background:var(--accent);color:var(--bg);border:none;padding:9px 24px;border-radius:8px;font-size:14px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .12s}
 .eq-modal-insert:hover{background:var(--accent-dark)}
 
 /* CALC FALLBACK */
@@ -127,13 +133,13 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .home-label{font-size:0.7rem;font-weight:700;color:var(--text-muted);letter-spacing:0.08em;margin-bottom:10px;text-transform:uppercase}
 
 /* HW BOX */
-.hw-box{background:var(--white);border:1.5px solid var(--divider);border-radius:12px;padding:18px;transition:border-color .15s;position:relative}
+.hw-box{background:var(--bg);border:1.5px solid var(--divider);border-radius:12px;padding:18px;transition:border-color .15s;position:relative}
 .hw-box:focus-within{border-color:var(--accent)}
 .hw-box.dragover{border-color:var(--accent);background:var(--accent-light)}
 .hw-drop-hint{display:none;position:absolute;inset:0;border-radius:12px;background:rgba(232,238,242,0.85);z-index:5;font-size:14px;color:var(--accent);font-weight:500;justify-content:center;align-items:center}
 .hw-box.dragover .hw-drop-hint{display:flex}
 .hw-textarea{width:100%;border:none;outline:none;font-size:14px;font-family:var(--font-body);resize:none;line-height:1.6;color:var(--text-primary);background:transparent}
-.hw-textarea::placeholder{color:var(--divider)}
+.hw-textarea::placeholder{color:var(--text-faint)}
 .hw-uploads{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .hw-upload-thumb{position:relative;width:72px;height:72px;border-radius:6px;border:1px solid var(--divider);overflow:hidden}
 .hw-upload-thumb img{width:100%;height:100%;object-fit:cover}
@@ -143,17 +149,17 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .hw-preview-label{font-size:0.65rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
 .hw-preview{font-size:14px;line-height:1.7;color:var(--text-primary)}
 .hw-toolbar{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--divider);flex-wrap:wrap}
-.hw-tb{padding:4px 7px;border:1px solid var(--divider);border-radius:5px;font-size:11px;cursor:pointer;background:var(--white);color:var(--text-primary);font-family:var(--font-body);transition:all .1s}
+.hw-tb{padding:4px 7px;border:1px solid var(--divider);border-radius:5px;font-size:11px;cursor:pointer;background:var(--bg);color:var(--text-primary);font-family:var(--font-body);transition:all .1s}
 .hw-tb:hover{border-color:var(--accent);background:var(--accent-light)}
-.hw-mq{flex:1;min-width:180px;min-height:30px;font-size:14px;padding:4px 8px;border:1.5px solid var(--divider);border-radius:8px;background:var(--white);margin:4px 0}
+.hw-mq{flex:1;min-width:180px;min-height:30px;font-size:14px;padding:4px 8px;border:1.5px solid var(--divider);border-radius:8px;background:var(--bg);margin:4px 0}
 .hw-actions{display:flex;gap:8px;margin-top:10px;align-items:center}
-.hw-go{background:var(--accent);color:var(--white);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.hw-go{background:var(--accent);color:var(--bg);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .15s}
 .hw-go:hover{background:var(--accent-dark)}
-.hw-btn2{background:var(--white);border:1.5px solid var(--divider);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--font-body);color:var(--text-muted);transition:all .15s}
+.hw-btn2{background:var(--bg);border:1.5px solid var(--divider);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--font-body);color:var(--text-muted);transition:all .15s}
 .hw-btn2:hover{border-color:var(--accent)}
 .hw-mic{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:14px;transition:all .15s;color:var(--accent)}
-.hw-mic:hover{background:var(--accent);color:var(--white)}
-.hw-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--white);animation:pulse 1.5s ease infinite}
+.hw-mic:hover{background:var(--accent);color:var(--bg)}
+.hw-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--bg);animation:pulse 1.5s ease infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
 
 /* QUICK ACTIONS */
@@ -171,7 +177,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .export-wrap{position:relative}
 .export-btn{background:none;border:1px solid var(--divider);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--text-muted);transition:all .12s;display:flex;align-items:center}
 .export-btn:hover{border-color:var(--accent);color:var(--accent)}
-.export-menu{display:none;position:absolute;top:36px;right:0;background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:190px;z-index:20}
+.export-menu{display:none;position:absolute;top:36px;right:0;background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:6px 0;min-width:190px;z-index:20}
 .export-menu.vis{display:block}
 .export-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;color:var(--text-primary);cursor:pointer;transition:background .1s}
 .export-item:hover{background:var(--surface)}
@@ -184,7 +190,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .problem-banner.vis{display:block}
 .problem-banner-label{font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
 .problem-banner img{max-height:70px;border-radius:6px;margin-top:4px}
-.chat-msgs{flex:1;overflow-y:auto;padding:20px 32px;display:flex;flex-direction:column;gap:20px;background:#FFFFFF}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px 32px;display:flex;flex-direction:column;gap:20px;background:var(--bg)}
 .msg{max-width:100%;animation:fadeUp .3s ease}
 .msg-k{align-self:flex-start;width:100%}
 .msg-s{align-self:flex-end;max-width:72%}
@@ -192,12 +198,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .msg-name-k{color:var(--text-faint,#A3A3A3)}
 .msg-name-s{color:var(--text-faint,#A3A3A3);text-align:right;padding-right:2px}
 .msg-bubble-k{background:none;border:none;border-radius:0;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary)}
-.msg-bubble-s{background:#F0F0F0;border:1px solid #E4E4E4;border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:#1A1A1A}
-.msg-bubble-s .katex{color:#1A1A1A}
+.msg-bubble-s{background:var(--surface);border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary)}
+.msg-bubble-s .katex{color:var(--text-primary)}
 .speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint,#A3A3A3);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:4px;vertical-align:middle;display:inline-flex;align-items:center}
 .speak-btn:hover{color:var(--accent)}
-.speak-btn:hover{background:var(--accent);color:var(--white)}
-.speak-btn.speaking{background:var(--accent);color:var(--white)}
+.speak-btn:hover{background:var(--accent);color:var(--bg)}
+.speak-btn.speaking{background:var(--accent);color:var(--bg)}
 .typing{display:none;align-self:flex-start;padding:8px 14px;background:var(--accent-light);border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center}
 .typing.vis{display:flex}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite}
@@ -211,22 +217,22 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .calc-panel iframe{width:100%;height:320px;border:none}
 
 /* CHAT INPUT BAR */
-.chat-input-bar{padding:10px 20px 16px;border-top:none;display:flex;gap:6px;align-items:flex-end;background:#FFFFFF;flex-shrink:0}
-.chat-text-input{flex:1;border:1.5px solid #E8E8E8;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1A1A1A;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:border-color .15s}
-.chat-text-input:focus{border-color:#E8E8E8}
-.chat-math-input{flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:6px 14px;font-size:16px;min-height:40px;background:var(--white);--caret-color:var(--accent)}
+.chat-input-bar{padding:10px 20px 16px;border-top:none;display:flex;gap:6px;align-items:flex-end;background:var(--bg);flex-shrink:0}
+.chat-text-input{flex:1;border:1.5px solid var(--divider);border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:var(--bg);color:var(--text-primary);box-shadow:0 2px 10px rgba(47,43,37,.06);transition:border-color .15s}
+.chat-text-input:focus{border-color:var(--accent)}
+.chat-math-input{flex:1;border:1.5px solid var(--divider);border-radius:8px;padding:6px 14px;font-size:16px;min-height:40px;background:var(--bg);--caret-color:var(--accent)}
 .chat-math-input:focus-within{border-color:var(--accent)}
 .ci-btn{padding:8px 10px;border-radius:7px;font-size:11px;cursor:pointer;transition:all .12s;font-family:var(--font-body);font-weight:500}
-.ci-mode{background:var(--white);border:1px solid var(--divider);color:var(--text-muted)}
+.ci-mode{background:var(--bg);border:1px solid var(--divider);color:var(--text-muted)}
 .ci-mode:hover{border-color:var(--accent);color:var(--accent)}
 .ci-mode.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
 .ci-calc{background:var(--accent-light);border:1.5px solid var(--accent);color:var(--accent)}
-.ci-calc:hover,.ci-calc.open{background:var(--accent);color:var(--white)}
+.ci-calc:hover,.ci-calc.open{background:var(--accent);color:var(--bg)}
 .ci-mic{background:var(--accent-light);border:1.5px solid var(--accent);color:var(--accent)}
-.ci-mic:hover{background:var(--accent);color:var(--white)}
-.ci-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--white);animation:pulse 1.5s ease infinite}
-.ci-send{background:#3A6B5C;color:#fff;border:none;padding:0;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ci-send:hover{background:#2D5347;opacity:1}
+.ci-mic:hover{background:var(--accent);color:var(--bg)}
+.ci-mic.rec{background:#B8784E;border-color:#B8784E;color:var(--bg);animation:pulse 1.5s ease infinite}
+.ci-send{background:var(--accent);color:var(--bg);border:none;padding:0;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci-send:hover{background:var(--accent-dark);opacity:1}
 .chat-footer{padding:6px 28px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-muted);border-top:1px solid var(--divider);flex-shrink:0}
 .q-badge{background:var(--accent-light);color:var(--accent-dark);padding:3px 10px;border-radius:6px;font-weight:500}
 
@@ -237,7 +243,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 /* HISTORY */
 .hist-inner{max-width:700px;padding:28px 20px 60px;width:100%}
 .hist-h{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px}
-.hist-item{background:var(--white);border:1px solid var(--divider);border-radius:10px;padding:13px 16px;margin-bottom:7px;cursor:pointer;transition:border-color .12s;display:flex;justify-content:space-between;align-items:center}
+.hist-item{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:13px 16px;margin-bottom:7px;cursor:pointer;transition:border-color .12s;display:flex;justify-content:space-between;align-items:center}
 .hist-item:hover{border-color:var(--accent)}
 .hist-topic{font-size:13px;font-weight:500}
 .hist-date{font-size:11px;color:var(--text-muted)}
@@ -246,70 +252,112 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 @media(max-width:768px){
-  .sidebar{width:60px;overflow:hidden}
-  .sb-brand span:not(.tk){display:none}
-  .sb-label{display:none}
-  .sb-item{padding:10px;justify-content:center;font-size:0}
-  .sb-badge{display:none}
-  .sb-uname{display:none}
-  .sb-user{justify-content:center}
+  .topbar-nav{gap:2px}
+  .topbar-tab{padding:6px 8px;font-size:11px}
 }
-@keyframes pageIn{from{opacity:0}to{opacity:1}}
-body{animation:pageIn .4s ease-out;}
+
+.login-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden}
+.login-left{display:flex;flex-direction:column;justify-content:center;padding:32px 48px;overflow-y:auto}
+.login-right{background:var(--surface);border-left:1px solid var(--divider);display:flex;align-items:center;justify-content:center;padding:40px;overflow-y:auto}
+.login-heading{font-family:var(--font-heading);font-size:clamp(1.4rem,2.5vw,2rem);font-weight:400;line-height:1.2;color:var(--text-primary);margin-bottom:10px}
+.login-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
+@media(max-width:700px){
+  .login-grid{grid-template-columns:1fr}
+  .login-right{display:none}
+  .login-left{padding:24px}
+}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="solo-login" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFFFFF;font-family:'DM Sans',sans-serif;z-index:1000;">
-  <div style="width:100%;max-width:340px;padding:0 24px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:32px;">
-      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
-      <div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#1A1A1A;">Kelvi Solo</div>
-        <div style="font-size:12px;color:#737373;margin-top:1px;">Your thinking partner</div>
+<div id="student-login" style="position:fixed;inset:0;z-index:1000;background:#F8F7F4;display:flex;flex-direction:column">
+
+  <!-- Topbar -->
+  <div style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--divider);flex-shrink:0">
+    <a href="../index.html" style="display:flex;align-items:center;gap:7px;text-decoration:none">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+      <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi</span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:500;margin-left:2px">Student</span>
+    </a>
+    <a href="../index.html" style="font-size:13px;font-weight:500;background:#2F2B25;color:#F8F7F4;padding:8px 18px;border-radius:8px;text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Try Kelvi Student</a>
+  </div>
+
+  <!-- Two-column body -->
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden">
+
+    <!-- LEFT -->
+    <div class="login-left">
+      <h1 class="login-heading">Think it through, on your own.</h1>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">A thinking partner that builds you toward the answer, not to it.</p>
+
+      <div style="background:var(--bg);border:1px solid var(--divider);border-radius:16px;padding:20px;max-width:400px">
+        <button onclick="doStudentLogin()" style="width:100%;padding:12px;border:1.5px solid var(--divider);border-radius:8px;background:var(--bg);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .15s;color:var(--text-primary);margin-bottom:16px"
+          onmouseover="this.style.borderColor='var(--text-muted)'" onmouseout="this.style.borderColor='var(--divider)'">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="flex:1;height:1px;background:var(--divider)"></div>
+          <span style="font-size:11px;color:var(--text-faint);font-weight:500;letter-spacing:.04em">OR</span>
+          <div style="flex:1;height:1px;background:var(--divider)"></div>
+        </div>
+        <input id="student-email" type="email" placeholder="Enter your email" value="gramesh@kelvi.io"
+          style="width:100%;padding:12px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:10px;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--student)'" onblur="this.style.borderColor='var(--divider)'">
+        <input id="student-pass" type="password" placeholder="Password" value="demo"
+          style="width:100%;padding:12px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:14px;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--student)'" onblur="this.style.borderColor='var(--divider)'"
+          onkeydown="if(event.key==='Enter')doStudentLogin()">
+        <button onclick="doStudentLogin()" style="width:100%;padding:13px;border:none;border-radius:8px;background:var(--text-primary);color:var(--bg);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:opacity .15s;margin-bottom:14px"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Continue with email</button>
+        <div style="font-size:11px;color:var(--text-faint);text-align:center;line-height:1.6">By continuing, you agree to Kelvi's <a href="#" style="color:var(--text-muted)">Privacy Policy</a>.<br><span style="opacity:.7">Demo mode — any password will work</span></div>
       </div>
     </div>
-    <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:6px;">Sign in</div>
-    <div style="font-size:13px;color:#737373;margin-bottom:28px;line-height:1.5;">Think through hard problems with an AI that won't give you the answer.</div>
-    <label style="font-size:11px;font-weight:500;color:#737373;margin-bottom:5px;display:block;">Email or username</label>
-    <input id="solo-login-user" type="text" placeholder="you@email.com" style="width:100%;padding:10px 12px;border:1px solid #D4D4D4;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;background:#fff;color:#1A1A1A;transition:border-color .15s;" onfocus="this.style.borderColor='#1A1A1A'" onblur="this.style.borderColor='#D4D4D4'">
-    <label style="font-size:11px;font-weight:500;color:#737373;margin-bottom:5px;display:block;">Password</label>
-    <input id="solo-login-pass" type="password" placeholder="Password" style="width:100%;padding:10px 12px;border:1px solid #D4D4D4;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:12px;background:#fff;color:#1A1A1A;transition:border-color .15s;" onfocus="this.style.borderColor='#1A1A1A'" onblur="this.style.borderColor='#D4D4D4'" onkeydown="if(event.key==='Enter')doSoloLogin()">
-    <button onclick="doSoloLogin()" style="width:100%;padding:11px;border:none;border-radius:8px;background:#5A7080;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;margin-bottom:12px;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Sign in</button>
-    <div style="font-size:11px;color:#A3A3A3;text-align:center;">Demo mode — any credentials will work</div>
-    <div style="margin-top:20px;text-align:center;"><a href="index.html" style="font-size:12px;color:#737373;text-decoration:none;">← Back to Kelvi</a></div>
+
+    <!-- RIGHT — capability showcase -->
+    <div class="login-right">
+      <div style="max-width:420px;width:100%">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+          <div>
+            <div style="font-family:var(--font-heading);font-size:1.4rem;color:var(--text-primary)">A math thinking partner.</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:3px">For students who want to understand, not just solve.</div>
+          </div>
+        </div>
+        <div id="scap-card">
+          <div id="scap-content" style="background:var(--bg);border:1px solid var(--divider);border-radius:14px;padding:28px;margin-bottom:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center;transition:opacity .3s,transform .3s">
+            <div id="scap-label" style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--student);margin-bottom:12px">For students</div>
+            <div id="scap-headline" style="font-family:var(--font-heading);font-size:1.5rem;line-height:1.3;color:var(--text-primary);margin-bottom:12px">Kelvi visualizes and verbalizes your thinking.</div>
+            <div id="scap-body"></div>
+          </div>
+          <div style="display:flex;gap:6px" id="scap-dots"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- APP (hidden until login) -->
-<div id="solo-app" style="display:none;height:100vh;overflow:hidden;flex-direction:row;">
-
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sb-brand"><svg width="20" height="20" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:6px"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg><span style="font-family:var(--font-heading);font-size:1.1rem;color:#1A1A1A;">Kelvi</span> <span class="sb-label">Solo</span></div>
-  <nav class="sb-nav">
-    <div class="sb-item active" onclick="showPanel('home')" id="nav-home">Home</div>
-    <div class="sb-item" onclick="showPanel('sessions')" id="nav-sessions">My sessions</div>
-    <div class="sb-item" onclick="showPanel('calculator')" id="nav-calculator">Desmos</div>
-  </nav>
-  <div class="sb-bottom">
-    <a href="index.html" class="sb-item" style="text-decoration:none;gap:8px;">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      Kelvi home
-    </a>
-    <div class="sb-item" onclick="showPanel('settings')" id="nav-settings">Settings</div>
-    <div class="sb-user">
-      <div class="sb-avatar" id="sb-avatar">?</div>
-      <span class="sb-uname" id="sb-uname">Student</span>
-    </div>
-  </div>
-</aside>
 
 <!-- MAIN -->
 <div class="main">
   <div class="main-header">
-    <span class="main-title" id="main-title">Home</span>
+    <a href="../index.html" class="topbar-brand">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+      Kelvi <span style="font-size:0.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:2px">Student</span>
+    </a>
+    <div class="topbar-nav" id="topbar-nav">
+      <button class="topbar-tab active" id="nav-home" onclick="showPanel('home')">Home</button>
+      <button class="topbar-tab" id="nav-sessions" onclick="showPanel('sessions')">My sessions</button>
+      <button class="topbar-tab" id="nav-progress" onclick="showPanel('progress')">My progress</button>
+      <button class="topbar-tab" id="nav-calculator" onclick="showPanel('calculator')">Desmos</button>
+      <button class="topbar-tab" id="nav-settings" onclick="showPanel('settings')">Settings</button>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="sb-uname">Student</span>
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600" id="sb-avatar">?</div>
+      <button onclick="doStudentLogout()" style="background:none;border:1px solid var(--divider);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .12s" onmouseover="this.style.borderColor='var(--text-muted)'" onmouseout="this.style.borderColor='var(--divider)'">Log out</button>
+    </div>
   </div>
 
 
@@ -357,7 +405,7 @@ body{animation:pageIn .4s ease-out;}
           </div>
           <span style="flex:1"></span>
           <button class="hi-btn" id="hw-mic" onclick="toggleHwVoice()" title="Dictate"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="15" y1="9" x2="15" y2="15"/></svg></button>
-          <button class="hi-send" onclick="startChat()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          <button class="hi-send" onclick="startChat()">Send</button>
         </div>
       </div>
     </div>
@@ -383,19 +431,21 @@ body{animation:pageIn .4s ease-out;}
         <div class="problem-banner-label">Your problem</div>
         <div id="problem-banner-content"></div>
       </div>
-      <div class="chat-msgs" id="chat-msgs">
+      <div class="chat-msgs" id="chat-msgs" style="padding-bottom:16px">
         <div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k" id="opening-msg"></div></div>
       </div>
       <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-      <div class="suggestions" id="suggestions" style="display:none"></div>
-      <div class="calc-panel" id="calc-panel">
+      <div style="background:var(--bg);flex-shrink:0">
+        <div class="suggestions" id="suggestions" style="display:none;padding:8px 20px 0"></div>
+        <div class="calc-panel" id="calc-panel">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--divider);flex-shrink:0">
           <span style="font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase">Desmos Calculator</span>
           <button onclick="toggleCalc()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);padding:0 4px;line-height:1;transition:color .12s" title="Close calculator">&times;</button>
         </div>
         <div style="text-align:center;padding:20px">
-          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--white);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">Open Desmos Calculator</a>
+          <a href="https://www.desmos.com/calculator" target="_blank" style="background:var(--accent);color:var(--bg);padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">Open Desmos Calculator</a>
           <span style="font-size:12px;color:var(--text-muted);margin-left:12px">Opens in a new tab</span>
+        </div>
         </div>
       </div>
       <div class="chat-input-bar">
@@ -428,7 +478,11 @@ body{animation:pageIn .4s ease-out;}
   </div>
 
   <!-- CALCULATOR -->
-  <div class="panel" id="panel-calculator">
+  <div class="panel" id="panel-calculator" style="flex-direction:column">
+    <div style="padding:12px 24px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span style="font-size:13px;font-weight:500;color:var(--text-primary)">Desmos Graphing Calculator</span>
+      <button onclick="showPanel('home')" style="background:none;border:1px solid var(--divider);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .12s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)';this.style.color='var(--text-muted)'">✕ Close</button>
+    </div>
     <div class="calc-main">
       <iframe src="https://www.desmos.com/calculator" title="Desmos Graphing Calculator" id="desmos-iframe" style="display:none" onload="this.style.display='block';document.getElementById('calc-fallback').style.display='none'"></iframe>
       <div class="calc-fallback" id="calc-fallback">
@@ -436,8 +490,64 @@ body{animation:pageIn .4s ease-out;}
           <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:20px"><rect x="8" y="4" width="40" height="48" rx="4" fill="#E8EEF2"/><rect x="14" y="12" width="28" height="8" rx="2" fill="#5A7080"/><rect x="14" y="26" width="8" height="8" rx="2" fill="#CDC3B1"/><rect x="24" y="26" width="8" height="8" rx="2" fill="#CDC3B1"/><rect x="34" y="26" width="8" height="8" rx="2" fill="#CDC3B1"/><rect x="14" y="38" width="8" height="8" rx="2" fill="#CDC3B1"/><rect x="24" y="38" width="8" height="8" rx="2" fill="#CDC3B1"/><rect x="34" y="38" width="18" height="8" rx="2" fill="#5A7080"/></svg>
           <div style="font-family:var(--font-heading);font-size:1.4rem;margin-bottom:8px;color:var(--text-primary)">Desmos Graphing Calculator</div>
           <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px;line-height:1.6">Graph equations, explore functions, and visualize your thinking.</p>
-          <a href="https://www.desmos.com/calculator" target="_blank" style="display:inline-block;background:var(--accent);color:var(--white);padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500;transition:background .15s" onmouseover="this.style.background='#48606E'" onmouseout="this.style.background='#5A7080'">Open Desmos →</a>
+          <a href="https://www.desmos.com/calculator" target="_blank" style="display:inline-block;background:var(--accent);color:var(--bg);padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500;transition:background .15s" onmouseover="this.style.background='var(--accent-dark)'" onmouseout="this.style.background='var(--accent)'">Open Desmos →</a>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY PROGRESS -->
+  <div class="panel" id="panel-progress" style="overflow-y:auto">
+    <div style="max-width:800px;padding:32px 28px 60px;width:100%;animation:fadeUp .4s ease" id="progress-body">
+      <div style="font-family:var(--font-heading);font-size:1.6rem;margin-bottom:4px" id="progress-title">My progress</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:28px" id="progress-sub">Based on your Kelvi sessions</div>
+
+      <!-- STATS ROW -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px" id="progress-stats">
+        <div style="background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--divider)">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Sessions</div>
+          <div style="font-size:1.8rem;font-weight:500;color:var(--text-primary)" id="stat-sessions">—</div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--divider)">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Questions asked</div>
+          <div style="font-size:1.8rem;font-weight:500;color:var(--text-primary)" id="stat-questions">—</div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--divider)">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Topics explored</div>
+          <div style="font-size:1.8rem;font-weight:500;color:var(--text-primary)" id="stat-topics">—</div>
+        </div>
+      </div>
+
+      <!-- PCG BARS -->
+      <div style="background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--divider);margin-bottom:20px">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:4px">How you think</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Based on the kinds of questions and reasoning in your sessions</div>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Procedural — following steps</span><span id="pct-p">—</span></div>
+          <div style="height:8px;background:var(--deeper);border-radius:4px;overflow:hidden"><div id="bar-p" style="height:100%;background:#5A7080;border-radius:4px;width:0%;transition:width .6s ease"></div></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Conceptual — understanding why</span><span id="pct-c">—</span></div>
+          <div style="height:8px;background:var(--deeper);border-radius:4px;overflow:hidden"><div id="bar-c" style="height:100%;background:#B8784E;border-radius:4px;width:0%;transition:width .6s ease"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>Generative — creating and connecting</span><span id="pct-g">—</span></div>
+          <div style="height:8px;background:var(--deeper);border-radius:4px;overflow:hidden"><div id="bar-g" style="height:100%;background:#3A6B5C;border-radius:4px;width:0%;transition:width .6s ease"></div></div>
+        </div>
+      </div>
+
+      <!-- RECENT TOPICS -->
+      <div style="background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--divider);margin-bottom:20px">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:12px">Recent topics</div>
+        <div id="progress-topics" style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="font-size:13px;color:var(--text-muted)">No sessions yet.</span>
+        </div>
+      </div>
+
+      <!-- THINKING PATTERN -->
+      <div style="background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--divider)">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:8px">Your thinking pattern</div>
+        <div id="progress-pattern" style="font-size:13px;color:var(--text-muted);line-height:1.7">Start a few sessions and Kelvi will notice patterns in how you think.</div>
       </div>
     </div>
   </div>
@@ -448,17 +558,17 @@ body{animation:pageIn .4s ease-out;}
       <div style="font-family:var(--font-heading);font-size:1.4rem;margin-bottom:18px">Settings</div>
       <div class="home-section">
         <div class="home-label">Your name</div>
-        <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--white)" oninput="updateName(this.value)">
+        <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--bg)" oninput="updateName(this.value)">
       </div>
       <div class="home-section">
         <div class="home-label">Anthropic API key</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used for Kelvi's AI responses. Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.</div>
-        <input type="password" id="settings-api" placeholder="sk-ant-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="saveKey()">
+        <input type="password" id="settings-api" placeholder="sk-ant-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--bg)" oninput="saveKey()">
       </div>
       <div class="home-section">
         <div class="home-label">OpenAI API key</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used as a fallback if Anthropic is unavailable. Get yours at <a href="https://platform.openai.com" target="_blank" style="color:var(--accent)">platform.openai.com</a>.</div>
-        <input type="password" id="settings-openai" placeholder="sk-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--white)" oninput="saveOpenAIKey()">
+        <input type="password" id="settings-openai" placeholder="sk-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--bg)" oninput="saveOpenAIKey()">
       </div>
     </div>
   </div>
@@ -582,8 +692,35 @@ Do not attempt to generate graphs or plots inline. If a graph would help, say: "
 24. AFTER THE ANSWER, ASK ONE MEANING QUESTION.
 When a student has found the numerical answer, don't just confirm the numbers and stop. Ask one question about what the answer means mathematically. For example: "Notice that this sector trades a smaller radius for a longer arc while keeping area and perimeter fixed — what does that tell you about the relationship between radius and arc length in a sector?" The goal is transfer, not closure.
 
+25. WHEN A STUDENT DOESN'T KNOW WHAT A CONCEPT MEANS:
+Step 1 — Ask them to define it in their own words: "How would you describe what a derivative is?" Do not define it yet.
+Step 2 — If they cannot define it, anchor to a concrete situation where the idea already lives: "Think about a speedometer — what is it measuring at any exact moment?" Let them arrive at the meaning themselves.
+Step 3 — If they still cannot after the anchor, define it directly and briefly, then move forward. A student cannot reason about what they cannot name. Getting a definition is not the same as getting the answer to the problem.
+Never skip to Step 3 without attempting Steps 1 and 2 first. Never send the student to an external resource — Kelvi is sufficient.
+
+26. THE MIRROR MOVE.
+When a student arrives at a correct insight, do not confirm it with "exactly," "correct," "right," or any judgment word. Instead, restate their insight as a mathematical principle using their own language: "So a derivative does the same thing for a function that a speedometer does for a car." This honors their thinking without judging it, and gives them a formulation they own. The mirror move is always better than praise.
+
+27. ANSWER YES/NO FACTUAL QUESTIONS DIRECTLY.
+When a student asks a yes/no factual question, answer it immediately — do not turn it into a Socratic moment. Then ask one question about the implication. Example: "No — a quadratic can represent anything that grows and then falls, or falls and then grows. Projectile motion, profit curves, population models. Which of those feels closest to what you were imagining?" Withholding a yes/no answer does not develop thinking — it creates frustration. The Socratic method is for reasoning, not for facts.
+
+28. NEVER SUMMARIZE FOR A STUDENT.
+When a student asks Kelvi to summarize the conversation, return the task to them. Frame it as a mathematical practice, not a refusal: the direction is that mathematicians use precise language to capture ideas, and the student should try first. Offer to help them refine what they produce. Early in a conversation (first or second exchange), always return it fully to the student. Later in a conversation, after substantial work, Kelvi may offer to build the summary together — student starts, Kelvi helps fill gaps. The act of summarizing is itself the learning. Never do it for them.
+
+29. WHEN A STUDENT ASKS FOR A HINT:
+A hint is a smaller question, not a smaller answer. Never give a formula, definition, procedure, or worked step as a hint. Ask one question that moves the student one step closer to their own insight. For example: if they are stuck on the divided difference formula, do not give the formula — ask "What would you calculate to describe how the y-values change relative to the x-values between two points?" The student must arrive at the formula themselves. A hint that contains the answer is not a hint.
+
+30. WHEN A STUDENT ASKS "WHY DOES THAT WORK?":
+Do not explain. Ask them to explain it first: "What's your instinct about why?" or "Try to put it in your own words — what's happening to the numbers?" Only after they've attempted an explanation should you probe further.
+
+31. WHEN A STUDENT ASKS FOR A SIMILAR PROBLEM:
+Give one immediately. Do not explain the solution. End with "What's one way you might start?"
+
+32. WHEN A STUDENT ASKS TO CREATE A DISCOVERY PROBLEM:
+Design a problem where the concept emerges from the structure of the problem itself — not from being told. The student should encounter the idea, not receive it. End with "What do you notice?"
+
 FACTUAL TOOLS:
-You may provide theorem statements, definitions, and formulas when accuracy matters.
+You may provide theorem statements, definitions, and formulas only when a student has already demonstrated understanding of the underlying concept and needs the formal notation to proceed. Never provide a formula as a first response, as a hint, or before the student has worked toward it themselves.
 
 P/C/G CLASSIFICATION:
 Internally classify every interaction: Procedural, Conceptual, or Generative. Do not announce it. Use it to guide your next move.
@@ -593,15 +730,41 @@ Two to three sentences maximum. Never write paragraphs. If you find yourself wri
 
 // PANEL NAVIGATION
 function showPanel(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active')});
+  document.querySelectorAll('.topbar-tab').forEach(t=>t.classList.remove('active'));
   const panel=document.getElementById('panel-'+id);
-  if(panel)panel.classList.add('active');
+  if(panel){panel.classList.add('active');requestAnimationFrame(()=>{panel.style.opacity='1'})}
   const nav=document.getElementById('nav-'+id);
   if(nav)nav.classList.add('active');
-  const titles={home:'Home',sessions:'My sessions',calculator:'Desmos',settings:'Settings',chat:'Chat',welcome:'Welcome'};
-  document.getElementById('main-title').textContent=titles[id]||'Kelvi Solo';
   if(id==='sessions')loadSessions();
+  if(id==='progress')loadProgress();
+}
+
+function doStudentLogout() {
+  localStorage.removeItem('kelvi-name');
+  document.getElementById('student-login').style.display = 'flex';
+}
+
+function doStudentLogin() {
+  const email = document.getElementById('student-email').value.trim();
+  if (!email) { alert('Please enter your email.'); return; }
+  const raw = email.split('@')[0].replace(/[^a-zA-Z\s]/g, ' ').trim();
+  const displayName = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+  userName = displayName;
+  localStorage.setItem('kelvi-name', userName);
+  document.getElementById('student-login').style.display = 'none';
+  const greeting = document.getElementById('greeting');
+  if (greeting) greeting.textContent = 'Hey ' + userName + '. What are you working on?';
+  const av = document.getElementById('sb-avatar');
+  if (av) av.textContent = userName[0].toUpperCase();
+  const un = document.getElementById('sb-uname');
+  if (un) un.textContent = userName;
+  const sn = document.getElementById('settings-name');
+  if (sn) sn.value = userName;
+  // Remove welcome panel active state and show home
+  const welcome = document.getElementById('panel-welcome');
+  if (welcome) welcome.classList.remove('active');
+  showPanel('home');
 }
 
 function startApp(){
@@ -657,7 +820,7 @@ function startChat(){
   if(hasUploads){uploadedImages.forEach(img=>{uc.push({type:'image',source:{type:'base64',media_type:img.type,data:img.data}})})}
   uc.push({type:'text',text:'Here is my problem: '+(hw||'See the uploaded image.')});
   msgs=[{role:'user',content:uc.length===1?uc[0].text:uc}];
-  qCount=0;updateQCount();showPanel('chat');
+  qCount=0;updateQCount();showPanel('chat');showSuggestions();
   autoSend();
 }
 
@@ -667,7 +830,7 @@ function quickChat(prompt){
   document.getElementById('problem-banner').classList.remove('vis');
   document.getElementById('chat-msgs').innerHTML='<div class="msg msg-k"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">What are you working on? Paste your problem or describe what you need help with.</div></div>';
   msgs=[{role:'assistant',content:'What are you working on? Paste your problem or describe what you need help with.'}];
-  qCount=0;updateQCount();showPanel('chat');
+  qCount=0;updateQCount();showPanel('chat');showSuggestions();
 }
 
 function pillToChat(text){
@@ -770,23 +933,18 @@ function chatPhoto(e){
 
 function showSuggestions(){
   const el=document.getElementById('suggestions');
-  const pills=[
+  el.innerHTML=[
+    'Why does that work?',
     'I\'m stuck, give me a hint',
     'Can you show me a similar problem?',
-    'Why does that work?',
-    'I want to try a different approach',
-    'I got an answer — check my reasoning'
-  ];
-  // Pick 3 random suggestions
-  const shuffled=pills.sort(()=>Math.random()-0.5).slice(0,3);
-  el.innerHTML=shuffled.map(p=>'<span class="suggestion" onclick="useSuggestion(this)">'+p+'</span>').join('');
+    'Can you create a discovery problem on this topic?'
+  ].map(p=>'<span class="suggestion" onclick="useSuggestion(this)">'+p+'</span>').join('');
   el.style.display='flex';
 }
 
 function useSuggestion(el){
   const text=el.textContent;
   document.getElementById('chat-input-text').value=text;
-  document.getElementById('suggestions').style.display='none';
   sendMsg();
 }
 
@@ -798,7 +956,6 @@ async function sendMsg(){
   const key=anthropicKey;
   if(!key){alert('Enter your Anthropic API key in Settings.');return}
   const qt=classifyQ(text);if(qt)qCount++;updateQCount();
-  document.getElementById('suggestions').style.display='none';
   const cm=document.getElementById('chat-msgs');
   cm.innerHTML+='<div class="msg msg-s" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-s">You</div><div class="msg-bubble-s">'+renderMath(eh(text))+'</div></div>';
   cm.scrollTop=cm.scrollHeight;
@@ -816,7 +973,6 @@ async function sendMsg(){
     const reply=data.content[0].text;msgs.push({role:'assistant',content:reply});
     cm.innerHTML+='<div class="msg msg-k" style="animation:fadeUp .3s ease"><div class="msg-name msg-name-k">Kelvi</div><div class="msg-bubble-k">'+renderKelvi(reply)+'<button class="speak-btn" onclick="speakText(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button></div></div>';
     cm.scrollTop=cm.scrollHeight;
-    showSuggestions();
     saveCurrentSession();
   }catch(e){
     document.getElementById('typing').classList.remove('vis');
@@ -933,6 +1089,71 @@ function saveCurrentSession(){
   // Keep max 50 sessions
   if(sessions.length>50)sessions=sessions.slice(0,50);
   try{localStorage.setItem('kelvi-sessions',JSON.stringify(sessions))}catch(e){}
+}
+
+function loadProgress(){
+  const sessions = JSON.parse(localStorage.getItem('kelvi-sessions') || '[]');
+  const name = userName || 'You';
+  document.getElementById('progress-title').textContent = name + "'s progress";
+  document.getElementById('progress-sub').textContent = 'Based on ' + sessions.length + ' Kelvi session' + (sessions.length === 1 ? '' : 's');
+
+  if (!sessions.length) {
+    document.getElementById('stat-sessions').textContent = '0';
+    document.getElementById('stat-questions').textContent = '0';
+    document.getElementById('stat-topics').textContent = '0';
+    return;
+  }
+
+  // Stats
+  const totalQ = sessions.reduce((s, x) => s + (x.qCount || 0), 0);
+  const topics = [...new Set(sessions.map(s => s.topic).filter(t => t && t !== 'Kelvi Session' && t !== 'Homework help'))];
+  document.getElementById('stat-sessions').textContent = sessions.length;
+  document.getElementById('stat-questions').textContent = totalQ;
+  document.getElementById('stat-topics').textContent = topics.length || sessions.length;
+
+  // PCG classification across all student messages
+  let p = 0, c = 0, g = 0;
+  sessions.forEach(session => {
+    (session.messages || []).forEach(m => {
+      if (m.role === 'user') {
+        const cls = classifyQ(typeof m.content === 'string' ? m.content : '');
+        if (cls === 'P') p++;
+        else if (cls === 'C') c++;
+        else if (cls === 'G') g++;
+      }
+    });
+  });
+  const total = p + c + g || 1;
+  const pp = Math.round(p / total * 100);
+  const cp = Math.round(c / total * 100);
+  const gp = Math.round(g / total * 100);
+  document.getElementById('pct-p').textContent = pp + '%';
+  document.getElementById('pct-c').textContent = cp + '%';
+  document.getElementById('pct-g').textContent = gp + '%';
+  setTimeout(() => {
+    document.getElementById('bar-p').style.width = pp + '%';
+    document.getElementById('bar-c').style.width = cp + '%';
+    document.getElementById('bar-g').style.width = gp + '%';
+  }, 100);
+
+  // Recent topics
+  const topicEl = document.getElementById('progress-topics');
+  const recentTopics = [...new Set(sessions.slice(0, 10).map(s => s.topic))].slice(0, 8);
+  if (recentTopics.length) {
+    topicEl.innerHTML = recentTopics.map(t =>
+      `<span style="background:var(--surface);border:1px solid var(--divider);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text-primary)">${t}</span>`
+    ).join('');
+  }
+
+  // Thinking pattern
+  const patternEl = document.getElementById('progress-pattern');
+  const dominant = pp >= cp && pp >= gp ? 'P' : cp >= gp ? 'C' : 'G';
+  const patterns = {
+    P: `You tend to focus on working through steps and procedures. ${cp > 20 ? 'You\'re starting to ask why things work — keep pulling on that.' : 'Try asking "why does this work?" more often.'}`,
+    C: `You ask a lot of "why" questions — you want to understand, not just execute. ${gp > 15 ? 'You\'re starting to make your own connections too.' : 'Next step: try creating your own problems.'}`,
+    G: `You think generatively — you make connections, ask "what if", and push beyond the problem. That\'s the highest level of mathematical thinking.`
+  };
+  patternEl.textContent = sessions.length >= 2 ? patterns[dominant] : 'Start a few more sessions and Kelvi will notice patterns in how you think.';
 }
 
 function loadSessions(){
@@ -1076,26 +1297,59 @@ setTimeout(function(){var mf=document.getElementById('eq-modal-field');if(mf)mf.
 
 // Auto-start if name is saved
 if(localStorage.getItem('kelvi-name')){
-  document.getElementById('greeting').textContent='Hey '+localStorage.getItem('kelvi-name')+'. What are you working on?';
+  userName = localStorage.getItem('kelvi-name');
+  const greeting = document.getElementById('greeting');
+  if(greeting) greeting.textContent='Hey '+userName+'. What are you working on?';
+  const av = document.getElementById('sb-avatar');
+  if(av) av.textContent = userName[0].toUpperCase();
+  const un = document.getElementById('sb-uname');
+  if(un) un.textContent = userName;
+  document.getElementById('student-login').style.display='none';
+  const welcome = document.getElementById('panel-welcome');
+  if(welcome) welcome.classList.remove('active');
   showPanel('home');
 }
 
-function doSoloLogin(){
-  const user=document.getElementById('solo-login-user').value.trim();
-  if(!user){document.getElementById('solo-login-user').focus();return;}
-  document.getElementById('solo-login').style.display='none';
-  const app=document.getElementById('solo-app');
-  app.style.display='flex';
-  app.style.flexDirection='row';
-  if(user&&user!=='you@email.com'){
-    const raw=user.includes('@')?user.split('@')[0]:user;
-    const clean=raw.split('.')[0];
-    const name=clean.charAt(0).toUpperCase()+clean.slice(1);
-    localStorage.setItem('kelvi-name',name);
-    updateName(name);
-  }
+// ── STUDENT LOGIN CAROUSEL ────────────────────────────
+const STUDENT_CAPS = [
+  { label: 'For students', headline: 'Kelvi visualizes and verbalizes your thinking.', color: 'var(--student)' },
+  { label: 'Become a mathematician', headline: 'Mistakes maketh the mathematician.', color: 'var(--accent)' },
+  { label: 'Self-reliance', headline: 'You leave every conversation knowing more than when you arrived.', color: 'var(--student)' },
+  { label: 'Any level', headline: 'From fractions to calculus — Kelvi meets you exactly where you are.', color: '#C9A84C' },
+  { label: 'No judgement', headline: 'No wrong ways to start. No rushing. Just thinking.', color: 'var(--accent)' },
+];
+let sCapIdx = 0;
+function renderStudentSlide(cap) {
+  const label = document.getElementById('scap-label');
+  const headline = document.getElementById('scap-headline');
+  const body = document.getElementById('scap-body');
+  if(label){ label.style.color=cap.color; label.textContent=cap.label; }
+  if(headline){ headline.textContent=cap.headline; headline.style.fontSize='1.5rem'; headline.style.color='var(--text-primary)'; }
+  if(body) body.innerHTML='';
 }
+function rotateStudentCap() {
+  sCapIdx = (sCapIdx + 1) % STUDENT_CAPS.length;
+  const cap = STUDENT_CAPS[sCapIdx];
+  const card = document.getElementById('scap-content');
+  if (!card) return;
+  card.style.opacity = '0'; card.style.transform = 'translateY(8px)';
+  setTimeout(() => {
+    renderStudentSlide(cap);
+    card.style.opacity = '1'; card.style.transform = 'translateY(0)';
+    const dots = document.getElementById('scap-dots');
+    if(dots) dots.innerHTML = STUDENT_CAPS.map((_,i) =>
+      `<div style="width:${i===sCapIdx?'20px':'6px'};height:6px;border-radius:3px;background:${i===sCapIdx?'var(--accent)':'var(--divider)'};transition:all .3s"></div>`
+    ).join('');
+  }, 200);
+}
+window.addEventListener('DOMContentLoaded', function() {
+  renderStudentSlide(STUDENT_CAPS[0]);
+  const dots = document.getElementById('scap-dots');
+  if(dots) dots.innerHTML = STUDENT_CAPS.map((_,i) =>
+    `<div style="width:${i===0?'20px':'6px'};height:6px;border-radius:3px;background:${i===0?'var(--accent)':'var(--divider)'};transition:all .3s"></div>`
+  ).join('');
+  setInterval(rotateStudentCap, 4000);
+});
 </script>
-</div><!-- /solo-app -->
 </body>
 </html>

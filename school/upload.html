@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School — Grade Work</title>
+<link rel="stylesheet" href="../shared/kelvi.css">
+<style>
+.upload-zone {
+  border: 2px dashed var(--divider); border-radius: var(--radius-lg);
+  padding: 40px; text-align: center; cursor: pointer;
+  transition: all var(--t-base); background: var(--surface);
+}
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: var(--accent-light); }
+.upload-icon { font-size: 2rem; margin-bottom: 12px; }
+.upload-label { font-size: 14px; color: var(--text-muted); }
+.upload-label strong { color: var(--accent); cursor: pointer; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.thumb { position: relative; width: 80px; height: 80px; border-radius: var(--radius); overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,.5); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.student-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.student-row input { flex: 1; }
+.student-row button { flex-shrink: 0; }
+.mode-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.mode-tab { padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--divider); color: var(--text-muted); background: var(--bg); transition: all var(--t-fast); font-family: var(--font-body); }
+.mode-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.result-block { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-lg); padding: 20px; margin-top: 20px; }
+.result-header { font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 16px; }
+.result-raw { font-size: 13px; color: var(--text-primary); line-height: 1.7; white-space: pre-wrap; font-family: var(--font-body); }
+.result-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+.rs-card { background: var(--bg); border: 1px solid var(--divider); border-radius: var(--radius-md); padding: 12px; text-align: center; }
+.rs-val { font-size: 1.4rem; font-weight: 500; color: var(--text-primary); }
+.rs-lab { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+.typing-dots { display: inline-flex; gap: 4px; align-items: center; }
+.typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce .8s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: .15s; }
+.typing-dots span:nth-child(3) { animation-delay: .3s; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div style="padding:16px;border-bottom:1px solid var(--divider)">
+      <a href="../index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+        <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+        <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi</span>
+        <span style="font-size:0.65rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body)">School</span>
+      </a>
+    </div>
+    <div class="sb-section-label">Workspace</div>
+    <div class="sb-item" onclick="location.href='dashboard.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="sb-item active" onclick="location.href='upload.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Grade work
+    </div>
+    <div class="sb-item" onclick="location.href='results.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Results
+    </div>
+    <div class="sb-item" onclick="location.href='quest.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Quest builder
+    </div>
+    <div class="sb-bottom">
+      <div style="padding:10px 16px;display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600" id="sb-avatar">G</div>
+        <div style="font-size:12px;font-weight:500;color:var(--text-primary)" id="sb-name">Teacher</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="font-family:var(--font-heading);font-size:1.05rem">Grade student work</div>
+      <div class="topbar-right">
+        <a href="results.html" class="btn btn-ghost btn-sm">View all results →</a>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="page">
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs">
+          <button class="mode-tab active" id="tab-batch" onclick="setMode('batch')">Batch grade (class)</button>
+          <button class="mode-tab" id="tab-single" onclick="setMode('single')">Single student</button>
+        </div>
+
+        <!-- SETUP ROW -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div>
+            <label class="input-label">Class</label>
+            <select class="input" id="sel-class" style="cursor:pointer">
+              <option value="">Select a class...</option>
+            </select>
+          </div>
+          <div>
+            <label class="input-label">Topic / Assignment</label>
+            <input class="input" id="sel-topic" placeholder="e.g. Fractions — comparing unlike denominators">
+          </div>
+        </div>
+
+        <!-- STUDENT NAMES (batch mode) -->
+        <div id="batch-names" style="margin-bottom:16px">
+          <label class="input-label">Student names <span style="font-weight:400;color:var(--text-faint)">(optional — if blank, Kelvi labels them Student 1, 2…)</span></label>
+          <div id="name-rows">
+            <div class="student-row">
+              <input class="input" placeholder="Student name" style="font-size:13px">
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="addNameRow()">+ Add student</button>
+        </div>
+
+        <!-- SINGLE MODE NAME -->
+        <div id="single-name" style="margin-bottom:16px;display:none">
+          <label class="input-label">Student name</label>
+          <input class="input" id="student-name-single" placeholder="Student name">
+        </div>
+
+        <!-- PROBLEM CONTEXT -->
+        <div style="margin-bottom:16px">
+          <label class="input-label">The problem <span style="font-weight:400;color:var(--text-faint)">(paste the question students were answering)</span></label>
+          <textarea class="input" id="problem-text" rows="3" placeholder="Paste the math problem or question here..." style="resize:vertical"></textarea>
+        </div>
+
+        <!-- RUBRIC -->
+        <div style="margin-bottom:16px">
+          <label class="input-label">Rubric <span style="font-weight:400;color:var(--text-faint)">(leave blank to use Kelvi default 4-point P/C/G scale)</span></label>
+          <textarea class="input" id="rubric-text" rows="2" placeholder="Optional: paste your own rubric or grading criteria..." style="resize:vertical"></textarea>
+        </div>
+
+        <!-- UPLOAD ZONE -->
+        <div style="margin-bottom:16px">
+          <label class="input-label">Student work</label>
+          <div class="upload-zone" id="upload-zone"
+            ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+            onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">📸</div>
+            <div class="upload-label"><strong>Upload images</strong> or drag and drop</div>
+            <div style="font-size:12px;color:var(--text-faint);margin-top:4px">PNG, JPG, PDF — up to 20 images</div>
+          </div>
+          <input type="file" id="file-input" accept="image/*,.pdf" multiple style="display:none" onchange="handleFiles(event)">
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+
+        <!-- OR PASTE TEXT -->
+        <div style="margin-bottom:20px">
+          <label class="input-label">Or paste typed responses <span style="font-weight:400;color:var(--text-faint)">(one per line, or separated by student name)</span></label>
+          <textarea class="input" id="typed-responses" rows="6" placeholder="Student 1: The answer is 3/4 because I divided both sides by 4...&#10;Student 2: I think it's equal to 0.75..." style="resize:vertical;font-size:13px"></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;padding:13px" onclick="doGrade()" id="grade-btn">
+          Grade with Kelvi →
+        </button>
+
+        <!-- RESULT -->
+        <div id="result-area"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/kelvi.js"></script>
+<script>
+let mode = 'batch';
+let uploadedImages = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!KelviAuth.requireAuth()) return;
+  const teacher = KelviSchool.getTeacher();
+  const user = KelviAuth.getUser();
+  const name = teacher?.name || user?.name || 'Teacher';
+  document.getElementById('sb-avatar').textContent = name[0].toUpperCase();
+  document.getElementById('sb-name').textContent = name;
+  loadClassSelect();
+});
+
+function loadClassSelect() {
+  const classes = KelviSchool.getClasses();
+  const sel = document.getElementById('sel-class');
+  if (classes.length) {
+    sel.innerHTML = '<option value="">Select a class...</option>' +
+      classes.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+  }
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('tab-batch').className = 'mode-tab' + (m === 'batch' ? ' active' : '');
+  document.getElementById('tab-single').className = 'mode-tab' + (m === 'single' ? ' active' : '');
+  document.getElementById('batch-names').style.display = m === 'batch' ? 'block' : 'none';
+  document.getElementById('single-name').style.display = m === 'single' ? 'block' : 'none';
+}
+
+function addNameRow() {
+  const row = document.createElement('div');
+  row.className = 'student-row';
+  row.innerHTML = `<input class="input" placeholder="Student name" style="font-size:13px">
+    <button class="btn btn-ghost btn-sm" onclick="this.parentElement.remove()">✕</button>`;
+  document.getElementById('name-rows').appendChild(row);
+}
+
+function handleFiles(event) { processFiles(Array.from(event.target.files)); }
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('upload-zone').classList.remove('dragover');
+  processFiles(Array.from(event.dataTransfer.files));
+}
+function handleDragOver(event) { event.preventDefault(); document.getElementById('upload-zone').classList.add('dragover'); }
+function handleDragLeave() { document.getElementById('upload-zone').classList.remove('dragover'); }
+
+function processFiles(files) {
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const id = 'img-' + Date.now() + Math.random();
+      uploadedImages.push({ id, dataUrl: e.target.result, type: file.type, data: e.target.result.split(',')[1] });
+      renderThumbs();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderThumbs() {
+  document.getElementById('thumbs').innerHTML = uploadedImages.map(img =>
+    `<div class="thumb">
+      <img src="${img.dataUrl}" alt="Student work">
+      <button class="thumb-remove" onclick="removeImage('${img.id}')">✕</button>
+    </div>`
+  ).join('');
+}
+
+function removeImage(id) {
+  uploadedImages = uploadedImages.filter(i => i.id !== id);
+  renderThumbs();
+}
+
+async function doGrade() {
+  const topic = document.getElementById('sel-topic').value.trim();
+  const problem = document.getElementById('problem-text').value.trim();
+  const rubric = document.getElementById('rubric-text').value.trim();
+  const typed = document.getElementById('typed-responses').value.trim();
+  const teacher = KelviSchool.getTeacher();
+  const className = document.getElementById('sel-class').options[document.getElementById('sel-class').selectedIndex]?.text || 'Class';
+
+  if (!problem && !typed && !uploadedImages.length) {
+    alert('Please add the problem and at least one student response.');
+    return;
+  }
+
+  // Get student names
+  let names = [];
+  if (mode === 'batch') {
+    names = Array.from(document.querySelectorAll('#name-rows input')).map(i => i.value.trim()).filter(Boolean);
+  } else {
+    const n = document.getElementById('student-name-single').value.trim();
+    if (n) names = [n];
+  }
+
+  // Build the grading message
+  const rubricSection = rubric
+    ? `TEACHER'S RUBRIC:\n${rubric}`
+    : `USE DEFAULT RUBRIC (4-point P/C/G scale). Scale: 4=Generative, 3=Conceptual, 2=Procedural, 1=Attempted, 0=Not attempted.`;
+
+  const scaleNote = teacher?.scale
+    ? `The teacher's preferred grading scale is: ${teacher.scale}-point. Convert grades accordingly.`
+    : '';
+
+  const curriculumNote = teacher?.curriculum
+    ? `Curriculum context: ${teacher.curriculum} (${teacher.country || ''}).`
+    : '';
+
+  let userContent = [];
+
+  // Add images
+  uploadedImages.forEach((img, i) => {
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: img.type, data: img.data } });
+    if (names[i]) userContent.push({ type: 'text', text: `[Above image is ${names[i]}'s work]` });
+  });
+
+  // Build text prompt
+  let prompt = `${mode === 'batch' ? 'BATCH GRADE REQUEST' : 'SINGLE STUDENT GRADE REQUEST'}
+
+Class: ${className}
+Topic: ${topic || 'Not specified'}
+${curriculumNote}
+
+THE PROBLEM STUDENTS WERE ANSWERING:
+${problem || 'See uploaded images'}
+
+${rubricSection}
+${scaleNote}
+
+${typed ? `STUDENT RESPONSES:\n${typed}` : ''}
+${names.length ? `\nStudent names: ${names.join(', ')}` : ''}
+
+Please produce the ${mode === 'batch' ? 'BATCH OUTPUT' : 'SINGLE STUDENT'} format as specified in your instructions.`;
+
+  userContent.push({ type: 'text', text: prompt });
+
+  // Show loading
+  const resultArea = document.getElementById('result-area');
+  resultArea.innerHTML = `<div class="result-block">
+    <div class="result-header">Kelvi is grading...</div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>`;
+
+  document.getElementById('grade-btn').disabled = true;
+
+  const reply = await KelviAPI.call({
+    system: KELVI_PROMPTS.teacher,
+    messages: [{ role: 'user', content: userContent.length > 1 ? userContent : prompt }],
+    maxTokens: 2000,
+    onError: (err) => {
+      resultArea.innerHTML = `<div class="result-block" style="border-color:var(--danger)">
+        <div style="color:var(--danger);font-size:14px">${escHtml(err)}</div>
+      </div>`;
+    }
+  });
+
+  document.getElementById('grade-btn').disabled = false;
+
+  if (!reply) return;
+
+  // Save result
+  const result = KelviSchool.saveResult({
+    topic: topic || 'Grading session',
+    className,
+    studentCount: names.length || uploadedImages.length || 1,
+    rawOutput: reply,
+    mode
+  });
+
+  // Render result
+  resultArea.innerHTML = `<div class="result-block">
+    <div class="result-header">Results — ${escHtml(topic || 'Grading session')}</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-ghost btn-sm" onclick="location.href='results.html'">View all results</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportResult('${result.id}')">Export PDF</button>
+    </div>
+    <div class="result-raw">${escHtml(reply)}</div>
+  </div>`;
+
+  resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function exportResult(id) {
+  // Stub — Padmaja wires PDF export
+  alert('PDF export coming soon. For now, copy the results text above.');
+}
+</script>
+</body>
+</html>
