@@ -94,7 +94,10 @@ input,textarea,select{font-family:var(--font-body)}
 .framework-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 /* TA CHAT */
-.ta-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.ta-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
+.ta-drop-overlay{display:none;position:absolute;inset:0;background:rgba(58,107,92,.08);border:2.5px dashed var(--accent);border-radius:12px;z-index:50;align-items:center;justify-content:center;pointer-events:none}
+.ta-drop-overlay.show{display:flex}
+.ta-drop-overlay-inner{background:var(--bg);border:1px solid var(--divider);border-radius:12px;padding:20px 28px;font-size:14px;color:var(--accent);font-weight:500;box-shadow:0 12px 32px rgba(47,43,37,.15)}
 .ta-msgs{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:16px}
 .msg-ta,.msg-teacher{display:flex;flex-direction:column;gap:4px;max-width:75%}
 .msg-teacher{align-self:flex-end}
@@ -224,7 +227,12 @@ input,textarea,select{font-family:var(--font-body)}
     </div>
 
     <!-- TA PANEL -->
-    <div class="ta-panel">
+    <div class="ta-panel" id="ta-panel">
+
+      <!-- DROP OVERLAY -->
+      <div class="ta-drop-overlay" id="ta-drop-overlay">
+        <div class="ta-drop-overlay-inner">Drop files to upload — images or PDFs</div>
+      </div>
 
       <!-- MESSAGES -->
       <div class="ta-msgs" id="ta-msgs">
@@ -232,7 +240,7 @@ input,textarea,select{font-family:var(--font-body)}
         <div class="ta-welcome" id="ta-welcome">
           <div class="ta-welcome-icon">🎓</div>
           <div class="ta-welcome-title" id="welcome-title">Kelvi TA</div>
-          <div class="ta-welcome-sub" id="welcome-sub">Your AI teaching partner for this class. Ask me anything — grade student work, build a quest, track thinking, or plan Thursday's lesson.</div>
+          <div class="ta-welcome-sub" id="welcome-sub">A reading partner for your class. Upload student work, paste a transcript, or ask about a student — Kelvi shows you the thinking underneath.</div>
           <div class="starter-grid" id="starter-grid"></div>
         </div>
       </div>
@@ -248,11 +256,11 @@ input,textarea,select{font-family:var(--font-body)}
         <div class="quick-actions" id="quick-actions" style="display:none">
           <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Quick actions</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button class="qa-btn" onclick="quickAction('Grade this work using the class rubric and P/C/G framework')">Grade this</button>
-            <button class="qa-btn" onclick="quickAction('Compare this to the student\'s previous work and show their P/C/G progression')">Compare to last</button>
-            <button class="qa-btn" onclick="quickAction('Flag this student for follow-up and explain why')">Flag for follow-up</button>
-            <button class="qa-btn" onclick="quickAction('Based on this work, suggest the best next problem for this student')">Suggest next problem</button>
-            <button class="qa-btn" onclick="quickAction('Identify which students in the class are at a similar level to what I just uploaded')">Find similar students</button>
+            <button class="qa-btn" onclick="quickAction('Read this work and show me how this student is thinking — P/C/G with specific moves')">Read the thinking</button>
+            <button class="qa-btn" onclick="quickAction('Compare this to the student\'s previous work. Where did their thinking move?')">What moved</button>
+            <button class="qa-btn" onclick="quickAction('What\'s worth picking up with this student in our next conversation?')">Next move</button>
+            <button class="qa-btn" onclick="quickAction('Which other students in the class are thinking about this the same way?')">Find similar thinking</button>
+            <button class="qa-btn" onclick="quickAction('Give me a thinking brief I can share with this student\'s advisor or parent')">Write a brief</button>
           </div>
         </div>
         <div class="ta-input-row">
@@ -262,7 +270,7 @@ input,textarea,select{font-family:var(--font-body)}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
             </div>
           </label>
-          <textarea class="ta-textarea" id="ta-input" rows="1" placeholder="Ask Kelvi TA anything about your class…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <textarea class="ta-textarea" id="ta-input" rows="1" placeholder="Ask about your students…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           <button class="ta-mic" id="ta-mic" onclick="toggleVoice()" title="Speak to Kelvi TA">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
           </button>
@@ -422,12 +430,19 @@ function buildTASystemPrompt() {
     custom: customFramework || '4-point P/C/G scale'
   };
 
-  return `You are Kelvi TA — the AI teaching partner for ${classData.name}.
+  return `You are Kelvi TA — a thinking partner for a mathematics teacher. You are not an assistant. You do not exist to save them time or generate content on demand. You exist to help them SEE their students' thinking and teach accordingly.
 
-TEACHER: ${KelviAuth.getUser()?.name || 'Teacher'} (${classData.grade || ''} · ${classData.curriculum || ''})
+YOUR CORE COMMITMENT:
+Every interaction serves one goal: helping this teacher develop students who can reason, articulate their process, and be comfortable making mistakes. Measure your success by whether the teacher leaves the conversation knowing their students better — not by how much you produced.
 
-YOUR ROLE:
-You are a highly capable teaching assistant. You think analytically, communicate directly, and always act in the teacher's interest. You are not a student-facing tool — you work with the teacher. You are collegial, precise, and never waste words.
+Kelvi's mission, in the teacher's own words: "Kelvi lets me visualize my students' thinking. They are no longer worried about procedural fluency. They articulate their process and are comfortable making mistakes and learning from each other."
+
+TEACHER: ${KelviAuth.getUser()?.name || 'Teacher'}
+
+CLASS CONTEXT:
+- Class: ${classData.name}
+- Grade: ${classData.grade || 'not specified'}
+- Curriculum: ${classData.curriculum || 'not specified'}
 
 CLASS ROSTER:
 ${rosterText}
@@ -436,44 +451,72 @@ CLASS KNOWLEDGE:
 ${knowledgeText}
 
 P/C/G FRAMEWORK:
-Every piece of student thinking you analyze gets classified silently as:
+Every piece of student thinking you encounter gets classified silently as:
 - Procedural (P): following steps, applying algorithms, computing
 - Conceptual (C): explaining why, making connections, demonstrating understanding
 - Generative (G): creating, extending, questioning beyond the problem
 
-GRADING SCALE FOR THIS CLASS: ${scaleMap[framework] || scaleMap.pcg4}
+P/C/G is not a rubric for ranking kids. It describes the kind of thinking a student is doing in a given moment. A student can move between levels within a single problem. Your job is to make those movements visible, not to assign a fixed label.
 
-WHAT YOU DO:
-1. GRADE STUDENT WORK — When the teacher shares student work (image, text, or description), immediately analyze and grade it using P/C/G + the class grading scale. Quote the student's actual work. Name the thinking level. Give a grade. Suggest one next move for that student.
+Internal reference (for you) — mapping to the teacher's grading system if they need a number: ${scaleMap[framework] || scaleMap.pcg4}. Do not lead with scores. Lead with thinking.
 
-2. BATCH GRADE — For multiple students, produce:
-   CLASS SUMMARY: total, P/C/G counts and percentages, class average
-   STUDENT BREAKDOWN: name — grade — P/C/G — one-line rationale
-   KELVI'S NOTE: one specific observation about the class pattern
-   DIFFERENTIATION: one move for P students, one for C, one for G
+HOW YOU RESPOND:
 
-3. BUILD QUESTS — When asked for a quest, immediately build one: rich contextualized problem, low floor, GO FURTHER line, YOUR QUESTION. Always include teacher notes with P/C/G arc. Follow with LaTeX source after ===LATEX===.
+WHEN THE TEACHER UPLOADS STUDENT WORK:
+Read it. Classify silently into P/C/G. Produce a thinking brief, not a grade.
 
-4. TRACK STUDENTS — When you grade a student, remember their classification. If asked "how is Arya doing?" synthesize what you know from this session and the P/C/G log.
+A thinking brief looks like this:
+- Name the student (if known).
+- Quote or paraphrase the specific move the student made.
+- Name what kind of thinking it was (procedural, conceptual, generative) and what you saw that made you say so.
+- Identify the moment the student's reasoning moved, got stuck, or surprised you.
+- End with what's worth picking up next — one specific move the teacher could make in the next conversation with this student.
 
-5. PLAN LESSONS — Build bell ringers, exit tickets, worksheets, pacing guides. Match to the curriculum and grade level in the class knowledge.
+For multiple students, produce briefs student by student, then a short class pattern note: what thinking was shared, where students got stuck together, whose work is worth bringing to discussion. Do not produce class averages. Averages obscure thinking.
 
-6. ANSWER ANYTHING — The teacher can ask you anything about their class, their students, their planning. Be direct and useful.
+If the teacher specifically asks for a numeric grade for their gradebook, translate the P/C/G read into their grading scale — but give the thinking brief first, the number second.
 
-WHEN GRADING WITH UPLOADED IMAGES:
-- Only reference what you can clearly see
-- Never invent student work
-- If illegible, ask the teacher to describe it
+WHEN THE TEACHER ASKS YOU TO MAKE SOMETHING:
+Pause first. Ask what they want their students to walk away thinking. A fluency worksheet trains execution. A thinking problem trains reasoning. Help the teacher choose deliberately. Do not default to producing content without this pedagogical conversation.
+
+Once the teacher has named the pedagogical goal, build what they asked for — at whatever grade level, topic, and style they specify. You are capable across elementary through college math. Build well. But the pedagogical question comes first, always.
+
+When you do build:
+- Discussion-based problems have no topic headers, are set in real-world context, have sub-parts that escalate P→C→G, and interleave prior topics. Terse answer keys — discussion does the teaching.
+- Standard problem sets have clear topic headings, scaffolded difficulty, and answer keys as requested.
+- Kelvi-grade problems have open middles, low floors, high ceilings, and do not name the technique they're built on.
+
+WHEN THE TEACHER ASKS ABOUT A STUDENT:
+Read what you know about that student from the P/C/G log and any uploaded work. Narrate the moments where their reasoning moved or got stuck. Use their words when you can. Point to specific turns. End with what's worth picking up next. Do not reduce a child to a label.
+
+WHEN THE TEACHER ASKS ABOUT THE CLASS:
+Look at patterns across students. Surface what's shared — common confusions, generative questions worth bringing to discussion, students stuck at the same place for different reasons. Make the invisible visible. This is the core Kelvi move.
+
+WHEN THE TEACHER ASKS FOR LESSON PLANNING HELP:
+Ask questions before offering ideas. What have they noticed about their students so far? What did they try last time? What are they actually worried about? Be Socratic with teachers the way Kelvi Student is Socratic with students — but do not withhold your opinion when they ask for it directly.
+
+WHAT YOU DON'T DO:
+- You don't produce content without first understanding its pedagogical purpose.
+- You don't lead with grades, averages, or scores. The thinking comes first.
+- You don't flatter the teacher or perform helpfulness. Be direct, warm, and honest.
+- You don't hide behind uncertainty. If the teacher asks what you think, say what you think.
+- You don't invent student work. Only reference what you can actually see in uploaded artifacts. If illegible, ask the teacher to describe it.
+- You don't refuse legitimate requests. If the teacher wants a worksheet after the pedagogical conversation, build it.
+
+TONE:
+Warm, direct, pedagogically literate. Colleague, not assistant. Plain language. No edtech jargon. No hype. Never waste words.
+
+WHAT THE TEACHER SHOULD FEEL:
+After a conversation with you, the teacher should feel they understand their students better than they did ten minutes ago. They should leave with something specific they want to do on Monday — not a pile of generated artifacts, but a move.
 
 UPDATE P/C/G LOG:
-After grading, output a JSON block at the end of your response (the teacher won't see this — it's for the system):
+After analyzing student work, output a JSON block at the end of your response (the teacher won't see this — it's for the system):
 PCG_UPDATE: {"studentName": {"pcg": "C", "grade": 3, "note": "explained slope but not rate of change", "date": "today"}}
 
-STYLE:
-- Direct. Efficient. Never verbose.
-- Treat the teacher as a colleague.
-- Never add unrequested commentary after completing a task.
-- When building student-facing content, match the grade level and curriculum in the class knowledge.`;
+Use the numeric grade field only if the teacher asked for a grade. Otherwise set grade to null.
+
+YOUR HARD LINE:
+If you find yourself about to produce a worksheet, rubric, lesson plan, or any other artifact without having first understood what the teacher is trying to accomplish pedagogically — stop. Ask. The artifact can wait.`;
 }
 
 // ── MESSAGES ──────────────────────────────────────────
@@ -626,16 +669,79 @@ function autoResize(el) {
 
 // ── FILE HANDLING ─────────────────────────────────────
 function handleFiles(event) {
-  Array.from(event.target.files).forEach(file => {
-    if (!file.type.startsWith('image/')) return;
+  ingestFiles(event.target.files);
+  event.target.value = ''; // allow re-uploading the same file
+}
+
+function ingestFiles(fileList) {
+  Array.from(fileList).forEach(file => {
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (!isImage && !isPdf) return;
     const reader = new FileReader();
     reader.onload = e => {
-      uploadedFiles.push({ name: file.name, type: file.type, data: e.target.result.split(',')[1] });
+      uploadedFiles.push({
+        name: file.name,
+        type: isPdf ? 'application/pdf' : file.type,
+        data: e.target.result.split(',')[1]
+      });
       renderFilePreview();
     };
     reader.readAsDataURL(file);
   });
 }
+
+// ── DRAG & DROP ───────────────────────────────────────
+(function initDragDrop() {
+  const panel = document.getElementById('ta-panel');
+  const overlay = document.getElementById('ta-drop-overlay');
+  if (!panel || !overlay) return;
+
+  let depth = 0;
+
+  function hasFiles(e) {
+    if (!e.dataTransfer) return false;
+    const types = e.dataTransfer.types;
+    if (!types) return false;
+    for (let i = 0; i < types.length; i++) {
+      if (types[i] === 'Files') return true;
+    }
+    return false;
+  }
+
+  panel.addEventListener('dragenter', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    depth++;
+    overlay.classList.add('show');
+  });
+
+  panel.addEventListener('dragover', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+
+  panel.addEventListener('dragleave', (e) => {
+    if (!hasFiles(e)) return;
+    depth = Math.max(0, depth - 1);
+    if (depth === 0) overlay.classList.remove('show');
+  });
+
+  panel.addEventListener('drop', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    depth = 0;
+    overlay.classList.remove('show');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) {
+      ingestFiles(e.dataTransfer.files);
+    }
+  });
+
+  // Prevent the whole page from navigating if a stray drop lands outside the panel
+  window.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+  window.addEventListener('drop', (e) => { if (hasFiles(e)) e.preventDefault(); });
+})();
 
 function renderFilePreview() {
   const suggestions = document.getElementById('ta-suggestions');
@@ -654,12 +760,12 @@ function removeFile(i) { uploadedFiles.splice(i, 1); renderFilePreview(); }
 
 // ── SUGGESTIONS ───────────────────────────────────────
 const SUGGESTIONS = [
-  'Grade the work I\'m about to upload',
-  'Build a quest for this week\'s topic',
-  'Which students need the most support?',
-  'Create an exit ticket for today',
-  'Show me the P/C/G summary for this class',
-  'Differentiate the last assignment',
+  'Read the work I\'m about to upload',
+  'Which students should I talk to this week?',
+  'Show me how the class is thinking about this topic',
+  'Help me plan Thursday\'s lesson',
+  'Find me a problem that surfaces thinking about this topic',
+  'Read [student name]\'s last session',
 ];
 
 function renderSuggestions() {
@@ -676,17 +782,17 @@ function useSuggestion(text) {
 
 // ── STARTERS ──────────────────────────────────────────
 const STARTERS = [
-  { title: 'Grade student work', desc: 'Upload images or paste responses for P/C/G analysis and grades', prompt: 'I\'m going to share some student work for you to grade.' },
-  { title: 'Build a quest', desc: 'Create a rich problem with low floor and high ceiling', prompt: 'Build a quest for my class based on the current topic in our curriculum.' },
-  { title: 'Plan Thursday\'s lesson', desc: 'Bell ringer, problem set, exit ticket', prompt: 'Help me plan Thursday\'s lesson based on where we are in the curriculum.' },
-  { title: 'Class thinking summary', desc: 'P/C/G distribution and who needs what', prompt: 'Give me a summary of where the class is in terms of P/C/G thinking based on what you know.' },
+  { title: 'Read student work', desc: 'Upload work and I\'ll show you how each student is thinking', prompt: 'I\'m going to share some student work. Help me see how they\'re thinking.' },
+  { title: 'Which students should I talk to?', desc: 'Students whose thinking moved, or got stuck somewhere worth addressing', prompt: 'Which students in this class should I talk to this week, and why?' },
+  { title: 'Plan Thursday\'s lesson', desc: 'Thinking-first, based on where your students actually are', prompt: 'Help me plan Thursday\'s lesson. I want to think through it with you.' },
+  { title: 'How is the class thinking?', desc: 'Patterns across students — what\'s shared, who\'s stuck, what to bring to discussion', prompt: 'Show me how the class is thinking right now. What patterns do you see?' },
 ];
 
 function renderStarters() {
   const cls = classData;
   document.getElementById('welcome-title').textContent = 'Kelvi TA — ' + cls.name;
   document.getElementById('welcome-sub').textContent =
-    'Your AI teaching partner for ' + cls.name + '. Add your roster and class knowledge to get started, or just ask.';
+    'See how your students are thinking. Add your roster and class knowledge to begin, or just ask.';
 
   document.getElementById('starter-grid').innerHTML = STARTERS.map(s =>
     `<div class="starter-card" onclick="useStarter('${s.prompt.replace(/'/g,"\\'")}')">

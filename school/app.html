@@ -366,10 +366,10 @@ input,textarea,select{font-family:var(--font-body)}
       <!-- CHAT TAB -->
       <div id="classtab-chat" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
         <div class="quick-actions" id="quick-actions">
-          <button class="qa-btn" onclick="quickAction('Grade this work using P/C/G')">Grade this</button>
-          <button class="qa-btn" onclick="quickAction('Compare this to the student\'s previous work')">Compare to last</button>
-          <button class="qa-btn" onclick="quickAction('Flag this student for follow-up')">Flag for follow-up</button>
-          <button class="qa-btn" onclick="quickAction('Suggest the next problem for this student')">Suggest next problem</button>
+          <button class="qa-btn" onclick="quickAction('Read this student&#39;s thinking')">Read their thinking</button>
+          <button class="qa-btn" onclick="quickAction('Compare this to their previous work — what moved?')">What moved?</button>
+          <button class="qa-btn" onclick="quickAction('Where did they get stuck, and what should I ask next?')">Where stuck?</button>
+          <button class="qa-btn" onclick="quickAction('Is this worth bringing to class discussion?')">Bring to class?</button>
         </div>
         <div class="chat-msgs" id="class-msgs"></div>
         <div class="chat-input-bar">
@@ -414,12 +414,13 @@ input,textarea,select{font-family:var(--font-body)}
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">Add instructions to tailor Kelvi TA's responses to your class. These are always active in every conversation.</p>
         <div class="settings-section">
           <div class="settings-label">What Kelvi TA should know</div>
-          <textarea class="settings-textarea" id="class-instructions-text" style="max-width:100%;min-height:120px" placeholder='e.g. "This is a Harkness class. Always ask Socratic questions rather than giving answers. Reference student names when tracking thinking patterns. Use P/C/G grading."'></textarea>
+          <textarea class="settings-textarea" id="class-instructions-text" style="max-width:100%;min-height:120px" placeholder='e.g. "This is a 6th grade class just starting ratios. I want to see how they&#39;re reasoning before I plan the unit. Most students are coming from a procedural background."'></textarea>
         </div>
         <div class="settings-section">
-          <div class="settings-label">Grading framework</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:500px">
-            ${[['P — Procedural','Can apply a procedure correctly'],['C — Conceptual','Understands the why behind the procedure'],['G — Generative','Can extend, connect, or create new ideas'],['1 — Attempted','Engaged but not yet showing understanding']].map(([label,desc])=>`
+          <div class="settings-label">How Kelvi classifies student thinking</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.6">P/C/G describes the kind of thinking a student is doing in a moment — not a rank or grade. Students move between levels within a single problem.</p>
+          <div style="display:grid;grid-template-columns:1fr;gap:8px;max-width:500px">
+            ${[['P — Procedural','Following steps, applying a method'],['C — Conceptual','Explaining why, seeing the underlying structure'],['G — Generative','Extending, generalizing, asking new questions']].map(([label,desc])=>`
             <div style="border:1px solid var(--divider);border-radius:var(--radius);padding:10px 12px;background:var(--bg)">
               <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:3px">${label}</div>
               <div style="font-size:11px;color:var(--text-muted)">${desc}</div>
@@ -779,19 +780,55 @@ function renderClassChat(classId) {
   if (!msgs.length) {
     const classes = KelviSchool.getClasses();
     const cls = classes.find(c => c.id === classId);
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
+    const hasData = Object.keys(pcgLog).length > 0;
+
+    // Build thinking brief
+    let briefHtml = '';
+    if (hasData) {
+      const students = Object.entries(pcgLog);
+      const p = students.filter(([,s]) => s.pcg === 'P').length;
+      const c = students.filter(([,s]) => s.pcg === 'C').length;
+      const g = students.filter(([,s]) => s.pcg === 'G').length;
+      const total = p + c + g;
+      const topThinking = g > 0 ? students.filter(([,s]) => s.pcg === 'G').slice(0, 2).map(([n]) => n).join(', ') : '';
+
+      briefHtml = `
+        <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">This week in ${escHtml(cls?.name || 'this class')}</div>
+          <div style="font-size:14px;line-height:1.7;color:var(--text-primary)">
+            You've read work from <strong>${total}</strong> ${total === 1 ? 'student' : 'students'}.
+            ${p > 0 ? `<strong>${p}</strong> entered procedurally. ` : ''}
+            ${c > 0 ? `<strong>${c}</strong> showed conceptual moves. ` : ''}
+            ${g > 0 ? `<strong>${g}</strong> produced generative thinking${topThinking ? ' (' + escHtml(topThinking) + ')' : ''}. ` : ''}
+            ${p > c + g ? 'Worth thinking about what would move more students to conceptual ground.' : ''}
+          </div>
+        </div>`;
+    } else {
+      briefHtml = `
+        <div style="background:var(--surface);border:1px dashed var(--divider);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">This week in ${escHtml(cls?.name || 'this class')}</div>
+          <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
+            Upload student work and Kelvi will show you how each student is thinking — who entered procedurally, who made conceptual moves, who produced generative questions worth bringing to class.
+          </div>
+        </div>`;
+    }
+
     container.innerHTML = `
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;animation:fadeUp .4s ease">
-        <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:400;margin-bottom:8px">${escHtml(cls?.name || 'Class')}</h2>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;max-width:380px">See how your students are thinking. Add your roster and knowledge, then ask.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:420px;width:100%">
+      <div style="max-width:640px;margin:40px auto;padding:0 24px;animation:fadeUp .4s ease">
+        <h2 style="font-family:var(--font-heading);font-size:1.6rem;font-weight:400;margin-bottom:6px">${escHtml(cls?.name || 'Class')}</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">See how your students are thinking.</p>
+        ${briefHtml}
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Start here</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           ${[
-            ['Read student work','Upload work and see how each student is thinking'],
-            ['How is the class thinking?','Patterns across students, students stuck together'],
-            ['Who should I talk to?','Students whose thinking moved or got stuck'],
-            ['View student chats','See what students are working on']
-          ].map(([t,d]) => `<div onclick="${t==='View student chats'?`openRosterModal('${classId}')`:`useStarter('${t.replace(/'/g,"\\'")}',this)`}" style="background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)'">
-            <div style="font-size:12px;font-weight:500;margin-bottom:3px">${t}</div>
-            <div style="font-size:11px;color:var(--text-muted)">${d}</div>
+            {title:'Read student work', desc:'Upload work and I&#39;ll show you how each student is thinking', prompt:'I&#39;m going to upload some student work. Show me how each student is thinking.'},
+            {title:'How is the class thinking?', desc:'Patterns across students, who&#39;s stuck together', prompt:'Show me how this class is thinking right now. What patterns do you see?'},
+            {title:'Who should I talk to?', desc:'Students whose thinking moved or got stuck', prompt:'Which students in this class should I talk to this week, and why?'},
+            {title:'View student chats', desc:'See what students are working on in Kelvi Student', prompt:''}
+          ].map(s => `<div onclick="${s.title==='View student chats'?`openRosterModal('${classId}')`:`useStarter('${s.prompt}')`}" style="background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)'">
+            <div style="font-size:12px;font-weight:500;margin-bottom:3px">${s.title}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${s.desc}</div>
           </div>`).join('')}
         </div>
       </div>`;

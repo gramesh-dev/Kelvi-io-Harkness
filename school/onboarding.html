@@ -15,136 +15,50 @@
 .ob-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
 .ob-field { margin-bottom: 16px; }
 .ob-field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; }
-.ob-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
-.ob-option {
-  padding: 12px 14px; border: 1.5px solid var(--divider);
-  border-radius: var(--radius); cursor: pointer;
-  font-size: 13px; color: var(--text-primary);
-  transition: all var(--t-fast); background: var(--bg);
-}
-.ob-option:hover { border-color: var(--accent); background: var(--accent-light); }
-.ob-option.selected { border-color: var(--accent); background: var(--accent-light); font-weight: 500; }
-.ob-option.selected::before { content: '✓  '; color: var(--accent); font-weight: 700; }
 .ob-actions { display: flex; gap: 10px; margin-top: 24px; }
 .ob-progress { display: flex; gap: 6px; margin-bottom: 32px; }
 .ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--divider); transition: background var(--t-base); }
 .ob-dot.active { background: var(--accent); }
 .ob-dot.done { background: var(--accent-light); border: 2px solid var(--accent); }
-.ob-grades { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 </style>
 </head>
 <body>
 <div class="ob-wrap">
   <div class="ob-box">
 
-    <!-- Progress dots -->
     <div class="ob-progress" id="ob-progress">
       <div class="ob-dot active" id="dot-1"></div>
       <div class="ob-dot" id="dot-2"></div>
-      <div class="ob-dot" id="dot-3"></div>
-      <div class="ob-dot" id="dot-4"></div>
-      <div class="ob-dot" id="dot-5"></div>
     </div>
 
-    <!-- Step 1 — Name & school -->
     <div class="ob-step active" id="ob-step-1">
       <a href="../index.html" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:24px">
         <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
         <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi School</span>
       </a>
-      <div class="ob-eyebrow">Welcome to the pilot</div>
-      <div class="ob-heading">Let's set up your workspace</div>
-      <div class="ob-sub">Takes 2 minutes. Your setup personalizes everything Kelvi builds for you.</div>
+      <div class="ob-eyebrow">Welcome</div>
+      <div class="ob-heading">What should Kelvi call you?</div>
+      <div class="ob-sub">Everything else, Kelvi will learn from your students.</div>
       <div class="ob-field">
         <label>Your name</label>
-        <input class="input" id="ob-name" placeholder="Dr. Ramesh" type="text">
-      </div>
-      <div class="ob-field">
-        <label>School name</label>
-        <input class="input" id="ob-school" placeholder="Phillips Exeter Academy" type="text">
-      </div>
-      <div class="ob-field">
-        <label>City</label>
-        <input class="input" id="ob-city" placeholder="Exeter, NH" type="text">
+        <input class="input" id="ob-name" placeholder="Dr. Ramesh" type="text" autofocus onkeydown="if(event.key==='Enter')obNext(1)">
       </div>
       <div class="ob-actions">
         <button class="btn btn-primary" onclick="obNext(1)">Continue →</button>
       </div>
     </div>
 
-    <!-- Step 2 — Country & curriculum -->
     <div class="ob-step" id="ob-step-2">
-      <div class="ob-eyebrow">Step 2 of 5</div>
-      <div class="ob-heading">Where do you teach?</div>
-      <div class="ob-sub">This helps Kelvi align to your curriculum and grading system.</div>
-      <div style="font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:8px">Country</div>
-      <div class="ob-options" id="country-options">
-        <div class="ob-option" onclick="selectOption('country','US')">🇺🇸  United States</div>
-        <div class="ob-option" onclick="selectOption('country','India')">🇮🇳  India</div>
-        <div class="ob-option" onclick="selectOption('country','UK')">🇬🇧  United Kingdom</div>
-        <div class="ob-option" onclick="selectOption('country','Other')">🌍  Other</div>
-      </div>
-      <div style="font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:8px;margin-top:8px">Curriculum</div>
-      <div class="ob-options" id="curriculum-options">
-        <div class="ob-option" onclick="selectOption('curriculum','Common Core')">Common Core</div>
-        <div class="ob-option" onclick="selectOption('curriculum','CBSE')">CBSE</div>
-        <div class="ob-option" onclick="selectOption('curriculum','ICSE')">ICSE</div>
-        <div class="ob-option" onclick="selectOption('curriculum','Other')">Other / No standard</div>
-      </div>
-      <div class="ob-actions">
-        <button class="btn btn-ghost btn-sm" onclick="obBack(2)">← Back</button>
-        <button class="btn btn-primary" onclick="obNext(2)">Continue →</button>
-      </div>
-    </div>
-
-    <!-- Step 3 — Grade levels -->
-    <div class="ob-step" id="ob-step-3">
-      <div class="ob-eyebrow">Step 3 of 5</div>
-      <div class="ob-heading">Which grades do you teach?</div>
-      <div class="ob-sub">Select all that apply. Kelvi will match content to these levels.</div>
-      <div class="ob-grades" id="grade-options">
-        <div class="ob-option" onclick="toggleGrade(this,'1-2')">Grades 1–2</div>
-        <div class="ob-option" onclick="toggleGrade(this,'3-5')">Grades 3–5</div>
-        <div class="ob-option" onclick="toggleGrade(this,'6-8')">Grades 6–8</div>
-        <div class="ob-option" onclick="toggleGrade(this,'9-10')">Grades 9–10</div>
-        <div class="ob-option" onclick="toggleGrade(this,'11-12')">Grades 11–12</div>
-        <div class="ob-option" onclick="toggleGrade(this,'AP')">AP / IB</div>
-      </div>
-      <div class="ob-actions">
-        <button class="btn btn-ghost btn-sm" onclick="obBack(3)">← Back</button>
-        <button class="btn btn-primary" onclick="obNext(3)">Continue →</button>
-      </div>
-    </div>
-
-    <!-- Step 4 — Grading scale -->
-    <div class="ob-step" id="ob-step-4">
-      <div class="ob-eyebrow">Step 4 of 5</div>
-      <div class="ob-heading">How do you grade?</div>
-      <div class="ob-sub">Kelvi will always show P/C/G thinking levels. Pick your preferred numeric scale for gradebook entry.</div>
-      <div class="ob-options" id="scale-options">
-        <div class="ob-option" onclick="selectOption('scale','4')">4-point scale<br><span style="font-size:11px;color:var(--text-muted)">4=Generative, 3=Conceptual, 2=Procedural</span></div>
-        <div class="ob-option" onclick="selectOption('scale','10')">10-point scale<br><span style="font-size:11px;color:var(--text-muted)">10=Generative, 8=Conceptual, 6=Procedural</span></div>
-        <div class="ob-option" onclick="selectOption('scale','100')">100-point scale<br><span style="font-size:11px;color:var(--text-muted)">95=Generative, 82=Conceptual, 68=Procedural</span></div>
-        <div class="ob-option" onclick="selectOption('scale','custom')">I'll set my own rubric<br><span style="font-size:11px;color:var(--text-muted)">Paste your rubric when grading</span></div>
-      </div>
-      <div class="ob-actions">
-        <button class="btn btn-ghost btn-sm" onclick="obBack(4)">← Back</button>
-        <button class="btn btn-primary" onclick="obNext(4)">Continue →</button>
-      </div>
-    </div>
-
-    <!-- Step 5 — API key -->
-    <div class="ob-step" id="ob-step-5">
-      <div class="ob-eyebrow">Step 5 of 5</div>
+      <div class="ob-eyebrow">Step 2 of 2</div>
       <div class="ob-heading">One last thing</div>
       <div class="ob-sub">Kelvi uses the Anthropic API for AI responses. Add your key below — it stays on your device and is never shared.</div>
       <div class="ob-field">
         <label>Anthropic API key</label>
-        <input class="input" id="ob-api" type="password" placeholder="sk-ant-...">
+        <input class="input" id="ob-api" type="password" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')obFinish()">
         <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>. You can add this later in Settings.</div>
       </div>
       <div class="ob-actions">
-        <button class="btn btn-ghost btn-sm" onclick="obBack(5)">← Back</button>
+        <button class="btn btn-ghost btn-sm" onclick="obBack(2)">← Back</button>
         <button class="btn btn-primary" onclick="obFinish()">Enter my workspace →</button>
       </div>
     </div>
@@ -154,11 +68,11 @@
 
 <script src="../shared/kelvi.js"></script>
 <script>
-let obData = { country: '', curriculum: '', grades: [], scale: '4' };
+let obData = {};
 let currentStep = 1;
 
 function updateDots(step) {
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 2; i++) {
     const dot = document.getElementById('dot-' + i);
     dot.className = 'ob-dot' + (i < step ? ' done' : i === step ? ' active' : '');
   }
@@ -167,25 +81,15 @@ function updateDots(step) {
 function obNext(step) {
   if (step === 1) {
     const name = document.getElementById('ob-name').value.trim();
-    const school = document.getElementById('ob-school').value.trim();
-    if (!name || !school) { alert('Please enter your name and school.'); return; }
+    if (!name) { alert('Please enter your name.'); return; }
     obData.name = name;
-    obData.school = school;
-    obData.city = document.getElementById('ob-city').value.trim();
-  }
-  if (step === 2) {
-    if (!obData.country || !obData.curriculum) { alert('Please select your country and curriculum.'); return; }
-  }
-  if (step === 3) {
-    if (!obData.grades.length) { alert('Please select at least one grade level.'); return; }
-  }
-  if (step === 4) {
-    if (!obData.scale) { alert('Please select a grading scale.'); return; }
   }
   document.getElementById('ob-step-' + step).classList.remove('active');
   document.getElementById('ob-step-' + (step + 1)).classList.add('active');
   currentStep = step + 1;
   updateDots(currentStep);
+  const nextInput = document.getElementById('ob-step-' + currentStep).querySelector('input');
+  if (nextInput) setTimeout(() => nextInput.focus(), 50);
 }
 
 function obBack(step) {
@@ -193,21 +97,6 @@ function obBack(step) {
   document.getElementById('ob-step-' + (step - 1)).classList.add('active');
   currentStep = step - 1;
   updateDots(currentStep);
-}
-
-function selectOption(group, value) {
-  obData[group] = value;
-  document.querySelectorAll(`#${group}-options .ob-option`).forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-}
-
-function toggleGrade(el, grade) {
-  el.classList.toggle('selected');
-  if (obData.grades.includes(grade)) {
-    obData.grades = obData.grades.filter(g => g !== grade);
-  } else {
-    obData.grades.push(grade);
-  }
 }
 
 function obFinish() {
