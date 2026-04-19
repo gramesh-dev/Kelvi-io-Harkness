@@ -16,6 +16,7 @@
   --class-color: #3A6B5C;
   --font-heading: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
   --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --chat-max: 740px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
@@ -24,122 +25,109 @@ button{cursor:pointer;font-family:var(--font-body)}
 input,textarea,select{font-family:var(--font-body)}
 
 /* LAYOUT */
-.app{display:flex;flex-direction:column;height:100vh}
+.app{display:flex;flex-direction:column;height:100vh;position:relative}
+
+/* TOPBAR */
 .topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;z-index:50}
-.tb-left{display:flex;align-items:center;gap:12px}
-.tb-back{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;transition:color .12s}
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.tb-back{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;transition:color .12s;flex-shrink:0}
 .tb-back:hover{color:var(--accent)}
-.tb-divider{width:1px;height:16px;background:var(--divider)}
-.tb-class{display:flex;align-items:center;gap:8px}
-.tb-stripe{width:10px;height:10px;border-radius:50%}
-.tb-name{font-weight:500;font-size:14px}
-.tb-meta{font-size:11px;color:var(--text-muted)}
-.tb-right{display:flex;align-items:center;gap:8px}
+.tb-divider{width:1px;height:16px;background:var(--divider);flex-shrink:0}
+.tb-class{display:flex;align-items:center;gap:8px;min-width:0}
+.tb-stripe{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tb-name{font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-meta{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.tb-iconbtn{width:34px;height:34px;border-radius:8px;background:none;border:none;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tb-iconbtn:hover{background:var(--surface);color:var(--text-primary)}
 
-.workspace{display:flex;flex:1;overflow:hidden}
+/* DROPDOWN MENU */
+.menu-wrap{position:relative}
+.menu-dropdown{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:6px;min-width:200px;box-shadow:0 12px 40px rgba(47,43,37,.12);z-index:200}
+.menu-dropdown.open{display:block}
+.menu-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--text-primary);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .1s;font-family:var(--font-body)}
+.menu-item:hover{background:var(--surface)}
+.menu-item .mi-icon{width:16px;height:16px;color:var(--text-muted);flex-shrink:0}
+.menu-divider{height:1px;background:var(--divider);margin:4px 0}
+.menu-item.danger{color:var(--family)}
+.menu-item.danger:hover{background:var(--family-light)}
 
-/* KNOWLEDGE PANEL */
-.knowledge-panel{width:280px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--divider);display:flex;flex-direction:column;overflow:hidden;transition:width .2s ease}
-.knowledge-panel.collapsed{width:0;border-right:none}
-.kp-header{padding:14px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.kp-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted)}
-.kp-body{flex:1;overflow-y:auto;padding:12px}
+/* CHAT AREA */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
 
-/* KNOWLEDGE SECTIONS */
-.ks{margin-bottom:4px;border-radius:var(--radius);overflow:hidden}
-.ks-header{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;cursor:pointer;background:var(--deeper);border-radius:var(--radius);transition:background .12s}
-.ks-header:hover{background:var(--divider)}
-.ks-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:6px}
-.ks-count{background:var(--accent);color:var(--bg);font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px}
-.ks-body{display:none;padding:8px 4px 4px}
-.ks.open .ks-body{display:block}
-.ks-chevron{font-size:10px;color:var(--text-faint);transition:transform .15s}
-.ks.open .ks-chevron{transform:rotate(180deg)}
-
-/* ROSTER */
-.student-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .1s;cursor:default}
-.student-row:hover{background:var(--deeper)}
-.student-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
-.student-name{font-size:12px;color:var(--text-primary);flex:1}
-.pcg-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;flex-shrink:0}
-.pcg-P{background:var(--student-light);color:var(--student)}
-.pcg-C{background:var(--family-light);color:var(--family)}
-.pcg-G{background:var(--accent-light);color:var(--accent)}
-.pcg-none{background:var(--deeper);color:var(--text-faint)}
-
-/* KNOWLEDGE FILES */
-.kf-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .1s}
-.kf-item:hover{background:var(--deeper)}
-.kf-icon{width:28px;height:28px;border-radius:6px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-.kf-info{flex:1;min-width:0}
-.kf-name{font-size:11px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kf-meta{font-size:10px;color:var(--text-faint)}
-.kf-remove{background:none;border:none;color:var(--text-faint);font-size:14px;padding:2px 4px;border-radius:4px;transition:color .1s}
-.kf-remove:hover{color:var(--family)}
-
-/* UPLOAD AREA */
-.kp-upload{margin:8px 0;border:1.5px dashed var(--divider);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;transition:all .15s;font-size:11px;color:var(--text-muted)}
-.kp-upload:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-
-/* PCG LOG */
-.pcg-log-item{padding:6px 8px;border-radius:6px;margin-bottom:4px;background:var(--deeper)}
-.pcg-log-student{font-size:11px;font-weight:600;color:var(--text-primary)}
-.pcg-log-entry{font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.4}
-
-/* FRAMEWORK SELECTOR */
-.framework-opts{display:flex;flex-direction:column;gap:4px;padding:4px 0}
-.framework-opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .12s;font-size:12px;color:var(--text-muted)}
-.framework-opt:hover{background:var(--deeper)}
-.framework-opt.active{background:var(--accent-light);color:var(--accent);font-weight:500}
-.framework-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
-
-/* TA CHAT */
-.ta-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
+/* DROP OVERLAY */
 .ta-drop-overlay{display:none;position:absolute;inset:0;background:rgba(58,107,92,.08);border:2.5px dashed var(--accent);border-radius:12px;z-index:50;align-items:center;justify-content:center;pointer-events:none}
 .ta-drop-overlay.show{display:flex}
 .ta-drop-overlay-inner{background:var(--bg);border:1px solid var(--divider);border-radius:12px;padding:20px 28px;font-size:14px;color:var(--accent);font-weight:500;box-shadow:0 12px 32px rgba(47,43,37,.15)}
-.ta-msgs{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:16px}
-.msg-ta,.msg-teacher{display:flex;flex-direction:column;gap:4px;max-width:75%}
-.msg-teacher{align-self:flex-end}
-.msg-ta{align-self:flex-start}
-.msg-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px}
-.msg-ta .msg-label{color:var(--accent)}
-.bubble-ta{background:var(--surface);border:1px solid var(--divider);border-radius:12px;border-top-left-radius:3px;padding:12px 16px;font-size:13px;line-height:1.7;color:var(--text-primary)}
-.bubble-teacher{background:var(--accent);color:var(--bg);border-radius:12px;border-bottom-right-radius:3px;padding:12px 16px;font-size:13px;line-height:1.65}
-.bubble-system{background:var(--deeper);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text-muted);align-self:center;max-width:60%}
+
+/* MESSAGES */
+.ta-msgs{flex:1;overflow-y:auto;padding:32px 20px 24px;display:flex;flex-direction:column;gap:24px;scroll-behavior:smooth}
+.msg-wrap{width:100%;max-width:var(--chat-max);margin:0 auto;display:flex;flex-direction:column}
+
+/* Teacher message: right-aligned subtle bubble */
+.msg-teacher{align-self:flex-end;max-width:80%;background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:10px 14px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap;word-wrap:break-word}
+
+/* Assistant message: no bubble, just flowing text */
+.msg-ta{align-self:stretch;max-width:100%;padding:2px 2px;font-size:15px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap;word-wrap:break-word}
+
+/* System bubble (small centered notice) */
+.bubble-system{background:var(--surface);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text-muted);align-self:center;max-width:60%}
 
 /* TYPING */
-.typing-indicator{display:none;align-self:flex-start;padding:10px 16px;background:var(--surface);border:1px solid var(--divider);border-radius:12px;border-top-left-radius:3px}
-.typing-indicator.vis{display:flex;gap:4px;align-items:center}
-.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tdot .8s infinite}
+.typing-indicator{display:none;padding:8px 0;width:100%;max-width:var(--chat-max);margin:0 auto}
+.typing-indicator.vis{display:flex;gap:5px;align-items:center}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:tdot .8s infinite}
 .typing-dot:nth-child(2){animation-delay:.15s}
 .typing-dot:nth-child(3){animation-delay:.3s}
-@keyframes tdot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes tdot{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-4px);opacity:1}}
 
-/* INPUT BAR */
-.ta-input-bar{padding:12px 20px 16px;border-top:1px solid var(--divider);background:var(--bg);flex-shrink:0}
-.ta-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.ta-suggestion{padding:5px 11px;border:1px solid var(--divider);border-radius:16px;font-size:11px;color:var(--text-muted);cursor:pointer;transition:all .12s;background:var(--bg);font-family:var(--font-body)}
-.ta-suggestion:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.ta-input-row{display:flex;gap:8px;align-items:flex-end}
-.ta-textarea{flex:1;padding:10px 14px;border:1.5px solid var(--divider);border-radius:var(--radius);font-size:13px;resize:none;outline:none;background:var(--bg);color:var(--text-primary);line-height:1.5;max-height:120px;transition:border-color .12s;font-family:var(--font-body)}
-.ta-textarea:focus{border-color:var(--accent)}
-.ta-send{width:38px;height:38px;border-radius:var(--radius);background:var(--accent);border:none;color:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s}
-.ta-send:hover{background:var(--accent-dark)}
-.ta-send:disabled{opacity:.4;cursor:not-allowed}
-.ta-attach{width:38px;height:38px;border-radius:var(--radius);background:none;border:1.5px solid var(--divider);color:var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
-.ta-attach:hover{border-color:var(--accent);color:var(--accent)}
-
-/* VOICE MIC */
-.ta-mic{width:38px;height:38px;border-radius:var(--radius);background:none;border:1.5px solid var(--divider);color:var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
-.ta-mic:hover{border-color:var(--accent);color:var(--accent)}
-.ta-mic.recording{background:var(--family);border-color:var(--family);color:var(--bg);animation:micpulse 1s infinite}
+/* INPUT AREA — floating centered pill */
+.input-area{padding:8px 20px 22px;background:linear-gradient(to bottom, transparent, var(--bg) 30%);flex-shrink:0}
+.input-wrap{max-width:var(--chat-max);margin:0 auto}
+.input-pill{background:var(--bg);border:1.5px solid var(--divider);border-radius:24px;padding:8px 8px 8px 14px;transition:border-color .15s;box-shadow:0 1px 2px rgba(47,43,37,.04)}
+.input-pill:focus-within{border-color:var(--accent)}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+.ta-textarea{flex:1;padding:8px 4px;border:none;outline:none;background:none;resize:none;font-size:15px;line-height:1.5;max-height:200px;color:var(--text-primary);font-family:var(--font-body)}
+.ta-textarea::placeholder{color:var(--text-faint)}
+.btn-circle{width:36px;height:36px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.btn-circle-ghost{background:none;color:var(--text-muted)}
+.btn-circle-ghost:hover{background:var(--surface);color:var(--text-primary)}
+.btn-circle-accent{background:var(--accent);color:var(--bg)}
+.btn-circle-accent:hover{background:var(--accent-dark)}
+.btn-circle-accent:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.btn-circle.recording{background:var(--family);color:var(--bg);animation:micpulse 1s infinite}
 @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(184,120,78,.4)}50%{box-shadow:0 0 0 8px rgba(184,120,78,0)}}
 
+/* FILE CHIPS */
+.file-chips{display:flex;gap:6px;flex-wrap:wrap;padding:4px 4px 8px}
+.file-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:14px;background:var(--accent-light);border:1px solid var(--accent);color:var(--accent);font-size:12px;font-weight:500}
+.file-chip-x{background:none;border:none;color:var(--accent);font-size:14px;padding:0;margin-left:2px;cursor:pointer;opacity:.6;transition:opacity .12s}
+.file-chip-x:hover{opacity:1}
+
 /* QUICK ACTIONS */
-.quick-actions{padding:10px 0 8px;border-top:1px solid var(--divider);margin-bottom:8px}
-.qa-btn{padding:5px 12px;border:1.5px solid var(--accent);border-radius:16px;font-size:11px;color:var(--accent);background:var(--accent-light);cursor:pointer;transition:all .12s;font-family:var(--font-body);font-weight:500}
-.qa-btn:hover{background:var(--accent);color:var(--bg)}
+.quick-actions{max-width:var(--chat-max);margin:0 auto 8px;display:flex;gap:6px;flex-wrap:wrap;padding:0 4px}
+.qa-btn{padding:4px 12px;border:1px solid var(--divider);border-radius:14px;font-size:12px;color:var(--text-muted);background:var(--bg);cursor:pointer;transition:all .12s;font-family:var(--font-body)}
+.qa-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* PROBLEM ACTIONS — appear below a TA message containing a generated problem */
+.problem-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
+.pa-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--divider);border-radius:8px;font-size:12px;color:var(--text-muted);background:var(--bg);cursor:pointer;transition:all .12s;font-family:var(--font-body)}
+.pa-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.pa-btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.pa-btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:var(--bg)}
+.pa-btn svg{flex-shrink:0}
+
+/* FOOTER HINT */
+.input-hint{max-width:var(--chat-max);margin:6px auto 0;text-align:center;font-size:10px;color:var(--text-faint)}
+
+/* WELCOME */
+.ta-welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;width:100%;max-width:var(--chat-max);margin:0 auto}
+.welcome-title{font-family:var(--font-heading);font-size:2rem;font-weight:400;color:var(--text-primary);margin-bottom:32px;text-align:center}
+.starter-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:520px}
+.starter-card{background:var(--bg);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all .15s;text-align:left}
+.starter-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.starter-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:2px}
+.starter-desc{font-size:11px;color:var(--text-muted);line-height:1.45}
 
 /* VOICE OVERLAY */
 .voice-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,.6);backdrop-filter:blur(8px);z-index:600;align-items:center;justify-content:center;flex-direction:column;gap:20px}
@@ -150,15 +138,13 @@ input,textarea,select{font-family:var(--font-body)}
 .voice-transcript{color:rgba(248,247,244,.7);font-size:13px;max-width:400px;text-align:center;min-height:20px}
 .voice-stop{padding:10px 24px;border-radius:20px;background:rgba(248,247,244,.15);border:1.5px solid rgba(248,247,244,.3);color:var(--bg);font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .12s}
 .voice-stop:hover{background:rgba(248,247,244,.25)}
-.kp-toggle{position:absolute;left:280px;top:50%;transform:translateY(-50%);width:18px;height:40px;background:var(--surface);border:1px solid var(--divider);border-left:none;border-radius:0 6px 6px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;z-index:10;font-size:10px;color:var(--text-muted)}
-.kp-toggle:hover{background:var(--accent-light);color:var(--accent)}
 
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,.45);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg);border-radius:var(--radius-xl);padding:28px;max-width:480px;width:100%;margin:16px;box-shadow:0 24px 60px rgba(47,43,37,.18);animation:modalIn .2s ease-out;max-height:80vh;overflow-y:auto}
+.modal{background:var(--bg);border-radius:var(--radius-xl);padding:28px;max-width:520px;width:100%;margin:16px;box-shadow:0 24px 60px rgba(47,43,37,.18);animation:modalIn .2s ease-out;max-height:80vh;overflow-y:auto}
 @keyframes modalIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.modal-title{font-family:var(--font-heading);font-size:1.2rem;margin-bottom:6px}
+.modal-title{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:6px}
 .modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;line-height:1.6}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
@@ -174,16 +160,43 @@ input,textarea,select{font-family:var(--font-body)}
 .btn-sm{padding:5px 12px;font-size:12px}
 .modal-actions{display:flex;gap:8px;margin-top:16px}
 
-/* EMPTY CHAT */
-.ta-welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center}
-.ta-welcome-icon{width:56px;height:56px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
-.ta-welcome-title{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:8px}
-.ta-welcome-sub{font-size:13px;color:var(--text-muted);line-height:1.7;max-width:380px;margin-bottom:24px}
-.starter-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:440px;width:100%}
-.starter-card{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:all .15s;text-align:left}
-.starter-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-1px)}
-.starter-title{font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
-.starter-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+/* Modal-specific content: roster/knowledge/pcg log */
+.ks{margin-bottom:4px;border-radius:var(--radius);overflow:hidden}
+.ks-header{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;cursor:pointer;background:var(--deeper);border-radius:var(--radius);transition:background .12s}
+.ks-header:hover{background:var(--divider)}
+.ks-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+.ks-count{background:var(--accent);color:var(--bg);font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px}
+.ks-body{display:none;padding:8px 4px 4px}
+.ks.open .ks-body{display:block}
+.ks-chevron{font-size:10px;color:var(--text-faint);transition:transform .15s}
+.ks.open .ks-chevron{transform:rotate(180deg)}
+.student-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .1s}
+.student-row:hover{background:var(--deeper)}
+.student-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
+.student-name{font-size:12px;color:var(--text-primary);flex:1}
+.pcg-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;flex-shrink:0}
+.pcg-P{background:var(--student-light);color:var(--student)}
+.pcg-C{background:var(--family-light);color:var(--family)}
+.pcg-G{background:var(--accent-light);color:var(--accent)}
+.pcg-none{background:var(--deeper);color:var(--text-faint)}
+.kf-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .1s}
+.kf-item:hover{background:var(--deeper)}
+.kf-icon{width:28px;height:28px;border-radius:6px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.kf-info{flex:1;min-width:0}
+.kf-name{font-size:11px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kf-meta{font-size:10px;color:var(--text-faint)}
+.kf-remove{background:none;border:none;color:var(--text-faint);font-size:14px;padding:2px 4px;border-radius:4px;transition:color .1s}
+.kf-remove:hover{color:var(--family)}
+.kp-upload{margin:8px 0;border:1.5px dashed var(--divider);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;transition:all .15s;font-size:11px;color:var(--text-muted)}
+.kp-upload:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.pcg-log-item{padding:6px 8px;border-radius:6px;margin-bottom:4px;background:var(--deeper)}
+.pcg-log-student{font-size:11px;font-weight:600;color:var(--text-primary)}
+.pcg-log-entry{font-size:10px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.framework-opts{display:flex;flex-direction:column;gap:4px;padding:4px 0}
+.framework-opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .12s;font-size:12px;color:var(--text-muted)}
+.framework-opt:hover{background:var(--deeper)}
+.framework-opt.active{background:var(--accent-light);color:var(--accent);font-weight:500}
+.framework-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
@@ -208,79 +221,92 @@ input,textarea,select{font-family:var(--font-body)}
       </div>
     </div>
     <div class="tb-right">
-      <button class="btn btn-ghost btn-sm" onclick="openRosterModal()">Edit roster</button>
-      <button class="btn btn-ghost btn-sm" onclick="clearSession()">New session</button>
-      <button class="btn btn-primary btn-sm" onclick="openKnowledgeModal()">+ Add knowledge</button>
-      <button onclick="doLogout()" style="background:none;border:1px solid var(--divider);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .12s" onmouseover="this.style.borderColor='var(--text-muted)'" onmouseout="this.style.borderColor='var(--divider)'">Log out</button>
+      <div class="menu-wrap">
+        <button class="tb-iconbtn" onclick="toggleMenu(event)" title="Menu" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg>
+        </button>
+        <div class="menu-dropdown" id="tb-menu">
+          <button class="menu-item" onclick="openRosterModal();closeMenu()">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Roster
+          </button>
+          <button class="menu-item" onclick="openKnowledgeModal();closeMenu()">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Class knowledge
+          </button>
+          <button class="menu-item" onclick="openPcgLogModal();closeMenu()">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><polyline points="7 14 11 10 15 14 21 8"/></svg>
+            P/C/G log
+          </button>
+          <div class="menu-divider"></div>
+          <button class="menu-item" onclick="clearSession();closeMenu()">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+            New session
+          </button>
+          <button class="menu-item" onclick="window.location.href='settings.html'">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </button>
+          <div class="menu-divider"></div>
+          <button class="menu-item danger" onclick="doLogout()">
+            <svg class="mi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="workspace" style="position:relative">
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="ta-panel">
 
-    <!-- KNOWLEDGE PANEL -->
-    <div class="knowledge-panel" id="kp">
-      <div class="kp-header">
-        <span class="kp-title">Class knowledge</span>
-        <button style="background:none;border:none;font-size:11px;color:var(--text-muted);cursor:pointer" onclick="toggleKP()">Hide</button>
-      </div>
-      <div class="kp-body" id="kp-body"></div>
+    <!-- DROP OVERLAY -->
+    <div class="ta-drop-overlay" id="ta-drop-overlay">
+      <div class="ta-drop-overlay-inner">Drop files to upload — images or PDFs</div>
     </div>
 
-    <!-- TA PANEL -->
-    <div class="ta-panel" id="ta-panel">
-
-      <!-- DROP OVERLAY -->
-      <div class="ta-drop-overlay" id="ta-drop-overlay">
-        <div class="ta-drop-overlay-inner">Drop files to upload — images or PDFs</div>
+    <!-- MESSAGES -->
+    <div class="ta-msgs" id="ta-msgs">
+      <!-- Welcome state shown when no messages -->
+      <div class="ta-welcome" id="ta-welcome">
+        <div class="welcome-title">How can I help you today?</div>
+        <div class="starter-grid" id="starter-grid"></div>
       </div>
+    </div>
 
-      <!-- MESSAGES -->
-      <div class="ta-msgs" id="ta-msgs">
-        <!-- Welcome state shown when no messages -->
-        <div class="ta-welcome" id="ta-welcome">
-          <div class="ta-welcome-icon">🎓</div>
-          <div class="ta-welcome-title" id="welcome-title">Kelvi TA</div>
-          <div class="ta-welcome-sub" id="welcome-sub">A reading partner for your class. Upload student work, paste a transcript, or ask about a student — Kelvi shows you the thinking underneath.</div>
-          <div class="starter-grid" id="starter-grid"></div>
-        </div>
-      </div>
+    <div class="typing-indicator" id="typing">
+      <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+    </div>
 
-      <div class="typing-indicator" id="typing">
-        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
-      </div>
+    <!-- QUICK ACTIONS — appear after file upload -->
+    <div class="quick-actions" id="quick-actions" style="display:none"></div>
 
-      <!-- INPUT BAR -->
-      <div class="ta-input-bar">
-        <div class="ta-suggestions" id="ta-suggestions"></div>
-        <!-- QUICK ACTIONS — appear after file upload -->
-        <div class="quick-actions" id="quick-actions" style="display:none">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Quick actions</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button class="qa-btn" onclick="quickAction('Read this work and show me how this student is thinking — P/C/G with specific moves')">Read the thinking</button>
-            <button class="qa-btn" onclick="quickAction('Compare this to the student\'s previous work. Where did their thinking move?')">What moved</button>
-            <button class="qa-btn" onclick="quickAction('What\'s worth picking up with this student in our next conversation?')">Next move</button>
-            <button class="qa-btn" onclick="quickAction('Which other students in the class are thinking about this the same way?')">Find similar thinking</button>
-            <button class="qa-btn" onclick="quickAction('Give me a thinking brief I can share with this student\'s advisor or parent')">Write a brief</button>
+    <!-- INPUT AREA -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <!-- File chips -->
+        <div class="file-chips" id="ta-suggestions"></div>
+        <div class="input-pill">
+          <div class="input-row">
+            <label style="cursor:pointer;align-self:flex-end" title="Attach student work">
+              <input type="file" id="file-input" accept="image/*,.pdf" multiple style="display:none" onchange="handleFiles(event)">
+              <div class="btn-circle btn-circle-ghost" title="Upload student work">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+              </div>
+            </label>
+            <textarea class="ta-textarea" id="ta-input" rows="1" placeholder="Ask about your students…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="btn-circle btn-circle-ghost" id="ta-mic" onclick="toggleVoice()" title="Speak to Kelvi TA" style="align-self:flex-end">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
+            </button>
+            <button class="btn-circle btn-circle-accent" id="ta-send" onclick="sendMsg()" style="align-self:flex-end">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
           </div>
         </div>
-        <div class="ta-input-row">
-          <label style="cursor:pointer" title="Attach student work">
-            <input type="file" id="file-input" accept="image/*,.pdf" multiple style="display:none" onchange="handleFiles(event)">
-            <div class="ta-attach" title="Upload student work">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-            </div>
-          </label>
-          <textarea class="ta-textarea" id="ta-input" rows="1" placeholder="Ask about your students…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-          <button class="ta-mic" id="ta-mic" onclick="toggleVoice()" title="Speak to Kelvi TA">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
-          </button>
-          <button class="ta-send" id="ta-send" onclick="sendMsg()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-        <div style="font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px">Kelvi TA reads your class knowledge. Everything stays private.</div>
+        <div class="input-hint">Kelvi reads class knowledge. Everything stays private.</div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -364,6 +390,59 @@ input,textarea,select{font-family:var(--font-body)}
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeFrameworkModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveFramework()">Save framework</button>
+    </div>
+  </div>
+</div>
+
+<!-- P/C/G LOG MODAL -->
+<div class="modal-overlay" id="pcg-log-modal">
+  <div class="modal">
+    <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div class="modal-title" style="margin-bottom:4px">P/C/G log</div>
+        <div class="modal-sub" style="margin-bottom:0">How Kelvi has classified thinking across this class.</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closePcgLogModal()">✕</button>
+    </div>
+    <div id="pcg-log-body" style="max-height:50vh;overflow-y:auto"></div>
+    <div class="modal-actions" style="justify-content:space-between">
+      <button class="btn btn-ghost btn-sm" onclick="openFrameworkModal();closePcgLogModal()">⚙ Assessment framework</button>
+      <button class="btn btn-ghost" onclick="closePcgLogModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- PCG LOG MODAL DUPLICATE REMOVED — keeping the first one above -->
+
+<!-- SHARE TO STUDENTS MODAL -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="max-width:560px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+      <div>
+        <div class="modal-title" style="margin-bottom:4px">Send to students</div>
+        <div class="modal-sub" id="share-title" style="font-weight:500;color:var(--text-primary);margin-bottom:14px"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeShareModal()">✕</button>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--divider);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5">
+      <strong style="color:var(--text-primary);display:block;margin-bottom:4px">Demo mode — same-device only</strong>
+      Students who open this link on this same browser will land in Kelvi Student with this problem loaded, and their conversations will stream back to you. Once your backend is ready, the link will work across devices.
+    </div>
+
+    <div class="field">
+      <label>Student link</label>
+      <div style="display:flex;gap:8px">
+        <input class="input" type="text" id="share-url" readonly style="font-family:monospace;font-size:11px" onclick="this.select()">
+        <button class="btn btn-primary btn-sm" onclick="copyShareUrl()" style="white-space:nowrap">Copy link</button>
+      </div>
+    </div>
+
+    <input type="hidden" id="share-problem-id">
+
+    <div class="modal-actions" style="justify-content:space-between;margin-top:20px">
+      <button class="btn btn-ghost" onclick="closeShareModal()">Close</button>
+      <button class="btn btn-primary" onclick="openReadClassView()">Read the class →</button>
     </div>
   </div>
 </div>
@@ -467,24 +546,100 @@ Read it. Classify silently into P/C/G. Produce a thinking brief, not a grade.
 
 A thinking brief looks like this:
 - Name the student (if known).
-- Quote or paraphrase the specific move the student made.
+- Describe the specific move the student made. Paraphrase by default; quote only when the student's exact words are clearly legible and the exact phrasing matters. Never fabricate or approximate a quote from unclear handwriting — if you can't read it with confidence, describe what the student appears to be doing and say so ("his work suggests he's reasoning about inscribed angles" not a made-up verbatim quote).
 - Name what kind of thinking it was (procedural, conceptual, generative) and what you saw that made you say so.
 - Identify the moment the student's reasoning moved, got stuck, or surprised you.
 - End with what's worth picking up next — one specific move the teacher could make in the next conversation with this student.
 
-For multiple students, produce briefs student by student, then a short class pattern note: what thinking was shared, where students got stuck together, whose work is worth bringing to discussion. Do not produce class averages. Averages obscure thinking.
+Flag incomplete or skipped work explicitly. If a student answered "graph" or "drop" or left a problem blank, that is the thinking brief for that problem — say so. Do not paper over gaps. A student who skipped 5 of 8 problems is telling the teacher something, and the teacher needs to see it.
+
+Flag articulation gaps explicitly. A correct answer without visible reasoning is not the same as understanding — and it's the pattern grades most reliably miss. When a student produces a correct answer through clean execution with no articulation of why the setup captures the problem, name it: "Correct answer on 114, but no visible reasoning about why w = 2h captures the rectangle's constraint in the triangular region. Worth asking her to explain it — if she can, the learning happened; if she cannot, the problem was procedural." The teacher needs visibility into which students understood and which students executed. Equal grades, different thinking.
+
+Distinguish thinking from presentation. A student whose reasoning is compressed into equations (doing both Pythagorean cases side-by-side rather than writing paragraphs about them) has articulated conceptually — just not in prose. A student whose handwriting or typing is messy (dyslexia, executive function differences, language) is not thinking less clearly. Read for the thinking, not the polish. A framework that biases toward verbal articulation reproduces the very bias teacher grades already carry.
+
+For multiple students, produce briefs student by student, then a short class pattern note: what thinking was shared, where students got stuck together, whose work is worth bringing to discussion, who skipped which problems, and which students produced fluent work with absent articulation. Do not produce class averages. Averages obscure thinking.
 
 If the teacher specifically asks for a numeric grade for their gradebook, translate the P/C/G read into their grading scale — but give the thinking brief first, the number second.
 
-WHEN THE TEACHER ASKS YOU TO MAKE SOMETHING:
-Pause first. Ask what they want their students to walk away thinking. A fluency worksheet trains execution. A thinking problem trains reasoning. Help the teacher choose deliberately. Do not default to producing content without this pedagogical conversation.
+WHEN THE TEACHER UPLOADS AN AI TRANSCRIPT (THEIRS OR A STUDENT'S):
+Read it as you would student work — but also read it for AI behavior. Flag moments where the AI:
+- Accepted a student's incorrect volunteered claim without redirecting to verification.
+- Introduced a concept, theorem, or formula the student hadn't encountered yet.
+- Let a student close a problem with a correct answer but no articulation.
+- Confirmed correctness with "exactly" or "right" or similar affirmations.
 
-Once the teacher has named the pedagogical goal, build what they asked for — at whatever grade level, topic, and style they specify. You are capable across elementary through college math. Build well. But the pedagogical question comes first, always.
+These are pedagogical failures the teacher needs to see. A student whose AI transcript shows multiple accepted wrong claims is not learning in the way the conversation suggests. Name the failure moments specifically and neutrally — not as AI-bashing, but as data the teacher can act on.
+
+WHEN THE TEACHER ASKS YOU TO MAKE SOMETHING:
+Ask one question: what kind of thinking is this for?
+
+Offer the choice directly — no preamble, no explanation of why the choice matters, no interview about where their students are. The teacher knows their students better than you do. They know the difference between fluency and reasoning. Your job is to force a deliberate pick, not to re-teach pedagogy.
+
+The question looks like: "Fluency worksheet, or a problem that lets students discover the idea themselves?" Or when the request is more specific: "Do you want them to arrive at the definition, or practice using it once they have it?" One sentence. Then wait.
+
+Do not ask multi-part interview questions. Do not ask what the teacher has noticed about their students unless they've explicitly asked you to help them read their class. Do not explain the difference between memorizing and reasoning — the teacher knows. Do not ask where they are in their curriculum as a gate to building. Trust them.
+
+Once the teacher has named the pedagogical goal, build it — at whatever grade level, topic, and style they specify. You are capable across elementary through college math. Build well. The pedagogical question comes first, but it is one question, not a conversation.
 
 When you do build:
 - Discussion-based problems have no topic headers, are set in real-world context, have sub-parts that escalate P→C→G, and interleave prior topics. Terse answer keys — discussion does the teaching.
 - Standard problem sets have clear topic headings, scaffolded difficulty, and answer keys as requested.
 - Kelvi-grade problems have open middles, low floors, high ceilings, and do not name the technique they're built on.
+
+ALWAYS WRAP GENERATED PROBLEMS IN MARKERS:
+Any response that contains substantive problem content must wrap the student-facing portion in these exact markers, so the Kelvi School interface can attach Copy, Download Word, Download PDF, and Send to Students buttons:
+
+<!-- KELVI_PROBLEM_START -->
+[Problem title on first line]
+
+[Student-facing problem content — problem statement, parts, any text the student would actually work on. Do NOT include teacher-only framing, teacher notes, or meta-commentary like "this is the opening" or "let them work this out" inside the markers.]
+<!-- KELVI_PROBLEM_END -->
+
+Teacher notes:
+[Teacher notes AFTER the closing marker — never inside.]
+
+"Substantive problem content" means anything a student could reasonably work on: a problem with parts, an opening prompt, a set of questions, a handout-style lesson fragment. If you catch yourself writing "Opening problem:", "Give them this:", or anything with parts labeled 1/2/3 or a/b/c — that's a problem. Mark it.
+
+This rule applies even when the teacher framed the request as lesson planning, exploration, or "think through this with me." A lesson sketch with a concrete problem embedded in it IS a generated problem for export purposes. Separate the conversational framing (your thinking out loud, your pedagogical reasoning) from the student-facing artifact, and wrap the artifact in markers. If your response has BOTH — say, a paragraph about the pedagogical arc, followed by the opening problem — put the conversational framing outside the markers and the student-facing problem inside.
+
+If the teacher is genuinely just discussing pedagogy — no concrete problem content, no parts, no student-facing text — no markers needed. Use judgment.
+
+WHEN THE TEACHER ASKS "TURN THIS INTO A HANDOUT" (OR SIMILAR):
+If the teacher says something like "turn this into a handout," "make this a problem I can send to students," "give me the student-facing version," or uses the quick-action button that sends "turn this into a student handout" — your job is to produce a clean, student-facing, marker-wrapped version of the problem you've been discussing.
+
+Strip out all pedagogical commentary, all "this is where we'd…", all teacher-facing framing. Keep only what a student would see on a handout: title, problem statement, parts, any needed context like diagrams or given values. Then, after the closing marker, include teacher notes as specified elsewhere.
+
+Do not ask "what kind of thinking is this for?" when turning something into a handout. The pedagogical conversation already happened. Just clean it up and mark it.
+
+HONOR THE CURRICULUM — DO NOT REACH BEYOND IT:
+When you build a problem, every part must be solvable using tools the students have actually encountered. You have the class name, grade level, and curriculum in CLASS CONTEXT above — use it.
+
+This means:
+- An Algebra 1 class does not have trigonometry. Do not add parts that require sin/cos/tan, unit circles, or angle sums beyond basic geometry. A circle problem ends at x² + y² = r², not at x = r·cos(t).
+- A geometry class working on the Pythagorean theorem does not have the law of cosines. If a problem reaches a point that would require it, stop there.
+- A pre-calculus class does not have calculus. No derivatives, integrals, limits — even if framed as "what if we thought about rate of change?"
+- A student at any level who hasn't been taught parametric equations cannot parameterize. The question "what form would let you express x and y as functions of time?" is a curriculum violation if parametrics aren't in the course.
+
+If you're tempted to add a "challenge" part that stretches outside the curriculum, STOP. Ask the teacher first: "I'd like to add a challenge part that brings in [parametric equations / trigonometry / whatever]. Is that available to your students, or should I keep this within [current curriculum]?" Do not assume. Curriculum scoping is load-bearing — a problem that requires tools students don't have isn't a challenge, it's a trap.
+
+If the teacher explicitly says "add a stretch that brings in parametrics even though we haven't done them" — fine, build it, but label it clearly in the teacher notes as "requires tools not yet introduced; enrichment or with-teacher only."
+
+When in doubt, default to the simplest framing. It is always better to produce a problem that's too contained than one that requires unfamiliar machinery.
+
+ALWAYS APPEND TEACHER NOTES TO ANY GENERATED PROBLEM:
+At the end of every problem you build, include a short section called "Teacher notes" (clearly separated from the student-facing content, not intended to be printed for students). The notes must cover:
+
+1. **Tools used.** List the mathematical concepts and techniques the problem requires, by part if they differ. ("Parts 1-3: distance formula, Pythagorean theorem. Part 4: circle equation as locus. No trig, no parametrics.") This lets the teacher instantly verify the problem is scoped to their curriculum.
+
+2. **P/C/G by part.** Label each sub-part's target thinking level. ("Part 1: P entry. Part 2: C — writing the circle equation from the locus definition. Part 3: C→G — tests whether students connect algebraic and geometric representations.")
+
+3. **Intentional tensions.** Name any deliberate mathematical paradoxes, edge cases, or tensions built into the problem — especially ones a teacher might read as errors on first pass. If you put a data point outside the stated domain, said so. If you gave information that contradicts a constraint, explain why. If you embedded a generative hook that only some students will notice, point to it. The teacher should never have to reverse-engineer your design choices.
+
+4. **What to watch for.** One or two sentences on what a P-stuck student will do, what a C-reaching student will do, and what a G-moment looks like. This helps the teacher spot thinking in real time.
+
+5. **Known risks.** If something in the problem could be confusing, ambiguous, or a common source of student error, flag it. Don't pretend the problem is cleaner than it is.
+
+Keep teacher notes tight — five short bullets or less. The goal is a teacher who reads your problem once and knows exactly why it's designed the way it is, what tools it requires, what to watch for, and where students will surprise them.
 
 WHEN THE TEACHER ASKS ABOUT A STUDENT:
 Read what you know about that student from the P/C/G log and any uploaded work. Narrate the moments where their reasoning moved or got stuck. Use their words when you can. Point to specific turns. End with what's worth picking up next. Do not reduce a child to a label.
@@ -493,14 +648,21 @@ WHEN THE TEACHER ASKS ABOUT THE CLASS:
 Look at patterns across students. Surface what's shared — common confusions, generative questions worth bringing to discussion, students stuck at the same place for different reasons. Make the invisible visible. This is the core Kelvi move.
 
 WHEN THE TEACHER ASKS FOR LESSON PLANNING HELP:
-Ask questions before offering ideas. What have they noticed about their students so far? What did they try last time? What are they actually worried about? Be Socratic with teachers the way Kelvi Student is Socratic with students — but do not withhold your opinion when they ask for it directly.
+You are not the teacher's Socratic tutor. They are a colleague. If they ask you to help plan tomorrow's lesson, help them plan it — don't interview them first.
+
+Ask one clarifying question only if you genuinely need it to proceed: what kind of thinking the lesson is for (fluency, discovery, or consolidation), or which specific part of the topic they want to focus on. Otherwise, propose. Offer a concrete starting structure — an opening problem, a thread of questions, a sequence — and let them react. They will tell you what to adjust. Colleagues build on each other's ideas; they do not interrogate each other's premises.
+
+Never ask them "what have you noticed about your students so far?" as a gate to helping. If their P/C/G log and uploaded work contain information about their students, use it silently — surface it when relevant, not as a quiz. Never ask them to articulate their pedagogical goals as a precondition to offering a draft. A teacher asking for help with a lesson has already thought about it. Respect that thinking by starting from it.
+
+Do not withhold your opinion. If they ask what you think, tell them.
 
 WHAT YOU DON'T DO:
 - You don't produce content without first understanding its pedagogical purpose.
 - You don't lead with grades, averages, or scores. The thinking comes first.
 - You don't flatter the teacher or perform helpfulness. Be direct, warm, and honest.
 - You don't hide behind uncertainty. If the teacher asks what you think, say what you think.
-- You don't invent student work. Only reference what you can actually see in uploaded artifacts. If illegible, ask the teacher to describe it.
+- You don't invent student work. Only reference what you can actually see in uploaded artifacts. When handwriting is unclear, paraphrase the apparent reasoning instead of fabricating a quote. If illegible entirely, say so and ask the teacher to describe it.
+- You don't paper over gaps. Skipped problems, blank pages, "drop" or "graph" without work — say what's missing. Omission is data.
 - You don't refuse legitimate requests. If the teacher wants a worksheet after the pedagogical conversation, build it.
 
 TONE:
@@ -531,7 +693,7 @@ function renderMessages() {
   welcome.style.display = 'none';
 
   // Clear and re-render
-  const existingMsgs = container.querySelectorAll('.msg-ta,.msg-teacher,.bubble-system');
+  const existingMsgs = container.querySelectorAll('.msg-wrap,.bubble-system');
   existingMsgs.forEach(m => m.remove());
 
   msgs.forEach(m => appendMessage(m.role, m.content, false));
@@ -542,18 +704,39 @@ function appendMessage(role, content, save = true) {
   const welcome = document.getElementById('ta-welcome');
   welcome.style.display = 'none';
 
-  const el = document.createElement('div');
+  // Outer centered wrapper
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.style.animation = 'fadeUp .25s ease';
 
   if (role === 'user') {
-    el.className = 'msg-teacher';
-    el.style.animation = 'fadeUp .25s ease';
-    el.innerHTML = `<div class="bubble-teacher">${escHtml(content)}</div>`;
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-teacher';
+    bubble.textContent = content;
+    wrap.appendChild(bubble);
   } else {
-    el.className = 'msg-ta';
-    el.style.animation = 'fadeUp .25s ease';
+    const msg = document.createElement('div');
+    msg.className = 'msg-ta';
     // Strip PCG_UPDATE from display
     const displayContent = content.replace(/PCG_UPDATE:[\s\S]*?(\n\n|$)/, '').trim();
-    el.innerHTML = `<div class="msg-label">Kelvi TA</div><div class="bubble-ta">${formatTAResponse(displayContent)}</div>`;
+    msg.innerHTML = formatTAResponse(displayContent);
+    wrap.appendChild(msg);
+
+    // Detect and surface a generated problem if present
+    const problem = extractProblem(content);
+    if (problem) {
+      const saved = saveOrGetProblem(problem);
+      const actions = buildProblemActions(saved);
+      wrap.appendChild(actions);
+    } else {
+      // No problem block yet — but the message might still contain problem-shaped
+      // content (lesson sketch, opening problem, etc.). Offer a one-click way
+      // to turn it into a handout.
+      if (couldBeHandout(displayContent)) {
+        const hint = buildHandoutHint();
+        wrap.appendChild(hint);
+      }
+    }
 
     // Process PCG updates silently
     const pcgMatch = content.match(/PCG_UPDATE:\s*(\{[\s\S]*?\})/);
@@ -570,7 +753,7 @@ function appendMessage(role, content, save = true) {
     }
   }
 
-  container.appendChild(el);
+  container.appendChild(wrap);
   container.scrollTop = container.scrollHeight;
 
   if (save) {
@@ -589,14 +772,120 @@ function appendMessage(role, content, save = true) {
 }
 
 function formatTAResponse(text) {
-  // Basic formatting: line breaks, bold headers, code blocks
-  return escHtml(text)
+  // Strip problem markers before display so the teacher doesn't see them
+  let cleaned = text
+    .replace(/<!--\s*KELVI_PROBLEM_START\s*-->\s*/g, '')
+    .replace(/\s*<!--\s*KELVI_PROBLEM_END\s*-->/g, '');
+  return escHtml(cleaned)
     .replace(/\n\n/g, '</p><p style="margin-top:10px">')
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/^(CLASS SUMMARY|STUDENT BREAKDOWN|KELVI'S NOTE|DIFFERENTIATION|TEACHER NOTES|QUEST:|THE PROBLEM|GO FURTHER|YOUR QUESTION)/gm, '<strong style="color:var(--accent)">$1</strong>')
+    .replace(/^(CLASS SUMMARY|STUDENT BREAKDOWN|KELVI'S NOTE|DIFFERENTIATION|TEACHER NOTES|Teacher notes|QUEST:|THE PROBLEM|GO FURTHER|YOUR QUESTION)/gm, '<strong style="color:var(--accent)">$1</strong>')
     .replace(/^─+$/gm, '<hr style="border:none;border-top:1px solid var(--divider);margin:8px 0">')
     .replace(/===LATEX===/g, '<div style="background:#1E1C19;color:#F0EDE6;border-radius:8px;padding:12px;margin-top:8px;font-family:monospace;font-size:11px;overflow-x:auto">LaTeX source ↓</div>');
+}
+
+// ── PROBLEM DETECTION & STORAGE ───────────────────────
+function extractProblem(rawContent) {
+  const m = rawContent.match(/<!--\s*KELVI_PROBLEM_START\s*-->([\s\S]*?)<!--\s*KELVI_PROBLEM_END\s*-->/);
+  if (!m) return null;
+  const body = m[1].trim();
+  // Grab teacher notes if present, from AFTER the closing marker
+  const after = rawContent.split(/<!--\s*KELVI_PROBLEM_END\s*-->/)[1] || '';
+  const notesMatch = after.match(/(?:^|\n)\s*Teacher\s*notes?\s*:?\s*([\s\S]*)/i);
+  const teacherNotes = notesMatch ? notesMatch[1].trim() : '';
+  // Use the first non-empty line as title
+  const firstLine = body.split('\n').find(l => l.trim().length > 0) || 'Untitled problem';
+  return {
+    title: firstLine.trim().replace(/^#+\s*/, '').slice(0, 120),
+    body: body,
+    teacherNotes: teacherNotes
+  };
+}
+
+function genId() {
+  return 'p_' + Math.random().toString(36).slice(2, 9);
+}
+
+function saveOrGetProblem(problem) {
+  const store = JSON.parse(localStorage.getItem('kelvi_problems') || '{}');
+  // Check for an existing identical problem in this class (avoid duplicates on re-render)
+  for (const [id, p] of Object.entries(store)) {
+    if (p.classId === classId && p.body === problem.body) {
+      return p;
+    }
+  }
+  const id = genId();
+  const saved = {
+    id: id,
+    classId: classId,
+    title: problem.title,
+    body: problem.body,
+    teacherNotes: problem.teacherNotes,
+    createdAt: new Date().toISOString()
+  };
+  store[id] = saved;
+  localStorage.setItem('kelvi_problems', JSON.stringify(store));
+  return saved;
+}
+
+function buildProblemActions(problem) {
+  const row = document.createElement('div');
+  row.className = 'problem-actions';
+  row.innerHTML = `
+    <button class="pa-btn" onclick="copyProblem('${problem.id}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy
+    </button>
+    <button class="pa-btn" onclick="downloadProblemDocx('${problem.id}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Word
+    </button>
+    <button class="pa-btn" onclick="downloadProblemPdf('${problem.id}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      PDF
+    </button>
+    <button class="pa-btn pa-btn-primary" onclick="openShareModal('${problem.id}')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      Send to students
+    </button>
+  `;
+  return row;
+}
+
+// Heuristic: does this message look like it could be turned into a student handout?
+// We're looking for problem-shaped content — sections with parts, "opening problem",
+// concrete scenarios, sub-part labels, etc. — even without the markers.
+function couldBeHandout(text) {
+  if (!text || text.length < 200) return false; // too short to be worth it
+  const signals = [
+    /\b(opening problem|opening move|the problem|problem[:.])/i,
+    /\bpart\s*(\d+|[a-c]|one|two|three)/i,
+    /\b(scenario|setup|give them|show them|have them)/i,
+    /\bstudents?\s+(will|should|can|work|discover|try|find)/i,
+    /\n\s*(\d+[.)]\s|[a-c][.)]\s)/, // numbered or lettered list items on new lines
+    /\bdiscovery\s+(turn|moment|problem)/i,
+  ];
+  const hits = signals.filter(rx => rx.test(text)).length;
+  return hits >= 2;
+}
+
+function buildHandoutHint() {
+  const row = document.createElement('div');
+  row.className = 'problem-actions';
+  row.innerHTML = `
+    <button class="pa-btn" onclick="turnIntoHandout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      Turn this into a student handout
+    </button>
+  `;
+  return row;
+}
+
+function turnIntoHandout() {
+  const input = document.getElementById('ta-input');
+  input.value = 'Turn what we just worked on into a clean student handout. Wrap the student-facing portion in the KELVI_PROBLEM markers so I can export and share it. Then give me teacher notes after the closing marker.';
+  sendMsg();
 }
 
 // ── SEND MESSAGE ──────────────────────────────────────
@@ -610,17 +899,41 @@ async function sendMsg() {
   input.value = '';
   input.style.height = 'auto';
 
-  // Build user content
+  // Build user content — images → image blocks, PDFs → document blocks
   let userContent = [];
+  let imageCount = 0;
+  let pdfCount = 0;
   uploadedFiles.forEach(f => {
-    userContent.push({ type: 'image', source: { type: 'base64', media_type: f.type, data: f.data } });
+    if (f.type === 'application/pdf') {
+      userContent.push({
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: f.data }
+      });
+      pdfCount++;
+    } else {
+      // Map any image variants to the 4 the API accepts
+      let mediaType = f.type;
+      if (!['image/jpeg','image/png','image/gif','image/webp'].includes(mediaType)) {
+        // jpg → jpeg, unknown image/* → jpeg fallback (data was normalized to JPEG on ingest for most cases)
+        mediaType = mediaType === 'image/jpg' ? 'image/jpeg' : 'image/jpeg';
+      }
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: mediaType, data: f.data }
+      });
+      imageCount++;
+    }
   });
   if (text) userContent.push({ type: 'text', text });
   uploadedFiles = [];
   renderFilePreview();
   showQuickActions(false);
 
-  const displayText = text || '[Uploaded ' + userContent.filter(c=>c.type==='image').length + ' image(s)]';
+  let uploadLabel = '';
+  if (imageCount && pdfCount) uploadLabel = `[Uploaded ${imageCount} image(s) and ${pdfCount} PDF(s)]`;
+  else if (imageCount) uploadLabel = `[Uploaded ${imageCount} image(s)]`;
+  else if (pdfCount) uploadLabel = `[Uploaded ${pdfCount} PDF(s)]`;
+  const displayText = text || uploadLabel;
   appendMessage('user', displayText);
 
   // Show typing
@@ -633,9 +946,19 @@ async function sendMsg() {
     role: m.role,
     content: m.content
   }));
+  // Content must be either a string (for text-only) or an array of content blocks.
+  // Never a bare object — that's what caused "Input should be a valid list".
+  let finalContent;
+  if (userContent.length === 0) {
+    finalContent = text;
+  } else if (userContent.length === 1 && userContent[0].type === 'text') {
+    finalContent = userContent[0].text; // plain string for text-only
+  } else {
+    finalContent = userContent; // always array for any non-text or mixed content
+  }
   apiMsgs.push({
     role: 'user',
-    content: userContent.length > 1 ? userContent : (text || userContent[0])
+    content: finalContent
   });
 
   const reply = await KelviAPI.call({
@@ -744,14 +1067,14 @@ function ingestFiles(fileList) {
 })();
 
 function renderFilePreview() {
-  const suggestions = document.getElementById('ta-suggestions');
-  document.querySelectorAll('.file-preview-tag').forEach(e => e.remove());
+  const container = document.getElementById('ta-suggestions');
+  container.innerHTML = '';
   uploadedFiles.forEach((f, i) => {
-    const tag = document.createElement('span');
-    tag.className = 'ta-suggestion file-preview-tag';
-    tag.style.cssText = 'background:var(--accent-light);border-color:var(--accent);color:var(--accent)';
-    tag.innerHTML = `📎 ${escHtml(f.name)} <span onclick="removeFile(${i})" style="margin-left:4px;cursor:pointer">✕</span>`;
-    suggestions.insertBefore(tag, suggestions.firstChild);
+    const chip = document.createElement('span');
+    chip.className = 'file-chip';
+    const icon = f.type === 'application/pdf' ? '📄' : '🖼';
+    chip.innerHTML = `${icon} ${escHtml(f.name)} <button class="file-chip-x" onclick="removeFile(${i})" title="Remove">✕</button>`;
+    container.appendChild(chip);
   });
   showQuickActions(uploadedFiles.length > 0);
 }
@@ -769,10 +1092,9 @@ const SUGGESTIONS = [
 ];
 
 function renderSuggestions() {
-  const el = document.getElementById('ta-suggestions');
-  el.innerHTML = SUGGESTIONS.slice(0, 4).map(s =>
-    `<button class="ta-suggestion" onclick="useSuggestion('${s.replace(/'/g,"\\'")}'">${s}</button>`
-  ).join('');
+  // Suggestion chips are now rendered inside the welcome grid (renderStarters).
+  // The 'ta-suggestions' container is repurposed for file preview chips.
+  return;
 }
 
 function useSuggestion(text) {
@@ -789,11 +1111,8 @@ const STARTERS = [
 ];
 
 function renderStarters() {
-  const cls = classData;
-  document.getElementById('welcome-title').textContent = 'Kelvi TA — ' + cls.name;
-  document.getElementById('welcome-sub').textContent =
-    'See how your students are thinking. Add your roster and class knowledge to begin, or just ask.';
-
+  // Welcome title is static "How can I help you today?" — don't overwrite.
+  // welcome-sub was removed in the redesign.
   document.getElementById('starter-grid').innerHTML = STARTERS.map(s =>
     `<div class="starter-card" onclick="useStarter('${s.prompt.replace(/'/g,"\\'")}')">
       <div class="starter-title">${s.title}</div>
@@ -809,82 +1128,55 @@ function useStarter(text) {
 
 // ── KNOWLEDGE PANEL ───────────────────────────────────
 function renderKnowledgePanel() {
-  const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + classId) || '[]');
-  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + classId) || '[]');
-  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
-  const framework = localStorage.getItem('kelvi_framework_' + classId) || 'pcg4';
-
-  const body = document.getElementById('kp-body');
-
-  const rosterHTML = `
-    <div class="ks open" id="ks-roster">
-      <div class="ks-header" onclick="toggleSection('ks-roster')">
-        <span class="ks-label">Roster <span class="ks-count">${roster.length}</span></span>
-        <span class="ks-chevron">▾</span>
-      </div>
-      <div class="ks-body">
-        ${roster.length ? roster.map(s => {
-          const pcg = pcgLog[s.name]?.pcg || null;
-          return `<div class="student-row">
-            <div class="student-avatar" style="background:${classData.color || 'var(--accent)'}">${s.name[0].toUpperCase()}</div>
-            <span class="student-name">${escHtml(s.name)}</span>
-            <span class="pcg-badge ${pcg ? 'pcg-'+pcg : 'pcg-none'}">${pcg || '—'}</span>
-          </div>`;
-        }).join('') : `<div style="font-size:11px;color:var(--text-faint);padding:6px 8px">No students yet. <span style="color:var(--accent);cursor:pointer" onclick="openRosterModal()">Add roster →</span></div>`}
-        <div class="kp-upload" onclick="openRosterModal()">+ Edit roster</div>
-      </div>
-    </div>`;
-
-  const knowledgeHTML = `
-    <div class="ks open" id="ks-knowledge">
-      <div class="ks-header" onclick="toggleSection('ks-knowledge')">
-        <span class="ks-label">Knowledge <span class="ks-count">${knowledge.length}</span></span>
-        <span class="ks-chevron">▾</span>
-      </div>
-      <div class="ks-body">
-        ${knowledge.map((k, i) => `
-          <div class="kf-item">
-            <div class="kf-icon">${k.type === 'syllabus' ? '📋' : k.type === 'curriculum' ? '🗺' : k.type === 'rubric' ? '📐' : '📝'}</div>
-            <div class="kf-info">
-              <div class="kf-name">${escHtml(k.title)}</div>
-              <div class="kf-meta">${k.type} · ${formatDate(k.date)}</div>
-            </div>
-            <button class="kf-remove" onclick="removeKnowledge(${i})">✕</button>
-          </div>`).join('')}
-        <div class="kp-upload" onclick="openKnowledgeModal()">+ Add knowledge</div>
-      </div>
-    </div>`;
-
-  const pcgItems = Object.entries(pcgLog);
-  const pcgHTML = `
-    <div class="ks" id="ks-pcg">
-      <div class="ks-header" onclick="toggleSection('ks-pcg')">
-        <span class="ks-label">P/C/G log <span class="ks-count">${pcgItems.length}</span></span>
-        <span class="ks-chevron">▾</span>
-      </div>
-      <div class="ks-body">
-        ${pcgItems.length ? pcgItems.map(([name, data]) => `
-          <div class="pcg-log-item">
-            <div class="pcg-log-student">${escHtml(name)} <span class="pcg-badge pcg-${data.pcg}" style="margin-left:4px">${data.pcg}</span></div>
-            <div class="pcg-log-entry">${escHtml(data.note || '')} · ${data.date || ''}</div>
-          </div>`).join('') : `<div style="font-size:11px;color:var(--text-faint);padding:6px 8px">P/C/G data appears here as you grade student work.</div>`}
-        <div class="kp-upload" onclick="openFrameworkModal()" style="margin-top:8px">⚙ Customize framework</div>
-      </div>
-    </div>`;
-
-  body.innerHTML = rosterHTML + knowledgeHTML + pcgHTML;
+  // Sidebar removed in UI redesign — retained as no-op so callers don't crash.
+  // Data still lives in localStorage. Content is surfaced through modals.
+  return;
 }
 
 function toggleSection(id) {
   document.getElementById(id).classList.toggle('open');
 }
 
-function toggleKP() {
-  const kp = document.getElementById('kp');
-  kpOpen = !kpOpen;
-  kp.style.width = kpOpen ? '280px' : '0';
-  kp.style.borderRight = kpOpen ? '1px solid var(--divider)' : 'none';
+// ── HEADER MENU ───────────────────────────────────────
+function toggleMenu(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('tb-menu');
+  m.classList.toggle('open');
 }
+function closeMenu() {
+  const m = document.getElementById('tb-menu');
+  if (m) m.classList.remove('open');
+}
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  const m = document.getElementById('tb-menu');
+  if (!m || !m.classList.contains('open')) return;
+  if (!m.contains(e.target) && !e.target.closest('.menu-wrap')) closeMenu();
+});
+
+// ── P/C/G LOG MODAL ───────────────────────────────────
+function openPcgLogModal() {
+  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
+  const items = Object.entries(pcgLog);
+  const body = document.getElementById('pcg-log-body');
+  if (!body) return;
+
+  body.innerHTML = items.length
+    ? items.map(([name, data]) => `
+        <div class="pcg-log-item">
+          <div class="pcg-log-student">${escHtml(name)} <span class="pcg-badge pcg-${data.pcg}" style="margin-left:4px">${data.pcg}</span></div>
+          <div class="pcg-log-entry">${escHtml(data.note || '')}${data.date ? ' · ' + data.date : ''}</div>
+        </div>`).join('')
+    : `<div style="font-size:12px;color:var(--text-faint);padding:16px;text-align:center">P/C/G data appears here as Kelvi reads student work.</div>`;
+
+  document.getElementById('pcg-log-modal').classList.add('open');
+}
+function closePcgLogModal() {
+  document.getElementById('pcg-log-modal').classList.remove('open');
+}
+
+// Legacy no-op (sidebar removed)
+function toggleKP() { /* sidebar removed */ }
 
 function updateRosterPCG(updates) {
   const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + classId) || '[]');
@@ -1066,8 +1358,170 @@ function quickAction(prompt) {
 
 // Show quick actions when files are uploaded
 function showQuickActions(show) {
-  document.getElementById('quick-actions').style.display = show ? 'block' : 'none';
+  const el = document.getElementById('quick-actions');
+  if (show) {
+    el.innerHTML = `
+      <button class="qa-btn" onclick="quickAction('Read this work and show me how this student is thinking — P/C/G with specific moves')">Read the thinking</button>
+      <button class="qa-btn" onclick="quickAction('Compare this to the student\\'s previous work. Where did their thinking move?')">What moved</button>
+      <button class="qa-btn" onclick="quickAction('What\\'s worth picking up with this student in our next conversation?')">Next move</button>
+      <button class="qa-btn" onclick="quickAction('Which other students in the class are thinking about this the same way?')">Find similar thinking</button>
+      <button class="qa-btn" onclick="quickAction('Give me a thinking brief I can share with this student\\'s advisor or parent')">Write a brief</button>
+    `;
+    el.style.display = 'flex';
+  } else {
+    el.innerHTML = '';
+    el.style.display = 'none';
+  }
 }
+
+// ── PROBLEM EXPORT ACTIONS ────────────────────────────
+function getProblem(problemId) {
+  const store = JSON.parse(localStorage.getItem('kelvi_problems') || '{}');
+  return store[problemId];
+}
+
+function problemAsText(p, includeNotes = true) {
+  let out = p.body;
+  if (includeNotes && p.teacherNotes) {
+    out += '\n\n---\nTeacher notes:\n' + p.teacherNotes;
+  }
+  return out;
+}
+
+function copyProblem(problemId) {
+  const p = getProblem(problemId);
+  if (!p) return;
+  const text = problemAsText(p, true);
+  navigator.clipboard.writeText(text).then(() => {
+    toast('Copied to clipboard');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Copied to clipboard');
+  });
+}
+
+function downloadProblemDocx(problemId) {
+  const p = getProblem(problemId);
+  if (!p) return;
+  // Minimal docx generation using a template approach — build a simple
+  // .docx by wrapping text in Office Open XML. For the demo we use a
+  // simpler approach: generate an HTML file that Word will open cleanly.
+  const html = `
+<html xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>${escHtml(p.title)}</title>
+<style>
+body{font-family:'Garamond',serif;font-size:12pt;line-height:1.5;max-width:6.5in;margin:1in auto;color:#2F2B25}
+h1{font-size:16pt;font-weight:600;margin-bottom:18pt;color:#2F2B25}
+h2{font-size:13pt;font-weight:600;margin-top:18pt;color:#3A6B5C}
+p{margin:0 0 10pt 0}
+.notes{margin-top:28pt;padding-top:14pt;border-top:1px solid #CDC3B1;font-size:11pt;color:#6F6A61}
+</style></head>
+<body>
+<h1>${escHtml(p.title)}</h1>
+${p.body.split('\n').map(line => line.trim() ? `<p>${escHtml(line)}</p>` : '<p>&nbsp;</p>').join('\n')}
+${p.teacherNotes ? `<div class="notes"><h2>Teacher notes</h2>${p.teacherNotes.split('\n').map(line => line.trim() ? `<p>${escHtml(line)}</p>` : '<p>&nbsp;</p>').join('\n')}</div>` : ''}
+</body></html>`;
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = sanitizeFilename(p.title) + '.doc';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('Downloaded Word document');
+}
+
+function downloadProblemPdf(problemId) {
+  const p = getProblem(problemId);
+  if (!p) return;
+  // Open a print-ready view in a new tab; user prints to PDF
+  const html = `<!doctype html>
+<html><head><meta charset="utf-8"><title>${escHtml(p.title)}</title>
+<style>
+@media print { @page { margin: 1in; } }
+body{font-family:Georgia,serif;font-size:12pt;line-height:1.55;max-width:6.5in;margin:1in auto;color:#2F2B25}
+h1{font-size:18pt;font-weight:600;margin:0 0 20pt;border-bottom:1px solid #CDC3B1;padding-bottom:10pt}
+h2{font-size:13pt;font-weight:600;margin-top:24pt;color:#3A6B5C}
+p{margin:0 0 10pt 0;white-space:pre-wrap}
+.notes{margin-top:32pt;padding-top:16pt;border-top:1px solid #CDC3B1;font-size:11pt;color:#6F6A61}
+.print-bar{position:fixed;top:12px;right:12px;background:#3A6B5C;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:sans-serif;font-size:12px;border:none}
+@media print { .print-bar { display:none } }
+</style></head>
+<body>
+<button class="print-bar" onclick="window.print()">Print / Save as PDF</button>
+<h1>${escHtml(p.title)}</h1>
+${p.body.split('\n').map(line => line.trim() ? `<p>${escHtml(line)}</p>` : '<p>&nbsp;</p>').join('\n')}
+${p.teacherNotes ? `<div class="notes"><h2>Teacher notes</h2>${p.teacherNotes.split('\n').map(line => line.trim() ? `<p>${escHtml(line)}</p>` : '<p>&nbsp;</p>').join('\n')}</div>` : ''}
+<scr` + `ipt>setTimeout(()=>window.print(),300);</scr` + `ipt>
+</body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function openShareModal(problemId) {
+  const p = getProblem(problemId);
+  if (!p) return;
+  // Build the student URL with both problemId and a base64 payload so it
+  // can load even on a different device (demo fallback).
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify({
+    id: p.id,
+    classId: p.classId,
+    title: p.title,
+    body: p.body
+  }))));
+  const studentUrl = new URL('student-from-school.html', window.location.href).toString()
+    + '?p=' + encodeURIComponent(p.id)
+    + '&c=' + encodeURIComponent(p.classId)
+    + '&d=' + payload;
+
+  document.getElementById('share-title').textContent = p.title;
+  document.getElementById('share-url').value = studentUrl;
+  document.getElementById('share-problem-id').value = p.id;
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+
+function copyShareUrl() {
+  const input = document.getElementById('share-url');
+  input.select();
+  navigator.clipboard.writeText(input.value).then(() => toast('Link copied'));
+}
+
+function openReadClassView() {
+  const pid = document.getElementById('share-problem-id').value;
+  window.location.href = 'read-class.html?class=' + encodeURIComponent(classId) + '&problem=' + encodeURIComponent(pid);
+}
+
+// ── TOAST & UTILITIES ─────────────────────────────────
+function toast(msg) {
+  let t = document.getElementById('kelvi-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'kelvi-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text-primary);color:var(--bg);padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+}
+
+function sanitizeFilename(name) {
+  return (name || 'problem').replace(/[^a-z0-9 _-]/gi, '').replace(/\s+/g, '_').slice(0, 60) || 'problem';
+}
+
 
 // ── SESSION ───────────────────────────────────────────
 function doLogout() {
