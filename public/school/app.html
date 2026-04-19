@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="../shared/kelvi.js"></script>
+<style>
+:root{
+  --bg:#F8F7F4;--surface:#F0EDE6;--deeper:#E8E3DA;--divider:#D9D4C9;
+  --text-primary:#2F2B25;--text-muted:#6F6A61;--text-faint:#9A9488;
+  --accent:#3A6B5C;--accent-dark:#2D5347;--accent-light:#EBF3EF;
+  --family:#B8784E;--student:#5A7080;
+  --font-heading:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;
+  --radius:8px;--radius-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font-body);background:var(--bg);color:var(--text-primary);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--font-body)}
+input,textarea,select{font-family:var(--font-body)}
+
+/* ── LAYOUT ───────────────────────────────────────── */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ──────────────────────────────────────── */
+.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--divider);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:width .2s ease}
+.sidebar.collapsed{width:0;border-right:none}
+.sb-top{padding:16px 16px 12px;border-bottom:1px solid var(--divider);flex-shrink:0}
+.sb-brand{display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:1.1rem;color:var(--accent)}
+.sb-workspace{font-size:11px;color:var(--text-muted);margin-top:2px;padding-left:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{flex:1;overflow-y:auto;padding:6px 0}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .1s;white-space:nowrap}
+.sb-item:hover{background:var(--deeper);color:var(--text-primary)}
+.sb-item.active{background:var(--deeper);color:var(--text-primary);font-weight:500}
+.sb-icon{width:15px;height:15px;flex-shrink:0;opacity:.6}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between}
+.sb-add-btn{background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;line-height:1;padding:0 2px;transition:color .1s}
+.sb-add-btn:hover{color:var(--accent)}
+.class-item{display:flex;align-items:center;gap:8px;padding:6px 16px 6px 28px;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all .1s;white-space:nowrap;overflow:hidden}
+.class-item:hover{background:var(--deeper);color:var(--text-primary)}
+.class-item.active{background:var(--deeper);color:var(--text-primary);font-weight:500}
+.class-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-divider{height:1px;background:var(--divider);margin:8px 0}
+.sb-bottom{padding:10px 14px;border-top:1px solid var(--divider);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.sb-user{display:flex;align-items:center;gap:8px}
+.sb-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.sb-uname{font-size:12px;color:var(--text-muted);white-space:nowrap}
+.sb-logout{font-size:11px;color:var(--text-faint);cursor:pointer;background:none;border:none;padding:0;transition:color .1s}
+.sb-logout:hover{color:var(--text-muted)}
+
+/* ── MAIN ─────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+.main-header{height:48px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;background:var(--bg)}
+.mh-left{display:flex;align-items:center;gap:10px}
+.mh-toggle{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center}
+.mh-toggle:hover{background:var(--deeper)}
+.mh-title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.mh-meta{font-size:11px;color:var(--text-muted)}
+.mh-right{display:flex;align-items:center;gap:6px}
+.mh-btn{font-size:11px;padding:5px 10px;border:1px solid var(--divider);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;background:none;transition:all .1s}
+.mh-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mh-btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.mh-btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:var(--bg)}
+
+/* ── KNOWLEDGE BAR ────────────────────────────────── */
+.knowledge-bar{padding:7px 20px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:6px;background:var(--surface);flex-shrink:0;min-height:36px}
+.knowledge-bar.collapsed{min-height:28px;padding:4px 20px}
+.knowledge-bar.collapsed #kb-files,.knowledge-bar.collapsed .kb-add{display:none}
+.kb-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-right:4px;flex-shrink:0;cursor:pointer;user-select:none}
+.kb-label:hover{color:var(--accent)}
+.kb-toggle-arrow{display:inline-block;margin-left:4px;transition:transform .15s;font-size:9px}
+.knowledge-bar.collapsed .kb-toggle-arrow{transform:rotate(-90deg)}
+.kb-summary{font-size:11px;color:var(--text-muted);display:none}
+.knowledge-bar.collapsed .kb-summary{display:inline}
+.kb-file{display:flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--divider);border-radius:20px;font-size:11px;color:var(--text-muted);cursor:default;background:var(--bg)}
+.kb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.kb-add{font-size:11px;color:var(--accent);cursor:pointer;margin-left:auto;flex-shrink:0}
+.kb-add:hover{text-decoration:underline}
+
+/* ── PANEL CONTAINER ──────────────────────────────── */
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden}
+.panel.active{display:flex}
+
+/* ── HOME PANEL ───────────────────────────────────── */
+.home-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px 0}
+.home-heading{font-family:var(--font-heading);font-size:2rem;font-weight:400;text-align:center;margin-bottom:8px}
+.home-sub{font-size:14px;color:var(--text-muted);text-align:center;line-height:1.6;margin-bottom:32px}
+.home-suggestions{width:100%;max-width:580px}
+.sugg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--divider);cursor:pointer;font-size:13px;color:var(--text-muted);transition:color .1s}
+.sugg-row:first-child{border-top:1px solid var(--divider)}
+.sugg-row:hover{color:var(--text-primary)}
+.sugg-arrow{opacity:.4;font-size:14px}
+
+/* ── CHAT PANEL ───────────────────────────────────── */
+.chat-msgs{flex:1;overflow-y:auto;padding:32px 60px;display:flex;flex-direction:column;gap:20px}
+.msg-kelvi{align-self:flex-start;max-width:85%}
+.msg-teacher{align-self:flex-end;max-width:70%}
+.msg-kelvi-label{font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:6px;letter-spacing:.03em}
+.msg-kelvi-text{font-size:14px;line-height:1.75;color:var(--text-primary)}
+
+/* ── LATEX / PDF EXPORT ──────────────────────────── */
+.latex-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.latex-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--divider);border-radius:6px;background:var(--bg);font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:all .15s;text-decoration:none}
+.latex-btn:hover{border-color:var(--accent);color:var(--accent)}
+.latex-btn:disabled{opacity:.6;cursor:wait}
+.latex-btn svg{flex-shrink:0}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+
+.pdf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,.7);z-index:800;align-items:center;justify-content:center;padding:24px}
+.pdf-modal-overlay.open{display:flex}
+.pdf-modal{background:var(--bg);border-radius:12px;width:100%;max-width:900px;height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pdf-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--divider);background:var(--surface);flex-shrink:0}
+.bubble-teacher{background:var(--surface);border:1px solid var(--divider);border-radius:12px;border-bottom-right-radius:3px;padding:10px 14px;font-size:14px;line-height:1.65;color:var(--text-primary)}
+.thinking-dots{display:inline-flex;gap:3px;align-items:center;padding:4px 0}
+.td{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tpulse 1.4s ease-in-out infinite}
+.td:nth-child(1){animation-delay:0s}.td:nth-child(2){animation-delay:.2s;margin-top:-8px}.td:nth-child(3){animation-delay:.4s}
+@keyframes tpulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+
+/* ── INPUT BAR ────────────────────────────────────── */
+.chat-input-bar{padding:10px 16px 14px;flex-shrink:0}
+.chat-input-inner{border:1px solid var(--divider);border-radius:14px;background:var(--bg);overflow:hidden;transition:border-color .15s}
+.chat-input-inner:focus-within{border-color:var(--divider)}
+.chat-textarea{width:100%;padding:12px 16px 4px;font-size:14px;border:none;outline:none;resize:none;background:transparent;color:var(--text-primary);line-height:1.5;max-height:120px;font-family:var(--font-body)}
+.chat-textarea::placeholder{color:var(--text-faint)}
+.chat-input-actions{display:flex;align-items:center;justify-content:space-between;padding:4px 10px 10px}
+.chat-input-left{display:flex;gap:4px}
+.cia-btn{width:28px;height:28px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--text-muted);transition:all .1s}
+.cia-btn:hover{background:var(--surface);color:var(--text-primary)}
+.cia-send{width:30px;height:30px;background:var(--text-primary);border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .1s}
+.cia-send:hover{opacity:.85}
+.cia-send:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── QUICK ACTIONS ────────────────────────────────── */
+.quick-actions{display:none;padding:8px 16px;border-top:1px solid var(--divider);flex-wrap:wrap;gap:6px;background:var(--bg)}
+.quick-actions.show{display:flex}
+.qa-btn{padding:5px 12px;border:1px solid var(--accent);border-radius:16px;font-size:11px;color:var(--accent);background:var(--accent-light);cursor:pointer;font-family:var(--font-body);font-weight:500;transition:all .12s}
+.qa-btn:hover{background:var(--accent);color:var(--bg)}
+
+/* ── FILE UPLOAD PREVIEW ──────────────────────────── */
+.file-preview{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 2px}
+.file-tag{background:var(--accent-light);border:1px solid var(--accent);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--accent);display:flex;align-items:center;gap:6px}
+.file-tag-x{cursor:pointer;opacity:.6;background:none;border:none;color:inherit;padding:0;font-size:13px;line-height:1}
+
+/* ── SETTINGS PANEL ───────────────────────────────── */
+.settings-layout{display:flex;flex:1;overflow:hidden}
+.settings-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--divider);padding:16px 0;overflow-y:auto;background:var(--bg)}
+.settings-item{padding:8px 20px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all .1s}
+.settings-item:hover{color:var(--text-primary)}
+.settings-item.active{color:var(--text-primary);font-weight:500;background:var(--surface)}
+.settings-content{flex:1;overflow-y:auto;padding:32px 40px}
+.settings-title{font-family:var(--font-heading);font-size:1.4rem;font-weight:400;margin-bottom:6px}
+.settings-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.6}
+.settings-section{margin-bottom:28px}
+.settings-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.settings-input{width:100%;max-width:440px;padding:9px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-primary);outline:none;transition:border-color .12s}
+.settings-input:focus{border-color:var(--accent)}
+.settings-textarea{width:100%;max-width:440px;padding:9px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-primary);outline:none;resize:vertical;min-height:80px;font-family:var(--font-body);line-height:1.5}
+.settings-textarea:focus{border-color:var(--accent)}
+
+/* MEMBERS TABLE */
+.members-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.members-actions{display:flex;gap:8px}
+.members-search{padding:7px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:13px;background:var(--bg);outline:none;width:220px}
+.members-search:focus{border-color:var(--accent)}
+.members-btn{padding:7px 14px;border:1px solid var(--divider);border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text-muted);font-family:var(--font-body);transition:all .1s}
+.members-btn:hover{border-color:var(--accent);color:var(--accent)}
+.members-btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.members-btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:var(--bg)}
+.members-tabs{display:flex;gap:0;margin-bottom:16px;border:1px solid var(--divider);border-radius:var(--radius);overflow:hidden;max-width:500px}
+.mtab{padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text-muted);border-right:1px solid var(--divider);transition:all .1s}
+.mtab:last-child{border-right:none}
+.mtab.active{background:var(--surface);color:var(--text-primary)}
+.members-table{width:100%;border-collapse:collapse;font-size:13px}
+.members-table th{text-align:left;padding:9px 12px;border-bottom:1px solid var(--divider);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-faint)}
+.members-table td{padding:10px 12px;border-bottom:1px solid var(--divider);color:var(--text-primary)}
+.members-table tr:last-child td{border-bottom:none}
+.members-table tr:hover td{background:var(--surface)}
+.role-select{border:1px solid var(--divider);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--bg);color:var(--text-muted);cursor:pointer;font-family:var(--font-body)}
+.member-av{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.member-name-cell{display:flex;align-items:center;gap:10px}
+
+/* MODERATION */
+.mod-category{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--divider)}
+.mod-check{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;margin-top:2px;flex-shrink:0}
+.mod-label{font-size:13px;font-weight:500;color:var(--text-primary)}
+.mod-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+.badge-exp{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:var(--deeper);color:var(--text-muted);margin-left:6px;letter-spacing:.03em}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--divider);max-width:440px}
+.toggle-info{font-size:13px;color:var(--text-primary)}
+.toggle-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--divider);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';width:16px;height:16px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:18px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,.45);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border-radius:16px;padding:28px;max-width:440px;width:100%;margin:16px;box-shadow:0 24px 60px rgba(47,43,37,.18);animation:modalIn .2s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-family:var(--font-heading);font-size:1.2rem;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:var(--font-body);transition:all .12s}
+.btn-primary{background:var(--accent);color:var(--bg)}.btn-primary:hover{background:var(--accent-dark)}
+.btn-ghost{background:none;border:1px solid var(--divider);color:var(--text-muted)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.select{width:100%;padding:9px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-primary);cursor:pointer;font-family:var(--font-body)}
+
+/* LIBRARY */
+.library-body{flex:1;overflow-y:auto;padding:32px 40px}
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:20px}
+.quest-card{background:var(--bg);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:all .15s}
+.quest-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.qc-tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.qc-title{font-family:var(--font-heading);font-size:1rem;margin-bottom:6px;line-height:1.3}
+.qc-desc{font-size:12px;color:var(--text-muted);line-height:1.5}
+.qc-meta{display:flex;gap:8px;margin-top:12px;font-size:11px;color:var(--text-faint)}
+
+/* CLASS TABS */
+.class-tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.class-tab:hover{color:var(--text-primary)}
+.class-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="sb-brand">
+        <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+        Kelvi
+      </div>
+      <div class="sb-workspace" id="sb-workspace">Gayatri's Workspace</div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-item active" id="nav-home" onclick="showView('home')">
+        <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        Home
+      </div>
+      <div class="sb-item" id="nav-chats" onclick="showView('chats')">
+        <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        My chats
+      </div>
+      <div class="sb-item" id="nav-library" onclick="showView('library')">
+        <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Math library
+      </div>
+
+      <div class="sb-section">
+        Classes
+        <button class="sb-add-btn" onclick="openAddClass()" title="Add class">+</button>
+      </div>
+
+      <div class="class-item" id="nav-all-classes" onclick="showView('all-classes')">
+        <svg width="7" height="7" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+        All classes
+      </div>
+      <div id="class-list"></div>
+
+      <div class="sb-divider"></div>
+
+      <div class="sb-item" id="nav-settings" onclick="showView('settings')">
+        <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings & members
+      </div>
+      <div class="sb-item" onclick="window.open('https://kelvi.io/learn','_blank')">
+        <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Learn more about Kelvi
+      </div>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-av">G</div>
+        <div class="sb-uname" id="sb-uname">Gayatri</div>
+      </div>
+      <button class="sb-logout" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main">
+
+    <!-- HEADER -->
+    <div class="main-header">
+      <div class="mh-left">
+        <button class="mh-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div>
+          <div class="mh-title" id="mh-title">Home</div>
+          <div class="mh-meta" id="mh-meta"></div>
+        </div>
+      </div>
+      <div class="mh-right" id="mh-right"></div>
+    </div>
+
+    <!-- KNOWLEDGE BAR (class context) -->
+    <div class="knowledge-bar" id="knowledge-bar" style="display:none">
+      <span class="kb-label" onclick="toggleKnowledgeBar()">Knowledge<span class="kb-toggle-arrow">▼</span></span>
+      <span class="kb-summary" id="kb-summary"></span>
+      <div id="kb-files"></div>
+      <span class="kb-add" onclick="openKnowledgeModal()">+ Add file</span>
+    </div>
+
+    <!-- ── HOME PANEL ── -->
+    <div class="panel active" id="panel-home">
+      <div class="home-center">
+        <h1 class="home-heading" id="home-heading">Hey Gayatri. What are your students thinking about?</h1>
+        <p class="home-sub">See how your students are thinking, plan for what comes next — just ask.</p>
+        <div class="home-suggestions">
+          <div class="sugg-row" onclick="useSuggestion('Show me how my class is thinking about this week&#39;s topic')"><span>Show me how my class is thinking about this week's topic</span><span class="sugg-arrow">→</span></div>
+          <div class="sugg-row" onclick="useSuggestion('Which students should I talk to this week?')"><span>Which students should I talk to this week?</span><span class="sugg-arrow">→</span></div>
+          <div class="sugg-row" onclick="useSuggestion('Read me a student&#39;s last session')"><span>Read me a student's last session</span><span class="sugg-arrow">→</span></div>
+          <div class="sugg-row" onclick="useSuggestion('Help me plan Thursday&#39;s lesson')"><span>Help me plan Thursday's lesson</span><span class="sugg-arrow">→</span></div>
+          <div class="sugg-row" onclick="useSuggestion('Find me a problem that surfaces thinking about this topic')"><span>Find me a problem that surfaces thinking about this topic</span><span class="sugg-arrow">→</span></div>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <div id="home-file-preview"></div>
+        <div class="chat-input-inner">
+          <textarea class="chat-textarea" id="home-input" rows="1" placeholder="Ask about your students…" onkeydown="handleHomeKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="chat-input-actions">
+            <div class="chat-input-left">
+              <label title="Upload file" style="cursor:pointer">
+                <input type="file" accept="image/*,.pdf" multiple style="display:none" onchange="handleHomeFiles(event)">
+                <div class="cia-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+              </label>
+              <label title="Attach student work" style="cursor:pointer">
+                <input type="file" accept="image/*,.pdf" multiple style="display:none" onchange="handleHomeFiles(event)">
+                <div class="cia-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div>
+              </label>
+            </div>
+            <button class="cia-send" onclick="sendHome()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLASS PANEL (tabbed) ── -->
+    <div class="panel" id="panel-class">
+
+      <!-- Class tabs -->
+      <div style="border-bottom:1px solid var(--divider);padding:0 20px;display:flex;align-items:center;gap:0;flex-shrink:0;background:var(--bg)">
+        <div id="ctab-chat" class="class-tab active" onclick="showClassTab('chat')">Chat</div>
+        <div id="ctab-memory" class="class-tab" onclick="showClassTab('memory')">Memory</div>
+        <div id="ctab-instructions" class="class-tab" onclick="showClassTab('instructions')">Instructions</div>
+        <div id="ctab-files" class="class-tab" onclick="showClassTab('files')">Files</div>
+      </div>
+
+      <!-- CHAT TAB -->
+      <div id="classtab-chat" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div class="quick-actions" id="quick-actions">
+          <button class="qa-btn" onclick="quickAction('Read this student&#39;s thinking')">Read their thinking</button>
+          <button class="qa-btn" onclick="quickAction('Compare this to their previous work — what moved?')">What moved?</button>
+          <button class="qa-btn" onclick="quickAction('Where did they get stuck, and what should I ask next?')">Where stuck?</button>
+          <button class="qa-btn" onclick="quickAction('Is this worth bringing to class discussion?')">Bring to class?</button>
+        </div>
+        <div class="chat-msgs" id="class-msgs"></div>
+        <div class="chat-input-bar">
+          <div id="class-file-preview"></div>
+          <div class="chat-input-inner">
+            <textarea class="chat-textarea" id="class-input" rows="1" placeholder="Ask about your students in this class…" onkeydown="handleClassKey(event)" oninput="autoResize(this)"></textarea>
+            <div class="chat-input-actions">
+              <div class="chat-input-left">
+                <label title="Upload student work" style="cursor:pointer">
+                  <input type="file" accept="image/*,.pdf" multiple style="display:none" onchange="handleClassFiles(event)">
+                  <div class="cia-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                </label>
+                <label title="Attach file" style="cursor:pointer">
+                  <input type="file" accept="image/*,.pdf" multiple style="display:none" onchange="handleClassFiles(event)">
+                  <div class="cia-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div>
+                </label>
+                <button class="cia-btn" title="Voice input" onclick="toggleVoice()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/></svg>
+                </button>
+              </div>
+              <button class="cia-send" id="class-send" onclick="sendClass()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMORY TAB -->
+      <div id="classtab-memory" style="display:none;flex:1;overflow-y:auto;padding:32px 40px">
+        <h2 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;margin-bottom:6px">Memory</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">Kelvi TA remembers key facts about your class — assessments, student patterns, flags. These are built automatically from your conversations.</p>
+        <div id="class-memory-list"></div>
+        <div style="margin-top:16px">
+          <button class="btn btn-ghost" onclick="addMemoryNote()" style="font-size:12px">+ Add a note</button>
+        </div>
+      </div>
+
+      <!-- INSTRUCTIONS TAB -->
+      <div id="classtab-instructions" style="display:none;flex:1;overflow-y:auto;padding:32px 40px">
+        <h2 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;margin-bottom:6px">Instructions</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">Add instructions to tailor Kelvi TA's responses to your class. These are always active in every conversation.</p>
+        <div class="settings-section">
+          <div class="settings-label">What Kelvi TA should know</div>
+          <textarea class="settings-textarea" id="class-instructions-text" style="max-width:100%;min-height:120px" placeholder='e.g. "This is a 6th grade class just starting ratios. I want to see how they&#39;re reasoning before I plan the unit. Most students are coming from a procedural background."'></textarea>
+        </div>
+        <div class="settings-section">
+          <div class="settings-label">How Kelvi classifies student thinking</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.6">P/C/G describes the kind of thinking a student is doing in a moment — not a rank or grade. Students move between levels within a single problem.</p>
+          <div style="display:grid;grid-template-columns:1fr;gap:8px;max-width:500px">
+            ${[['P — Procedural','Following steps, applying a method'],['C — Conceptual','Explaining why, seeing the underlying structure'],['G — Generative','Extending, generalizing, asking new questions']].map(([label,desc])=>`
+            <div style="border:1px solid var(--divider);border-radius:var(--radius);padding:10px 12px;background:var(--bg)">
+              <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:3px">${label}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${desc}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveClassInstructions()" style="margin-top:8px">Save instructions</button>
+      </div>
+
+      <!-- FILES TAB -->
+      <div id="classtab-files" style="display:none;flex:1;overflow-y:auto;padding:32px 40px">
+        <h2 style="font-family:var(--font-heading);font-size:1.4rem;font-weight:400;margin-bottom:6px">Files</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">Upload your syllabus, rubrics, curriculum maps, or student work. Kelvi TA reads these in every conversation.</p>
+        <div id="class-files-list" style="margin-bottom:16px"></div>
+        <label style="display:flex;align-items:center;gap:10px;padding:14px 18px;border:1px dashed var(--divider);border-radius:var(--radius-lg);cursor:pointer;transition:all .15s;max-width:400px" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)'">
+          <input type="file" accept=".pdf,.txt,.doc,.docx" multiple style="display:none" onchange="handleKnowledgeFiles(event)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text-primary)">Upload a file</div>
+            <div style="font-size:11px;color:var(--text-muted)">PDF, Word, or text — up to 10MB</div>
+          </div>
+        </label>
+        <div style="margin-top:20px;border-top:1px solid var(--divider);padding-top:20px">
+          <div class="settings-label" style="margin-bottom:12px">Or paste content directly</div>
+          <div class="settings-section">
+            <div class="settings-label" style="font-size:10px">Title</div>
+            <input class="settings-input" id="kn-title" placeholder="e.g. AP Calculus Rubric" style="max-width:400px;margin-bottom:8px">
+            <div class="settings-label" style="font-size:10px;margin-top:8px">Content</div>
+            <textarea class="settings-textarea" id="kn-content" placeholder="Paste your syllabus, rubric, curriculum topics…" style="max-width:400px"></textarea>
+            <button class="btn btn-primary" onclick="saveKnowledge()" style="margin-top:8px">Add to class</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ALL CLASSES PANEL ── -->
+    <div class="panel" id="panel-all-classes">
+      <div style="flex:1;overflow-y:auto;padding:32px 40px">
+        <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:400;margin-bottom:6px">All classes</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Select a class to open its Kelvi TA chat, or ask a cross-class question below.</p>
+
+        <!-- Class dropdown list -->
+        <div id="all-classes-dropdown" style="margin-bottom:24px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Your classes</div>
+          <div id="all-classes-list"></div>
+          <button onclick="openAddClass()" style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border:1px dashed var(--divider);border-radius:var(--radius-lg);background:none;cursor:pointer;font-size:13px;color:var(--text-muted);font-family:var(--font-body);margin-top:8px;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)';this.style.color='var(--text-muted)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add a class
+          </button>
+        </div>
+
+        <!-- Cross-class chat -->
+        <div id="allclass-msgs" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+      <div class="chat-input-bar">
+        <div class="chat-input-inner">
+          <textarea class="chat-textarea" id="allclass-input" rows="1" placeholder="Ask about your students across all classes…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAllClass()}" oninput="autoResize(this)"></textarea>
+          <div class="chat-input-actions">
+            <div class="chat-input-left">
+              <label style="cursor:pointer" title="Upload">
+                <input type="file" accept="image/*,.pdf" multiple style="display:none">
+                <div class="cia-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div>
+              </label>
+            </div>
+            <button class="cia-send" onclick="sendAllClass()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STUDENT CHAT HISTORY PANEL ── -->
+    <div class="panel" id="panel-student-chat">
+      <div class="main-header" style="height:44px">
+        <div class="mh-left">
+          <button class="mh-btn" onclick="showView('class',currentClassId)" style="display:flex;align-items:center;gap:6px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to class
+          </button>
+          <div>
+            <div class="mh-title" id="student-chat-title">Student chat history</div>
+            <div class="mh-meta" id="student-chat-meta"></div>
+          </div>
+        </div>
+        <div class="mh-right">
+          <span style="font-size:11px;color:var(--text-faint);padding:4px 8px;background:var(--surface);border-radius:var(--radius)">Read only</span>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:28px 60px;display:flex;flex-direction:column;gap:16px" id="student-chat-msgs"></div>
+    </div>
+
+    <!-- ── LIBRARY PANEL ── -->
+    <div class="panel" id="panel-library">
+      <div class="library-body">
+        <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:400;margin-bottom:4px">Math library</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px">Ready-to-use problem sets and discussion problems for your classes.</p>
+        <input placeholder="Search the library…" style="padding:8px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:13px;background:var(--bg);outline:none;width:280px;margin-bottom:4px">
+        <div class="library-grid" id="library-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── CHATS PANEL ── -->
+    <div class="panel" id="panel-chats">
+      <div style="flex:1;overflow-y:auto;padding:32px 40px">
+        <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:400;margin-bottom:20px">My chats</h2>
+        <div id="chats-list" style="font-size:13px;color:var(--text-muted)">Your recent conversations with Kelvi TA will appear here.</div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS PANEL ── -->
+    <div class="panel" id="panel-settings">
+      <div class="settings-layout">
+        <div class="settings-sidebar">
+          <div class="settings-item active" id="stab-general" onclick="showSettingsTab('general')">General</div>
+          <div class="settings-item" id="stab-members" onclick="showSettingsTab('members')">Members</div>
+          <div class="settings-item" id="stab-ta" onclick="showSettingsTab('ta')">Kelvi TA customizations</div>
+          <div class="settings-item" id="stab-moderation" onclick="showSettingsTab('moderation')">Moderation and access</div>
+          <div class="settings-item" id="stab-api" onclick="showSettingsTab('api')">API & integrations</div>
+          <div class="settings-item" id="stab-terms" onclick="showSettingsTab('terms')">Terms</div>
+        </div>
+        <div class="settings-content" id="settings-content"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD CLASS MODAL -->
+<div class="modal-overlay" id="add-class-modal">
+  <div class="modal">
+    <div class="modal-title">Add a class</div>
+    <div class="modal-sub">Kelvi TA will learn your class from the knowledge you add. You can always update this later.</div>
+    <div class="field"><label>Class name</label><input class="settings-input" id="new-class-name" placeholder="e.g. MAT 210 — Calculus" style="max-width:100%"></div>
+    <div class="field"><label>Grade / level</label><input class="settings-input" id="new-class-grade" placeholder="e.g. Grade 11, AP Calculus AB" style="max-width:100%"></div>
+    <div class="field"><label>Curriculum</label>
+      <select class="select" id="new-class-curriculum">
+        <option>Common Core</option><option>CBSE</option><option>ICSE</option><option>IB</option><option>AP</option><option>Other</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-class-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createClass()">Create class →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="add-member-modal">
+  <div class="modal">
+    <div class="modal-title">Add member</div>
+    <div class="modal-sub">Add a teacher or student to your workspace.</div>
+    <div class="field"><label>Email</label><input class="settings-input" id="new-member-email" placeholder="name@school.edu" style="max-width:100%"></div>
+    <div class="field"><label>Role</label>
+      <select class="select" id="new-member-role"><option>Teacher</option><option>Student</option><option>Admin</option></select>
+    </div>
+    <div class="field"><label>Name (optional)</label><input class="settings-input" id="new-member-name" placeholder="Full name" style="max-width:100%"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-member-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMember()">Add member</button>
+    </div>
+  </div>
+</div>
+
+<!-- KNOWLEDGE MODAL -->
+<div class="modal-overlay" id="knowledge-modal">
+  <div class="modal">
+    <div class="modal-title">Add class knowledge</div>
+    <div class="modal-sub">Kelvi TA reads everything here on every conversation.</div>
+    <div class="field"><label>Type</label>
+      <select class="select" id="kn-type"><option value="syllabus">Syllabus</option><option value="curriculum">Curriculum / topic map</option><option value="rubric">Rubric / grading framework</option><option value="notes">Teacher notes</option></select>
+    </div>
+    <div class="field"><label>Title</label><input class="settings-input" id="kn-title" placeholder="e.g. AP Calculus Rubric" style="max-width:100%"></div>
+    <div class="field"><label>Content</label><textarea class="settings-textarea" id="kn-content" placeholder="Paste your syllabus, rubric, curriculum topics…" style="max-width:100%"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('knowledge-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveKnowledge()">Add to class</button>
+    </div>
+  </div>
+</div>
+
+<!-- VOICE OVERLAY -->
+<div class="modal-overlay" id="voice-overlay">
+  <div style="text-align:center;color:var(--bg)">
+    <div style="width:70px;height:70px;border-radius:50%;background:var(--family);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:micpulse 1.2s infinite">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="21" x2="12" y2="17"/></svg>
+    </div>
+    <div style="font-size:15px;font-weight:500;margin-bottom:8px">Listening…</div>
+    <div style="font-size:13px;opacity:.7;margin-bottom:20px" id="voice-transcript">Speak now.</div>
+    <button onclick="stopVoice()" style="padding:9px 22px;border-radius:20px;background:rgba(245,243,238,.15);border:1px solid rgba(245,243,238,.3);color:var(--bg);font-size:13px;cursor:pointer;font-family:var(--font-body)">Stop</button>
+  </div>
+</div>
+<style>@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(184,120,78,.4)}50%{box-shadow:0 0 0 16px rgba(184,120,78,0)}}</style>
+
+<script>
+
+// ── STATE ──────────────────────────────────────────────
+let currentView = 'home';
+let currentClassId = null;
+let classConversations = {}; // classId -> [{role, content}]
+let homeConversation = [];
+let uploadedFiles = { home: [], class: [] };
+let sidebarOpen = true;
+let recognition = null;
+let isRecording = false;
+
+const CLASS_COLORS = ['#3A6B5C','#B8784E','#5A7080','#8B5CF6','#EC4899','#C9A84C'];
+
+// ── INIT ───────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(localStorage.getItem('kelvi_user') || 'null');
+  if (!user || user.role !== 'teacher') { window.location.href = 'index.html'; return; }
+
+  const name = user.name || user.email?.split('@')[0] || 'Teacher';
+  const firstName = name.split(' ')[0];
+  document.getElementById('sb-av').textContent = name[0].toUpperCase();
+  document.getElementById('sb-uname').textContent = name;
+  document.getElementById('sb-workspace').textContent = firstName + "'s Workspace";
+  document.getElementById('home-heading').textContent = 'Hey ' + firstName + '. What are your students thinking about?';
+
+  renderClassList();
+  renderLibrary();
+  showSettingsTab('general');
+  renderAllClasses();
+  seedSampleClass();
+  renderClassList();
+});
+
+// ── NAVIGATION ─────────────────────────────────────────
+function showView(view, classId) {
+  currentView = view;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item,.class-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('knowledge-bar').style.display = 'none';
+  document.getElementById('quick-actions').classList.remove('show');
+
+  const mhRight = document.getElementById('mh-right');
+  mhRight.innerHTML = '';
+
+  if (view === 'home') {
+    document.getElementById('panel-home').classList.add('active');
+    document.getElementById('nav-home').classList.add('active');
+    document.getElementById('mh-title').textContent = 'Home';
+    document.getElementById('mh-meta').textContent = '';
+  } else if (view === 'class' && classId) {
+    currentClassId = classId;
+    const classes = KelviSchool.getClasses();
+    const cls = classes.find(c => c.id === classId);
+    if (!cls) return;
+
+    document.getElementById('panel-class').classList.add('active');
+    const navEl = document.getElementById('class-nav-' + classId);
+    if (navEl) navEl.classList.add('active');
+    document.getElementById('mh-title').textContent = cls.name;
+    document.getElementById('mh-meta').textContent = [cls.grade, cls.curriculum].filter(Boolean).join(' · ');
+
+    mhRight.innerHTML = `
+      <button class="mh-btn" onclick="openRosterModal('${classId}')">Edit roster</button>
+      <button class="mh-btn" onclick="showClassTab('files')">+ Knowledge</button>
+      <button class="mh-btn" onclick="clearClassSession()">New session</button>`;
+
+    renderKnowledgeBar(classId);
+    document.getElementById('knowledge-bar').style.display = 'flex';
+    showClassTab('chat');
+    renderClassChat(classId);
+    autoCollapseKnowledgeIfChat(classId);
+  } else if (view === 'all-classes') {
+    document.getElementById('panel-all-classes').classList.add('active');
+    document.getElementById('nav-all-classes').classList.add('active');
+    document.getElementById('mh-title').textContent = 'All classes';
+    document.getElementById('mh-meta').textContent = '';
+    renderAllClasses();
+  } else if (view === 'library') {
+    document.getElementById('panel-library').classList.add('active');
+    document.getElementById('nav-library').classList.add('active');
+    document.getElementById('mh-title').textContent = 'Math library';
+    document.getElementById('mh-meta').textContent = '';
+  } else if (view === 'chats') {
+    document.getElementById('panel-chats').classList.add('active');
+    document.getElementById('nav-chats').classList.add('active');
+    document.getElementById('mh-title').textContent = 'My chats';
+    document.getElementById('mh-meta').textContent = '';
+    renderRecentChats();
+  } else if (view === 'settings') {
+    document.getElementById('panel-settings').classList.add('active');
+    document.getElementById('nav-settings').classList.add('active');
+    document.getElementById('mh-title').textContent = 'Settings & members';
+    document.getElementById('mh-meta').textContent = '';
+  }
+}
+
+function toggleSidebar() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+}
+
+// ── CLASS LIST ─────────────────────────────────────────
+function renderClassList() {
+  const classes = KelviSchool.getClasses();
+  const list = document.getElementById('class-list');
+  list.innerHTML = classes.map((cls, i) => {
+    const color = cls.color || CLASS_COLORS[i % CLASS_COLORS.length];
+    return `<div class="class-item" id="class-nav-${cls.id}" onclick="showView('class','${cls.id}')">
+      <div class="class-dot" style="background:${color}"></div>
+      <span style="overflow:hidden;text-overflow:ellipsis">${escHtml(cls.name)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── KNOWLEDGE BAR ──────────────────────────────────────
+function renderKnowledgeBar(classId) {
+  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + classId) || '[]');
+  const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + classId) || '[]');
+  const files = document.getElementById('kb-files');
+  let html = '';
+  const summaryParts = [];
+  if (roster.length) {
+    html += `<div class="kb-file"><div class="kb-dot"></div>Roster · ${roster.length}</div>`;
+    summaryParts.push(`Roster · ${roster.length}`);
+  }
+  knowledge.forEach(k => {
+    html += `<div class="kb-file"><div class="kb-dot"></div>${escHtml(k.title)}</div>`;
+    summaryParts.push(escHtml(k.title));
+  });
+  if (!html) html = '<span style="font-size:11px;color:var(--text-faint)">No knowledge added yet</span>';
+  files.innerHTML = html;
+  const summaryEl = document.getElementById('kb-summary');
+  if (summaryEl) summaryEl.textContent = summaryParts.length ? summaryParts.join(' · ') : 'None added';
+}
+
+function toggleKnowledgeBar() {
+  const bar = document.getElementById('knowledge-bar');
+  if (bar) bar.classList.toggle('collapsed');
+}
+
+function autoCollapseKnowledgeIfChat(classId) {
+  const bar = document.getElementById('knowledge-bar');
+  if (!bar) return;
+  const msgs = classConversations[classId] || JSON.parse(localStorage.getItem('kelvi_ta_msgs_' + classId) || '[]');
+  if (msgs.length > 0) {
+    bar.classList.add('collapsed');
+  } else {
+    bar.classList.remove('collapsed');
+  }
+}
+
+// ── CLASS CHAT ─────────────────────────────────────────
+function renderClassChat(classId) {
+  if (!classConversations[classId]) {
+    classConversations[classId] = JSON.parse(localStorage.getItem('kelvi_ta_msgs_' + classId) || '[]');
+  }
+  const msgs = classConversations[classId];
+  const container = document.getElementById('class-msgs');
+  container.innerHTML = '';
+
+  if (!msgs.length) {
+    const classes = KelviSchool.getClasses();
+    const cls = classes.find(c => c.id === classId);
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
+    const hasData = Object.keys(pcgLog).length > 0;
+
+    // Build thinking brief
+    let briefHtml = '';
+    if (hasData) {
+      const students = Object.entries(pcgLog);
+      const p = students.filter(([,s]) => s.pcg === 'P').length;
+      const c = students.filter(([,s]) => s.pcg === 'C').length;
+      const g = students.filter(([,s]) => s.pcg === 'G').length;
+      const total = p + c + g;
+      const topThinking = g > 0 ? students.filter(([,s]) => s.pcg === 'G').slice(0, 2).map(([n]) => n).join(', ') : '';
+
+      briefHtml = `
+        <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">This week in ${escHtml(cls?.name || 'this class')}</div>
+          <div style="font-size:14px;line-height:1.7;color:var(--text-primary)">
+            You've read work from <strong>${total}</strong> ${total === 1 ? 'student' : 'students'}.
+            ${p > 0 ? `<strong>${p}</strong> entered procedurally. ` : ''}
+            ${c > 0 ? `<strong>${c}</strong> showed conceptual moves. ` : ''}
+            ${g > 0 ? `<strong>${g}</strong> produced generative thinking${topThinking ? ' (' + escHtml(topThinking) + ')' : ''}. ` : ''}
+            ${p > c + g ? 'Worth thinking about what would move more students to conceptual ground.' : ''}
+          </div>
+        </div>`;
+    } else {
+      briefHtml = `
+        <div style="background:var(--surface);border:1px dashed var(--divider);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">This week in ${escHtml(cls?.name || 'this class')}</div>
+          <div style="font-size:13px;line-height:1.7;color:var(--text-muted)">
+            Upload student work and Kelvi will show you how each student is thinking — who entered procedurally, who made conceptual moves, who produced generative questions worth bringing to class.
+          </div>
+        </div>`;
+    }
+
+    container.innerHTML = `
+      <div style="max-width:640px;margin:40px auto;padding:0 24px;animation:fadeUp .4s ease">
+        <h2 style="font-family:var(--font-heading);font-size:1.6rem;font-weight:400;margin-bottom:6px">${escHtml(cls?.name || 'Class')}</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">See how your students are thinking.</p>
+        ${briefHtml}
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Start here</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[
+            {title:'Read student work', desc:'Upload work and I&#39;ll show you how each student is thinking', prompt:'I&#39;m going to upload some student work. Show me how each student is thinking.'},
+            {title:'How is the class thinking?', desc:'Patterns across students, who&#39;s stuck together', prompt:'Show me how this class is thinking right now. What patterns do you see?'},
+            {title:'Who should I talk to?', desc:'Students whose thinking moved or got stuck', prompt:'Which students in this class should I talk to this week, and why?'},
+            {title:'View student chats', desc:'See what students are working on in Kelvi Student', prompt:''}
+          ].map(s => `<div onclick="${s.title==='View student chats'?`openRosterModal('${classId}')`:`useStarter('${s.prompt}')`}" style="background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--divider)'">
+            <div style="font-size:12px;font-weight:500;margin-bottom:3px">${s.title}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${s.desc}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
+  msgs.forEach(m => appendClassMsg(m.role, m.content, false));
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendClassMsg(role, content, save = true) {
+  const container = document.getElementById('class-msgs');
+  // Remove starter cards if present
+  const starter = container.querySelector('[style*="display:flex;flex-direction:column;align-items:center"]') ||
+                  container.querySelector('[style*="flex:1;display:flex;flex-direction:column;align-items:center"]');
+  if (starter) starter.remove();
+
+  const el = document.createElement('div');
+  el.style.animation = 'fadeUp .25s ease';
+
+  if (role === 'user') {
+    el.className = 'msg-teacher';
+    el.innerHTML = `<div class="bubble-teacher">${escHtml(content)}</div>`;
+  } else {
+    el.className = 'msg-kelvi';
+    // Extract LaTeX block before stripping for display
+    const latexMatch = content.match(/===LATEX===([\s\S]*?)===END LATEX===/);
+    const latexSource = latexMatch ? latexMatch[1].trim() : null;
+    // Strip PCG update and LaTeX block from visible display
+    let display = content.replace(/PCG_UPDATE:[\s\S]*?(\n\n|$)/, '').trim();
+    display = display.replace(/===LATEX===[\s\S]*?===END LATEX===/, '').trim();
+
+    const exportButtons = latexSource ? `
+      <div class="latex-actions">
+        <button class="latex-btn" onclick="copyLatex(this)" data-latex="${encodeURIComponent(latexSource)}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy LaTeX
+        </button>
+        <button class="latex-btn" onclick="downloadPDF(this)" data-latex="${encodeURIComponent(latexSource)}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="latex-btn" onclick="printProblemSet(this)" data-display="${encodeURIComponent(display)}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
+        </button>
+      </div>` : '';
+
+    el.innerHTML = `<div class="msg-kelvi-text">${escHtml(display).replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>${exportButtons}`;
+
+    // PCG update
+    const pcgMatch = content.match(/PCG_UPDATE:\s*(\{[\s\S]*?\})/);
+    if (pcgMatch) {
+      try {
+        const updates = JSON.parse(pcgMatch[1]);
+        const log = JSON.parse(localStorage.getItem('kelvi_pcg_' + currentClassId) || '{}');
+        Object.assign(log, updates);
+        localStorage.setItem('kelvi_pcg_' + currentClassId, JSON.stringify(log));
+      } catch(e) {}
+    }
+  }
+
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+
+  if (save && currentClassId) {
+    if (!classConversations[currentClassId]) classConversations[currentClassId] = [];
+    classConversations[currentClassId].push({ role, content });
+    localStorage.setItem('kelvi_ta_msgs_' + currentClassId, JSON.stringify(classConversations[currentClassId]));
+    autoCollapseKnowledgeIfChat(currentClassId);
+  }
+}
+
+function useStarter(text) {
+  document.getElementById('class-input').value = text;
+  sendClass();
+}
+
+// ── SEND CLASS MESSAGE ─────────────────────────────────
+async function sendClass() {
+  const input = document.getElementById('class-input');
+  const text = input.value.trim();
+  if (!text && !uploadedFiles.class.length) return;
+  if (!currentClassId) return;
+
+  const sendBtn = document.getElementById('class-send');
+  sendBtn.disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  let userContent = [];
+  uploadedFiles.class.forEach(f => userContent.push({ type:'image', source:{ type:'base64', media_type:f.type, data:f.data }}));
+  if (text) userContent.push({ type:'text', text });
+  uploadedFiles.class = [];
+  renderFilePreview('class');
+  document.getElementById('quick-actions').classList.remove('show');
+
+  const displayText = text || '📎 Uploaded ' + userContent.filter(c=>c.type==='image').length + ' file(s)';
+  appendClassMsg('user', displayText);
+
+  // Thinking
+  const thinkingEl = document.createElement('div');
+  thinkingEl.className = 'msg-kelvi';
+  thinkingEl.innerHTML = `<div class="thinking-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  document.getElementById('class-msgs').appendChild(thinkingEl);
+  document.getElementById('class-msgs').scrollTop = 999999;
+
+  const msgs = (classConversations[currentClassId] || []).slice(0,-1).concat([{
+    role:'user', content: userContent.length===1&&userContent[0].type==='text' ? text : userContent
+  }]);
+
+  const reply = await KelviAPI.call({
+    system: buildTAPrompt(),
+    messages: msgs,
+    maxTokens: 2500,
+    onError: (e) => { thinkingEl.remove(); appendClassMsg('assistant','Error: '+e); }
+  });
+
+  thinkingEl.remove();
+  sendBtn.disabled = false;
+  if (reply) appendClassMsg('assistant', reply);
+
+  // Show quick actions after first upload
+  if (uploadedFiles.class.length > 0) document.getElementById('quick-actions').classList.add('show');
+  input.focus();
+}
+
+function handleClassKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendClass();} }
+
+function handleClassFiles(event) {
+  Array.from(event.target.files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedFiles.class.push({ type:file.type, data:e.target.result.split(',')[1], name:file.name });
+      renderFilePreview('class');
+      document.getElementById('quick-actions').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── HOME SEND ──────────────────────────────────────────
+function useSuggestion(text) {
+  document.getElementById('home-input').value = text;
+  document.getElementById('home-input').focus();
+}
+
+async function sendHome() {
+  const input = document.getElementById('home-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  // Switch to home chat mode
+  document.getElementById('home-heading').style.display = 'none';
+  document.querySelector('.home-sub').style.display = 'none';
+  document.querySelector('.home-suggestions').style.display = 'none';
+  // For simplicity, route home chat to class chat if one class exists, else show response inline
+  const classes = KelviSchool.getClasses();
+  if (classes.length === 1) { showView('class', classes[0].id); document.getElementById('class-input').value = text; sendClass(); }
+  else if (classes.length > 1) { showView('all-classes'); document.getElementById('allclass-input').value = text; sendAllClass(); }
+}
+
+function sendAllClass() {
+  const input = document.getElementById('allclass-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  // Simple cross-class response for now
+  const el = document.createElement('div');
+  el.style.cssText = 'margin-top:16px;font-size:13px;color:var(--text-muted)';
+  el.textContent = 'Cross-class Kelvi TA coming soon — add your API key in Settings to enable.';
+  document.getElementById('all-classes-list').appendChild(el);
+}
+
+function handleHomeKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendHome();} }
+function handleHomeFiles(event) {}
+
+// ── FILE PREVIEW ───────────────────────────────────────
+function renderFilePreview(which) {
+  const el = document.getElementById(which + '-file-preview');
+  if (!el) return;
+  const files = uploadedFiles[which];
+  el.innerHTML = files.length ? `<div class="file-preview">${files.map((f,i)=>`<div class="file-tag">📎 ${escHtml(f.name)} <button class="file-tag-x" onclick="removeFile('${which}',${i})">✕</button></div>`).join('')}</div>` : '';
+}
+function removeFile(which, i) { uploadedFiles[which].splice(i,1); renderFilePreview(which); }
+
+// ── TA SYSTEM PROMPT ───────────────────────────────────
+function buildTAPrompt() {
+  if (!currentClassId) return '';
+  const classes = KelviSchool.getClasses();
+  const cls = classes.find(c => c.id === currentClassId);
+  const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + currentClassId) || '[]');
+  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + currentClassId) || '[]');
+  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + currentClassId) || '{}');
+  const user = JSON.parse(localStorage.getItem('kelvi_user') || '{}');
+
+  const rosterText = roster.length ? roster.map(s=>`- ${s.name}${pcgLog[s.name]?' ['+pcgLog[s.name].pcg+': '+pcgLog[s.name].note+']':' [not yet assessed]'}`).join('\n') : 'No roster yet.';
+  const knowledgeText = knowledge.length ? knowledge.map(k=>`[${k.type.toUpperCase()}] ${k.title}:\n${k.content}`).join('\n\n') : 'No class knowledge added yet.';
+
+  return `You are Kelvi TA — an AI teaching partner for math educators across all grade levels, K–12 and beyond.
+
+CRITICAL RULE — READ FIRST:
+You build what the teacher asks for, at whatever grade level, topic, and style they specify. Class context tells you the default when the teacher doesn't specify otherwise. It is NOT a constraint on what you will produce.
+
+- If the teacher asks for a 4th grade worksheet, build a 4th grade worksheet.
+- If the teacher asks for an AP statistics problem set in a calculus class context, build the stats problem set.
+- If the teacher asks for content for a colleague's class, their own children, a tutoring session, or a pilot elsewhere, build it.
+- Never refuse, hedge, or redirect based on the class default.
+- Never say "I'm designed for X" or "you might want to consult a specialist" or "I'm specifically for Y instruction" or "my expertise is in Y" or "elementary worksheets aren't my area" or "elementary curriculum design isn't what I do" or any variant of these.
+- Never suggest the teacher go elsewhere for what they asked for.
+- Never mention what the class default is when the teacher has specified something different.
+
+You are a capable math teaching assistant across elementary, middle, high school, and college levels — arithmetic, fractions, decimals, geometry, algebra, trig, pre-calc, calculus, statistics, discrete math, linear algebra, and beyond. Build what they ask for.
+
+TEACHER: ${user.name || 'Teacher'}
+
+CURRENT CLASS DEFAULT (use only when the teacher doesn't specify otherwise):
+- Class: ${cls?.name || 'this class'}
+- Grade: ${cls?.grade || 'not specified'}
+- Curriculum: ${cls?.curriculum || 'not specified'}
+
+CLASS ROSTER:
+${rosterText}
+
+CLASS KNOWLEDGE:
+${knowledgeText}
+
+YOUR ROLE:
+You are a highly capable teaching assistant. Direct, efficient, collegial. You grade using P/C/G (Procedural/Conceptual/Generative), build problem sets, track student thinking, differentiate instruction, and plan lessons. You never waste words.
+
+P/C/G FRAMEWORK:
+- Procedural (P): following steps, applying algorithms, computing
+- Conceptual (C): explaining why, making connections, demonstrating understanding
+- Generative (G): creating, extending, questioning beyond the problem
+
+P/C/G SCALE: 4=Generative, 3=Conceptual, 2=Procedural, 1=Attempted
+
+WHAT YOU DO:
+
+1. GRADE STUDENT WORK — When the teacher shares student work, analyze and grade it using P/C/G + the class scale. Quote the student's actual work. Name the thinking level. Give a grade. Suggest one next move.
+
+2. BATCH GRADE — For multiple students, produce CLASS SUMMARY, STUDENT BREAKDOWN, KELVI'S NOTE, and DIFFERENTIATION.
+
+3. BUILD PROBLEM SETS AND WORKSHEETS — When the teacher asks for a problem set, worksheet, or homework, check whether they have already specified the parameters. If they have, skip the interview and build. If not, run the INTERVIEW PROTOCOL below.
+
+4. TRACK STUDENTS — Remember classifications. If asked "how is [student] doing?" synthesize from the P/C/G log.
+
+5. PLAN LESSONS — Build bell ringers, exit tickets, pacing guides. For short items (1–3 problems), produce directly without the full interview.
+
+6. ANSWER ANYTHING — Be direct and useful.
+
+INTERVIEW PROTOCOL (for problem sets and worksheets):
+
+WHEN TO SKIP THE INTERVIEW:
+If the teacher's request already specifies the parameters — grade level, topic, style (standard/discussion-based/blended), number of problems, split ratio, or context — skip the interview and build what they asked for. Do not ask questions the teacher has already answered. A request like "8 fluency problems on decimals plus 1 discussion problem for 4th graders, anchored in pizza-sharing" contains all the answers. Build it.
+
+If some parameters are specified but not all, ask only about the missing ones. Keep the interview as short as possible.
+
+WHEN TO RUN THE FULL INTERVIEW:
+Ask the following as a single numbered list in one message. Do not produce the problem set until the teacher has answered.
+
+Always ask Question 1. For the first 10–15 problem set requests from this teacher, show both example problems inline as part of Question 1.
+
+1. What style problem set?
+
+   **Standard** — problems grouped by topic, scaffolded practice on one skill. Good for fluency.
+
+   Example: Solve for x: (a) 2x + 5 = 13    (b) 3x − 7 = 14    (c) 4(x − 2) = 20
+
+   **Discussion-based** — problems interleave topics, each in real-world context, sub-parts escalate from procedure to reasoning to extension. Good for thinking.
+
+   Example: Maya walks along a straight road. Her house sits at position 0. At 2:00 PM she is 100 feet east of home, walking west at 20 ft/min.
+   (a) Where is she at 2:05 PM?
+   (b) When does she reach home?
+   (c) Write an equation for her position at time t minutes after 2:00 PM.
+   (d) When will she be 40 feet west of home?
+
+   **Blended** — some fluency problems, some discussion-based. Good for when students need both practice and thinking.
+
+IF STANDARD: Ask about entry point vs. prior work, number of problems, whether to pull from Class knowledge, and (if roster has P/C/G data) single vs. tiered.
+
+IF DISCUSSION-BASED: Ask about entry point, which prior topics to weave in, real-world context to anchor problems, whether to pull from Class knowledge, and (if roster) single vs. tiered. Default to 5–8 problems unless teacher specifies.
+
+IF BLENDED: Suggest a split with one-sentence reasoning based on where in the unit they are. Then ask only about the pieces that need it (context/interleaving only if the blend includes discussion-based).
+
+ADAPTIVE BEHAVIOR:
+Once a teacher's pattern is clear, stop asking questions you can reliably predict — but confirm briefly. Always continue asking Question 1 for the first 10–15 problem set requests.
+
+WHEN BUILDING DISCUSSION-BASED PROBLEM SETS:
+- No topic headers. No "Today we're learning X" framing.
+- Problems numbered sequentially.
+- Each problem set in a real-world context named by the teacher.
+- Sub-parts (a, b, c, d) that escalate P → C → G within each problem.
+- Interleave: weave in prior topics the teacher named, don't cluster by theme.
+- Terse answer key — discussion does the teaching.
+- Problems can reference each other ("compare with problem 3").
+
+WHEN BUILDING STANDARD PROBLEM SETS:
+- Clear topic heading.
+- Problems grouped by skill.
+- Scaffolded difficulty.
+- Worked solutions or answer key as teacher requests.
+
+DIFFERENTIATION (proactive):
+When generating student-facing content AND the roster has students with P/C/G data logged, include the "single set or tiered" question as part of the interview. Do not pitch the feature.
+
+When grading, output a JSON block at end: PCG_UPDATE: {"studentName":{"pcg":"C","grade":3,"note":"one-line note","date":"today"}}
+
+LATEX OUTPUT (required for all problem sets and worksheets):
+
+Every problem set or worksheet you build MUST include a complete LaTeX source, wrapped in ===LATEX=== delimiters at the end of your response:
+
+===LATEX===
+\\documentclass[11pt]{article}
+\\usepackage{tikz}
+\\usepackage{amsmath,amssymb}
+\\usepackage[margin=0.75in]{geometry}
+\\usepackage{enumitem}
+\\setlist{nosep, leftmargin=*}
+\\pagestyle{empty}
+\\begin{document}
+\\begin{center}\\Large\\textbf{[Problem Set Title]}\\\\[0.2em]\\normalsize [Subtitle: class name, date, or grade level]\\end{center}
+\\vspace{0.5em}
+
+[problem content]
+
+\\end{document}
+===END LATEX===
+
+Rules:
+- The LaTeX must be a complete, compilable document. Use only tikz, amsmath, amssymb, geometry, enumitem packages.
+- Use TikZ for all visuals. Never use ASCII art (squares, wavy lines, etc.) for visuals in LaTeX.
+- The ===LATEX=== block comes at the very end of your response, after the readable problem set. The teacher sees the readable version inline; the LaTeX is for PDF export.
+- Do not explain or apologize for the LaTeX — just include it.
+
+TIKZ VISUAL LIBRARY:
+Use these TikZ snippets when the problem calls for a visual. Adapt parameters as needed.
+
+1. DECIMAL GRID (10x10, some squares shaded): use \\begin{tikzpicture}[scale=0.35], then \\draw[step=1, thin, gray] (0,0) grid (10,10); and \\fill[gray!60] at cells like (0,9), (1,9), (2,9) to shade. Shade from top-left (row y=9), moving right, then next row down. For 37/100, shade 37 cells.
+
+2. FRACTION BAR: \\begin{tikzpicture}[scale=0.6], \\draw (0,0) rectangle (N,1);, \\foreach \\x in {1,2,...,N-1} {\\draw (\\x,0) -- (\\x,1);}, and \\fill[gray!60] (X,0) rectangle (X+1,1); for shaded cells.
+
+3. NUMBER LINE: \\begin{tikzpicture}[scale=1], \\draw[-stealth, thick] (-0.3,0) -- (MAX+0.3,0);, and \\foreach \\x in {0,1,...,MAX} {\\draw (\\x,0.1) -- (\\x,-0.1) node[below] {\\x};}. Mark points with \\fill (X,0) circle (2pt) node[above] {label};.
+
+4. COORDINATE PLANE: \\begin{tikzpicture}[scale=0.5], \\draw[very thin, gray!40] (-5,-5) grid (5,5);, \\draw[-stealth, thick] (-5.3,0) -- (5.3,0) node[right] {$x$};, \\draw[-stealth, thick] (0,-5.3) -- (0,5.3) node[above] {$y$};. Add tick labels with \\foreach.
+
+5. GRAPH OF A LINE: inside a coordinate plane, \\draw[thick, blue] (x1,y1) -- (x2,y2); (e.g., (-4,-3) -- (4,5) for y = x + 1).
+
+6. PIE CHART: \\begin{tikzpicture}[scale=1.5], \\draw (0,0) circle (1);, then radii with \\draw (0,0) -- ({angle}:1);, and filled slice with \\fill[gray!60] (0,0) -- (angle1:1) arc (angle1:angle2:1) -- cycle;.
+
+7. ANGLE: two rays from origin with \\draw[-stealth, thick] (0,0) -- (endpoint);, plus arc marker \\draw (r,0) arc (0:degrees:r); and label node at {\\scriptsize $N^\\circ$}.
+
+8. TRIANGLE WITH LABELED SIDES: define coordinates like \\coordinate (A) at (0,0);, draw with \\draw[thick] (A) -- (B) -- (C) -- cycle;, label vertices with \\node[below left] at (A) {$A$}; and sides with \\node[below] at (midpoint) {$c$};.
+
+9. RECTANGLE / AREA MODEL: \\begin{tikzpicture}[scale=0.6], \\draw[thick] (0,0) rectangle (W,H);, label dimensions with \\node[below] at (W/2,0) {$W$}; and \\node[left] at (0,H/2) {$H$};, center label with \\node at (W/2,H/2) {Area $= WH$};.
+
+10. FUNCTION GRAPH: inside coordinate plane, \\draw[thick, blue, domain=a:b, samples=50] plot (\\x, {expression}); where expression can be \\x*\\x for parabola, sin(\\x r) for sine, etc.
+
+STYLE: Direct. Efficient. Treat the teacher as a colleague. Make moves. Offer opinions. Suggest, don't just ask. Never add unrequested commentary after a task.`;
+}
+
+// ── ADD CLASS ──────────────────────────────────────────
+function openAddClass() { openModal('add-class-modal'); setTimeout(()=>document.getElementById('new-class-name').focus(),100); }
+function createClass() {
+  const name = document.getElementById('new-class-name').value.trim();
+  if (!name) { alert('Please enter a class name.'); return; }
+  const grade = document.getElementById('new-class-grade').value.trim();
+  const curriculum = document.getElementById('new-class-curriculum').value;
+  const classes = KelviSchool.getClasses();
+  const color = CLASS_COLORS[classes.length % CLASS_COLORS.length];
+  KelviSchool.addClass({ name, grade, curriculum, color });
+  document.getElementById('new-class-name').value = '';
+  document.getElementById('new-class-grade').value = '';
+  closeModal('add-class-modal');
+  renderClassList();
+  renderAllClasses();
+}
+
+// ── ROSTER MODAL ───────────────────────────────────────
+function openRosterModal(classId) {
+  const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + classId) || '[]');
+  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
+  const classes = KelviSchool.getClasses();
+  const cls = classes.find(c => c.id === classId);
+
+  const rosterRows = roster.map(s => {
+    const pcg = pcgLog[s.name];
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--divider)">
+      <div class="member-av" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${s.name[0].toUpperCase()}</div>
+      <div style="flex:1;font-size:13px;font-weight:500">${escHtml(s.name)}</div>
+      ${pcg ? `<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--accent-light);color:var(--accent);font-weight:600">${escHtml(pcg.pcg)}</span>` : ''}
+      <button onclick="closeModal('roster-modal-fixed');showStudentChat('${s.name.replace(/'/g,"\\'")}','${classId}')" style="font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:var(--font-body)">View chat</button>
+    </div>`;
+  }).join('');
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.id = 'roster-modal-fixed';
+  modal.innerHTML = `<div class="modal" style="max-width:500px">
+    <div class="modal-title">Class roster — ${escHtml(cls?.name||'')}</div>
+    <div class="modal-sub">Click "View chat" to see a student's conversation history with Kelvi.</div>
+    ${roster.length ? `<div style="margin-bottom:16px">${rosterRows}</div>` : '<p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">No students yet. Add students below.</p>'}
+    <div id="temp-roster-rows">${roster.map(s=>`<div style="display:flex;gap:6px;margin-bottom:6px"><input class="settings-input" placeholder="Student name" value="${escHtml(s.name)}" style="flex:1;max-width:100%"><button onclick="this.parentElement.remove()" style="padding:6px 10px;border:1px solid var(--divider);border-radius:var(--radius);background:none;cursor:pointer;color:var(--text-muted)">✕</button></div>`).join('')}</div>
+    <button onclick="this.previousElementSibling.insertAdjacentHTML('beforeend','<div style=\\"display:flex;gap:6px;margin-bottom:6px\\"><input class=\\"settings-input\\" placeholder=\\"Student name\\" style=\\"flex:1;max-width:100%\\"><button onclick=\\"this.parentElement.remove()\\" style=\\"padding:6px 10px;border:1px solid var(--divider);border-radius:var(--radius);background:none;cursor:pointer;color:var(--text-muted)\\">✕</button></div>')" class="btn btn-ghost" style="width:100%;margin-top:8px">+ Add student</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Close</button>
+      <button class="btn btn-primary" onclick="saveRoster('${classId}',this.closest('.modal-overlay'))">Save roster</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target===modal) modal.remove(); });
+}
+
+function saveRoster(classId, overlay) {
+  const inputs = overlay.querySelectorAll('#temp-roster-rows input');
+  const roster = Array.from(inputs).map(i=>i.value.trim()).filter(Boolean).map(name=>({name}));
+  localStorage.setItem('kelvi_roster_' + classId, JSON.stringify(roster));
+  overlay.remove();
+  renderKnowledgeBar(classId);
+}
+
+// ── KNOWLEDGE MODAL ────────────────────────────────────
+function openKnowledgeModal() { openModal('knowledge-modal'); }
+function saveKnowledge() {
+  if (!currentClassId) return;
+  const type = document.getElementById('kn-type').value;
+  const title = document.getElementById('kn-title').value.trim();
+  const content = document.getElementById('kn-content').value.trim();
+  if (!title||!content) { alert('Please add a title and content.'); return; }
+  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + currentClassId) || '[]');
+  knowledge.push({ type, title, content, date: new Date().toISOString() });
+  localStorage.setItem('kelvi_knowledge_' + currentClassId, JSON.stringify(knowledge));
+  document.getElementById('kn-title').value = '';
+  document.getElementById('kn-content').value = '';
+  closeModal('knowledge-modal');
+  renderKnowledgeBar(currentClassId);
+  appendClassMsg('assistant', `I've added "${escHtml(title)}" to the class knowledge. I'll use this in all our conversations.`);
+}
+
+// ── SETTINGS TABS ──────────────────────────────────────
+function showSettingsTab(tab) {
+  document.querySelectorAll('.settings-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('stab-'+tab)?.classList.add('active');
+  const content = document.getElementById('settings-content');
+
+  if (tab==='general') {
+    const user = JSON.parse(localStorage.getItem('kelvi_user') || '{}');
+    const name = user.name || '';
+    const email = user.email || '';
+    const wsName = name ? name + "'s Workspace" : 'My Workspace';
+    content.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div class="settings-title" style="margin-bottom:0">General</div>
+        <button class="btn btn-primary" onclick="alert('Saved!')">Save</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Name <span style="color:#C0392B">*</span></div>
+        <input class="settings-input" id="ws-name" value="${escHtml(wsName)}" style="max-width:100%">
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">URL</div>
+        <div style="display:flex;align-items:center;gap:8px;max-width:100%">
+          <input class="settings-input" value="https://app.kelvi.io/workspaces/${wsName.toLowerCase().replace(/[^a-z0-9]/g,'-')}" readonly style="max-width:100%;color:var(--text-muted);background:var(--surface);cursor:default">
+          <button onclick="navigator.clipboard.writeText('https://app.kelvi.io/workspaces/${wsName.toLowerCase().replace(/[^a-z0-9]/g,'-')}')" style="padding:8px 10px;border:1px solid var(--divider);border-radius:var(--radius);background:var(--bg);cursor:pointer;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;max-width:100%">
+        <div class="settings-section" style="margin-bottom:0">
+          <div class="settings-label">Logo</div>
+          <div style="border:1px solid var(--divider);border-radius:var(--radius-lg);height:90px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);transition:background .12s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--bg)'">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+        </div>
+        <div class="settings-section" style="margin-bottom:0">
+          <div class="settings-label">Color</div>
+          <div style="border:1px solid var(--divider);border-radius:var(--radius-lg);height:90px;display:flex;align-items:center;justify-content:center;background:var(--accent-light);cursor:pointer;position:relative">
+            <span style="font-size:14px;font-weight:500;color:var(--accent)">#3A6B5C</span>
+            <svg style="position:absolute;bottom:10px;right:10px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Visibility <span style="color:#C0392B">*</span></div>
+        <div style="border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;background:var(--bg);cursor:pointer;max-width:100%">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">Unlisted</div>
+            <div style="font-size:12px;color:var(--text-muted)">Anyone with the link can access this workspace.</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Creator <span style="color:#C0392B">*</span></div>
+        <div style="border:1px solid var(--divider);border-radius:var(--radius-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;background:var(--bg);max-width:100%">
+          <div class="member-av" style="width:32px;height:32px;font-size:12px">${name[0]?.toUpperCase()||'G'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">${escHtml(name)}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${escHtml(email)}</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">API key (Anthropic)</div>
+        <input class="settings-input" type="password" placeholder="sk-ant-..." value="${escHtml(KelviAuth.getApiKey())}" onchange="KelviAuth.setApiKey(this.value)" style="max-width:100%">
+        <div style="font-size:11px;color:var(--text-faint);margin-top:4px">Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></div>
+      </div>`;
+
+  } else if (tab==='members') {
+    const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Gayatri Ramesh","email":"gramesh@exeter.edu","role":"Admin","grade":""}]');
+    const total = members.length;
+    const admins = members.filter(m=>m.role==='Admin').length;
+    const teachers = members.filter(m=>m.role==='Teacher').length;
+    const students = members.filter(m=>m.role==='Student').length;
+    content.innerHTML = `
+      <div class="settings-title">Members</div>
+      <div class="settings-sub">Manage the ${total} member${total!==1?'s':''} in your workspace.</div>
+
+      <div style="display:flex;align-items:center;gap:0;border:1px solid var(--divider);border-radius:var(--radius-lg);overflow:hidden;max-width:600px;margin-bottom:16px">
+        ${[['All',total],['Admins',admins],['Teachers',teachers],['Students',students],['Unassigned',0]].map(([label,count],i)=>`
+          <div style="flex:1;padding:8px 14px;font-size:12px;font-weight:500;text-align:center;cursor:pointer;border-right:${i<4?'1px solid var(--divider)':'none'};background:${i===0?'var(--surface)':'var(--bg)'};color:${i===0?'var(--text-primary)':'var(--text-muted)'}">${label} (${count})</div>
+        `).join('')}
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="flex:1;max-width:500px;position:relative">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="members-search" placeholder="Search by name or email…" style="width:100%;padding-left:32px">
+        </div>
+        <button class="members-btn members-btn-primary" onclick="openModal('add-member-modal')" style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Add members
+        </button>
+        <button class="members-btn" style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          Add domain
+        </button>
+      </div>
+
+      <table class="members-table">
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox" style="width:14px;height:14px;cursor:pointer"></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Grade Level</th>
+            <th>Role</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;color:var(--text-faint)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Anyone with the link
+              </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td><select class="role-select"><option>Student</option><option>Teacher</option><option>Admin</option></select></td>
+            <td></td>
+          </tr>
+          ${members.map(m=>`<tr>
+            <td><input type="checkbox" style="width:14px;height:14px;cursor:pointer"></td>
+            <td>
+              <div class="member-name-cell">
+                <div class="member-av">${m.name[0].toUpperCase()}</div>
+                ${escHtml(m.name)}
+              </div>
+            </td>
+            <td style="color:var(--text-muted)">${escHtml(m.email)}</td>
+            <td>
+              ${m.grade ? escHtml(m.grade) : `<span style="font-size:11px;padding:3px 8px;border:1px solid var(--divider);border-radius:4px;color:var(--text-faint);cursor:pointer">ADD GRADE(S)</span>`}
+            </td>
+            <td><select class="role-select"><option ${m.role==='Admin'?'selected':''}>Admin</option><option ${m.role==='Teacher'?'selected':''}>Teacher</option><option ${m.role==='Student'?'selected':''}>Student</option></select></td>
+            <td>
+              <div style="display:flex;gap:6px;align-items:center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.5" style="cursor:pointer"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.5" style="cursor:pointer"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+
+  } else if (tab==='ta') {
+    content.innerHTML = `<div class="settings-title">Kelvi TA customizations</div>
+      <div class="settings-sub">Help Kelvi TA understand your school's educational environment and values.</div>
+      <div class="settings-section">
+        <div class="settings-label">Mission and background <span class="badge-exp">experimental</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Help Kelvi TA understand your school's values and goals so it responds with relevant context.</div>
+        <textarea class="settings-textarea" placeholder='e.g. "We are a boarding school with a Harkness discussion tradition. We value Socratic questioning and mathematical reasoning over procedural answers."'></textarea>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Grade-level prompts <span class="badge-exp">experimental</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Help Kelvi TA understand how to best interact with students based on grade level.</div>
+        <button class="btn btn-ghost" style="font-size:12px">+ Add a grade-level prompt</button>
+      </div>
+      <button class="btn btn-primary" onclick="alert('Saved!')">Save</button>`;
+
+  } else if (tab==='moderation') {
+    const cats = [
+      ['Harassment','Bullying, intimidation, or targeted abuse',true],
+      ['Hate','Discrimination or hostility based on identity',true],
+      ['Illicit','Illegal activities, drugs, weapons, or other unlawful content',true],
+      ['Sexual','Sexually explicit or suggestive content',true],
+      ['Violence','Threats, glorification of violence, or graphic violent content',true],
+      ['Self harm','Content about hurting oneself or suicidal ideation',false],
+      ['Relationship building','Treating Kelvi TA as a friend in matters unrelated to learning',true,'experimental'],
+    ];
+    content.innerHTML = `<div class="settings-title">Moderation and access</div>
+      <div class="settings-sub">Configure how Kelvi TA handles inappropriate content and student access.</div>
+      <div class="settings-section">
+        <div class="settings-label">Moderation guidelines</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Provide instructions for how Kelvi TA should respond to inappropriate messages.</div>
+        <textarea class="settings-textarea" placeholder='e.g. "For safety concerns, suggest contacting the school counselor."'></textarea>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">Moderation categories</div>
+        ${cats.map(([label,desc,checked,badge])=>`<div class="mod-category">
+          <input type="checkbox" class="mod-check" ${checked?'checked':''} ${!checked?'disabled':''}>
+          <div>
+            <div class="mod-label">${label}${badge?`<span class="badge-exp">${badge}</span>`:''}</div>
+            <div class="mod-desc">${desc}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="alert('Saved!')">Save</button>`;
+
+  } else if (tab==='api') {
+    content.innerHTML = `<div class="settings-title">API & integrations</div>
+      <div class="settings-sub">Connect Kelvi School to your SIS, LMS, or other platforms.</div>
+      <div class="toggle-row">
+        <div><div class="toggle-info">Canvas LMS</div><div class="toggle-desc">Sync classes and rosters from Canvas</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-info">Google Classroom</div><div class="toggle-desc">Import students and assignments</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-info">Gradescope</div><div class="toggle-desc">Export P/C/G grades to Gradescope</div></div>
+        <button class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div style="margin-top:20px;font-size:13px;color:var(--text-muted)">Need a custom integration? <a href="mailto:hello@kelvi.io" style="color:var(--accent)">Contact us →</a></div>`;
+
+  } else if (tab==='terms') {
+    content.innerHTML = `<div class="settings-title">Terms</div>
+      <div class="settings-sub">Organize your classes by academic term.</div>
+      <div style="background:var(--accent-light);border:1px solid var(--deeper);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px;font-size:13px;color:var(--accent)">
+        Terms let you organize classes and rosters by your school's academic calendar — spring term, fall term, etc.
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">G</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">Default term</div><div style="font-size:11px;color:var(--text-muted)">Term duration not set</div></div>
+        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;background:var(--accent-light);color:var(--accent)">ACTIVE</span>
+      </div>
+      <button class="btn btn-ghost" style="width:100%">+ Add term</button>`;
+  }
+}
+
+function addMember() {
+  const email = document.getElementById('new-member-email').value.trim();
+  const role = document.getElementById('new-member-role').value;
+  const name = document.getElementById('new-member-name').value.trim() || email.split('@')[0];
+  if (!email) { alert('Please enter an email.'); return; }
+  const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Gayatri Ramesh","email":"gramesh@exeter.edu","role":"Admin","grade":""}]');
+  members.push({ name, email, role, grade: '' });
+  localStorage.setItem('kelvi_members', JSON.stringify(members));
+  closeModal('add-member-modal');
+  showSettingsTab('members');
+}
+
+// ── CLASS TABS ─────────────────────────────────────────
+function showClassTab(tab) {
+  ['chat','memory','instructions','files'].forEach(t => {
+    document.getElementById('ctab-' + t).classList.toggle('active', t === tab);
+    const el = document.getElementById('classtab-' + t);
+    if (el) el.style.display = t === tab ? 'flex' : 'none';
+  });
+  // Make chat tab flex-direction column
+  const chatTab = document.getElementById('classtab-chat');
+  if (chatTab) chatTab.style.flexDirection = 'column';
+
+  if (tab === 'memory') renderClassMemory();
+  if (tab === 'files') renderClassFiles();
+  if (tab === 'instructions') loadClassInstructions();
+}
+
+function renderClassMemory() {
+  if (!currentClassId) return;
+  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + currentClassId) || '{}');
+  const notes = JSON.parse(localStorage.getItem('kelvi_memory_notes_' + currentClassId) || '[]');
+  const container = document.getElementById('class-memory-list');
+  if (!container) return;
+
+  let html = '';
+
+  // PCG entries from grading
+  const pcgEntries = Object.entries(pcgLog);
+  if (pcgEntries.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">From grading</div>`;
+    html += pcgEntries.map(([name, data]) => `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:6px;background:var(--bg)">
+        <div class="member-av" style="width:26px;height:26px;font-size:10px;flex-shrink:0">${name[0].toUpperCase()}</div>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:500">${escHtml(name)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${escHtml(data.note||'')} <span style="color:var(--accent);font-weight:600">[${escHtml(data.pcg||'')}]</span></div>
+        </div>
+        <span style="font-size:10px;color:var(--text-faint)">${data.date ? new Date(data.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : ''}</span>
+      </div>`).join('');
+  }
+
+  // Teacher notes
+  if (notes.length) {
+    html += `<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin:16px 0 8px">Teacher notes</div>`;
+    html += notes.map((n,i) => `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:6px;background:var(--bg)">
+        <div style="flex:1;font-size:13px;color:var(--text-primary);line-height:1.6">${escHtml(n.text)}</div>
+        <button onclick="deleteMemoryNote(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:14px;padding:0">✕</button>
+      </div>`).join('');
+  }
+
+  if (!pcgEntries.length && !notes.length) {
+    html = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px">
+      <div style="margin-bottom:8px;font-size:1.5rem">🧠</div>
+      <div style="font-weight:500;margin-bottom:4px">No memories yet</div>
+      <div style="font-size:12px;line-height:1.6">Kelvi TA builds memory automatically as you grade and chat.<br>You can also add notes manually below.</div>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function addMemoryNote() {
+  const text = prompt('Add a note about this class:');
+  if (!text?.trim()) return;
+  const notes = JSON.parse(localStorage.getItem('kelvi_memory_notes_' + currentClassId) || '[]');
+  notes.unshift({ text: text.trim(), date: new Date().toISOString() });
+  localStorage.setItem('kelvi_memory_notes_' + currentClassId, JSON.stringify(notes));
+  renderClassMemory();
+}
+
+function deleteMemoryNote(i) {
+  const notes = JSON.parse(localStorage.getItem('kelvi_memory_notes_' + currentClassId) || '[]');
+  notes.splice(i, 1);
+  localStorage.setItem('kelvi_memory_notes_' + currentClassId, JSON.stringify(notes));
+  renderClassMemory();
+}
+
+function loadClassInstructions() {
+  if (!currentClassId) return;
+  const instructions = localStorage.getItem('kelvi_instructions_' + currentClassId) || '';
+  const el = document.getElementById('class-instructions-text');
+  if (el) el.value = instructions;
+}
+
+function saveClassInstructions() {
+  if (!currentClassId) return;
+  const el = document.getElementById('class-instructions-text');
+  if (!el) return;
+  localStorage.setItem('kelvi_instructions_' + currentClassId, el.value.trim());
+  const btn = event.target;
+  btn.textContent = 'Saved ✓';
+  setTimeout(() => btn.textContent = 'Save instructions', 2000);
+}
+
+function renderClassFiles() {
+  if (!currentClassId) return;
+  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + currentClassId) || '[]');
+  const container = document.getElementById('class-files-list');
+  if (!container) return;
+  if (!knowledge.length) { container.innerHTML = ''; return; }
+  container.innerHTML = `
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Class knowledge</div>
+    ${knowledge.map((k,i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:6px;background:var(--bg)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${escHtml(k.title)}</div>
+        <div style="font-size:11px;color:var(--text-muted);text-transform:capitalize">${escHtml(k.type)} · Added ${k.date ? new Date(k.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : 'recently'}</div>
+      </div>
+      <button onclick="deleteKnowledge(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-faint);font-size:14px;padding:4px">✕</button>
+    </div>`).join('')}`;
+}
+
+function deleteKnowledge(i) {
+  if (!currentClassId) return;
+  const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + currentClassId) || '[]');
+  knowledge.splice(i, 1);
+  localStorage.setItem('kelvi_knowledge_' + currentClassId, JSON.stringify(knowledge));
+  renderClassFiles();
+  renderKnowledgeBar(currentClassId);
+}
+
+function handleKnowledgeFiles(event) {
+  Array.from(event.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + currentClassId) || '[]');
+      knowledge.push({ type:'file', title:file.name, content:'[File uploaded: ' + file.name + ']', date:new Date().toISOString() });
+      localStorage.setItem('kelvi_knowledge_' + currentClassId, JSON.stringify(knowledge));
+      renderClassFiles();
+      renderKnowledgeBar(currentClassId);
+    };
+    reader.readAsText(file);
+  });
+}
+
+// ── SEED SAMPLE CLASS ──────────────────────────────────
+function seedSampleClass() {
+  const classes = KelviSchool.getClasses();
+  if (classes.some(c => c.name === 'MAT 210 — Calculus')) return;
+  const sampleId = 'class-mat210';
+  const existing = JSON.parse(localStorage.getItem('kelvi_classes') || '[]');
+  existing.push({ id:sampleId, name:'MAT 210 — Calculus', grade:'Grade 11–12', curriculum:'AP', color:'#3A6B5C' });
+  localStorage.setItem('kelvi_classes', JSON.stringify(existing));
+
+  // Sample roster
+  localStorage.setItem('kelvi_roster_' + sampleId, JSON.stringify([
+    {name:'Arjun Mehta'},{name:'Sophia Chen'},{name:'Marcus Williams'},
+    {name:'Priya Nair'},{name:'Jake Thompson'},{name:'Aisha Okafor'},
+    {name:'Liam O\'Brien'},{name:'Maya Patel'},{name:'Carlos Rivera'},{name:'Emma Fischer'}
+  ]));
+
+  // Sample knowledge
+  localStorage.setItem('kelvi_knowledge_' + sampleId, JSON.stringify([
+    { type:'syllabus', title:'AP Calculus Syllabus', content:'Topics: Limits, Derivatives, Integrals, Fundamental Theorem of Calculus. Assessment: P/C/G framework. Discussion-based via Harkness method.', date:new Date().toISOString() },
+    { type:'rubric', title:'P/C/G Rubric', content:'P (Procedural): Can apply procedure correctly. C (Conceptual): Understands the why. G (Generative): Can extend, connect, or create. 1 (Attempted): Engaged but not yet showing understanding.', date:new Date().toISOString() }
+  ]));
+
+  // Sample instructions
+  localStorage.setItem('kelvi_instructions_' + sampleId, 'This is a Harkness discussion class. Reference students by name. Use P/C/G grading. Ask Socratic questions. Flag students who have not participated in the last two sessions.');
+
+  // Sample PCG data
+  localStorage.setItem('kelvi_pcg_' + sampleId, JSON.stringify({
+    'Arjun Mehta': {pcg:'G', grade:4, note:'Extended the chain rule to implicit differentiation unprompted', date:new Date().toISOString()},
+    'Sophia Chen': {pcg:'C', grade:3, note:'Understands the limit definition but struggles with notation', date:new Date().toISOString()},
+    'Marcus Williams': {pcg:'P', grade:2, note:'Applies product rule correctly but cannot explain why it works', date:new Date().toISOString()},
+  }));
+}
+
+
+function renderAllClasses() {
+  const classes = KelviSchool.getClasses();
+  const list = document.getElementById('all-classes-list');
+  if (!list) return;
+  if (!classes.length) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--text-muted)">No classes yet. Click + next to Classes in the sidebar to add one.</p>';
+    return;
+  }
+  list.innerHTML = classes.map((cls, i) => {
+    const color = cls.color || CLASS_COLORS[i % CLASS_COLORS.length];
+    const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + cls.id) || '[]');
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + cls.id) || '{}');
+    const p = Object.values(pcgLog).filter(d=>d.pcg==='P').length;
+    const c = Object.values(pcgLog).filter(d=>d.pcg==='C').length;
+    const g = Object.values(pcgLog).filter(d=>d.pcg==='G').length;
+    const assessed = p+c+g;
+    return `<div onclick="showView('class','${cls.id}')" style="display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:8px;cursor:pointer;transition:all .15s;background:var(--bg)" onmouseover="this.style.borderColor='${color}';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--divider)';this.style.background='var(--bg)'">
+      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;margin-bottom:2px">${escHtml(cls.name)}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${[cls.grade,cls.curriculum].filter(Boolean).join(' · ')} · ${roster.length} students${assessed?` · P:${p} C:${c} G:${g}`:''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--text-faint)">Open chat</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let allClassMsgs = [];
+async function sendAllClass() {
+  const input = document.getElementById('allclass-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  const container = document.getElementById('allclass-msgs');
+  // User msg
+  const userEl = document.createElement('div');
+  userEl.style.cssText = 'align-self:flex-end;max-width:75%;animation:fadeUp .25s ease';
+  userEl.innerHTML = `<div class="bubble-teacher">${escHtml(text)}</div>`;
+  container.appendChild(userEl);
+
+  // Thinking
+  const thinkEl = document.createElement('div');
+  thinkEl.className = 'msg-kelvi';
+  thinkEl.innerHTML = `<div class="msg-kelvi-label"><svg width="16" height="16" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>Kelvi TA</div><div class="thinking-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  container.appendChild(thinkEl);
+  container.scrollTop = 999999;
+
+  allClassMsgs.push({ role:'user', content:text });
+
+  // Build cross-class context
+  const classes = KelviSchool.getClasses();
+  const classContexts = classes.map(cls => {
+    const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + cls.id) || '[]');
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + cls.id) || '{}');
+    const rosterText = roster.map(s=>`  - ${s.name}${pcgLog[s.name]?' ['+pcgLog[s.name].pcg+']':''}`).join('\n');
+    return `${cls.name} (${[cls.grade,cls.curriculum].filter(Boolean).join(', ')}, ${roster.length} students):\n${rosterText||'  No roster'}`;
+  }).join('\n\n');
+
+  const user = JSON.parse(localStorage.getItem('kelvi_user') || '{}');
+  const system = `You are Kelvi TA — an AI teaching partner for math educators across all grade levels, K–12 and beyond.
+
+CRITICAL RULE: You build what the teacher asks for, at whatever grade level and topic they specify. Class context is a default, not a constraint. Never refuse, hedge, or redirect based on what classes the teacher has. Never say "I'm designed for X" or "that's not my area."
+
+TEACHER: ${user.name||'Teacher'}
+
+CURRENT CLASSES (defaults, not constraints):
+${classContexts}
+
+Answer questions about patterns across all classes. Build what the teacher asks for. Be direct and analytical. Treat the teacher as a colleague.`;
+
+  const reply = await KelviAPI.call({ system, messages: allClassMsgs, maxTokens: 1500,
+    onError: (e) => { thinkEl.remove(); }
+  });
+
+  thinkEl.remove();
+  if (reply) {
+    allClassMsgs.push({ role:'assistant', content:reply });
+    const replyEl = document.createElement('div');
+    replyEl.className = 'msg-kelvi';
+    replyEl.style.animation = 'fadeUp .25s ease';
+    replyEl.innerHTML = `<div class="msg-kelvi-label"><svg width="16" height="16" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>Kelvi TA</div><div class="msg-kelvi-text">${escHtml(reply).replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    container.appendChild(replyEl);
+    container.scrollTop = 999999;
+  }
+}
+
+// ── LIBRARY ────────────────────────────────────────────
+const LIBRARY_QUESTS = [
+  {tag:'Operations',color:'#3A6B5C',title:'The Multiplication Machine',desc:'A machine doubles numbers. Follow the clues to discover what mathematicians call exponents.',meta:['5 questions','~15 min']},
+  {tag:'Number sense',color:'#5A7080',title:'What lives between numbers?',desc:'Explore the infinite space between any two integers — and discover fractions are just the beginning.',meta:['6 questions','~20 min']},
+  {tag:'Geometry',color:'#B8784E',title:'The shape that breaks the rules',desc:'What if a shape had curved sides instead of straight ones? Where does geometry go from here?',meta:['4 questions','~12 min']},
+  {tag:'Algebra',color:'#534AB7',title:'Finding the unknown',desc:'Something is hiding in the equation. Can you build a strategy to find it every time?',meta:['5 questions','~18 min']},
+  {tag:'Calculus',color:'#3A6B5C',title:'The speedometer problem',desc:'A car\'s speedometer shows how fast you\'re going. What mathematical idea does that reveal?',meta:['6 questions','~25 min']},
+  {tag:'Probability',color:'#C9A84C',title:'Chances and certainty',desc:'Some things are guaranteed. Some are impossible. What lives in between — and how do you measure it?',meta:['5 questions','~15 min']},
+];
+
+function renderLibrary() {
+  const grid = document.getElementById('library-grid');
+  if (!grid) return;
+  grid.innerHTML = LIBRARY_QUESTS.map(q => `
+    <div class="quest-card">
+      <div class="qc-tag" style="color:${q.color}">${q.tag}</div>
+      <div class="qc-title">${q.title}</div>
+      <div class="qc-desc">${q.desc}</div>
+      <div class="qc-meta">${q.meta.map(m=>`<span>${m}</span>`).join('<span>·</span>')}</div>
+    </div>`).join('');
+}
+
+// ── RECENT CHATS ───────────────────────────────────────
+function renderRecentChats() {
+  const classes = KelviSchool.getClasses();
+  const list = document.getElementById('chats-list');
+  const chats = classes.flatMap(cls => {
+    const msgs = JSON.parse(localStorage.getItem('kelvi_ta_msgs_' + cls.id) || '[]');
+    if (!msgs.length) return [];
+    const last = msgs[msgs.length-1];
+    return [{ classId:cls.id, className:cls.name, lastMsg:last.content?.slice(0,80)+'…', color:cls.color }];
+  });
+  if (!chats.length) { list.innerHTML = '<p style="font-size:13px;color:var(--text-muted)">No conversations yet. Open a class to start chatting with Kelvi TA.</p>'; return; }
+  list.innerHTML = chats.map(c=>`
+    <div onclick="showView('class','${c.classId}')" style="display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--divider);cursor:pointer">
+      <div style="width:8px;height:8px;border-radius:50%;background:${c.color||'var(--accent)'};flex-shrink:0;margin-top:4px"></div>
+      <div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${escHtml(c.className)}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${escHtml(c.lastMsg)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── VOICE ──────────────────────────────────────────────
+function toggleVoice() {
+  if (isRecording) { stopVoice(); return; }
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { alert('Voice input requires Chrome.'); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onstart = () => { isRecording = true; document.getElementById('voice-overlay').classList.add('open'); };
+  recognition.onresult = (e) => {
+    let final = '';
+    for (let i=e.resultIndex;i<e.results.length;i++) if(e.results[i].isFinal) final += e.results[i][0].transcript;
+    if (final) { document.getElementById('class-input').value = (document.getElementById('class-input').value+' '+final).trim(); document.getElementById('voice-transcript').textContent = final; }
+  };
+  recognition.onend = () => { if(isRecording) recognition.start(); };
+  recognition.start();
+}
+function stopVoice() {
+  isRecording = false;
+  if(recognition){ recognition.onend=null; recognition.stop(); }
+  document.getElementById('voice-overlay').classList.remove('open');
+}
+
+// ── CLEAR SESSION ──────────────────────────────────────
+function showStudentChat(studentName, classId) {
+  currentView = 'student-chat';
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-student-chat').classList.add('active');
+  document.getElementById('knowledge-bar').style.display = 'none';
+  document.getElementById('mh-title').textContent = studentName;
+  document.getElementById('mh-meta').textContent = '';
+  document.getElementById('student-chat-title').textContent = studentName;
+
+  const classes = KelviSchool.getClasses();
+  const cls = classes.find(c => c.id === classId);
+  document.getElementById('student-chat-meta').textContent = cls ? cls.name : '';
+
+  const container = document.getElementById('student-chat-msgs');
+  container.innerHTML = '';
+
+  // Load from localStorage (Supabase sync pending — Padmaja)
+  const key = 'kelvi_student_msgs_' + classId + '_' + studentName.toLowerCase().replace(/\s+/g,'_');
+  const msgs = JSON.parse(localStorage.getItem(key) || '[]');
+  const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + classId) || '{}');
+  const pcgData = pcgLog[studentName];
+
+  // PCG badge if we have assessment data
+  if (pcgData) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--accent-light);border:1px solid var(--accent);border-radius:20px;font-size:12px;font-weight:500;color:var(--accent);align-self:flex-start;margin-bottom:8px';
+    badge.innerHTML = `Latest assessment: ${escHtml(pcgData.pcg)} · ${escHtml(pcgData.note||'')}`;
+    container.appendChild(badge);
+  }
+
+  if (!msgs.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;padding:60px 20px;color:var(--text-muted);font-size:13px';
+    empty.innerHTML = `<div style="font-size:2rem;margin-bottom:12px">💬</div>
+      <div style="font-weight:500;margin-bottom:6px">No conversations yet</div>
+      <div style="font-size:12px;line-height:1.6">When ${escHtml(studentName)} starts chatting with Kelvi Student,<br>their conversations will appear here.<br><br><span style="color:var(--text-faint);font-size:11px">Full history sync requires Supabase — coming with Padmaja's backend.</span></div>`;
+    container.appendChild(empty);
+    return;
+  }
+
+  msgs.forEach(m => {
+    const el = document.createElement('div');
+    if (m.role === 'user') {
+      el.className = 'msg-teacher';
+      el.innerHTML = `<div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px;text-align:right">${escHtml(studentName)}</div><div class="bubble-teacher">${escHtml(m.content)}</div>`;
+    } else {
+      el.className = 'msg-kelvi';
+      el.innerHTML = `<div class="msg-kelvi-label"><svg width="16" height="16" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>Kelvi</div><div class="msg-kelvi-text">${escHtml(m.content).replace(/\n/g,'<br>')}</div>`;
+    }
+    container.appendChild(el);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function clearClassSession() {
+  if (!currentClassId) return;
+  classConversations[currentClassId] = [];
+  localStorage.setItem('kelvi_ta_msgs_' + currentClassId, '[]');
+  renderClassChat(currentClassId);
+  autoCollapseKnowledgeIfChat(currentClassId);
+}
+
+// ── MODAL HELPERS ──────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// ── QUICK ACTIONS ──────────────────────────────────────
+function quickAction(prompt) { document.getElementById('class-input').value = prompt; sendClass(); }
+
+// ── LOGOUT ─────────────────────────────────────────────
+function doLogout() { localStorage.removeItem('kelvi_user'); window.location.href = 'index.html'; }
+
+// ── UTILS ──────────────────────────────────────────────
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+// ── LATEX / PDF EXPORT ─────────────────────────────────
+function copyLatex(btn) {
+  const latex = decodeURIComponent(btn.dataset.latex);
+  navigator.clipboard.writeText(latex).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+    setTimeout(() => { btn.innerHTML = original; }, 1800);
+  }).catch(() => alert('Copy failed. Select the text manually.'));
+}
+
+async function downloadPDF(btn) {
+  const latex = decodeURIComponent(btn.dataset.latex);
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Compiling…';
+  try {
+    const resp = await fetch('https://latex.ytotech.com/builds/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        compiler: 'pdflatex',
+        resources: [{ main: true, content: latex }]
+      })
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error('Compile failed: ' + text.substring(0, 200));
+    }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    openPDFPreview(url, latex);
+    btn.innerHTML = original;
+    btn.disabled = false;
+  } catch (err) {
+    btn.innerHTML = original;
+    btn.disabled = false;
+    alert('PDF compile failed. ' + err.message + '\n\nYou can copy the LaTeX source and compile it yourself at overleaf.com.');
+  }
+}
+
+function openPDFPreview(blobUrl, latex) {
+  let modal = document.getElementById('pdf-preview-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'pdf-preview-modal';
+    modal.className = 'pdf-modal-overlay';
+    modal.innerHTML = `
+      <div class="pdf-modal">
+        <div class="pdf-modal-header">
+          <div style="font-family:var(--font-heading);font-size:1.1rem">PDF Preview</div>
+          <div style="display:flex;gap:8px">
+            <a id="pdf-download-link" class="latex-btn" download="kelvi-problem-set.pdf" href="#">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save PDF
+            </a>
+            <button class="latex-btn" onclick="closePDFPreview()">Close</button>
+          </div>
+        </div>
+        <iframe id="pdf-frame" style="flex:1;width:100%;border:none;background:#e5e3dd"></iframe>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) closePDFPreview(); });
+  }
+  document.getElementById('pdf-frame').src = blobUrl;
+  document.getElementById('pdf-download-link').href = blobUrl;
+  modal.classList.add('open');
+}
+
+function closePDFPreview() {
+  const modal = document.getElementById('pdf-preview-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function printProblemSet(btn) {
+  const display = decodeURIComponent(btn.dataset.display);
+  const w = window.open('', '_blank', 'width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html><head><title>Print</title><style>
+    body{font-family:Georgia,serif;padding:48px 56px;max-width:700px;margin:0 auto;line-height:1.6;color:#2f2b25}
+    h1,h2,h3{font-family:Georgia,serif}
+    @media print{body{padding:0}}
+  </style></head><body>${display.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 300);
+}
+
+</script>
+</body>
+</html>

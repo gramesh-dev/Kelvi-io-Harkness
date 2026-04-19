@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kelvi Family — a math galaxy for young explorers.">
+<title>Kelvi Family — Math Galaxy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+
+:root {
+  --bg: #F8F7F4;
+  --surface: #F0EDE6;
+  --deeper: #E8E3DA;
+  --divider: #D9D4C9;
+  --text-primary: #2F2B25;
+  --text-muted: #6F6A61;
+  --text-faint: #9A9488;
+  --accent: #3A6B5C;
+  --accent-dark: #2D5347;
+  --accent-light: #EBF3EF;
+  --family: #B8784E;
+  --family-dark: #9E6640;
+  --family-light: #F5EDE5;
+  --gold: #C9A84C;
+  --space-deep: #0D0C1C;
+  --space-mid: #1F1D3A;
+  --space-accent: #F5E6A8;
+  --font-heading: 'DM Serif Display', serif;
+  --font-serif: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{cursor:pointer;font-family:inherit}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:56px;padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid var(--divider);
+  transition:background .3s ease, border-color .3s ease;
+}
+.topbar.space-mode{background:rgba(26,24,48,0.85);backdrop-filter:blur(12px);border-bottom-color:rgba(245,230,168,0.08)}
+.topbar.space-mode .topbar-brand{color:#fff}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.topbar.space-mode .topbar-uname{color:rgba(240,232,204,0.7)}
+.topbar.space-mode .sb-label{color:rgba(240,232,204,0.5)}
+.topbar-brand{
+  font-family:var(--font-heading);font-size:1.25rem;color:var(--accent);
+  display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;
+}
+.sb-label{font-size:0.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:2px;letter-spacing:0.05em;text-transform:uppercase}
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar-tab{
+  font-size:12px;color:var(--text-muted);padding:6px 14px;border-radius:8px;
+  font-weight:500;background:none;border:none;transition:all .12s;
+}
+.topbar-tab:hover{color:var(--text-primary);background:var(--surface)}
+.topbar-tab.active{color:var(--family);background:var(--family-light)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color:#F5E6A8;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-serif);font-size:13px;font-weight:500;
+}
+.topbar-uname{font-size:12px;color:var(--text-muted);font-weight:500}
+
+/* ── MAIN ── */
+.main{padding-top:56px;height:100vh;overflow:hidden;position:relative}
+.panel{position:absolute;inset:56px 0 0 0;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.panel.active{opacity:1;pointer-events:auto}
+
+/* ═══════════════════════════════════════════════════════════
+   GALAXY VIEW
+   4 variants switchable via [data-variant]:
+   ─ v1 "sky"       living sky, parallax drift, resume pulse
+   ─ v2 "orbit"     planets slowly orbit, faint constellation links
+   ─ v3 "creature"  each planet has a signature silhouette
+   ─ v4 "objects"   each planet IS the math thing (polygon, pie, etc)
+   palette togglable via [data-palette="saffron"]
+══════════════════════════════════════════════════════════════ */
+.galaxy{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  /* default (deep-space) background */
+  background:
+    radial-gradient(ellipse at 30% 25%, rgba(60,55,110,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(40,35,80,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at center, #1F1D3A 0%, #0D0C1C 75%);
+  --gx-accent: #F5E6A8;   /* highlight colour for labels / center name */
+  --gx-halo:   58,107,92; /* rgb used for centre halo & accents        */
+  --gx-resume: #F5E6A8;   /* resume pulse ring                         */
+}
+/* saffron/ink palette variant: warmer night sky, ink-blue base */
+.galaxy[data-palette="saffron"]{
+  background:
+    radial-gradient(ellipse at 30% 25%, rgba(229,163,33,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 72% 82%, rgba(31,58,107,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at center, #152143 0%, #0A1128 78%);
+  --gx-accent: #F5E6A8;
+  --gx-halo:   229,163,33;
+  --gx-resume: #E5A321;
+}
+
+/* ── starfield ── */
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.star{position:absolute;border-radius:50%;opacity:0;animation:twinkle 3s ease-in-out infinite}
+.star{background:var(--gx-accent)}
+.star-blue{background:#B8C8E8}
+.star-warm{background:#F8D898}
+@keyframes twinkle{0%,100%{opacity:0.25}50%{opacity:0.95}}
+
+.nebula{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(ellipse 300px 200px at 18% 80%, rgba(184,120,78,0.08), transparent 60%),
+    radial-gradient(ellipse 360px 240px at 82% 22%, rgba(90,74,160,0.12), transparent 60%);
+}
+.galaxy[data-palette="saffron"] .nebula{
+  background-image:
+    radial-gradient(ellipse 340px 220px at 18% 80%, rgba(229,163,33,0.10), transparent 60%),
+    radial-gradient(ellipse 400px 260px at 82% 22%, rgba(31,58,107,0.30), transparent 60%);
+}
+
+/* ── orbit rings (ambient) — elliptical to echo the galaxy disc ── */
+.orbit{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  border:1px solid rgba(232,220,184,0.08);border-radius:50%;pointer-events:none;
+}
+/* Rings are ellipses — wider than tall (rx ≈ 1.6 × ry) so the viewer reads a
+   spiral galaxy seen from a 3/4 angle rather than a flat solar system. */
+.orbit-1{width:240px;height:150px}
+.orbit-2{width:400px;height:250px;border-style:dashed;border-color:rgba(232,220,184,0.07)}
+.orbit-3{width:580px;height:360px}
+.orbit-4{width:780px;height:490px;border-style:dashed;border-color:rgba(232,220,184,0.05)}
+.orbit-5{width:1000px;height:625px}
+.orbit-6{width:1240px;height:775px;border-color:rgba(232,220,184,0.04)}
+
+/* ── parallax layer: slowly drifts with mouse ── */
+.parallax{position:absolute;inset:0;pointer-events:none;will-change:transform;transition:transform .6s cubic-bezier(.22,.61,.36,1);margin-top:-40px}
+
+/* ── constellation links (v2) ── */
+.links{position:absolute;inset:0;pointer-events:none;opacity:0}
+.galaxy[data-variant="orbit"] .links{opacity:1}
+.links line{stroke:rgba(245,230,168,0.14);stroke-width:1;stroke-dasharray:2 6}
+.galaxy[data-palette="saffron"] .links line{stroke:rgba(229,163,33,0.18)}
+
+/* ── centre (Kelvi · you · today's invitation) ── */
+.galaxy-center{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;z-index:40;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.kelvi-sun{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 18px;
+  background:radial-gradient(circle at 35% 30%, #FFF6CF 0%, #F5E6A8 35%, #E0BF5A 72%, #B8893A 100%);
+  box-shadow:
+    0 0 32px rgba(245,230,168,0.7),
+    0 0 72px rgba(245,230,168,0.38),
+    0 0 140px rgba(245,230,168,0.2);
+  animation:sunPulse 4s ease-in-out infinite;
+}
+/* Arya — the galactic core, large italic serif */
+.galaxy-core-name{
+  font-family:var(--font-serif);font-style:italic;font-weight:400;
+  font-size:clamp(22px, 2.4vw, 32px);line-height:1;
+  color:#F5E6A8;letter-spacing:-0.005em;
+  text-shadow:
+    0 0 22px rgba(245,230,168,0.45),
+    0 0 44px rgba(245,230,168,0.18),
+    0 2px 14px rgba(0,0,0,0.7);
+  margin:0;
+}
+.galaxy[data-palette="saffron"] .galaxy-core-name{
+  color:#F5CC6E;
+  text-shadow:
+    0 0 32px rgba(245,178,69,0.4),
+    0 0 64px rgba(245,178,69,0.2),
+    0 2px 18px rgba(0,0,0,0.6);
+}
+.galaxy-core-label{
+  margin-top:10px;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;
+  color:rgba(240,232,204,0.45);
+}
+@keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.galaxy[data-palette="saffron"] .kelvi-sun{
+  background:radial-gradient(circle at 35% 30%, #FFE9C0, #F5B245 40%, #C67E18 100%);
+  box-shadow:0 0 20px rgba(245,178,69,0.6), 0 0 40px rgba(245,178,69,0.3), 0 0 80px rgba(245,178,69,0.18);
+}
+
+/* bottom ribbon: avatar + resume + hint — full-width bar pinned to the bottom */
+.galaxy-ribbon{
+  position:absolute;left:0;right:0;bottom:0;
+  display:flex;align-items:center;justify-content:center;gap:28px;
+  background:rgba(20,18,40,0.82);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(245,230,168,0.12);
+  padding:14px 32px;z-index:60;
+  box-shadow:0 -8px 28px rgba(0,0,0,0.35);
+}
+.galaxy[data-palette="saffron"] .galaxy-ribbon{background:rgba(10,17,40,0.85);border-color:rgba(229,163,33,0.18)}
+.ribbon-id{display:flex;align-items:center;gap:10px}
+.ribbon-id .avatar-circle{width:34px;height:34px;font-size:14px;margin:0;border-width:1.5px}
+.ribbon-id-text{text-align:left;line-height:1.1}
+.ribbon-id-text .center-name{font-family:var(--font-serif);font-style:italic;font-size:14px;color:#F5E6A8;margin:0}
+.ribbon-id-text .center-sub{font-size:10px;color:rgba(240,232,204,0.55);letter-spacing:0.05em;text-transform:uppercase;margin:0}
+.ribbon-div{width:1px;height:28px;background:rgba(245,230,168,0.14);flex-shrink:0}
+.galaxy-ribbon .today{
+  margin:0;padding:4px 0;background:none;backdrop-filter:none;border:none;
+  min-width:0;max-width:none;cursor:pointer;
+}
+.galaxy-ribbon .today:hover{background:none;border:none;transform:none}
+.galaxy-ribbon .today-label{font-size:9px;margin-bottom:2px}
+.galaxy-ribbon .today-text{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
+.ribbon-hint{display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(240,232,204,0.6)}
+@media (max-width:860px){
+  .galaxy-ribbon{flex-direction:column;gap:8px;padding:14px 18px}
+  .ribbon-div{display:none}
+  .galaxy-ribbon .today-text{white-space:normal;max-width:none}
+}
+.center-halo{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:280px;height:280px;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle, rgba(var(--gx-halo),0.28) 0%, rgba(var(--gx-halo),0.10) 42%, transparent 70%);
+  animation:halo 5s ease-in-out infinite;
+}
+@keyframes halo{
+  0%,100%{opacity:0.75;transform:translate(-50%,-50%) scale(1)}
+  50%    {opacity:1;   transform:translate(-50%,-50%) scale(1.14)}
+}
+.avatar-circle{
+  width:58px;height:58px;border-radius:50%;margin:0 auto;
+  background:linear-gradient(135deg, #4A8878 0%, #2D5347 100%);
+  border:2px solid rgba(245,230,168,0.38);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-serif);font-size:22px;font-weight:500;color:var(--gx-accent);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.1);
+}
+.galaxy[data-palette="saffron"] .avatar-circle{
+  background:linear-gradient(135deg, #4A8878 0%, #2D5347 100%);
+  border-color:rgba(229,163,33,0.45);
+}
+.center-name{
+  margin-top:10px;font-family:var(--font-serif);font-style:italic;
+  font-size:15px;font-weight:500;color:var(--gx-accent);
+  text-shadow:0 2px 10px rgba(0,0,0,0.7);
+}
+.center-sub{
+  font-size:9px;color:rgba(240,232,204,0.55);letter-spacing:0.15em;
+  text-transform:uppercase;margin-top:3px;font-weight:500;
+}
+/* today's invitation card under the centre avatar */
+.today{
+  margin:14px auto 0;padding:10px 14px;max-width:220px;
+  background:rgba(26,24,48,0.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(245,230,168,0.14);border-radius:12px;
+  cursor:pointer;transition:all .18s ease;
+}
+.today:hover{background:rgba(26,24,48,0.75);border-color:rgba(245,230,168,0.28);transform:translateY(-1px)}
+.today-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gx-resume);margin-bottom:3px}
+.today-text{font-family:var(--font-serif);font-style:italic;font-size:12.5px;line-height:1.45;color:rgba(245,230,168,0.92)}
+.galaxy[data-palette="saffron"] .today{background:rgba(10,17,40,0.60);border-color:rgba(229,163,33,0.20)}
+.galaxy[data-palette="saffron"] .today:hover{border-color:rgba(229,163,33,0.42)}
+
+/* ── floating mathematical glyphs ── */
+.glyph{position:absolute;font-family:var(--font-heading);font-style:italic;color:rgba(245,230,168,0.20);pointer-events:none;animation:glyphFloat 8s ease-in-out infinite}
+@keyframes glyphFloat{0%,100%{opacity:0.20;transform:translateY(0)}50%{opacity:0.45;transform:translateY(-6px)}}
+
+/* ── PLANETS (shared shell) ── */
+.planet{
+  position:absolute;cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:auto;
+  transition:transform .25s cubic-bezier(.22,.61,.36,1), filter .25s ease;
+}
+.planet:hover{transform:translate(-50%,-50%) scale(1.15);z-index:25}
+/* planets near the bottom → labels above, not below */
+.planet.label-above .p-label{top:auto;bottom:calc(100% + 10px)}
+.planet.label-above .p-sub{top:auto;bottom:calc(100% + 28px)}
+.planet:hover .p-label{opacity:1}
+.planet:hover .p-sub{opacity:1}
+
+.p-label{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  font-family:var(--font-serif);font-size:12px;font-weight:500;font-style:italic;
+  color:var(--gx-accent);white-space:nowrap;letter-spacing:0.02em;
+  opacity:0.85;transition:opacity .2s;
+  text-shadow:0 2px 8px rgba(0,0,0,0.7);pointer-events:none;
+}
+.p-sub{
+  position:absolute;top:calc(100% + 28px);left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:500;color:rgba(240,232,204,0.55);white-space:nowrap;
+  letter-spacing:0.08em;text-transform:uppercase;opacity:0;transition:opacity .2s;pointer-events:none;
+}
+
+/* each planet is absolutely positioned from its centre via transform */
+.planet{transform:translate(-50%,-50%)}
+.p-body{
+  width:100%;height:100%;border-radius:50%;position:relative;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,0.4));
+  transition:filter .25s ease;
+}
+.planet:hover .p-body{filter:drop-shadow(0 6px 18px rgba(0,0,0,0.55)) drop-shadow(0 0 22px currentColor)}
+
+/* spheres: shared radial gradient skin, coloured per planet via --tint vars */
+.p-body.sphere{
+  background:radial-gradient(circle at 35% 30%, var(--tint-hi) 0%, var(--tint-mid) 55%, var(--tint-lo) 100%);
+}
+/* rings for saturn-like bodies (geometry) */
+.p-body .ring{
+  position:absolute;left:-40%;top:40%;width:180%;height:22%;
+  border-radius:50%;transform:rotate(-16deg);pointer-events:none;
+  background:linear-gradient(to bottom, transparent 30%, var(--tint-mid) 50%, transparent 70%);
+  opacity:0.65;
+}
+
+/* v1 sky — gentle breathing on all planets (staggered) */
+.galaxy[data-variant="sky"] .planet .p-body{animation:breathe 6s ease-in-out infinite}
+.galaxy[data-variant="sky"] .planet:nth-child(3n)  .p-body{animation-delay:-1.5s}
+.galaxy[data-variant="sky"] .planet:nth-child(3n+1) .p-body{animation-delay:-3s}
+.galaxy[data-variant="sky"] .planet:nth-child(3n+2) .p-body{animation-delay:-4.5s}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+/* resume-pulse: the ring that tells a returning kid "you were here" */
+.planet.resume::before{
+  content:'';position:absolute;inset:-14px;border-radius:50%;
+  border:1.5px solid var(--gx-resume);opacity:0;
+  animation:resumePulse 2.4s ease-out infinite;
+}
+.planet.resume::after{
+  content:'';position:absolute;inset:-8px;border-radius:50%;
+  border:1.5px solid var(--gx-resume);opacity:.35;
+}
+@keyframes resumePulse{
+  0%  {transform:scale(0.88);opacity:0.55}
+  80% {transform:scale(1.45);opacity:0}
+  100%{opacity:0}
+}
+
+/* "deep" treatment = strong halo glow for planets she's explored deeply */
+.planet.deep .p-body{filter:drop-shadow(0 6px 14px rgba(0,0,0,0.4)) drop-shadow(0 0 16px currentColor)}
+/* "untouched" = dimmed */
+.planet.untouched .p-body{filter:grayscale(.55) brightness(.8) drop-shadow(0 4px 10px rgba(0,0,0,0.4));opacity:.72}
+
+/* v2 orbit — actual slow rotation around the centre */
+.galaxy[data-variant="orbit"] .orbiter,
+.galaxy[data-variant="drift-objects"] .orbiter{
+  position:absolute;left:50%;top:50%;pointer-events:none;
+  transform-origin:0 0;
+  animation:spin linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* inside an orbiter, the planet is offset to the orbit radius */
+.galaxy[data-variant="orbit"] .orbiter .planet,
+.galaxy[data-variant="drift-objects"] .orbiter .planet{left:var(--r);top:0;animation:counterSpin linear infinite;animation-duration:inherit}
+@keyframes counterSpin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
+
+/* drift — each planet moves along a small ellipse around its curated position.
+   Ellipse is horizontal (rx > ry) to echo galaxy-disc motion. Uses margin
+   offsets so it composes with the existing translate(-50%, -50%) centering. */
+.planet.drifting{
+  animation:
+    wobble-x var(--wobble-dur, 24s) ease-in-out infinite,
+    wobble-y var(--wobble-dur, 24s) ease-in-out infinite;
+  animation-delay:
+    var(--wobble-delay, 0s),
+    calc(var(--wobble-delay, 0s) - var(--wobble-dur, 24s) * 0.25);
+  will-change: margin;
+}
+@keyframes wobble-x{
+  0%,100%{ margin-left: var(--wobble-rx, 26px) }
+  50%    { margin-left: calc(var(--wobble-rx, 26px) * -1) }
+}
+@keyframes wobble-y{
+  0%,100%{ margin-top: 0 }
+  50%    { margin-top: var(--wobble-ry, 12px) }
+}
+@media (prefers-reduced-motion: reduce){
+  .planet.drifting{animation:none}
+}
+
+/* v3 creature — each planet has a signature */
+/* the signature add-ons live as ::before / .p-deco inside .p-body */
+.p-deco{position:absolute;pointer-events:none}
+
+/* v4 objects — the math thing replaces the sphere */
+.galaxy[data-variant="objects"] .p-body.sphere,
+.galaxy[data-variant="drift-objects"] .p-body.sphere{background:transparent;filter:none}
+.galaxy[data-variant="objects"] .p-body .ring,
+.galaxy[data-variant="drift-objects"] .p-body .ring{display:none}
+.galaxy[data-variant="objects"] .planet:hover .p-body,
+.galaxy[data-variant="drift-objects"] .planet:hover .p-body{filter:drop-shadow(0 0 18px currentColor)}
+.mo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.mo svg{width:100%;height:100%;overflow:visible}
+
+/* ── bottom hint + status bar ── */
+.galaxy-hint{display:none}
+.galaxy[data-palette="saffron"] .galaxy-hint{display:none}
+.hint-dot{width:7px;height:7px;border-radius:50%;background:var(--gx-resume);box-shadow:0 0 8px var(--gx-resume);flex-shrink:0}
+.hint-strong{color:var(--gx-accent);font-family:var(--font-serif);font-style:italic;font-weight:500}
+
+
+.welcome-overlay{position:fixed;inset:0;background:var(--space-deep);z-index:500;display:flex;align-items:center;justify-content:center;padding:40px}
+.welcome-overlay.hidden{display:none}
+.welcome-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.welcome-card{text-align:center;max-width:460px;position:relative;z-index:2}
+.welcome-logo{font-family:var(--font-heading);font-size:1.8rem;color:#fff;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:10px}
+.welcome-kicker{font-size:12px;color:rgba(240,232,204,0.55);margin-bottom:26px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.welcome-title{font-family:var(--font-heading);font-size:2.2rem;margin-bottom:14px;letter-spacing:-0.01em;line-height:1.2;color:#fff}
+.welcome-sub{font-size:15px;color:rgba(240,232,204,0.7);line-height:1.6;margin-bottom:28px}
+.welcome-field{display:flex;gap:10px;max-width:360px;margin:0 auto}
+.welcome-input{flex:1;padding:13px 16px;border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;font-size:15px;font-family:var(--font-body);outline:none;background:rgba(255,255,255,0.08);color:#fff}
+.welcome-input::placeholder{color:rgba(240,232,204,0.4)}
+.welcome-input:focus{border-color:var(--family);background:rgba(255,255,255,0.12)}
+.welcome-btn{background:var(--family);color:#fff;border:none;padding:13px 24px;border-radius:10px;font-size:14px;font-weight:500;transition:all .15s}
+.welcome-btn:hover{background:var(--family-dark)}
+.welcome-btn:disabled{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);cursor:not-allowed}
+
+
+/* ── TOPBAR ADDITIONS ── */
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.settings-btn{background:none;border:none;color:rgba(240,232,204,0.65);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;transition:all .15s}
+.settings-btn:hover{color:#F5E6A8;background:rgba(255,255,255,0.08)}
+.topbar.light-mode .settings-btn{color:var(--text-muted)}
+.topbar.light-mode .settings-btn:hover{color:var(--family);background:var(--family-light)}
+
+/* ── PLANET VIEW ── */
+.planet-scene{position:absolute;inset:56px 0 0 0;background:var(--bg);overflow-y:auto}
+.planet-header{
+  padding:48px 40px 30px;text-align:center;position:relative;
+  background:linear-gradient(180deg, rgba(232,216,184,0.35) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--divider);
+}
+.planet-back{
+  position:absolute;top:16px;left:20px;background:none;border:1px solid var(--divider);
+  padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text-muted);
+  display:flex;align-items:center;gap:6px;transition:all .15s;cursor:pointer;font-family:var(--font-body);
+}
+.planet-back:hover{border-color:var(--family);color:var(--family)}
+.planet-visual{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 30%, #DCC094 0%, #A07D4A 55%, #6C502C 100%);
+  box-shadow:0 4px 30px rgba(160,125,74,0.3);position:relative;
+  animation:planetFloat 6s ease-in-out infinite;
+}
+.planet-visual::after{
+  content:'';position:absolute;width:170%;height:22%;left:-35%;top:40%;border-radius:50%;
+  background:linear-gradient(to bottom, transparent 30%, rgba(160,125,74,0.5) 50%, transparent 70%);
+  transform:rotate(-16deg);
+}
+@keyframes planetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.planet-title{font-family:var(--font-heading);font-size:2.6rem;letter-spacing:-0.01em;margin-bottom:8px}
+.planet-tagline{font-family:'Fraunces',serif;font-style:italic;color:var(--text-muted);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.5}
+.planet-meta{display:inline-flex;gap:24px;margin-top:10px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.planet-meta strong{color:var(--text-primary);font-family:var(--font-body);font-weight:600;font-size:13px;display:block;letter-spacing:0;text-transform:none;margin-bottom:2px}
+.levels-wrap{max-width:1280px;margin:0 auto;padding:40px}
+.levels-intro{text-align:center;margin-bottom:30px;color:var(--text-muted);font-size:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.levels-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:16px}
+.level-col{background:#fff;border:1px solid var(--divider);border-radius:14px;padding:20px 18px 24px;min-height:540px;position:relative;transition:all .2s ease}
+.level-col:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(47,43,37,0.08)}
+.level-col::before{content:'';position:absolute;top:0;left:16px;right:16px;height:3px;border-radius:0 0 3px 3px}
+.level-col.l1::before{background:#E09C50}
+.level-col.l2::before{background:#D8AA58}
+.level-col.l3::before{background:#3E9282}
+.level-col.l4::before{background:#5286B4}
+.level-col.l5::before{background:#6856A8}
+.level-num{font-family:var(--font-heading);font-style:italic;font-size:1rem;color:var(--text-muted);letter-spacing:0.05em}
+.level-name{font-family:var(--font-heading);font-size:1.4rem;letter-spacing:-0.01em;margin-bottom:6px;margin-top:-2px}
+.level-pcg{display:inline-block;padding:3px 8px;border-radius:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.pcg-p{background:#F5DDD3;color:#8A4B1E}
+.pcg-c{background:#D6E8DC;color:#2D5347}
+.pcg-g{background:#E8DDF0;color:#48366E}
+.level-desc{font-size:12px;color:var(--text-muted);line-height:1.5;margin:12px 0 18px;min-height:48px}
+.activity{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;position:relative}
+.activity:hover{background:var(--family-light);border-color:var(--family);transform:translateY(-1px)}
+.activity-title{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.activity-prompt{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic}
+.activity-visited{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* ── CHAT ── */
+.chat-scene{position:absolute;inset:56px 0 0 0;display:flex;flex-direction:column;background:var(--bg)}
+.chat-header{padding:14px 28px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-back{font-size:13px;color:var(--family);font-weight:500;background:none;border:none;display:flex;align-items:center;gap:4px;cursor:pointer;font-family:var(--font-body)}
+.chat-back:hover{color:var(--family-dark)}
+.chat-topic{font-size:14px;font-weight:500;flex:1}
+.chat-kicker{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--family);font-weight:600}
+.activity-banner{padding:14px 28px;background:var(--family-light);border-bottom:1px solid var(--divider);font-size:14px;line-height:1.55;color:var(--text-primary);flex-shrink:0;font-style:italic;font-family:'Fraunces',serif}
+.activity-banner-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--family);margin-bottom:4px;font-family:var(--font-body);font-style:normal}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px;margin:0 auto;width:100%}
+.msg{max-width:100%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start;width:100%}
+.msg-s{align-self:flex-end;max-width:72%}
+.msg-name{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;padding-left:2px;color:var(--text-faint)}
+.msg-name-s{text-align:right;padding-right:2px}
+.msg-bubble-k{background:none;border:none;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.msg-bubble-s{background:var(--family-light);border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:var(--family-light);border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center;margin-left:32px}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--family);animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-input-bar{padding:14px 20px 20px;display:flex;gap:8px;align-items:flex-end;background:var(--bg);flex-shrink:0;max-width:820px;margin:0 auto;width:100%}
+.chat-input{flex:1;border:1.5px solid var(--divider);border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:var(--bg);color:var(--text-primary);box-shadow:0 2px 10px rgba(47,43,37,.06);transition:border-color .15s}
+.chat-input:focus{border-color:var(--family)}
+.chat-mic{background:var(--family-light);color:var(--family);border:1.5px solid var(--family);padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;cursor:pointer}
+.chat-mic:hover{background:var(--family);color:#fff}
+.chat-mic.recording{background:#D94A4A;border-color:#D94A4A;color:#fff;animation:micPulse 1.2s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+.chat-send{background:var(--family);color:#fff;border:none;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;cursor:pointer}
+.chat-send:hover{background:var(--family-dark)}
+.chat-send:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:6px;vertical-align:middle;display:inline-flex;align-items:center}
+.speak-btn:hover{color:var(--family)}
+.speak-btn.speaking{background:var(--family);color:#fff}
+
+/* ── GUARDIAN ── */
+.guardian-scene{position:absolute;inset:56px 0 0 0;overflow-y:auto;background:var(--bg)}
+.g-container{max-width:1200px;margin:0 auto;padding:40px 40px 60px}
+.g-header{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--divider)}
+.g-title{font-family:var(--font-heading);font-size:2rem;margin-bottom:6px;letter-spacing:-0.01em}
+.g-sub{font-size:14px;color:var(--text-muted);line-height:1.55;max-width:620px}
+.g-top{display:grid;grid-template-columns:340px 1fr;gap:28px;margin-bottom:32px}
+.child-card{background:linear-gradient(135deg, var(--family-light) 0%, #EBE2D4 100%);border:1px solid var(--divider);border-radius:16px;padding:28px;text-align:center}
+.child-avatar{width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg, #4A8878 0%, #2D5347 100%);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:30px;color:#F5E6A8;margin:0 auto 14px;box-shadow:0 4px 16px rgba(58,107,92,0.25)}
+.child-name{font-family:var(--font-heading);font-size:1.6rem;margin-bottom:4px}
+.child-meta{font-size:12px;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px}
+.child-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;text-align:left}
+.stat-label{font-size:10px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
+.stat-value{font-family:var(--font-heading);font-size:1.4rem;color:var(--text-primary);line-height:1.1}
+.stat-context{font-size:11px;color:var(--text-muted);margin-top:2px;font-style:italic}
+.story-card{background:var(--bg);border:1px solid var(--divider);border-radius:16px;padding:24px 28px}
+.story-kicker{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--family);font-weight:600;margin-bottom:6px}
+.story-title{font-family:var(--font-heading);font-size:1.35rem;margin-bottom:12px;line-height:1.25}
+.story-body{font-size:14px;color:var(--text-primary);line-height:1.7;margin-bottom:14px}
+.story-body p{margin-bottom:10px}
+.story-body em{font-style:italic;color:var(--accent)}
+.story-body strong{font-weight:500}
+.story-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);border-top:1px solid var(--divider);padding-top:14px;margin-top:8px}
+.story-link{color:var(--family);cursor:pointer}
+.g-galaxy{background:#0D0C1C;border-radius:16px;padding:26px 20px;position:relative;min-height:420px;margin-bottom:32px;overflow:hidden}
+.g-galaxy-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding:0 16px}
+.g-galaxy-title{font-family:var(--font-heading);font-size:1.2rem;color:#F5E6A8}
+.g-galaxy-filter{display:flex;gap:6px}
+.g-filter-btn{padding:5px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(240,232,204,0.85);border-radius:14px;font-size:11px;font-family:var(--font-body);cursor:pointer}
+.g-filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.g-stage{position:relative;height:340px}
+.g-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, #4A8878 0%, #2D5347 100%);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:18px;color:#F5E6A8;box-shadow:0 0 30px rgba(58,107,92,0.4);z-index:10}
+.g-orbit{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(232,220,184,0.08);border-radius:50%;pointer-events:none}
+.g-planet{position:absolute;border-radius:50%;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4));z-index:5;transition:all .2s}
+.g-planet.deep{animation:deepPulse 3s ease-in-out infinite}
+@keyframes deepPulse{0%,100%{filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4)) drop-shadow(0 0 12px currentColor)}50%{filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4)) drop-shadow(0 0 24px currentColor)}}
+.g-planet.untouched{opacity:0.35;filter:grayscale(0.6) drop-shadow(0 4px 10px rgba(0,0,0,0.4))}
+.g-plabel{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);font-family:'Fraunces',serif;font-size:10px;font-style:italic;color:#F5E6A8;white-space:nowrap;opacity:0.75;text-shadow:0 2px 8px rgba(0,0,0,0.7);pointer-events:none}
+.g-legend{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:18px;font-size:10px;color:rgba(240,232,204,0.6);letter-spacing:0.04em}
+.g-legend-item{display:flex;align-items:center;gap:6px}
+.g-legend-dot{width:8px;height:8px;border-radius:50%}
+.dot-deep{background:#3A8A78;box-shadow:0 0 8px #3A8A78}
+.dot-visited{background:var(--family);opacity:0.8}
+.dot-untouched{background:#666;opacity:0.5}
+.timeline-card{background:var(--bg);border:1px solid var(--divider);border-radius:16px;padding:26px 28px;margin-bottom:24px}
+.timeline-title{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:18px}
+.timeline-list{display:flex;flex-direction:column;gap:18px}
+.timeline-entry{display:grid;grid-template-columns:90px 1fr;gap:18px;padding-bottom:18px;border-bottom:1px solid rgba(47,43,37,0.08)}
+.timeline-entry:last-child{border-bottom:none;padding-bottom:0}
+.te-date{font-size:11px;color:var(--text-muted);letter-spacing:0.05em;text-transform:uppercase;padding-top:3px}
+.te-body{font-size:14px;line-height:1.55}
+.te-planet{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;font-weight:500;margin-bottom:6px}
+.te-p-geometry{background:#E8D8B8;color:#6C502C}
+.te-p-puzzle{background:#F5E3A8;color:#8A6820}
+.te-p-number{background:#F5D8B8;color:#8A4B1E}
+.te-text{color:var(--text-primary)}
+.te-text em{color:var(--accent);font-style:italic;font-weight:500}
+
+/* ── SETTINGS MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(47,43,37,0.45);z-index:450;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-card{background:var(--bg);border-radius:16px;max-width:480px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.modal-header{padding:20px 28px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:var(--font-heading);font-size:1.3rem;color:var(--text-primary)}
+.modal-close{background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;padding:0 6px}
+.modal-close:hover{color:var(--text-primary)}
+.modal-body{padding:24px 28px}
+.modal-section{margin-bottom:22px}
+.modal-section:last-child{margin-bottom:0}
+.modal-label{font-size:12px;font-weight:600;color:var(--text-primary);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:10px}
+.modal-input{width:100%;padding:11px 14px;border:1.5px solid var(--divider);border-radius:10px;font-size:14px;font-family:monospace;outline:none;background:var(--bg);color:var(--text-primary)}
+.modal-input:focus{border-color:var(--family)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.toggle-label{font-size:14px;color:var(--text-primary);flex:1}
+.toggle-label-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.toggle{position:relative;width:42px;height:24px;background:var(--divider);border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--family)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;top:3px;left:3px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle.on::after{left:21px}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--divider);display:flex;justify-content:flex-end;gap:8px}
+.modal-btn{padding:9px 20px;border-radius:10px;font-size:13px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.modal-btn-primary{background:var(--family);color:#fff}
+.modal-btn-primary:hover{background:var(--family-dark)}
+.modal-btn-secondary{background:none;border:1px solid var(--divider);color:var(--text-muted)}
+.modal-btn-secondary:hover{border-color:var(--family);color:var(--family)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width:1100px){.levels-grid{grid-template-columns:repeat(2, 1fr)}.g-top{grid-template-columns:1fr}}
+@media (max-width:640px){.levels-grid{grid-template-columns:1fr}.planet-title{font-size:1.8rem}.g-container{padding:24px}}
+
+/* ── GEOMETRY V4 ── */
+.geo-scene{position:absolute;inset:0;overflow-y:auto;background:var(--bg);padding-top:56px}
+.geo-back-row{padding:28px 48px 0}
+.geo-back-btn{background:none;border:1px solid var(--divider);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.geo-back-btn:hover{border-color:var(--family);color:var(--family)}
+.geo-badge{display:flex;align-items:center;gap:14px;padding:32px 48px 0}
+.geo-planet-dot{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#DCC094,#A07D4A 55%,#6C502C);box-shadow:0 2px 6px rgba(0,0,0,0.2);flex-shrink:0}
+.geo-planet-label{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-faint);font-weight:500}
+.geo-hero{padding:40px 48px 24px;max-width:780px}
+.geo-hero-eyebrow{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px;font-weight:500}
+.geo-hero-prompt{font-family:var(--font-heading);font-style:italic;font-size:clamp(28px,3.4vw,46px);line-height:1.15;letter-spacing:-0.015em;color:var(--text-primary)}
+.geo-hero-prompt-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.geo-speak-btn{flex-shrink:0;background:var(--surface);border:1px solid var(--divider);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:6px}
+.geo-speak-btn:hover{background:var(--deeper);color:var(--text-primary);border-color:var(--text-muted)}
+.geo-speak-btn .speak-icon{display:flex;align-items:center;justify-content:center}
+.voice-picker-row{margin-top:12px}
+.geo-hero-sub{font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:32px;max-width:560px}
+.geo-hero-ctas{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.geo-btn-primary{background:var(--accent);color:#fff;padding:10px 22px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .12s}
+.geo-btn-primary:hover{background:var(--accent-dark)}
+.geo-btn-secondary{background:none;border:none;color:var(--text-muted);padding:10px 16px;font-size:14px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
+.geo-btn-secondary:hover{color:var(--text-primary)}
+.geo-wander-row{padding:24px 48px 16px;border-top:1px solid var(--divider);margin-top:8px}
+.geo-wander-text{font-family:var(--font-heading);font-style:italic;font-size:18px;color:var(--text-primary)}
+.geo-accordion{padding:0 48px}
+.geo-level{border-top:1px solid var(--divider)}
+.geo-level-header{display:flex;align-items:baseline;justify-content:space-between;padding:20px 0;cursor:pointer;user-select:none}
+.geo-level-header:hover .geo-level-name{color:var(--family)}
+.geo-level-left{display:flex;align-items:baseline;gap:20px}
+.geo-level-num{font-family:var(--font-heading);font-style:italic;font-size:14px;color:var(--text-faint);width:24px;flex-shrink:0}
+.geo-level-name{font-family:var(--font-heading);font-size:22px;color:var(--text-primary);transition:color .12s}
+.geo-level-pcg{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500}
+.geo-level-toggle{color:var(--text-faint);font-size:18px;line-height:1;padding-right:4px}
+.geo-level-body{padding-bottom:20px;padding-left:44px;display:none}
+.geo-level-body.open{display:block}
+.geo-level-desc{font-size:14px;color:var(--text-muted);margin-bottom:14px;max-width:560px;line-height:1.55}
+.geo-activity-row{display:flex;align-items:baseline;gap:14px;padding:10px 14px;border-radius:6px;cursor:pointer;transition:background .12s}
+.geo-activity-row:hover{background:var(--surface)}
+.geo-activity-row.active{background:var(--accent-light)}
+.geo-activity-title{font-size:14px;color:var(--text-primary);min-width:190px;flex-shrink:0;transition:color .12s}
+.geo-activity-row.active .geo-activity-title{color:var(--accent-dark);font-weight:500}
+.geo-activity-prompt{font-size:13px;color:var(--text-muted);font-style:italic;font-family:var(--font-heading);line-height:1.4}
+.geo-activity-visited{width:6px;height:6px;border-radius:50%;background:var(--family);flex-shrink:0;margin-left:auto}
+@media(max-width:700px){
+  .geo-hero,.geo-back-row,.geo-badge,.geo-wander-row,.geo-accordion{padding-left:24px;padding-right:24px}
+  .geo-level-body{padding-left:28px}
+}
+/* ── JOURNAL ── */
+.journal-scene{position:absolute;inset:0;padding-top:56px;overflow-y:auto;background:var(--bg)}
+.journal-header{padding:40px 48px 28px;border-bottom:1px solid var(--divider)}
+.journal-title{font-family:var(--font-heading);font-size:2rem;color:var(--text-primary);margin-bottom:6px}
+.journal-sub{font-size:14px;color:var(--text-muted);line-height:1.5}
+.journal-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 48px;gap:16px;color:var(--text-faint)}
+.journal-empty-icon{opacity:0.35}
+.journal-empty-text{font-size:14px;color:var(--text-muted);text-align:center;max-width:320px;line-height:1.6}
+.journal-list{padding:16px 48px 60px;display:flex;flex-direction:column;gap:12px}
+.journal-card{background:var(--surface);border:1px solid var(--divider);border-radius:14px;overflow:hidden;transition:box-shadow .15s}
+.journal-card:hover{box-shadow:0 4px 16px rgba(47,43,37,.08)}
+.journal-card-header{padding:18px 22px;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.journal-card-left{flex:1;min-width:0}
+.journal-card-meta{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:5px;font-weight:500}
+.journal-card-title{font-family:var(--font-heading);font-size:17px;color:var(--text-primary);margin-bottom:6px;line-height:1.3}
+.journal-card-prompt{font-size:13px;color:var(--text-muted);font-style:italic;font-family:var(--font-heading);line-height:1.4;margin-bottom:10px}
+.journal-pcg-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.journal-pcg-chip{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;letter-spacing:0.04em}
+.journal-pcg-p{background:#F5EDE5;color:#A07D4A}
+.journal-pcg-c{background:#F5EDE5;color:#B8784E}
+.journal-pcg-g{background:var(--accent-light);color:var(--accent-dark)}
+.journal-pcg-pending{font-size:11px;color:var(--text-faint);font-style:italic}
+.journal-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.journal-toggle{color:var(--text-faint);font-size:18px;line-height:1}
+.journal-msg-count{font-size:11px;color:var(--text-faint)}
+.journal-transcript{border-top:1px solid var(--divider);padding:20px 22px;display:none;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;background:var(--bg)}
+.journal-transcript.open{display:flex}
+.journal-msg{display:flex;flex-direction:column;gap:3px;max-width:80%}
+.journal-msg-k{align-self:flex-start}
+.journal-msg-s{align-self:flex-end}
+.journal-msg-name{font-size:11px;font-weight:500;color:var(--text-faint);letter-spacing:0.04em}
+.journal-msg-bubble{font-size:13px;line-height:1.55;padding:10px 14px;border-radius:12px}
+.journal-msg-k .journal-msg-bubble{background:var(--surface);color:var(--text-primary)}
+.journal-msg-s .journal-msg-bubble{background:var(--accent-light);color:var(--accent-dark)}
+@media(max-width:700px){
+  .journal-header,.journal-list{padding-left:24px;padding-right:24px}
+}
+</style>
+</head>
+<body>
+
+<div class="welcome-overlay" id="welcome-overlay">
+  <div class="welcome-stars" id="welcome-stars"></div>
+  <div class="welcome-card">
+    <div class="welcome-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+      Kelvi
+    </div>
+    <div class="welcome-kicker">Math Galaxy</div>
+    <!-- Step 1: name -->
+    <div id="welcome-step-1">
+      <div class="welcome-title">Every child has a galaxy of their own.</div>
+      <div class="welcome-sub">What's your name, explorer?</div>
+      <div class="welcome-field">
+        <input type="text" class="welcome-input" id="name-input" placeholder="Your first name" autocomplete="given-name">
+        <button class="welcome-btn" id="welcome-btn" onclick="submitName()" disabled>Next →</button>
+      </div>
+    </div>
+    <!-- Step 2: API key -->
+    <div id="welcome-step-2" style="display:none">
+      <div class="welcome-title" id="welcome-step2-title">Hi, explorer.</div>
+      <div class="welcome-sub">Kelvi needs an Anthropic API key to think with you. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--family);text-decoration:none">console.anthropic.com</a>. It stays on this device only.</div>
+      <div class="welcome-field" style="flex-direction:column;gap:10px">
+        <input type="password" class="welcome-input" id="key-input" placeholder="sk-ant-..." autocomplete="off" style="width:100%">
+        <div style="display:flex;gap:10px;width:100%">
+          <button class="welcome-btn" onclick="submitKey(true)" style="background:rgba(255,255,255,0.12);flex:1">Skip for now</button>
+          <button class="welcome-btn" id="key-btn" onclick="submitKey(false)" disabled style="flex:2">Enter my galaxy →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="topbar" id="topbar">
+  <a href="index.html" class="topbar-brand">
+    <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+    <span>Kelvi</span>
+    <span class="sb-label">Family</span>
+  </a>
+  <div class="topbar-nav">
+    <button class="topbar-tab active" data-panel="galaxy" onclick="showPanel('galaxy')">Galaxy</button>
+    <button class="topbar-tab" data-panel="journal" onclick="showPanel('journal')">Journal</button>
+    <button class="topbar-tab" data-panel="guardian" onclick="showPanel('guardian')">For parents</button>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-uname" id="tb-name">Explorer</span>
+    <div class="topbar-avatar" id="tb-avatar">?</div>
+    <button class="settings-btn" onclick="openSettings()" title="Settings" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══ GALAXY PANEL ══ -->
+  <div class="panel active" id="panel-galaxy">
+    <div class="galaxy" id="galaxy" data-variant="sky" data-palette="default">
+      <div class="stars" id="starfield"></div>
+      <div class="nebula"></div>
+      <div class="parallax" id="parallax">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="orbit orbit-3"></div>
+        <div class="orbit orbit-4"></div>
+        <div class="orbit orbit-5"></div>
+        <div class="orbit orbit-6"></div>
+        <div class="glyph-layer" id="glyph-layer"></div>
+        <svg class="links" id="links" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="planets" id="planets"></div>
+      </div>
+      <div class="galaxy-center">
+        <div class="center-halo"></div>
+        <div class="kelvi-sun" aria-hidden="true"></div>
+        <div class="galaxy-core-name" id="center-core-name">Arya</div>
+        <div class="galaxy-core-label" id="galaxy-core-label">math galaxy</div>
+      </div>
+      <div class="galaxy-ribbon">
+        <div class="ribbon-id">
+          <div class="avatar-circle" id="center-avatar">A</div>
+          <div class="ribbon-id-text">
+            <div class="center-name" id="center-name">Arya</div>
+            <div class="center-sub" id="center-sub">welcome back</div>
+          </div>
+        </div>
+        <div class="ribbon-div"></div>
+        <div class="today" id="today-card" onclick="showPanel('geometry')">
+          <div class="today-label" id="today-label">Pick up where you were</div>
+          <div class="today-text" id="today-text">The triangle's secret, on Geometry Planet.</div>
+        </div>
+        <div class="ribbon-div"></div>
+        <div class="ribbon-hint">
+          <span class="hint-dot"></span>
+          <span id="galaxy-hint-text"><span id="hint-name">Arya</span>'s galaxy · tap any planet to wander in</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GEOMETRY PLANET ══ -->
+  <div class="panel" id="panel-geometry">
+    <div class="geo-scene">
+      <div class="geo-back-row">
+        <button class="geo-back-btn" onclick="showPanel('galaxy')">← Back to galaxy</button>
+      </div>
+      <div class="geo-badge">
+        <div class="geo-planet-dot"></div>
+        <div class="geo-planet-label">Geometry Planet</div>
+      </div>
+      <div id="geo-hero"></div>
+      <div class="geo-wander-row">
+        <span class="geo-wander-text">Or wander into —</span>
+      </div>
+      <div id="geo-accordion"></div>
+      <div style="height:60px"></div>
+    </div>
+  </div>
+
+  <!-- ══ CHAT ══ -->
+  <div class="panel" id="panel-chat">
+    <div class="chat-scene">
+      <div class="chat-header">
+        <button class="chat-back" onclick="showPanel('geometry')">← Back to Geometry</button>
+        <div class="chat-topic">
+          <div class="chat-kicker">Geometry Planet</div>
+          <span id="chat-activity-name">Activity</span>
+        </div>
+      </div>
+      <div class="activity-banner">
+        <div class="activity-banner-label">The invitation</div>
+        <span id="chat-activity-prompt"></span>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="chat-input" rows="1" placeholder="Say what you're thinking…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="chat-mic" id="mic-btn" onclick="toggleMic()" title="Speak to Kelvi" aria-label="Speak">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <button class="chat-send" id="send-btn" onclick="sendMsg()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JOURNAL ══ -->
+  <div class="panel" id="panel-journal">
+    <div class="journal-scene">
+      <div class="journal-header">
+        <div class="journal-title" id="journal-title">Journal</div>
+        <div class="journal-sub">Every question <span id="journal-name">Arya</span> has sat with.</div>
+      </div>
+      <div class="journal-empty" id="journal-empty">
+        <div class="journal-empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <div class="journal-empty-text">No sessions yet. Start a question on Geometry Planet.</div>
+      </div>
+      <div class="journal-list" id="journal-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ GUARDIAN ══ -->
+  <div class="panel" id="panel-guardian">
+    <div class="guardian-scene">
+      <div class="g-container">
+        <div class="g-header">
+          <div class="g-title"><span id="g-name">Arya</span>'s galaxy</div>
+          <div class="g-sub">Not a gradebook. A map of where your child is thinking, how her thinking has grown, and what she's exploring.</div>
+        </div>
+        <div class="g-top">
+          <div class="child-card">
+            <div class="child-avatar" id="g-avatar">A</div>
+            <div class="child-name" id="g-name-2">Arya</div>
+            <div class="child-meta">Age 7 · explorer since February</div>
+            <div class="child-stats">
+              <div class="stat"><div class="stat-label">Active this week</div><div class="stat-value">4 days</div><div class="stat-context">mostly evenings</div></div>
+              <div class="stat"><div class="stat-label">Deep planets</div><div class="stat-value">2</div><div class="stat-context">Geometry, Puzzle</div></div>
+              <div class="stat"><div class="stat-label">First visits</div><div class="stat-value">1</div><div class="stat-context">Number — today</div></div>
+              <div class="stat"><div class="stat-label">Thinking moves</div><div class="stat-value">12</div><div class="stat-context">noted this week</div></div>
+            </div>
+          </div>
+          <div class="story-card">
+            <div class="story-kicker">This week's story</div>
+            <div class="story-title">Arya made friends with the triangle's secret.</div>
+            <div class="story-body">
+              <p>She spent three sessions on <strong>Geometry Planet</strong>, exploring the idea that the three corners of a triangle always add up to something surprising. Her first instinct was <em>"they probably add up to something different for each triangle"</em> — a reasonable guess.</p>
+              <p>On Wednesday she tore the corners off a paper triangle and put them side by side. <em>"Wait. That looks like a straight line."</em> She tested it on three different triangles. Same thing every time. That pattern owned her attention for twenty minutes.</p>
+              <p>She also tried Puzzle Planet for the first time and solved the river-crossing puzzle three different ways.</p>
+            </div>
+            <div class="story-footer">
+              <span>Week of April 13 – 19</span>
+              <span class="story-link">Read the full week's notes →</span>
+            </div>
+          </div>
+        </div>
+        <div class="g-galaxy">
+          <div class="g-galaxy-header">
+            <div class="g-galaxy-title">Where <span id="g-name-3">she</span>'s been thinking</div>
+            <div class="g-galaxy-filter">
+              <button class="g-filter-btn active">This month</button>
+              <button class="g-filter-btn">All time</button>
+            </div>
+          </div>
+          <div class="g-stage">
+            <div class="g-orbit" style="width:170px;height:170px"></div>
+            <div class="g-orbit" style="width:260px;height:260px"></div>
+            <div class="g-orbit" style="width:360px;height:360px"></div>
+            <div class="g-center">A</div>
+            <div class="g-planet deep" style="width:46px;height:46px;background:radial-gradient(circle at 35% 30%,#DCC094,#A07D4A 55%,#6C502C);left:calc(50% + 110px);top:calc(50% - 90px);color:#A07D4A"><div class="g-plabel">Geometry</div></div>
+            <div class="g-planet deep" style="width:38px;height:38px;background:radial-gradient(circle at 35% 30%,#F8E088,#D89A2A 55%,#9A6818);left:calc(50% - 140px);top:calc(50% + 60px);color:#D89A2A"><div class="g-plabel">Puzzle</div></div>
+            <div class="g-planet" style="width:32px;height:32px;background:radial-gradient(circle at 35% 30%,#F8D8A8,#E09C50 55%,#A8682A);left:calc(50% + 90px);top:calc(50% - 10px);color:#E09C50;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4))"><div class="g-plabel">Number</div></div>
+            <div class="g-planet" style="width:36px;height:36px;background:radial-gradient(circle at 35% 30%,#F0A090,#C85A55 55%,#8A3840);left:calc(50% - 90px);top:calc(50% - 20px);color:#C85A55;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4))"><div class="g-plabel">Operation</div></div>
+            <div class="g-planet" style="width:34px;height:34px;background:radial-gradient(circle at 35% 30%,#B8E0D4,#3E9282 55%,#1E5C50);left:calc(50% + 60px);top:calc(50% + 70px);color:#3E9282;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4))"><div class="g-plabel">Fraction</div></div>
+            <div class="g-planet untouched" style="width:28px;height:28px;background:radial-gradient(circle at 35% 30%,#B8A8E0,#6856A8 55%,#3C2C78);left:calc(50% - 170px);top:calc(50% + 105px)"><div class="g-plabel">Algebra</div></div>
+            <div class="g-planet untouched" style="width:28px;height:28px;background:radial-gradient(circle at 35% 30%,#A8C8E0,#5286B4 55%,#2C5880);left:calc(50% - 170px);top:calc(50% - 70px)"><div class="g-plabel">Measurement</div></div>
+            <div class="g-planet untouched" style="width:26px;height:26px;background:radial-gradient(circle at 35% 30%,#DCB8D4,#964E82 55%,#602C54);left:calc(50% + 20px);top:calc(50% - 130px)"><div class="g-plabel">Data</div></div>
+            <div class="g-planet untouched" style="width:24px;height:24px;background:radial-gradient(circle at 35% 30%,#E0E0F0,#8888A0 55%,#54546C);left:calc(50% + 170px);top:calc(50% + 100px)"><div class="g-plabel">Observatory</div></div>
+            <div class="g-legend">
+              <span class="g-legend-item"><span class="g-legend-dot dot-deep"></span>Deep exploration</span>
+              <span class="g-legend-item"><span class="g-legend-dot dot-visited"></span>Visited</span>
+              <span class="g-legend-item"><span class="g-legend-dot dot-untouched"></span>Not yet</span>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-card">
+          <div class="timeline-title">Thinking moments from this week</div>
+          <div class="timeline-list">
+            <div class="timeline-entry">
+              <div class="te-date">Thu · Apr 17</div>
+              <div class="te-body"><div><span class="te-planet te-p-geometry">Geometry · Connect</span></div><div class="te-text">Worked on the 3-4-5 pattern. Squared each side (9, 16, 25), noticed 9+16=25, tested 5-12-13 on her own. <em>Found the Pythagorean relationship before it was named.</em></div></div>
+            </div>
+            <div class="timeline-entry">
+              <div class="te-date">Wed · Apr 16</div>
+              <div class="te-body"><div><span class="te-planet te-p-puzzle">Puzzle</span></div><div class="te-text">Solved the River Crossing puzzle in 14 minutes. When Kelvi asked if there was another way, she found <em>two more solutions.</em></div></div>
+            </div>
+            <div class="timeline-entry">
+              <div class="te-date">Tue · Apr 15</div>
+              <div class="te-body"><div><span class="te-planet te-p-geometry">Geometry · Question</span></div><div class="te-text">Tore the three corners off a paper triangle and arranged them. <em>"Wait, that looks like a straight line!"</em> — a question she owned.</div></div>
+            </div>
+            <div class="timeline-entry">
+              <div class="te-date">Mon · Apr 14</div>
+              <div class="te-body"><div><span class="te-planet te-p-number">Number · Arrive</span></div><div class="te-text">First visit to Number Planet. Said <em>"counting by 5s feels like music"</em> — worth following up on.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Settings</div>
+      <button class="modal-close" onclick="closeSettings()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-label">Anthropic API key</div>
+        <div class="modal-sub">Kelvi needs your Anthropic API key to think with your child. You can get one at console.anthropic.com. It stays on this device only.</div>
+        <input type="password" class="modal-input" id="settings-key" placeholder="sk-ant-..." autocomplete="off">
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Voice</div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Auto-read Kelvi's messages aloud</div><div class="toggle-label-sub">Good for children who don't read yet.</div></div>
+          <div class="toggle" id="toggle-autospeak" onclick="toggleAutoSpeak()"></div>
+        </div>
+        <div class="voice-picker-row">
+          <div class="modal-sub" style="margin-bottom:8px">Voice</div>
+          <select class="modal-input" id="settings-voice" style="cursor:pointer">
+            <option value="">Default</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Explorer</div>
+        <div class="toggle-row">
+          <div><div class="toggle-label" id="settings-child-name">Arya</div><div class="toggle-label-sub">The child exploring the galaxy.</div></div>
+          <button class="modal-btn modal-btn-secondary" onclick="changeName()">Change</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-secondary" onclick="closeSettings()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function buildSYS(activity) {
+  const planet = (activity && activity.planet) ? activity.planet : 'Geometry';
+  const activityBlock = activity
+    ? `\n\nACTIVITY: The child has chosen "${activity.name}". The invitation is: "${activity.prompt}". Work within this activity. Do not move to a new topic unless the child explicitly asks.`
+    : '';
+  return `You are Kelvi, a warm, curious thinking partner for a young child exploring mathematics.
+
+ABSOLUTE PRINCIPLE 0: NEVER LET A WRONG FACT PASS. If the child says something mathematically incorrect, gently redirect. Wrong facts building on wrong facts is the worst failure mode.
+
+AGE RANGE: The child may be 5 to 12. Adapt your language to theirs. Match their register.
+
+MODE OF CONVERSATION:
+- Never lecture. Never explain concepts before the child has encountered them through their own work.
+- Ask questions more than you give answers, but don't ask a question after every response. Mix questions, brief observations, and silence.
+- Read engagement. If they are on a roll, stay out of the way. If stuck, offer one concrete foothold, not a full hint.
+- Never praise the child as a person ("you're so smart"). Name specific mathematical moves when they happen ("you caught your own error").
+- When a problem ends: do NOT recap. Offer a choice. A deeper question that builds on what they discovered, OR permission to wrap up.
+
+NEVER FABRICATE: If the child uploads an image you cannot fully read, say what you can see and ask them to describe the rest. Never invent work.
+
+CURRICULUM: The child is on ${planet} Planet. Stay within ${planet.toLowerCase()} tools and concepts. Do not nudge toward unrelated topics unless the child brings them up.${activityBlock}
+
+P/C/G CLASSIFICATION: After each child message, silently classify their thinking:
+- P (Procedural): following steps, computing, recalling facts
+- C (Conceptual): explaining why, connecting ideas, noticing patterns
+- G (Generative): conjecturing, inventing, proving, asking "what if"
+Do NOT name the classification to the child. Use it to decide your next move:
+- After P: ask a "why does that work?" question
+- After C: invite them to push further or generalize
+- After G: give space, then ask if it always holds
+
+RESPONSE LENGTH: Two to three sentences maximum. Never write paragraphs.`;
+}
+
+let childName = localStorage.getItem('kelvi_family_name') || '';
+
+function checkWelcome() {
+  if (childName) {
+    document.getElementById('welcome-overlay').classList.add('hidden');
+    updateName(childName);
+  } else {
+    const input = document.getElementById('name-input');
+    const btn = document.getElementById('welcome-btn');
+    input.addEventListener('input', () => { btn.disabled = input.value.trim().length < 1; });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && input.value.trim()) submitName(); });
+    setTimeout(() => input.focus(), 300);
+  }
+}
+
+function submitName() {
+  const val = document.getElementById('name-input').value.trim();
+  if (!val) return;
+  childName = val;
+  localStorage.setItem('kelvi_family_name', val);
+  // If API key already set, skip step 2
+  const existingKey = localStorage.getItem('kelvi_api_key');
+  if (existingKey) {
+    document.getElementById('welcome-overlay').classList.add('hidden');
+    updateName(val);
+    return;
+  }
+  // Show step 2
+  document.getElementById('welcome-step-1').style.display = 'none';
+  document.getElementById('welcome-step-2').style.display = 'block';
+  document.getElementById('welcome-step2-title').textContent = 'Hi, ' + val + '.';
+  const keyInput = document.getElementById('key-input');
+  const keyBtn = document.getElementById('key-btn');
+  keyInput.addEventListener('input', () => { keyBtn.disabled = keyInput.value.trim().length < 10; });
+  keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && keyInput.value.trim().length >= 10) submitKey(false); });
+  setTimeout(() => keyInput.focus(), 100);
+}
+
+function submitKey(skip) {
+  if (!skip) {
+    const key = document.getElementById('key-input').value.trim();
+    if (key) localStorage.setItem('kelvi_api_key', key);
+  }
+  document.getElementById('welcome-overlay').classList.add('hidden');
+  updateName(childName);
+}
+
+function updateName(name) {
+  const initial = name[0].toUpperCase();
+  document.getElementById('tb-name').textContent = name;
+  document.getElementById('tb-avatar').textContent = initial;
+  document.getElementById('center-avatar').textContent = initial;
+  document.getElementById('center-name').textContent = name;
+  document.getElementById('center-core-name').textContent = name + '\u2019s';
+  const lbl = document.getElementById('galaxy-core-label'); if(lbl) lbl.textContent = 'math galaxy';
+  const hintEl = document.getElementById('hint-name');
+  if (hintEl) hintEl.textContent = name + "'s";
+  ['g-name','g-name-2','g-name-3'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = name;
+  });
+  const gav = document.getElementById('g-avatar');  if (gav) gav.textContent = initial;
+  const scn = document.getElementById('settings-child-name'); if (scn) scn.textContent = name;
+  const jn = document.getElementById('journal-name'); if (jn) jn.textContent = name;
+}
+
+// ── SETTINGS ────────────────────────────────────────────
+let autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+
+function openSettings() {
+  const modal = document.getElementById('settings-modal');
+  const keyField = document.getElementById('settings-key');
+  const key = localStorage.getItem('kelvi_api_key') || '';
+  keyField.value = key ? '••••••••' : '';
+  keyField.dataset.unchanged = 'true';
+  keyField.addEventListener('focus', function() {
+    if (this.dataset.unchanged === 'true') { this.value = ''; this.dataset.unchanged = 'false'; }
+  }, { once: true });
+  const toggle = document.getElementById('toggle-autospeak');
+  if (autoSpeak) toggle.classList.add('on'); else toggle.classList.remove('on');
+  populateVoiceSelector();
+  modal.style.display = 'flex';
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').style.display = 'none';
+}
+
+function saveSettings() {
+  const keyField = document.getElementById('settings-key');
+  if (keyField.dataset.unchanged !== 'true' && keyField.value.trim()) {
+    localStorage.setItem('kelvi_api_key', keyField.value.trim());
+  }
+  localStorage.setItem('kelvi_autospeak', autoSpeak);
+  const voiceSel = document.getElementById('settings-voice');
+  if (voiceSel) localStorage.setItem('kelvi_voice', voiceSel.value);
+  closeSettings();
+}
+
+function changeName() {
+  const name = prompt('Explorer name:', childName);
+  if (name && name.trim()) {
+    childName = name.trim();
+    localStorage.setItem('kelvi_family_name', childName);
+    updateName(childName);
+    const scn = document.getElementById('settings-child-name');
+    if (scn) scn.textContent = childName;
+  }
+}
+
+function toggleAutoSpeak() {
+  autoSpeak = !autoSpeak;
+  const toggle = document.getElementById('toggle-autospeak');
+  if (autoSpeak) toggle.classList.add('on'); else toggle.classList.remove('on');
+}
+
+// ── TTS / STT ────────────────────────────────────────────
+let currentUtterance = null;
+
+function getSelectedVoice() {
+  const saved = localStorage.getItem('kelvi_voice');
+  if (!saved) return null;
+  return speechSynthesis.getVoices().find(v => v.name === saved) || null;
+}
+
+function populateVoiceSelector() {
+  const sel = document.getElementById('settings-voice');
+  if (!sel || !window.speechSynthesis) return;
+  const populate = () => {
+    const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+    const saved = localStorage.getItem('kelvi_voice') || '';
+    sel.innerHTML = '<option value="">Default</option>' +
+      voices.map(v => `<option value="${v.name}"${v.name === saved ? ' selected' : ''}>${v.name} (${v.lang})</option>`).join('');
+  };
+  populate();
+  if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populate;
+}
+
+function speakString(text, onEnd) {
+  if (!window.speechSynthesis) return;
+  if (currentUtterance) { window.speechSynthesis.cancel(); }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.92;
+  utter.pitch = 1.05;
+  const voice = getSelectedVoice();
+  if (voice) utter.voice = voice;
+  currentUtterance = utter;
+  utter.onend = () => { currentUtterance = null; if (onEnd) onEnd(); };
+  window.speechSynthesis.speak(utter);
+}
+
+function speakText(btn) {
+  if (!window.speechSynthesis) return;
+  const bubble = btn.closest('.msg-bubble-k');
+  if (!bubble) return;
+  const text = bubble.textContent.trim();
+  btn.style.opacity = '0.4';
+  speakString(text, () => { btn.style.opacity = ''; });
+}
+
+function speakPrompt(btn) {
+  if (!window.speechSynthesis) return;
+  const lvl = GEOM_LEVELS[geoFocused.level];
+  const act = lvl.activities[geoFocused.activity];
+  const text = act.prompt.replace(/["""]/g, '');
+  const icon = btn.querySelector('.speak-icon');
+  if (icon) icon.style.opacity = '0.4';
+  speakString(text, () => { if (icon) icon.style.opacity = ''; });
+}
+
+function autoSpeakMessage(btn) {
+  if (autoSpeak) speakText(btn);
+}
+
+let micRecognition = null;
+let micActive = false;
+
+function toggleMic() {
+  const btn = document.getElementById('mic-btn');
+  if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Try Chrome.');
+    return;
+  }
+  if (micActive) {
+    micRecognition && micRecognition.stop();
+    micActive = false;
+    btn.style.color = '';
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  micRecognition = new SR();
+  micRecognition.lang = 'en-US';
+  micRecognition.interimResults = false;
+  micRecognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    const input = document.getElementById('chat-input');
+    input.value = (input.value + ' ' + transcript).trim();
+    autoResize(input);
+  };
+  micRecognition.onend = () => { micActive = false; btn.style.color = ''; };
+  micRecognition.onerror = () => { micActive = false; btn.style.color = ''; };
+  micRecognition.start();
+  micActive = true;
+  btn.style.color = 'var(--family)';
+}
+
+function populateStars(container, count) {
+  const colors = ['', '', '', '', 'star-blue', 'star-warm'];
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'star ' + colors[Math.floor(Math.random() * colors.length)];
+    const size = Math.random() * 2 + 0.4;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top = (Math.random() * 100) + '%';
+    s.style.animationDelay = (Math.random() * 4) + 's';
+    s.style.animationDuration = (2 + Math.random() * 4) + 's';
+    container.appendChild(s);
+  }
+}
+populateStars(document.getElementById('starfield'), 180);
+populateStars(document.getElementById('welcome-stars'), 80);
+
+/* ═══════════════════════════════════════════════════════
+   GALAXY — data, layout, variants, resume, tweaks
+═══════════════════════════════════════════════════════ */
+
+/* tweakable defaults — editable via the Tweaks panel */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "variant": "objects",
+  "palette": "default",
+  "motion": "medium",
+  "resumePlanet": "geometry",
+  "resumeActivity": "The triangle's secret"
+}/*EDITMODE-END*/;
+
+/* planet catalogue
+   x, y are polar-ish offsets from center, expressed in "layout units"
+   that get scaled into a viewport-fitting radius at render time.
+   angle in degrees (0 = right, 90 = down), r in [0..1] fraction of max radius */
+/* Hand-curated constellation.
+   nx, ny are normalized coordinates in [-1, 1], measured from galaxy center.
+   nx is scaled by the horizontal layout radius, ny by the vertical one.
+   Positions chosen so (a) labels below each planet don't collide with the
+   planet below it, (b) no two planets share a column, (c) bigger planets
+   (Geometry, Algebra, Puzzle) get more breathing room.
+   `angle` is retained only so the drift-orbit animation in v2 still works. */
+/* ring: 1..5 — which concentric orbit this planet belongs to.
+   Planets on the same ring share rx/ry and appear on the same ellipse.
+   nx/ny are used only to seed the STARTING ANGLE on that ring
+   (so the initial pose still respects the curated composition). */
+const PLANETS = [
+  // ring 1 — innermost
+  { key:'number',      label:'Number',      sub:'counting · place value',     ring:1, nx: 0.65, ny:-0.15, angle: 20,  r:0.26, size:54, tint:['#F8D8A8','#E09C50','#A8682A'], hex:'#E09C50', sig:'dotted',   obj:'numbers' },
+  { key:'fraction',    label:'Fraction',    sub:'parts · ratios · decimals',  ring:1, nx: 0.25, ny:-0.62, angle:280,  r:0.30, size:58, tint:['#B8E0D4','#3E9282','#1E5C50'], hex:'#3E9282', sig:'slice',    obj:'pie'     },
+  // ring 2 — Observatory, away from Fraction (opposite side)
+  { key:'observatory', label:'Observatory', sub:'how mathematicians think',   ring:2, nx:-0.55, ny: 0.35, angle:210,  r:0.40, size:40, tint:['#E0E0F0','#8888A0','#54546C'], hex:'#AAAAC0', sig:'telescope',obj:'question' },
+  // ring 3 — Algebra / Operation / Measurement
+  { key:'algebra',     label:'Algebra',     sub:'patterns · variables',       ring:3, nx:-0.95, ny:-0.15, angle:180,  r:0.65, size:78, tint:['#B8A8E0','#6856A8','#3C2C78'], hex:'#6856A8', sig:'spiral',   obj:'xy'      },
+  { key:'operation',   label:'Operation',   sub:'+ − × ÷',                    ring:3, nx:-0.35, ny:-0.55, angle: 90,  r:0.65, size:58, tint:['#D4DCB0','#7A8E4E','#3E4A24'], hex:'#7A8E4E', sig:'craters',  obj:'plus'    },
+  { key:'measurement', label:'Measurement', sub:'length · time · weight',     ring:3, nx: 1.18, ny:-0.15, angle:  0,  r:0.65, size:52, tint:['#A8C8E0','#5286B4','#2C5880'], hex:'#5286B4', sig:'moon',     obj:'ruler'   },
+  // ring 4 — Geometry, solo
+  { key:'geometry',    label:'Geometry',    sub:'shape · space · proof',      ring:4, nx: 0.40, ny: 0.92, angle:100,  r:0.80, size:40, tint:['#DCC094','#A07D4A','#6C502C'], hex:'#A07D4A', sig:'rings',    obj:'polygon' },
+  // ring 5 — outer frontier
+  { key:'data',        label:'Data',        sub:'graphs · chance',            ring:5, nx: 0.90, ny: 0.75, angle: 10,  r:1.00, size:48, tint:['#DCB8D4','#964E82','#602C54'], hex:'#964E82', sig:'clouds',   obj:'bars'    },
+  { key:'puzzle',      label:'Puzzle Planet', sub:'pure problem-solving',     ring:5, nx:-1.05, ny: 0.75, angle:130,  r:1.00, size:56, tint:['#F8E088','#D89A2A','#9A6818'], hex:'#D89A2A', sig:'halo',     obj:'knot'    },
+];
+
+/* Ring radii as a fraction of bounds.halfW (used only by revolve variants). */
+const RING_RX = { 1:0.26, 2:0.73, 3:0.60, 4:0.82, 5:1.02 };
+
+/* which planets are "deep", "visited", "untouched" — from the story in the guardian view */
+const STATUS = { geometry:'deep', puzzle:'deep', number:'visited', operation:'visited', fraction:'visited', algebra:'untouched', measurement:'untouched', data:'untouched', observatory:'untouched' };
+
+/* constellation links for the "orbit" variant */
+const LINKS = [
+  // inner ring triangle (number/operation/fraction)
+  ['number','operation'],
+  ['operation','fraction'],
+  ['fraction','number'],
+  // inner→middle: each inner connects to its "parent" structure
+  ['number','measurement'],
+  ['operation','algebra'],
+  ['fraction','geometry'],
+  // outer frontiers connect to the middle
+  ['data','algebra'],
+  ['puzzle','geometry'],
+  ['observatory','measurement'],
+];
+
+let state = {
+  variant: localStorage.getItem('kelvi_gx_variant') || TWEAK_DEFAULTS.variant,
+  palette: localStorage.getItem('kelvi_gx_palette') || TWEAK_DEFAULTS.palette,
+  motion:  localStorage.getItem('kelvi_gx_motion')  || TWEAK_DEFAULTS.motion,
+  resumePlanet:   TWEAK_DEFAULTS.resumePlanet,
+  resumeActivity: TWEAK_DEFAULTS.resumeActivity,
+};
+
+function computeLayoutBounds() {
+  // Fit planets within the galaxy container. Budget for topbar (56px) and ribbon (~120px).
+  // Returns separate horizontal and vertical half-extents so the constellation
+  // fills the available rectangle without clipping labels or overlapping the ribbon.
+  const gx = document.getElementById('galaxy');
+  const w = gx.clientWidth, h = gx.clientHeight;
+  const topPad   = 60;   // below topbar, for Observatory label
+  const botPad   = 150;  // above ribbon, for lower planets' labels
+  const sidePad  = 140;  // for outer-planet labels at left/right extremes
+  // Positions range over ~[-1.15, 1.15] on x and ~[-1.0, 0.6] on y, so divide
+  // by the max magnitude to keep everything inside the visible frame.
+  const xExtent = 1.15, yExtent = 1.05;
+  const halfW = Math.max(260, (w - sidePad * 2) / 2) / xExtent;
+  const halfH = Math.max(200, (h - topPad - botPad) / 2) / yExtent;
+  // Center y-offset: more bottom padding than top means visual center shifts up.
+  const yOffset = (topPad - botPad) / 2;
+  return { halfW, halfH, yOffset };
+}
+
+function polar(angleDeg, r){
+  // Retained for the drift-orbit animation (variant='drift').
+  const a = angleDeg * Math.PI/180;
+  return { x: Math.cos(a) * r, y: Math.sin(a) * r * 0.9 };
+}
+
+function renderPlanets(){
+  const host = document.getElementById('planets');
+  const svg  = document.getElementById('links');
+  host.innerHTML = '';
+  svg.innerHTML = '';
+  const bounds = computeLayoutBounds();
+
+  // record positions so links + resume can reference them
+  const positions = {};
+
+  PLANETS.forEach(p => {
+    const pos = { x: p.nx * bounds.halfW, y: p.ny * bounds.halfH + bounds.yOffset };
+    positions[p.key] = pos;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'planet status-' + (STATUS[p.key] || 'visited');
+    if (STATUS[p.key] === 'deep')      wrap.classList.add('deep');
+    if (STATUS[p.key] === 'untouched') wrap.classList.add('untouched');
+    if (p.key === state.resumePlanet)  wrap.classList.add('resume');
+    // Lower-half planets: labels above so they don't fall into the ribbon.
+    if (pos.y > 30) wrap.classList.add('label-above');
+
+    // In revolve mode the rAF loop drives position via transform alone.
+    // Set left/top to 50%/50% so the click target always matches the visual.
+    const willRevolve = (state.variant === 'drift-objects');
+    wrap.style.left = willRevolve ? '50%' : 'calc(50% + ' + pos.x + 'px)';
+    wrap.style.top  = willRevolve ? '50%' : 'calc(50% + ' + pos.y + 'px)';
+    wrap.style.width  = p.size + 'px';
+    wrap.style.height = p.size + 'px';
+    wrap.style.color = p.hex;
+    wrap.style.setProperty('--tint-hi',  p.tint[0]);
+    wrap.style.setProperty('--tint-mid', p.tint[1]);
+    wrap.style.setProperty('--tint-lo',  p.tint[2]);
+    // Planets are inert in this showcase (palette + motion review only).
+
+    // body changes based on variant
+    const body = document.createElement('div');
+    body.className = 'p-body sphere';
+
+    // rings on geometry (and some creatures)
+    if (p.sig === 'rings') {
+      const ring = document.createElement('div'); ring.className='ring'; body.appendChild(ring);
+    }
+
+    // Decompose variant into independent body + motion components.
+    // - sky:     sphere body,   still
+    // - orbit:   sphere body,   drift
+    // - creature: creature body, still
+    // - objects: math-object body, still
+    // - drift-objects: math-object body, drift  ← new combo
+    const bodyStyle = (state.variant === 'creature') ? 'creature'
+                    : (state.variant === 'objects' || state.variant === 'drift-objects') ? 'object'
+                    : 'sphere';
+
+    // creature signatures (v3)
+    if (bodyStyle === 'creature') {
+      applyCreature(body, p);
+    }
+
+    // math objects (v4) — replace the body contents with an SVG
+    if (bodyStyle === 'object') {
+      body.classList.remove('sphere');
+      body.innerHTML = mathObject(p);
+    }
+
+    wrap.appendChild(body);
+
+    const lab = document.createElement('div'); lab.className='p-label'; lab.textContent = p.label; wrap.appendChild(lab);
+    const sub = document.createElement('div'); sub.className='p-sub';   sub.textContent = p.sub;   wrap.appendChild(sub);
+    wrap.addEventListener('click', () => openPlanet(p.key));
+
+    // Motion handling:
+    // Objects gets a tiny breathing wobble so the galaxy feels alive without
+    // full motion; orbit uses a larger wobble; drift-objects fully revolves.
+    // Both 'objects' and 'drift-objects' now revolve around Arya so the
+    // galaxy actually feels like a galaxy; 'sky' stays still, 'orbit' wobbles.
+    host.appendChild(wrap);
+    const motionMode = (state.variant === 'drift-objects') ? 'revolve'
+                     : (state.variant === 'objects')       ? 'breathe'
+                     : (state.variant === 'orbit')         ? 'wobble'
+                     : 'still';
+
+    if (motionMode === 'breathe') {
+      wrap.classList.add('drifting');
+      const motionScale = state.motion === 'rich' ? 1.1 : (state.motion === 'subtle' ? 0.55 : 0.8);
+      const baseR = 20 + Math.abs(p.nx + p.ny) * 8;
+      const wobbleRx = baseR * motionScale;
+      const wobbleRy = (baseR * 0.55) * motionScale;
+      const phase = (Math.abs(p.nx * 13 + p.ny * 29) % 1);
+      const wobbleDur = 22 + (Math.abs(p.nx + p.ny) * 8);
+      wrap.style.setProperty('--wobble-rx', wobbleRx.toFixed(1) + 'px');
+      wrap.style.setProperty('--wobble-ry', wobbleRy.toFixed(1) + 'px');
+      wrap.style.setProperty('--wobble-dur', wobbleDur.toFixed(1) + 's');
+      wrap.style.setProperty('--wobble-delay', (-phase * wobbleDur).toFixed(2) + 's');
+    } else if (motionMode === 'wobble') {
+      wrap.classList.add('drifting');
+      const motionScale = state.motion === 'rich' ? 1.35 : (state.motion === 'subtle' ? 0.55 : 1);
+      const baseR = 22 + Math.abs(p.nx + p.ny) * 7;
+      const wobbleRx = baseR * motionScale;
+      const wobbleRy = baseR * motionScale * 0.45;
+      const wobbleDur = 18 + Math.abs(p.nx - p.ny) * 9;
+      const phaseSeed = [...p.key].reduce((a,c)=>a+c.charCodeAt(0),0);
+      const phase = (phaseSeed % 360) / 360;
+      wrap.style.setProperty('--wobble-rx',  wobbleRx.toFixed(1) + 'px');
+      wrap.style.setProperty('--wobble-ry',  wobbleRy.toFixed(1) + 'px');
+      wrap.style.setProperty('--wobble-dur', wobbleDur.toFixed(1) + 's');
+      wrap.style.setProperty('--wobble-delay', (-phase * wobbleDur).toFixed(2) + 's');
+    } else if (motionMode === 'revolve') {
+      // Full elliptical revolution around Arya. Planets on the same `ring`
+      // share the SAME ellipse, so they truly co-orbit. nx/ny seed only the
+      // starting angle on that shared ring.
+      wrap.style.left = '50%';
+      wrap.style.top  = 'calc(50% + ' + bounds.yOffset + 'px)';
+      wrap.dataset.revolve = '1';
+      const ellipseRatio = 0.62;  // disc tilt: wider than tall
+      const ringFrac = RING_RX[p.ring] || 0.6;
+      const rx = Math.max(60, ringFrac * bounds.halfW);
+      const ry = Math.max(40, rx * ellipseRatio);
+      // Starting angle: use curated nx/ny projected onto this shared ellipse.
+      // x = rx·cos(θ), y = ry·sin(θ) → θ = atan2(ny·compress, nx)
+      const startAngle = Math.atan2(p.ny * (rx / ry), p.nx);
+      // Period scales with ring size — outer rings take longer to loop.
+      const motionScale = state.motion === 'rich' ? 1 : (state.motion === 'subtle' ? 2.2 : 1.5);
+      const periodSec = (70 + rx * 0.18) * motionScale;
+      // Slight per-planet variation in speed so they don't lockstep
+      const keySeed = [...p.key].reduce((a,c)=>a+c.charCodeAt(0),0);
+      const speedJitter = 1 + ((keySeed % 7) - 3) * 0.03;  // ±9%
+      wrap._revolve = {
+        rx, ry,
+        startAngle,
+        omega: (2 * Math.PI) / (periodSec * speedJitter),
+        // Counter-clockwise for every planet.
+        // In screen coords (y-down), CCW = decreasing angle over time → direction -1.
+        direction: -1,
+      };
+    }
+  });
+
+  // draw constellation links in drift mode (keeps the "orbital paths" feel)
+  if (state.variant === 'orbit') {
+    const r = host.getBoundingClientRect();
+    svg.setAttribute('viewBox', '0 0 ' + r.width + ' ' + r.height);
+    svg.setAttribute('width',  r.width);
+    svg.setAttribute('height', r.height);
+    const cx = r.width/2, cy = r.height/2;
+    LINKS.forEach(([a, b]) => {
+      const pa = positions[a], pb = positions[b];
+      if (!pa || !pb) return;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', cx + pa.x);
+      line.setAttribute('y1', cy + pa.y);
+      line.setAttribute('x2', cx + pb.x);
+      line.setAttribute('y2', cy + pb.y);
+      svg.appendChild(line);
+    });
+  }
+
+  // Start / restart the elliptical-revolution rAF loop for drift-objects.
+  startRevolutionLoop();
+}
+
+// rAF handle for the revolution loop, so resize/variant-change can restart it.
+let __revolveRaf = 0;
+let __revolveStart = 0;
+
+function startRevolutionLoop() {
+  // Cancel any previous loop — renderPlanets may rebuild the DOM.
+  if (__revolveRaf) cancelAnimationFrame(__revolveRaf);
+  __revolveRaf = 0;
+
+  // Respect reduced-motion preference: park every planet at its starting pose.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nodes = Array.from(document.querySelectorAll('.planet[data-revolve="1"]'));
+  if (nodes.length === 0) return;
+
+  __revolveStart = performance.now();
+  const tick = (now) => {
+    const elapsed = (now - __revolveStart) / 1000; // seconds
+    for (const wrap of nodes) {
+      const o = wrap._revolve;
+      if (!o) continue;
+      const theta = reduced ? o.startAngle : (o.startAngle + o.direction * o.omega * elapsed);
+      const x = o.rx * Math.cos(theta);
+      const y = o.ry * Math.sin(theta);
+      // The planet element is centered at (50%, 50%) via translate(-50%,-50%)
+      // in CSS; we append additional xy translation for the orbit.
+      wrap.style.transform =
+        'translate(calc(-50% + ' + x.toFixed(1) + 'px), calc(-50% + ' + y.toFixed(1) + 'px))';
+    }
+    if (!reduced) __revolveRaf = requestAnimationFrame(tick);
+  };
+  __revolveRaf = requestAnimationFrame(tick);
+}
+
+/* v3 creature signatures: each planet gets a small decorative treatment */
+function applyCreature(body, p){
+  const sig = p.sig;
+  if (sig === 'rings') return; // already has ring
+
+  if (sig === 'moon') {
+    const moon = document.createElement('div');
+    moon.className = 'p-deco moon';
+    moon.style.cssText = 'width:34%;height:34%;border-radius:50%;background:radial-gradient(circle at 30% 30%,#E8F0F8,#9EB0C4 60%,#526478);right:-14%;top:-8%;box-shadow:0 2px 6px rgba(0,0,0,.4)';
+    body.appendChild(moon);
+  }
+  if (sig === 'halo') {
+    const halo = document.createElement('div');
+    halo.className = 'p-deco halo';
+    halo.style.cssText = 'inset:-22%;border-radius:50%;border:1.5px solid rgba(245,224,136,0.55);box-shadow:0 0 24px rgba(245,224,136,0.35), inset 0 0 14px rgba(245,224,136,0.2);animation:spin 30s linear infinite';
+    body.appendChild(halo);
+  }
+  if (sig === 'craters') {
+    const c1 = document.createElement('div'); c1.style.cssText='position:absolute;width:22%;height:22%;border-radius:50%;background:rgba(0,0,0,0.18);left:22%;top:56%;box-shadow:inset 1px 1px 2px rgba(255,255,255,0.15)';
+    const c2 = document.createElement('div'); c2.style.cssText='position:absolute;width:14%;height:14%;border-radius:50%;background:rgba(0,0,0,0.22);left:58%;top:28%';
+    const c3 = document.createElement('div'); c3.style.cssText='position:absolute;width:10%;height:10%;border-radius:50%;background:rgba(0,0,0,0.20);left:66%;top:60%';
+    body.append(c1,c2,c3);
+  }
+  if (sig === 'clouds') {
+    const band = document.createElement('div');
+    band.style.cssText = 'position:absolute;left:-10%;right:-10%;top:38%;height:12%;background:linear-gradient(to right, transparent, rgba(255,255,255,0.35), transparent);border-radius:50%;mix-blend-mode:overlay';
+    const band2 = document.createElement('div');
+    band2.style.cssText = 'position:absolute;left:-8%;right:-8%;top:62%;height:8%;background:linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);border-radius:50%;mix-blend-mode:overlay';
+    body.append(band, band2);
+  }
+  if (sig === 'dotted') {
+    // number planet: tiny digit tattoos orbiting
+    for (let i = 0; i < 6; i++) {
+      const d = document.createElement('div');
+      const a = (i/6) * Math.PI * 2;
+      d.style.cssText = 'position:absolute;left:'+(50 + Math.cos(a)*38)+'%;top:'+(50 + Math.sin(a)*38)+'%;transform:translate(-50%,-50%);font-size:8px;color:rgba(255,255,255,0.55);font-family:ui-monospace,monospace';
+      d.textContent = (i + 1);
+      body.appendChild(d);
+    }
+  }
+  if (sig === 'slice') {
+    // fraction planet: a pie slice carved in shadow
+    const slice = document.createElement('div');
+    slice.style.cssText = 'position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -35deg, rgba(0,0,0,0.30) 0 95deg, transparent 95deg)';
+    body.appendChild(slice);
+  }
+  if (sig === 'spiral') {
+    // algebra planet: a golden-ratio-ish spiral glyph on the surface
+    const sp = document.createElement('div');
+    sp.innerHTML = '<svg viewBox="-50 -50 100 100" width="100%" height="100%" style="position:absolute;inset:0"><path d="M 0 0 m 0 -6 a 6 6 0 1 1 0 12 a 10 10 0 1 1 0 -20 a 16 16 0 1 1 0 32 a 24 24 0 1 1 0 -48" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.3"/></svg>';
+    body.appendChild(sp);
+  }
+  if (sig === 'telescope') {
+    // small dashed ring + spark for observatory
+    const r = document.createElement('div');
+    r.style.cssText='position:absolute;inset:-18%;border-radius:50%;border:1px dashed rgba(255,255,255,0.35);animation:spin 40s linear infinite';
+    body.appendChild(r);
+  }
+}
+
+/* v4 math object renderers */
+function mathObject(p){
+  const stroke = p.tint[1];
+  const fill   = p.tint[0] + 'dd';
+  const hi     = p.tint[0];
+  const lo     = p.tint[2];
+  const cc = 'stroke-linejoin:round;stroke-linecap:round';
+  switch(p.obj){
+    case 'polygon':
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><polygon points="0,-42 40,-12 25,38 -25,38 -40,-12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3" style="'+cc+'"/><polygon points="0,-42 40,-12 25,38 -25,38 -40,-12" fill="none" stroke="'+hi+'" stroke-width="1" opacity="0.5"/></svg></div>';
+    case 'plus':
+      // 2×2 grid of operators: + − × ÷ so the "Operation" planet
+      // represents all four, not just addition.
+      return '<div class="mo"><svg viewBox="-50 -50 100 100">'+
+        '<circle cx="0" cy="0" r="42" fill="'+lo+'" opacity="0.35"/>'+
+        // +  (top-left)
+        '<path d="M -24 -18 L -12 -18 M -18 -24 L -18 -12" stroke="'+hi+'" stroke-width="4" style="'+cc+'"/>'+
+        // −  (top-right)
+        '<path d="M 12 -18 L 24 -18" stroke="'+hi+'" stroke-width="4" style="'+cc+'"/>'+
+        // ×  (bottom-left)
+        '<path d="M -24 12 L -12 24 M -24 24 L -12 12" stroke="'+hi+'" stroke-width="4" style="'+cc+'"/>'+
+        // ÷  (bottom-right)
+        '<circle cx="18" cy="12" r="2.5" fill="'+hi+'"/>'+
+        '<path d="M 10 18 L 26 18" stroke="'+hi+'" stroke-width="3.5" style="'+cc+'"/>'+
+        '<circle cx="18" cy="24" r="2.5" fill="'+hi+'"/>'+
+        '<circle cx="0" cy="0" r="42" fill="none" stroke="'+stroke+'" stroke-width="2.5"/>'+
+      '</svg></div>';
+    case 'numbers':
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="42" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/><text x="0" y="6" text-anchor="middle" font-family="DM Serif Display, serif" font-size="36" fill="'+lo+'">7</text></svg></div>';
+    case 'pie':
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="42" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/><path d="M 0 0 L 0 -42 A 42 42 0 0 1 42 0 Z" fill="'+stroke+'"/><line x1="0" y1="0" x2="0" y2="-42" stroke="'+hi+'" stroke-width="1.5" opacity="0.6"/><line x1="0" y1="0" x2="42" y2="0" stroke="'+hi+'" stroke-width="1.5" opacity="0.6"/></svg></div>';
+    case 'xy':
+      // centered italic x with a small superscript 2 to its upper-right
+      return '<div class="mo"><svg viewBox="-50 -50 100 100">'+
+        '<circle cx="0" cy="0" r="42" fill="'+fill+'" opacity="0.4"/>'+
+        '<text x="-6" y="10" text-anchor="middle" font-family="DM Serif Display, serif" font-style="italic" font-size="40" fill="'+lo+'">x</text>'+
+        '<text x="18" y="-8" text-anchor="middle" font-family="DM Serif Display, serif" font-size="18" fill="'+stroke+'">2</text>'+
+        '<circle cx="0" cy="0" r="42" fill="none" stroke="'+stroke+'" stroke-width="2.5"/>'+
+      '</svg></div>';
+    case 'ruler':
+      // Angle / degree measurement — an open arc between two rays meeting at
+      // a vertex, with a small degree mark. Reads as geometry/angle rather
+      // than a straight ruler.
+      return '<div class="mo"><svg viewBox="-50 -50 100 100">'+
+        '<circle cx="0" cy="0" r="42" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/>'+
+        // two rays meeting at lower-left vertex (-26, 20)
+        '<path d="M -26 20 L 30 20 M -26 20 L 18 -24" stroke="'+lo+'" stroke-width="3" style="'+cc+'"/>'+
+        // arc sweeping between the rays
+        '<path d="M 4 20 A 30 30 0 0 0 -4 0" fill="none" stroke="'+hi+'" stroke-width="2" style="'+cc+'"/>'+
+        // degree mark
+        '<circle cx="14" cy="0" r="2" fill="'+lo+'"/>'+
+        '<text x="20" y="4" text-anchor="start" font-family="DM Serif Display, serif" font-size="14" fill="'+lo+'">\u00b0</text>'+
+      '</svg></div>';
+    case 'bars':
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="42" fill="'+lo+'" opacity="0.35"/><rect x="-24" y="-4" width="10" height="26" fill="'+hi+'"/><rect x="-7" y="-20" width="10" height="42" fill="'+stroke+'"/><rect x="10" y="-10" width="10" height="32" fill="'+hi+'"/><circle cx="0" cy="0" r="42" fill="none" stroke="'+stroke+'" stroke-width="2.5"/></svg></div>';
+    case 'knot':
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="42" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/><path d="M -22 -6 C -22 -26 22 -26 22 -6 C 22 14 -22 14 -22 -6 M 22 6 C 22 26 -22 26 -22 6 C -22 -14 22 -14 22 6" fill="none" stroke="'+lo+'" stroke-width="2.5" style="'+cc+'"/></svg></div>';
+    case 'question':
+      // a serif-set '?' — the thesis glyph of the whole galaxy.
+      // "how mathematicians think" = starting with a question, not an answer.
+      return '<div class="mo"><svg viewBox="-50 -50 100 100"><circle cx="0" cy="0" r="42" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2.5"/><text x="0" y="20" text-anchor="middle" font-family="DM Serif Display, Georgia, serif" font-size="58" font-weight="400" fill="'+lo+'" style="'+cc+'">?</text></svg></div>';
+    default:
+      return '';
+  }
+}
+
+/* floating glyphs */
+function renderGlyphs(){
+  const layer = document.getElementById('glyph-layer');
+  const bounds = computeLayoutBounds();
+  const rMax = Math.min(bounds.halfW, bounds.halfH);
+  const glyphs = ['π','∞','√','∑','φ','Δ','θ','∫'];
+  layer.innerHTML = '';
+  glyphs.forEach((g, i) => {
+    const a = (i / glyphs.length) * Math.PI * 2 + 0.4;
+    const r = rMax * (0.38 + (i%3)*0.12);
+    const x = Math.cos(a) * r, y = Math.sin(a) * r + bounds.yOffset;
+    const el = document.createElement('span');
+    el.className = 'glyph';
+    el.textContent = g;
+    el.style.cssText = 'left:calc(50% + '+x+'px);top:calc(50% + '+y+'px);font-size:'+(12 + (i%3)*4)+'px;animation-delay:'+(i*0.7)+'s';
+    layer.appendChild(el);
+  });
+}
+
+/* parallax: slow drift of the planets/orbits layer with cursor */
+let parallaxRaf = 0;
+function wireParallax(){
+  const gx = document.getElementById('galaxy');
+  const px = document.getElementById('parallax');
+  gx.addEventListener('mousemove', (e) => {
+    if (state.motion === 'none') return;
+    const r = gx.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width/2) / r.width;
+    const dy = (e.clientY - r.top - r.height/2) / r.height;
+    const mag = state.motion === 'rich' ? 22 : (state.motion === 'subtle' ? 6 : 12);
+    cancelAnimationFrame(parallaxRaf);
+    parallaxRaf = requestAnimationFrame(() => {
+      px.style.transform = 'translate('+(-dx*mag)+'px, '+(-dy*mag)+'px)';
+    });
+  });
+  gx.addEventListener('mouseleave', () => { px.style.transform=''; });
+}
+
+function applyVariant(){
+  const gx = document.getElementById('galaxy');
+  gx.dataset.variant = state.variant;
+  gx.dataset.palette = state.palette;
+  gx.dataset.motion  = state.motion;
+  document.body.dataset.palette = state.palette;
+  renderPlanets();
+  renderGlyphs();
+  // persist
+  localStorage.setItem('kelvi_gx_variant', state.variant);
+  localStorage.setItem('kelvi_gx_palette', state.palette);
+  localStorage.setItem('kelvi_gx_motion',  state.motion);
+}
+
+// re-render on resize so planets stay inside the viewport
+let resizeRaf = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeRaf);
+  resizeRaf = setTimeout(() => { renderPlanets(); renderGlyphs(); }, 150);
+});
+
+// kick off
+setTimeout(() => {
+  applyVariant();
+  wireParallax();
+}, 50);
+
+
+
+function showPanel(id) {
+  // Auto-save when leaving chat with content
+  const chatActive = document.getElementById('panel-chat').classList.contains('active');
+  if (chatActive && id !== 'chat' && msgs && msgs.length >= 2) {
+    saveCurrentSession();
+  }
+
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+
+  document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
+  const tabId = (id === 'geometry' || id === 'chat') ? 'galaxy' : id;
+  const tab = document.querySelector('.topbar-tab[data-panel="' + tabId + '"]');
+  if (tab) tab.classList.add('active');
+
+  const topbar = document.getElementById('topbar');
+  if (id === 'galaxy') {
+    topbar.classList.add('space-mode');
+    topbar.classList.remove('light-mode');
+  } else {
+    topbar.classList.remove('space-mode');
+    topbar.classList.add('light-mode');
+  }
+
+  if (id === 'journal') renderJournal();
+}
+
+// ── GEOMETRY V4 ─────────────────────────────────────────────────────────────
+const GEOM_LEVELS = [
+  {
+    num:'I', key:'arrive', name:'Arrive', pcg:'Procedural · K–Gr 2', pcgKind:'p',
+    desc:'Meet the shapes. Touch them, sort them, find them hiding in the world.',
+    activities:[
+      { id:'shape-hunt',   title:'The Shape Hunt',    prompt:'"Look around. How many different shapes can you find?"', fullPrompt:'Look around the room you are in. How many different shapes can you find?' },
+      { id:'sides-corners',title:'Sides and Corners',  prompt:'"Draw a triangle. Count the sides. Count the corners. Notice anything?"', fullPrompt:'Draw a triangle. Count the sides. Count the corners. Do you notice anything?', visited:true },
+      { id:'sort-shapes',  title:'Sorting Shapes',     prompt:'"A pile of shapes. How would you sort them?"', fullPrompt:'Someone gave you a pile of shapes. How would you sort them into groups?' },
+      { id:'3d-names',     title:'The 3D Family',      prompt:'"Ball, box, can, party hat — each has a math name."', fullPrompt:'A ball, a box, a can, a party hat. Each one has a math name. Can you guess them?' },
+    ],
+  },
+  {
+    num:'II', key:'notice', name:'Notice', pcg:'Procedural → Conceptual · Gr 2–4', pcgKind:'p',
+    desc:'Lines, angles, symmetry. What makes one shape match itself when you fold it?',
+    activities:[
+      { id:'angle-types',   title:'Kinds of Angles',       prompt:'"Right, acute, obtuse, straight — find each in your room."', fullPrompt:'You see four angles — a tiny one, a square corner, a wide one, and a flat line. Can you find each kind in your room?' },
+      { id:'symmetry-fold', title:'Folding Symmetry',       prompt:'"Draw on folded paper. Cut. Unfold. What do you notice?"', fullPrompt:'Draw a shape on a folded piece of paper. Cut it out. When you unfold it, what do you notice?', visited:true },
+      { id:'parallel-perp', title:'Two Special Pairs',      prompt:'"Some lines never meet. Some meet at right angles."', fullPrompt:'Some lines never meet. Some meet at right angles. Find me one of each.' },
+      { id:'polygon-hunt',  title:'What Makes a Polygon?',  prompt:'"Is a circle a polygon? A star? What actually counts?"', fullPrompt:'Is a circle a polygon? What about a star? What makes something count?' },
+    ],
+  },
+  {
+    num:'III', key:'question', name:'Question', pcg:'Conceptual · Gr 4–6', pcgKind:'c',
+    desc:'Area and perimeter. When is a shape the same as another? Why do triangles behave the way they do?',
+    activities:[
+      { id:'same-perim',    title:'Same Fence, Different Garden', prompt:'"A 24-foot fence. Which shape gives the biggest garden?"', fullPrompt:'A fence that is 24 feet long. What shape of garden has the most room inside?' },
+      { id:'triangle-area', title:'Half a Rectangle',             prompt:'"Every triangle is half of some rectangle. Prove it."', fullPrompt:'A triangle is always half of some rectangle. Can you prove that to a friend?' },
+      { id:'transformations',title:'Three Ways to Move',          prompt:'"Slide, spin, flip. What stays the same? What changes?"', fullPrompt:'You can slide a shape, spin it, or flip it. What stays the same? What changes?' },
+      { id:'angle-sum',     title:"The Triangle's Secret",        prompt:'"Tear off the three corners. Put them together."', fullPrompt:'Tear the three corners off a paper triangle. Put them together. What do you see?' },
+    ],
+  },
+  {
+    num:'IV', key:'connect', name:'Connect', pcg:'Conceptual · Gr 6–8', pcgKind:'c',
+    desc:'Shapes scale. Volume grows fast. The Pythagorean theorem links geometry to numbers.',
+    activities:[
+      { id:'similar-shapes',title:'Big and Small Twins',     prompt:'"Photo enlarged twice. How much bigger is the area?"', fullPrompt:'A photo enlarged to twice its size. How much bigger is the area? Guess first.' },
+      { id:'volume-grows',  title:'Why Volume Grows Faster', prompt:'"Cube sides doubled. Twice as big? Let\'s see."', fullPrompt:'A cube with sides 2. A cube with sides 4. Twice as big?' },
+      { id:'pythagorean',   title:'The 3-4-5 Pattern',       prompt:'"Sides 3, 4, 5. Square each. What do you see?"', fullPrompt:'Take a triangle with sides 3, 4, 5. Square each side. What do you notice? Try 5, 12, 13.', visited:true },
+      { id:'nets',          title:'Unfolding a Cube',         prompt:'"How many different nets can a cube make?"', fullPrompt:'A cube unfolded lays flat in six squares. How many different ways can you lay it out?' },
+    ],
+  },
+  {
+    num:'V', key:'create', name:'Create', pcg:'Generative · Gr 7–8', pcgKind:'g',
+    desc:'Make a proof. Break a rule. Invent a shape no one has seen yet.',
+    activities:[
+      { id:'prove-180',  title:'Why 180°?',              prompt:'"Every triangle\'s angles add to 180°. Always. Prove why?"', fullPrompt:'The angles of every triangle add up to 180 degrees. Always. Can you prove why?' },
+      { id:'impossible', title:'An Impossible Triangle', prompt:'"Two right angles in a triangle. Try. What goes wrong?"', fullPrompt:'Can you draw a triangle with two right angles? Try. What goes wrong?' },
+      { id:'tiling',     title:'Tiling the Floor',       prompt:'"Which shapes tile perfectly? Which leave gaps? Why?"', fullPrompt:'Some shapes tile perfectly. Some leave gaps. Which shapes work? Why?' },
+      { id:'invent',     title:'Invent a Shape',          prompt:'"Invent a shape with a property no one has named."', fullPrompt:'Invent a shape with a property no one has named yet. Write down the rules it follows.' },
+    ],
+  },
+];
+
+const PCG_COLORS = { p:'#A07D4A', c:'#B8784E', g:'#3A6B5C' };
+
+let geoFocused = { level:0, activity:0 };
+let geoOpenLevel = 'arrive';
+
+function renderGeometry() {
+  renderGeoHero();
+  renderGeoAccordion();
+}
+
+function renderGeoHero() {
+  const lvl = GEOM_LEVELS[geoFocused.level];
+  const act = lvl.activities[geoFocused.activity];
+  const mood = lvl.pcgKind === 'g' ? 'make something new'
+             : lvl.pcgKind === 'c' ? 'think deeper'
+             : 'look closely';
+  document.getElementById('geo-hero').innerHTML = `
+    <div class="geo-hero">
+      <div class="geo-hero-eyebrow">${lvl.name} · Level ${lvl.num}</div>
+      <div class="geo-hero-prompt-row">
+        <div class="geo-hero-prompt">${escapeHtml(act.prompt)}</div>
+        <button class="geo-speak-btn" onclick="speakPrompt(this)" title="Listen" aria-label="Read question aloud">
+          <span class="speak-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></span>
+        </button>
+      </div>
+      <div class="geo-hero-sub">${escapeHtml(act.title)} · a question for when you’re in the mood to ${mood}.</div>
+      <div class="geo-hero-ctas">
+        <button class="geo-btn-primary" onclick="beginGeoQuestion()">Begin this question →</button>
+        <button class="geo-btn-secondary" onclick="tryAnotherGeo()">Try another →</button>
+      </div>
+    </div>`;
+}
+
+function renderGeoAccordion() {
+  const el = document.getElementById('geo-accordion');
+  el.innerHTML = GEOM_LEVELS.map((lvl, li) => {
+    const open = geoOpenLevel === lvl.key;
+    const pcgColor = PCG_COLORS[lvl.pcgKind] || PCG_COLORS.p;
+    const bodyRows = open ? lvl.activities.map((act, ai) => {
+      const isActive = geoFocused.level === li && geoFocused.activity === ai;
+      return `<div class="geo-activity-row${isActive ? ' active' : ''}" onclick="setGeoFocused(${li},${ai})">
+        <div class="geo-activity-title">${escapeHtml(act.title)}</div>
+        <div class="geo-activity-prompt">${escapeHtml(act.prompt)}</div>
+        ${act.visited ? '<div class="geo-activity-visited"></div>' : ''}
+      </div>`;
+    }).join('') : '';
+    const body = open
+      ? `<div class="geo-level-body open"><div class="geo-level-desc">${escapeHtml(lvl.desc)}</div>${bodyRows}</div>`
+      : '';
+    return `<div class="geo-level">
+      <div class="geo-level-header" onclick="toggleGeoLevel(${li})">
+        <div class="geo-level-left">
+          <div class="geo-level-num">${lvl.num}.</div>
+          <div class="geo-level-name">${lvl.name}</div>
+          <div class="geo-level-pcg" style="color:${pcgColor}">${escapeHtml(lvl.pcg)}</div>
+        </div>
+        <div class="geo-level-toggle">${open ? '−' : '+'}</div>
+      </div>
+      ${body}
+    </div>`;
+  }).join('');
+}
+
+
+function setGeoFocused(li, ai) {
+  geoFocused = { level: li, activity: ai };
+  renderGeoHero();
+  renderGeoAccordion();
+  document.querySelector('.geo-scene').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleGeoLevel(li) {
+  const key = GEOM_LEVELS[li].key;
+  geoOpenLevel = (geoOpenLevel === key) ? null : key;
+  renderGeoAccordion();
+}
+
+function beginGeoQuestion() {
+  const lvl = GEOM_LEVELS[geoFocused.level];
+  const act = lvl.activities[geoFocused.activity];
+  openActivity(act.id, act.title, act.fullPrompt, 'Geometry');
+}
+
+function tryAnotherGeo() {
+  const total = GEOM_LEVELS.reduce((n, l) => n + l.activities.length, 0);
+  let flat = [];
+  GEOM_LEVELS.forEach((l, li) => l.activities.forEach((a, ai) => flat.push({li, ai})));
+  const cur = flat.findIndex(f => f.li === geoFocused.level && f.ai === geoFocused.activity);
+  const next = flat[(cur + 1) % flat.length];
+  geoOpenLevel = GEOM_LEVELS[next.li].key;
+  setGeoFocused(next.li, next.ai);
+}
+
+// ── JOURNAL ─────────────────────────────────────────────────────────────────
+const MAX_SESSIONS = 50;
+
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem('kelvi_sessions') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveSessions(sessions) {
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0, MAX_SESSIONS)));
+}
+
+function saveCurrentSession() {
+  if (!msgs || msgs.length < 2) return;          // need at least one exchange
+  if (!currentActivity) return;
+  const session = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    activity: { ...currentActivity },
+    messages: msgs.map(m => ({ role: m.role, content: m.content })),
+    pcg: null,   // filled in async after save
+    msgCount: msgs.length,
+  };
+  const sessions = getSessions();
+  sessions.unshift(session);
+  saveSessions(sessions);
+  classifySessionAsync(session.id);
+}
+
+async function classifySessionAsync(sessionId) {
+  const key = localStorage.getItem('kelvi_api_key');
+  if (!key) return;
+  const sessions = getSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  const transcript = session.messages
+    .filter(m => m.role === 'user')
+    .map(m => m.content).join('\n');
+  if (!transcript.trim()) return;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 60,
+        system: 'You classify student mathematical thinking. Given a transcript of student responses, return ONLY a JSON object with keys p, c, g representing percentage of thinking that is Procedural, Conceptual, and Generative. Values must sum to 100. Example: {"p":60,"c":30,"g":10}',
+        messages: [{ role: 'user', content: transcript }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const match = text.match(/\{[^}]+\}/);
+    if (match) {
+      const pcg = JSON.parse(match[0]);
+      const fresh = getSessions();
+      const s = fresh.find(x => x.id === sessionId);
+      if (s) { s.pcg = pcg; saveSessions(fresh); }
+      if (document.getElementById('panel-journal').classList.contains('active')) renderJournal();
+    }
+  } catch(e) { /* silent fail */ }
+}
+
+function renderJournal() {
+  const sessions = getSessions();
+  const empty = document.getElementById('journal-empty');
+  const list  = document.getElementById('journal-list');
+  const nameEl = document.getElementById('journal-name');
+  if (nameEl) nameEl.textContent = childName || 'Arya';
+
+  if (sessions.length === 0) {
+    empty.style.display = 'flex';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = sessions.map((s, si) => {
+    const date = new Date(s.timestamp);
+    const dateStr = date.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    const timeStr = date.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    const planet = s.activity?.planet || 'Geometry';
+
+    let pcgHtml = '';
+    if (s.pcg) {
+      pcgHtml = `
+        ${s.pcg.p > 0 ? `<span class="journal-pcg-chip journal-pcg-p">P ${s.pcg.p}%</span>` : ''}
+        ${s.pcg.c > 0 ? `<span class="journal-pcg-chip journal-pcg-c">C ${s.pcg.c}%</span>` : ''}
+        ${s.pcg.g > 0 ? `<span class="journal-pcg-chip journal-pcg-g">G ${s.pcg.g}%</span>` : ''}`;
+    } else {
+      pcgHtml = '<span class="journal-pcg-pending">Classifying…</span>';
+    }
+
+    const transcriptHtml = s.messages.map(m => {
+      const isKelvi = m.role === 'assistant';
+      const name = isKelvi ? 'Kelvi' : (childName || 'Explorer');
+      const cls = isKelvi ? 'journal-msg-k' : 'journal-msg-s';
+      return `<div class="journal-msg ${cls}">
+        <div class="journal-msg-name">${escapeHtml(name)}</div>
+        <div class="journal-msg-bubble">${escapeHtml(m.content)}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="journal-card" id="jcard-${si}">
+      <div class="journal-card-header" onclick="toggleJournalCard(${si})">
+        <div class="journal-card-left">
+          <div class="journal-card-meta">${escapeHtml(planet)} · ${dateStr} at ${timeStr}</div>
+          <div class="journal-card-title">${escapeHtml(s.activity?.name || 'Session')}</div>
+          <div class="journal-card-prompt">${escapeHtml(s.activity?.prompt || '')}</div>
+          <div class="journal-pcg-bar">${pcgHtml}</div>
+        </div>
+        <div class="journal-card-right">
+          <div class="journal-toggle">+</div>
+          <div class="journal-msg-count">${s.msgCount} messages</div>
+        </div>
+      </div>
+      <div class="journal-transcript" id="jtranscript-${si}">
+        ${transcriptHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleJournalCard(si) {
+  const transcript = document.getElementById(`jtranscript-${si}`);
+  const toggle = document.querySelector(`#jcard-${si} .journal-toggle`);
+  if (!transcript) return;
+  const open = transcript.classList.toggle('open');
+  if (toggle) toggle.textContent = open ? '−' : '+';
+}
+
+function openPlanet(key) {
+  if (key === 'geometry') {
+    showPanel('geometry');
+    renderGeometry();
+  } else {
+    alert(key.charAt(0).toUpperCase() + key.slice(1) + ' Planet is still being mapped. For now, start with Geometry!');
+  }
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet: planet || 'Geometry' };
+  document.getElementById('chat-activity-name').textContent = name;
+  document.getElementById('chat-activity-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  msgs = [];
+  showPanel('chat');
+
+  const openers = [
+    "What's one way you might start thinking about this?",
+    "Have you seen anything like this before?",
+    "What do you already know that might help?",
+    "Where would you begin?"
+  ];
+  const opener = openers[Math.floor(Math.random() * openers.length)];
+  setTimeout(() => { addMessage('assistant', opener); }, 300);
+}
+
+function addMessage(role, content) {
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role === 'user' ? 'msg-s' : 'msg-k');
+  const nameClass = role === 'user' ? 'msg-name-s' : 'msg-name-k';
+  const bubbleClass = role === 'user' ? 'msg-bubble-s' : 'msg-bubble-k';
+  const nameText = role === 'user' ? escapeHtml(childName) : 'Kelvi';
+  const rendered = renderMath(escapeHtml(content));
+
+  const speakBtn = role === 'assistant'
+    ? '<button class="speak-btn" onclick="speakText(this)" title="Listen" aria-label="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>'
+    : '';
+
+  wrap.innerHTML = '<div class="msg-name ' + nameClass + '">' + nameText + '</div>' +
+                   '<div class="' + bubbleClass + '">' + rendered + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role === 'assistant') {
+    msgs.push({ role: 'assistant', content });
+    const btn = wrap.querySelector('.speak-btn');
+    if (btn) autoSpeakMessage(btn);
+  }
+}
+
+function renderMath(t) {
+  if (typeof katex === 'undefined') return t;
+  t = t.replace(/\$\$([\s\S]*?)\$\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: true }); }
+    catch(e) { return m; }
+  });
+  t = t.replace(/\$([^\$\n]+?)\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: false }); }
+    catch(e) { return m; }
+  });
+  return t;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+
+  addMessage('user', text);
+  msgs.push({ role: 'user', content: text });
+
+  const typing = document.getElementById('typing');
+  typing.classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+
+  const key = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+  if (!key) {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMessage('assistant', "(No API key set — add one in Settings ⚙︎ to start thinking with Kelvi.)");
+    return;
+  }
+
+  try {
+    const contextualMsgs = msgs.map((m, i) => {
+      if (i === 0 && m.role === 'user' && currentActivity) {
+        return { role: 'user', content: 'I am working on an activity called "' + currentActivity.name + '". The invitation is: "' + currentActivity.prompt + '"\n\n' + m.content };
+      }
+      return m;
+    });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: buildSYS(currentActivity),
+        messages: contextualMsgs
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const reply = data.content[0].text;
+    addMessage('assistant', reply);
+  } catch(e) {
+    console.error(e);
+    addMessage('assistant', '(Something went wrong: ' + (e.message || '') + ')');
+  } finally {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('chat-input').focus();
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+checkWelcome();
+document.getElementById('topbar').classList.add('space-mode');
+
+</script>
+</body>
+</html>
