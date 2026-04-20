@@ -890,13 +890,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
         </div>
         <button onclick="obNext(3)" class="ob-btn-primary">Next →</button>
       </div>
-      <div id="ob-step-4" style="display:none">
-        <div style="font-size:1rem;font-weight:500;color:var(--text-primary);margin-bottom:8px">One last thing — add your API key</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6">Kelvi uses the Anthropic API. Your key is stored only in this browser.</div>
-        <input type="password" id="ob-api" placeholder="sk-ant-..." style="width:100%;padding:11px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:16px"
-          onfocus="this.style.borderColor='var(--family)'" onblur="this.style.borderColor='var(--divider)'">
-        <button onclick="obFinish()" style="background:var(--family);color:var(--bg);border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-family:var(--font-body);font-weight:500;cursor:pointer">Let's go →</button>
-      </div>
     </div>
   </div>
 
@@ -1011,10 +1004,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
       <div style="font-family:var(--font-heading);font-size:1.3rem">Settings</div>
       <button onclick="closeSettings()" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer;line-height:1">✕</button>
     </div>
-    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Anthropic API key</div>
-    <input type="password" id="settings-api-key" placeholder="sk-ant-..." style="width:100%;padding:10px 13px;border:1.5px solid var(--divider);border-radius:8px;font-size:13px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:6px" onfocus="this.style.borderColor='var(--family)'" onblur="this.style.borderColor='var(--divider)'">
-    <div style="font-size:11px;color:var(--text-faint);margin-bottom:20px">Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>. Stored only on this device.</div>
-    <button onclick="saveSettings()" style="width:100%;padding:11px;border:none;border-radius:8px;background:var(--family);color:var(--bg);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .15s" onmouseover="this.style.background='var(--family-dark)'" onmouseout="this.style.background='var(--family)'">Save</button>
+    <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px">Kelvi’s AI runs on our servers when you use the web app with your account. No API key needed.</p>
+    <button type="button" onclick="closeSettings()" style="width:100%;padding:11px;border:none;border-radius:8px;background:var(--family);color:var(--bg);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body)">Close</button>
   </div>
 </div>
 
@@ -1388,28 +1379,27 @@ function obNext(step) {
   } else if (step === 3) {
     const sel = document.querySelector('#ob-step-3 .ob-option.selected');
     obData.spark = sel ? sel.dataset.value : 'not specified';
-    document.getElementById('ob-step-3').style.display = 'none';
-    document.getElementById('ob-step-4').style.display = 'block';
+    obCompleteOnboarding();
   }
 }
 
-function obFinish() {
-  const key = document.getElementById('ob-api').value.trim();
-  if (key) { apiKey = key; localStorage.setItem('kelvi_key', key); }
+function obCompleteOnboarding() {
+  document.getElementById('ob-step-3').style.display = 'none';
   userName = obData.name || 'Friend';
-  // Persist profile data
   localStorage.setItem('kelvi_age_' + userName, obData.age || '');
   localStorage.setItem('kelvi_mathfeel_' + userName, obData.mathFeel || '');
   localStorage.setItem('kelvi_spark_' + userName, obData.spark || '');
   updateUserUI();
-  // Reset steps for next time
   document.getElementById('ob-step-1').style.display = 'block';
   document.getElementById('ob-step-2').style.display = 'none';
   document.getElementById('ob-step-3').style.display = 'none';
-  document.getElementById('ob-step-4').style.display = 'none';
   document.querySelectorAll('.ob-option').forEach(o => o.classList.remove('selected'));
   document.getElementById('identity-name') && (document.getElementById('identity-name').textContent = userName);
   showPanel('galaxy');
+}
+
+function obFinish() {
+  obCompleteOnboarding();
 }
 
 // ── SETTINGS ──────────────────────────────────────────
@@ -1420,21 +1410,11 @@ function doFamilyLogout() {
 }
 
 function openSettings() {
-  const modal = document.getElementById('settings-modal');
-  modal.style.display = 'flex';
-  const saved = localStorage.getItem('kelvi_key') || '';
-  document.getElementById('settings-api-key').value = saved;
-  setTimeout(() => document.getElementById('settings-api-key').focus(), 100);
+  document.getElementById('settings-modal').style.display = 'flex';
 }
 
 function closeSettings() {
   document.getElementById('settings-modal').style.display = 'none';
-}
-
-function saveSettings() {
-  const key = document.getElementById('settings-api-key').value.trim();
-  if (key) { apiKey = key; localStorage.setItem('kelvi_key', key); }
-  closeSettings();
 }
 
 document.getElementById('settings-modal').addEventListener('click', function(e) {

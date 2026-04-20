@@ -40,7 +40,7 @@ a{text-decoration:none;color:inherit}
 
   <div class="wrap">
     <div class="heading">Settings</div>
-    <div class="sub">Update your profile and API key.</div>
+    <div class="sub">Update your profile. AI is provided by Kelvi when you use the web app.</div>
 
     <div class="card">
       <div class="card-title">Profile</div>
@@ -56,21 +56,8 @@ a{text-decoration:none;color:inherit}
     </div>
 
     <div class="card">
-      <div class="card-title">Anthropic API key</div>
-      <div class="card-sub">Kelvi uses the Anthropic API for AI responses. Your key stays on your device and is never shared. Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.</div>
-      <div class="field">
-        <label>API key</label>
-        <input class="input" id="s-key" type="password" placeholder="sk-ant-...">
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px">
-          <span id="key-state"></span>
-          <a href="#" onclick="toggleKeyVisibility(event)" style="color:var(--accent);margin-left:8px">Show</a>
-        </div>
-      </div>
-      <div class="row">
-        <button class="btn btn-primary btn-sm" onclick="saveKey()">Save</button>
-        <button class="btn btn-ghost btn-sm" onclick="clearKey()">Clear</button>
-        <span class="status" id="key-status">Saved ✓</span>
-      </div>
+      <div class="card-title">AI</div>
+      <div class="card-sub">Kelvi runs AI on our servers. You don’t need to bring your own API key.</div>
     </div>
 
     <div class="card">
@@ -88,15 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const teacher = KelviSchool.getTeacher() || {};
   const user = KelviAuth.getUser() || {};
   document.getElementById('s-name').value = teacher.name || user.name || '';
-
-  const key = (KelviAuth.getApiKey && KelviAuth.getApiKey()) || localStorage.getItem('kelvi_api_key') || '';
-  const ks = document.getElementById('key-state');
-  if (key) {
-    ks.textContent = 'Key on file: ' + key.slice(0, 10) + '…' + key.slice(-4);
-    document.getElementById('s-key').placeholder = 'Paste a new key to replace';
-  } else {
-    ks.textContent = 'No key saved yet.';
-  }
 });
 
 function flash(id) {
@@ -113,33 +91,6 @@ function saveName() {
   KelviSchool.setTeacher({ ...teacher, name });
   KelviAuth.setUser({ ...user, name });
   flash('name-status');
-}
-
-function saveKey() {
-  const key = document.getElementById('s-key').value.trim();
-  if (!key) { alert('Please paste an API key.'); return; }
-  if (KelviAuth.setApiKey) KelviAuth.setApiKey(key);
-  else localStorage.setItem('kelvi_api_key', key);
-  document.getElementById('s-key').value = '';
-  document.getElementById('key-state').textContent = 'Key on file: ' + key.slice(0, 10) + '…' + key.slice(-4);
-  flash('key-status');
-}
-
-function clearKey() {
-  if (!confirm('Remove your API key from this device? Kelvi will stop responding until a new key is added.')) return;
-  if (KelviAuth.setApiKey) KelviAuth.setApiKey('');
-  localStorage.removeItem('kelvi_api_key');
-  document.getElementById('s-key').value = '';
-  document.getElementById('key-state').textContent = 'No key saved.';
-  flash('key-status');
-}
-
-function toggleKeyVisibility(e) {
-  e.preventDefault();
-  const input = document.getElementById('s-key');
-  const link = e.target;
-  if (input.type === 'password') { input.type = 'text'; link.textContent = 'Hide'; }
-  else { input.type = 'password'; link.textContent = 'Show'; }
 }
 
 function doSignOut() {

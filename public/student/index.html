@@ -561,14 +561,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
         <input type="text" id="settings-name" placeholder="Enter your name" style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:300px;background:var(--bg)" oninput="updateName(this.value)">
       </div>
       <div class="home-section">
-        <div class="home-label">Anthropic API key</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used for Kelvi's AI responses. Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.</div>
-        <input type="password" id="settings-api" placeholder="sk-ant-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--bg)" oninput="saveKey()">
-      </div>
-      <div class="home-section">
-        <div class="home-label">OpenAI API key</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Used as a fallback if Anthropic is unavailable. Get yours at <a href="https://platform.openai.com" target="_blank" style="color:var(--accent)">platform.openai.com</a>.</div>
-        <input type="password" id="settings-openai" placeholder="sk-..." style="padding:10px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;width:100%;max-width:400px;background:var(--bg)" oninput="saveOpenAIKey()">
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;max-width:420px">Kelvi’s AI is provided on our servers when you use the signed-in web app. This standalone preview may not call live AI without the app backend.</p>
       </div>
     </div>
   </div>
@@ -1049,11 +1042,9 @@ function speakText(btn){if('speechSynthesis' in window){if(currentUtterance&&spe
 
 // PERSISTENCE
 let anthropicKey='',openaiKey='';
-function saveKey(){anthropicKey=document.getElementById('settings-api').value.trim();localStorage.setItem('kelvi-solo-key',anthropicKey)}
-function saveOpenAIKey(){openaiKey=document.getElementById('settings-openai').value.trim();localStorage.setItem('kelvi-openai-key',openaiKey)}
-function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k){anthropicKey=k;if(document.getElementById('settings-api'))document.getElementById('settings-api').value=k}}
+function loadKey(){const k=localStorage.getItem('kelvi-solo-key');if(k)anthropicKey=k;}
 function loadName(){const n=localStorage.getItem('kelvi-name');if(n){userName=n;document.getElementById('sb-avatar').textContent=n[0].toUpperCase();document.getElementById('sb-uname').textContent=n;if(document.getElementById('settings-name'))document.getElementById('settings-name').value=n}}
-function loadOpenAIKey(){const k=localStorage.getItem('kelvi-openai-key');if(k){openaiKey=k;if(document.getElementById('settings-openai'))document.getElementById('settings-openai').value=k}}
+function loadOpenAIKey(){const k=localStorage.getItem('kelvi-openai-key');if(k)openaiKey=k;}
 
 // SESSION MANAGEMENT
 let currentSessionId=null;

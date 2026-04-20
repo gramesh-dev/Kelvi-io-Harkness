@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
 import {
   submitFamilyOrg,
@@ -16,6 +16,18 @@ export function RoleSetupWizard() {
   const [familyName, setFamilyName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("kelvi_signup_intent");
+      if (raw === "school" || raw === "family" || raw === "student") {
+        setRole(raw);
+      }
+      sessionStorage.removeItem("kelvi_signup_intent");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function onSchoolSubmit(e: React.FormEvent) {
     e.preventDefault();

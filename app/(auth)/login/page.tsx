@@ -14,9 +14,27 @@ export default function LoginPage() {
   const [passwordResetOk, setPasswordResetOk] = useState(false);
   const router = useRouter();
 
+  const [intentProduct, setIntentProduct] = useState<string | null>(null);
+  const [signupHref, setSignupHref] = useState("/signup");
+
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     if (p.get("reset") === "success") setPasswordResetOk(true);
+    const intent = p.get("intent");
+    const labels: Record<string, string> = {
+      school: "Kelvi School",
+      family: "Kelvi Family",
+      student: "Kelvi Student",
+    };
+    if (intent && labels[intent]) {
+      setIntentProduct(labels[intent]);
+      try {
+        sessionStorage.setItem("kelvi_signup_intent", intent);
+      } catch {
+        /* ignore */
+      }
+      setSignupHref(`/signup?intent=${encodeURIComponent(intent)}`);
+    }
   }, []);
 
   async function handleLogin(e: React.FormEvent) {
@@ -62,6 +80,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <KelviWordmark />
+          {intentProduct && (
+            <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-kelvi-600">
+              {intentProduct}
+            </p>
+          )}
           <p className="mt-3 text-kelvi-slate">Welcome back</p>
         </div>
 
@@ -172,7 +195,7 @@ export default function LoginPage() {
           <p className="text-center text-sm text-text-secondary">
             Don&apos;t have an account?{" "}
             <Link
-              href="/signup"
+              href={signupHref}
               className="text-kelvi-600 font-medium hover:underline"
             >
               Sign up

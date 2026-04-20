@@ -8,110 +8,43 @@
 <style>
 .ob-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
 .ob-box { max-width: 520px; width: 100%; animation: fadeUp .5s ease; }
-.ob-step { display: none; }
-.ob-step.active { display: block; }
 .ob-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
 .ob-heading { font-family: var(--font-heading); font-size: 1.9rem; font-weight: 400; margin-bottom: 8px; }
 .ob-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
 .ob-field { margin-bottom: 16px; }
 .ob-field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; }
-.ob-actions { display: flex; gap: 10px; margin-top: 24px; }
-.ob-progress { display: flex; gap: 6px; margin-bottom: 32px; }
-.ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--divider); transition: background var(--t-base); }
-.ob-dot.active { background: var(--accent); }
-.ob-dot.done { background: var(--accent-light); border: 2px solid var(--accent); }
+.ob-actions { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
 <div class="ob-wrap">
   <div class="ob-box">
-
-    <div class="ob-progress" id="ob-progress">
-      <div class="ob-dot active" id="dot-1"></div>
-      <div class="ob-dot" id="dot-2"></div>
+    <a href="../index.html" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:24px">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+      <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi School</span>
+    </a>
+    <div class="ob-eyebrow">Welcome</div>
+    <div class="ob-heading">What should Kelvi call you?</div>
+    <div class="ob-sub">Sign in with your school account to continue. AI is provided by Kelvi — no API key needed.</div>
+    <div class="ob-field">
+      <label>Your name (optional, for this demo)</label>
+      <input class="input" id="ob-name" placeholder="Dr. Ramesh" type="text" autofocus>
     </div>
-
-    <div class="ob-step active" id="ob-step-1">
-      <a href="../index.html" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:24px">
-        <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
-        <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi School</span>
-      </a>
-      <div class="ob-eyebrow">Welcome</div>
-      <div class="ob-heading">What should Kelvi call you?</div>
-      <div class="ob-sub">Everything else, Kelvi will learn from your students.</div>
-      <div class="ob-field">
-        <label>Your name</label>
-        <input class="input" id="ob-name" placeholder="Dr. Ramesh" type="text" autofocus onkeydown="if(event.key==='Enter')obNext(1)">
-      </div>
-      <div class="ob-actions">
-        <button class="btn btn-primary" onclick="obNext(1)">Continue →</button>
-      </div>
+    <div class="ob-actions">
+      <a class="btn btn-ghost btn-sm" href="/login?intent=school">← Sign in with Kelvi</a>
+      <button class="btn btn-primary" onclick="obFinish()">Continue to workspace →</button>
     </div>
-
-    <div class="ob-step" id="ob-step-2">
-      <div class="ob-eyebrow">Step 2 of 2</div>
-      <div class="ob-heading">One last thing</div>
-      <div class="ob-sub">Kelvi uses the Anthropic API for AI responses. Add your key below — it stays on your device and is never shared.</div>
-      <div class="ob-field">
-        <label>Anthropic API key</label>
-        <input class="input" id="ob-api" type="password" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')obFinish()">
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Get yours at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>. You can add this later in Settings.</div>
-      </div>
-      <div class="ob-actions">
-        <button class="btn btn-ghost btn-sm" onclick="obBack(2)">← Back</button>
-        <button class="btn btn-primary" onclick="obFinish()">Enter my workspace →</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script src="../shared/kelvi.js"></script>
 <script>
-let obData = {};
-let currentStep = 1;
-
-function updateDots(step) {
-  for (let i = 1; i <= 2; i++) {
-    const dot = document.getElementById('dot-' + i);
-    dot.className = 'ob-dot' + (i < step ? ' done' : i === step ? ' active' : '');
-  }
-}
-
-function obNext(step) {
-  if (step === 1) {
-    const name = document.getElementById('ob-name').value.trim();
-    if (!name) { alert('Please enter your name.'); return; }
-    obData.name = name;
-  }
-  document.getElementById('ob-step-' + step).classList.remove('active');
-  document.getElementById('ob-step-' + (step + 1)).classList.add('active');
-  currentStep = step + 1;
-  updateDots(currentStep);
-  const nextInput = document.getElementById('ob-step-' + currentStep).querySelector('input');
-  if (nextInput) setTimeout(() => nextInput.focus(), 50);
-}
-
-function obBack(step) {
-  document.getElementById('ob-step-' + step).classList.remove('active');
-  document.getElementById('ob-step-' + (step - 1)).classList.add('active');
-  currentStep = step - 1;
-  updateDots(currentStep);
-}
-
 function obFinish() {
-  const key = document.getElementById('ob-api').value.trim();
-  if (key) KelviAuth.setApiKey(key);
-
-  const user = KelviAuth.getUser();
-  const teacher = {
-    ...obData,
-    email: user?.email || '',
-    setupComplete: true,
-    createdAt: new Date().toISOString()
-  };
+  const name = document.getElementById('ob-name').value.trim();
+  const user = KelviAuth.getUser() || {};
+  KelviAuth.setUser({ ...user, name: name || user.name || 'Teacher', role: 'teacher' });
+  const teacher = { name: name || 'Teacher', email: user.email || '', setupComplete: true, createdAt: new Date().toISOString() };
   KelviSchool.setTeacher(teacher);
-  KelviAuth.setUser({ ...user, name: obData.name, role: 'teacher' });
   window.location.href = 'classes.html';
 }
 </script>
