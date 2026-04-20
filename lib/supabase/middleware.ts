@@ -29,21 +29,33 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup");
-  const isProtectedPage = request.nextUrl.pathname.startsWith("/app");
+  const path = request.nextUrl.pathname;
 
-  if (!user && isProtectedPage) {
+  const isAuthEntry =
+    path.startsWith("/login") ||
+    path.startsWith("/signup") ||
+    path.startsWith("/forgot-password");
+
+  const isProtectedApp =
+    path.startsWith("/family") ||
+    path.startsWith("/school") ||
+    path.startsWith("/student") ||
+    path.startsWith("/role-setup") ||
+    path.startsWith("/post-login") ||
+    path.startsWith("/app");
+
+  if (!user && isProtectedApp) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    if (path !== "/login") {
+      url.searchParams.set("next", path);
+    }
     return NextResponse.redirect(url);
   }
 
-  // Allow password recovery flow: signed-in recovery session must reach /reset-password
-  if (user && isAuthPage) {
+  if (user && isAuthEntry) {
     const url = request.nextUrl.clone();
-    url.pathname = "/app";
+    url.pathname = "/post-login";
     return NextResponse.redirect(url);
   }
 

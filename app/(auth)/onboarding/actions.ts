@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getPostAuthRedirectPath } from "@/lib/auth/post-auth";
 
 /**
  * First-time family setup: create org + first membership.
@@ -73,5 +74,5 @@ export async function createFamilyOrg(formData: FormData) {
     return { error: memberError.message };
   }
 
-  redirect("/app");
+  redirect(await getPostAuthRedirectPath());
 }
