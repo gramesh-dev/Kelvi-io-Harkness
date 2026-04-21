@@ -3,109 +3,131 @@ import type { User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabasePublicCredentials } from "./public-env";
 
-export async function updateSession(request: NextRequest) {
-  const creds = getSupabasePublicCredentials();
-  if (!creds) {
-    console.error(
-      "[middleware] Missing NEXT_PUBLIC_SUPABASE_URL and/or anon key. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY on Vercel."
-    );
-    return NextResponse.next({ request });
-  }
-
-  let supabaseResponse = NextResponse.next({ request });
-
-  let user: User | null = null;
-
+function copyCookiesTo(from: NextResponse, to: NextResponse) {
   try {
+    from.cookies.getAll().forEach(({ name, value }) => {
+      try {
+        to.cookies.set(name, value);
+      } catch {
+        /* ignore single-cookie failures on Edge */
+      }
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+function redirectPreservingCookies(
+  request: NextRequest,
+  supabaseResponse: NextResponse,
+  pathname: string,
+  searchParams?: Record<string, string>
+) {
+  const url = new URL(pathname, request.url);
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([k, v]) => url.searchParams.set(k, v));
+  }
+  const res = NextResponse.redirect(url);
+  copyCookiesTo(supabaseResponse, res);
+  return res;
+}
+
+export async function updateSession(request: NextRequest) {
+  try {
+    const creds = getSupabasePublicCredentials();
+    if (!creds) {
+      console.error(
+        "[middleware] Missing NEXT_PUBLIC_SUPABASE_URL and/or anon key. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY on Vercel."
+      );
+      return NextResponse.next({ request });
+    }
+
+    let supabaseResponse = NextResponse.next({ request });
+
+    let user: User | null = null;
+
     const supabase = createServerClient(creds.url, creds.anonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
-        // Next.js Edge: request.cookies are read-only — never call request.cookies.set.
-        // Second arg is cache headers from @supabase/ssr (must be copied to the response).
         setAll(cookiesToSet, headersToSet) {
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) => {
-            supabaseResponse.cookies.set(name, value, options);
+            try {
+              supabaseResponse.cookies.set(name, value, options ?? {});
+            } catch (e) {
+              console.error("[middleware] cookie set failed:", name, e);
+            }
           });
           if (headersToSet && typeof headersToSet === "object") {
             Object.entries(headersToSet).forEach(([key, value]) => {
-              supabaseResponse.headers.set(key, String(value));
+              try {
+                supabaseResponse.headers.set(key, String(value));
+              } catch {
+                /* ignore */
+              }
             });
           }
         },
       },
     });
 
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
+    try {
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch (e) {
+      console.error("[middleware] Supabase getUser error:", e);
+      return NextResponse.next({ request });
+    }
+
+    const path = request.nextUrl.pathname;
+
+    if (user && path === "/school/index.html") {
+      return redirectPreservingCookies(request, supabaseResponse, "/school");
+    }
+
+    if (
+      user &&
+      path === "/student/index.html" &&
+      !request.nextUrl.searchParams.has("app")
+    ) {
+      return redirectPreservingCookies(request, supabaseResponse, "/solo");
+    }
+
+    const isAuthEntry =
+      path.startsWith("/login") ||
+      path.startsWith("/signup") ||
+      path.startsWith("/forgot-password");
+
+    const isPublicFamilyGalaxy = path === "/family/family.html";
+
+    const isProtectedApp =
+      path.startsWith("/family") ||
+      path.startsWith("/school") ||
+      path.startsWith("/solo") ||
+      path.startsWith("/student") ||
+      path.startsWith("/role-setup") ||
+      path.startsWith("/post-login");
+
+    if (!user && isProtectedApp && !isPublicFamilyGalaxy) {
+      const qp =
+        path !== "/login" ? { next: path } : undefined;
+      return redirectPreservingCookies(
+        request,
+        supabaseResponse,
+        "/login",
+        qp
+      );
+    }
+
+    if (user && isAuthEntry) {
+      return redirectPreservingCookies(request, supabaseResponse, "/post-login");
+    }
+
+    return supabaseResponse;
   } catch (e) {
-    console.error("[middleware] Supabase session error:", e);
+    console.error("[middleware] updateSession fatal:", e);
     return NextResponse.next({ request });
   }
-
-  const path = request.nextUrl.pathname;
-
-  // Signed-in users should use the Next app at `/school`, not static `public/school/index.html`.
-  if (user && path === "/school/index.html") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/school";
-    url.search = "";
-    const redirectResponse = NextResponse.redirect(url);
-    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      redirectResponse.cookies.set(name, value);
-    });
-    return redirectResponse;
-  }
-
-  // Static student shell: same HTML is both marketing + full UI (localStorage `kelvi-name`).
-  // Logged-in users should use `/solo` unless opening the full workspace from the app (?app=1).
-  if (
-    user &&
-    path === "/student/index.html" &&
-    !request.nextUrl.searchParams.has("app")
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/solo";
-    url.search = "";
-    const redirectResponse = NextResponse.redirect(url);
-    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      redirectResponse.cookies.set(name, value);
-    });
-    return redirectResponse;
-  }
-
-  const isAuthEntry =
-    path.startsWith("/login") ||
-    path.startsWith("/signup") ||
-    path.startsWith("/forgot-password");
-
-  /** Static Math Galaxy shell (`public/family/family.html`) — student-facing; may open without parent session when linked from parent dashboard. */
-  const isPublicFamilyGalaxy = path === "/family/family.html";
-
-  const isProtectedApp =
-    path.startsWith("/family") ||
-    path.startsWith("/school") ||
-    path.startsWith("/solo") ||
-    path.startsWith("/student") ||
-    path.startsWith("/role-setup") ||
-    path.startsWith("/post-login");
-
-  if (!user && isProtectedApp && !isPublicFamilyGalaxy) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    if (path !== "/login") {
-      url.searchParams.set("next", path);
-    }
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isAuthEntry) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/post-login";
-    return NextResponse.redirect(url);
-  }
-
-  return supabaseResponse;
 }
