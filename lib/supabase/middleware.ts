@@ -22,14 +22,18 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
+        // Next.js Edge: request.cookies are read-only — never call request.cookies.set.
+        // Second arg is cache headers from @supabase/ssr (must be copied to the response).
+        setAll(cookiesToSet, headersToSet) {
           supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, options);
+          });
+          if (headersToSet && typeof headersToSet === "object") {
+            Object.entries(headersToSet).forEach(([key, value]) => {
+              supabaseResponse.headers.set(key, String(value));
+            });
+          }
         },
       },
     });
