@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
-// Relative import required for Vercel Edge: `@/` alias is flagged as unsupported in middleware.
+// Relative import for Edge bundle (avoid `@/` in this file).
 import { updateSession } from "./lib/supabase/middleware";
 
-export async function middleware(request: NextRequest) {
+/** Next.js 16+: `middleware` was renamed to `proxy` (Edge entry before routes). */
+export async function proxy(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
     // Legacy URLs: `/app` was removed in favor of `/login` + `/family/*`.
@@ -20,7 +21,7 @@ export async function middleware(request: NextRequest) {
 
     return await updateSession(request);
   } catch (e) {
-    console.error("[middleware] unhandled error:", e);
+    console.error("[proxy] unhandled error:", e);
     return NextResponse.next({ request });
   }
 }
