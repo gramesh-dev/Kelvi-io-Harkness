@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+// Relative import required for Vercel Edge: `@/` alias is flagged as unsupported in middleware.
+import { updateSession } from "./lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
