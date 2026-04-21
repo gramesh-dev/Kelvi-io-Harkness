@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getPostAuthRedirectPath } from "@/lib/auth/post-auth";
+import { markKelviRoleSetupComplete } from "@/lib/auth/profile-metadata";
+import { KELVI_ROLE_SETUP_METADATA_KEY } from "@/lib/auth/role-setup";
 
 export async function submitSchoolOrg(formData: FormData) {
   const orgName = (formData.get("orgName") as string)?.trim();
@@ -59,6 +61,11 @@ export async function submitSchoolOrg(formData: FormData) {
 
   if (memError) {
     return { error: memError.message };
+  }
+
+  const marked = await markKelviRoleSetupComplete(user.id);
+  if (marked.error) {
+    return { error: marked.error };
   }
 
   redirect(await getPostAuthRedirectPath());
@@ -121,6 +128,11 @@ export async function submitFamilyOrg(formData: FormData) {
     return { error: memberError.message };
   }
 
+  const marked = await markKelviRoleSetupComplete(user.id);
+  if (marked.error) {
+    return { error: marked.error };
+  }
+
   redirect(await getPostAuthRedirectPath());
 }
 
@@ -142,6 +154,56 @@ export async function submitStudentSegment() {
   }
 
   const admin = createServiceClient();
+
+  const { data: memberships } = await admin
+    .from("org_memberships")
+    .select("organizations(type)")
+    .eq("profile_id", user.id)
+    .eq("is_active", true);
+
+  const hasSoloOrg = (memberships ?? []).some(
+    (m: any) => m.organizations?.type === "solo"
+  );
+
+  if (!hasSoloOrg) {
+    const { data: profileRow } = await admin
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    const displayName = profileRow?.full_name?.trim() || "My learning space";
+    const slug =
+      "solo-" +
+      user.id.replace(/-/g, "").slice(0, 12) +
+      "-" +
+      user.id.slice(0, 8);
+
+    const { data: org, error: orgError } = await admin
+      .from("organizations")
+      .insert({
+        type: "solo",
+        name: displayName,
+        slug,
+      })
+      .select("id")
+      .single();
+
+    if (orgError) {
+      return { error: orgError.message };
+    }
+
+    const { error: memError } = await admin.from("org_memberships").insert({
+      org_id: org.id,
+      profile_id: user.id,
+      role: "solo_learner",
+    });
+
+    if (memError) {
+      return { error: memError.message };
+    }
+  }
+
   const { data: profile } = await admin
     .from("profiles")
     .select("metadata")
@@ -152,7 +214,11 @@ export async function submitStudentSegment() {
   const { error } = await admin
     .from("profiles")
     .update({
-      metadata: { ...meta, kelvi_segment: "student" },
+      metadata: {
+        ...meta,
+        kelvi_segment: "student",
+        [KELVI_ROLE_SETUP_METADATA_KEY]: true,
+      },
     })
     .eq("id", user.id);
 

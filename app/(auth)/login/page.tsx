@@ -63,7 +63,7 @@ export default function LoginPage() {
     setError(null);
     const supabase = createClient();
     const origin = window.location.origin;
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+    const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${origin}/callback`,
@@ -72,7 +72,15 @@ export default function LoginPage() {
     if (oauthError) {
       setError(oauthError.message);
       setLoading(false);
+      return;
     }
+    // Browser + SSR client returns an authorize URL; navigation is not always automatic.
+    if (data.url) {
+      window.location.assign(data.url);
+      return;
+    }
+    setError("Could not start Google sign-in. Please try again.");
+    setLoading(false);
   }
 
   return (

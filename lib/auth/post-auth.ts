@@ -3,16 +3,18 @@ import {
   resolvePrimaryHomePath,
   type MembershipRow,
 } from "@/lib/auth/home-path";
+import { hasCompletedKelviRoleSetup } from "@/lib/auth/role-setup";
 
 /** Map internal home paths to URLs (Next routes + static shells in `public/`). */
 export function mapHomePathToDashboardUrl(internal: string): string {
   switch (internal) {
     case "/school":
-      return "/school/index.html";
+      // Next.js app route (`app/school`) — real session + avoids redirect loop with `/login`.
+      return "/school";
     case "/family":
       return "/family";
     case "/solo":
-      return "/student/index.html";
+      return "/solo";
     default:
       return "/role-setup";
   }
@@ -20,8 +22,8 @@ export function mapHomePathToDashboardUrl(internal: string): string {
 
 /**
  * Where to send the user after OAuth or email sign-in.
- * - Has org membership → school / family (or solo → student shell)
- * - Marked student learner in profile metadata → student shell
+ * - Has org membership → school / family / solo (Next app routes)
+ * - Student segment but no org yet → role-setup (not static `student/index.html`)
  * - Otherwise → role + org wizard
  */
 export async function getPostAuthRedirectPath(): Promise<string> {
@@ -41,6 +43,11 @@ export async function getPostAuthRedirectPath(): Promise<string> {
     .maybeSingle();
 
   const meta = (profile?.metadata ?? {}) as Record<string, unknown>;
+
+  if (!hasCompletedKelviRoleSetup(meta)) {
+    return "/role-setup";
+  }
+
   const segment = meta.kelvi_segment as string | undefined;
 
   const { data: memberships } = await supabase
@@ -55,8 +62,9 @@ export async function getPostAuthRedirectPath(): Promise<string> {
     return mapHomePathToDashboardUrl(primary);
   }
 
+  // Segment set but no org (shouldn't happen after role-setup) — finish provisioning.
   if (segment === "student") {
-    return "/student/index.html";
+    return "/role-setup";
   }
 
   return "/role-setup";

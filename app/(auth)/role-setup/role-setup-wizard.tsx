@@ -33,11 +33,14 @@ export function RoleSetupWizard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const fd = new FormData();
-    fd.set("orgName", orgName);
-    const res = await submitSchoolOrg(fd);
-    if (res?.error) {
-      setError(res.error);
+    try {
+      const fd = new FormData();
+      fd.set("orgName", orgName);
+      const res = await submitSchoolOrg(fd);
+      if (res?.error) {
+        setError(res.error);
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -46,11 +49,14 @@ export function RoleSetupWizard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const fd = new FormData();
-    fd.set("familyName", familyName);
-    const res = await submitFamilyOrg(fd);
-    if (res?.error) {
-      setError(res.error);
+    try {
+      const fd = new FormData();
+      fd.set("familyName", familyName);
+      const res = await submitFamilyOrg(fd);
+      if (res?.error) {
+        setError(res.error);
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -58,9 +64,12 @@ export function RoleSetupWizard() {
   async function onStudentContinue() {
     setLoading(true);
     setError(null);
-    const res = await submitStudentSegment();
-    if (res?.error) {
-      setError(res.error);
+    try {
+      const res = await submitStudentSegment();
+      if (res?.error) {
+        setError(res.error);
+      }
+    } finally {
       setLoading(false);
     }
   }

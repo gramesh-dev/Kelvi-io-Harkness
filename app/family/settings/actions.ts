@@ -27,7 +27,7 @@ export async function updateFullName(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/app");
-  revalidatePath("/app/settings");
+  revalidatePath("/family");
+  revalidatePath("/family/settings");
   return { success: true };
 }

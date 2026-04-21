@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateChild } from "./actions";
 import { DeleteChildButton } from "./delete-child-button";
@@ -158,6 +159,25 @@ export function ChildRow({ student }: { student: ChildRowStudent }) {
               Born {new Date(student.date_of_birth).toLocaleDateString()}
             </span>
           )}
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+          <Link
+            href={`/family/children/${student.id}/sessions`}
+            className="text-xs font-semibold text-kelvi-600 hover:underline"
+          >
+            Student dashboard
+          </Link>
+          <span className="text-xs text-text-muted" aria-hidden>
+            ·
+          </span>
+          <a
+            href={`/family/family.html?student=${encodeURIComponent(student.id)}&name=${encodeURIComponent(display)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-kelvi-600 hover:underline"
+          >
+            Student portal
+          </a>
         </div>
       </div>
       <div className="flex items-center gap-1 shrink-0">

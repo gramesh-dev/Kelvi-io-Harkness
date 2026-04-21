@@ -369,11 +369,9 @@
         <span></span><span></span><span></span>
       </button>
       <div class="nav-links" id="navLinks">
-        <a href="school/index.html">School</a>
-        <a href="family/index.html">Family</a>
-        <a href="student/index.html">Student</a>
+        <a href="#products">Products</a>
         <a href="about.html">Our Story</a>
-        <button class="btn-nav" onclick="openLoginModal()" type="button">Log in</button>
+        <a href="/login" class="btn-nav" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Log in</a>
       </div>
     </div>
   </nav>
@@ -384,7 +382,7 @@
       <h1 class="fade-in">Grow your questioning and reasoning every time you do math.</h1>
       <p class="subhead fade-in">Kelvi is an AI that helps learners move forward through their own reasoning, not by being handed answers.</p>
       <div class="cta-row fade-in">
-        <button class="btn-primary" onclick="openLoginModal()" type="button">Log in</button>
+        <a href="/login" class="btn-primary">Log in</a>
         <a href="#signup" class="btn-outline">Join the waitlist</a>
       </div>
       <p class="support-line fade-in">An AI companion for questioning and reasoning.</p>
@@ -399,19 +397,19 @@
           <p class="audience-label">For teachers</p>
           <h3>See your students think.</h3>
           <p>Design quests and see how students are reasoning, with AI-powered insights.</p>
-          <a href="school/index.html" class="card-link">Explore School →</a>
+          <a href="/login?intent=school" class="card-link">Explore School →</a>
         </div>
         <div class="audience-card family fade-in">
           <p class="audience-label">For families</p>
           <h3>Nurture curiosity early.</h3>
           <p>Enrichment and mathematical curiosity for children ages 4–13, at home.</p>
-          <a href="family/index.html" class="card-link">Explore Family →</a>
+          <a href="/login?intent=family" class="card-link">Explore Family →</a>
         </div>
         <div class="audience-card student fade-in">
           <p class="audience-label">For learners</p>
           <h3>Think it through.</h3>
           <p>Practice for fluency, conceptual depth, and generative thinking — without being handed answers.</p>
-          <a href="student/index.html" class="card-link">Explore Student →</a>
+          <a href="/login?intent=student" class="card-link">Explore Student →</a>
         </div>
       </div>
     </div>
@@ -530,44 +528,13 @@
       </div>
       <div class="footer-bottom">
         <div class="footer-links">
-          <a href="school/index.html">School</a>
-          <a href="family/index.html">Family</a>
-          <a href="student/index.html">Student</a>
+          <a href="#products">Products</a>
           <a href="about.html">Our Story</a>
         </div>
         <p>&copy; 2026 Kelvi. All rights reserved.</p>
       </div>
     </div>
   </footer>
-
-  <!-- LOGIN MODAL -->
-  <div class="modal-overlay" id="loginModal" onclick="handleOverlayClick(event)">
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
-      <button class="modal-close" onclick="closeLoginModal()" aria-label="Close">✕</button>
-      <h2 class="modal-heading" id="modalHeading">Welcome to Kelvi</h2>
-      <p class="modal-sub">Who are you here as today?</p>
-      <div class="modal-cards">
-        <a href="/login?intent=family" class="modal-card family">
-          <p class="modal-card-label">Kelvi Family</p>
-          <p class="modal-card-title">For parents</p>
-          <p class="modal-card-desc">Enrichment and mathematical curiosity for children ages 4–13, at home.</p>
-          <span class="modal-card-arrow">Enter →</span>
-        </a>
-        <a href="/login?intent=student" class="modal-card student">
-          <p class="modal-card-label">Kelvi Student</p>
-          <p class="modal-card-title">For students</p>
-          <p class="modal-card-desc">Practice for fluency, conceptual depth, and generative thinking.</p>
-          <span class="modal-card-arrow">Enter →</span>
-        </a>
-        <a href="/login?intent=school" class="modal-card school">
-          <p class="modal-card-label">Kelvi School</p>
-          <p class="modal-card-title">For teachers</p>
-          <p class="modal-card-desc">Move your students from procedural thinking to a generative mindset.</p>
-          <span class="modal-card-arrow">Enter →</span>
-        </a>
-      </div>
-    </div>
-  </div>
 
   <script>
     const nav = document.getElementById('nav');
@@ -603,20 +570,6 @@
       setTimeout(() => { input.placeholder = 'your@email.com'; }, 3000);
     }
 
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    function handleOverlayClick(e) {
-      if (e.target === document.getElementById('loginModal')) closeLoginModal();
-    }
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeLoginModal();
-    });
   </script>
 
 </body>

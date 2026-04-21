@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   title: "Kelvi — AI Learning for Kids",
   description:
     "An AI thinking partner that never gives answers — only better questions. For schools and families.",
+};
+
+/** Matches static pages (`public/*.html`) — avoids odd mobile scaling if the browser falls back oddly without an explicit tag. */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

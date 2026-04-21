@@ -48,8 +48,8 @@ export async function addChild(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/app");
-  revalidatePath("/app/children");
+  revalidatePath("/family");
+  revalidatePath("/family/children");
   return { studentId: data };
 }
 
@@ -88,8 +88,8 @@ export async function updateChild(studentId: string, formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/app");
-  revalidatePath("/app/children");
+  revalidatePath("/family");
+  revalidatePath("/family/children");
   return { success: true };
 }
 
@@ -190,7 +190,7 @@ export async function removeChild(studentId: string) {
     return { error: error.message };
   }
 
-  revalidatePath("/app");
-  revalidatePath("/app/children");
+  revalidatePath("/family");
+  revalidatePath("/family/children");
   return { success: true };
 }

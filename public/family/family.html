@@ -1036,6 +1036,23 @@ RESPONSE LENGTH: Two to three sentences maximum. Never write paragraphs.`;
 
 let childName = localStorage.getItem('kelvi_family_name') || '';
 
+/** Parent dashboard links: /family/family.html?student=<uuid>&name=<display> — sets explorer + optional id for future sync. */
+(function applyStudentFromQuery() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const nameParam = params.get('name') || params.get('display');
+    const studentId = params.get('student');
+    if (nameParam && String(nameParam).trim()) {
+      const decoded = decodeURIComponent(String(nameParam).trim());
+      childName = decoded;
+      localStorage.setItem('kelvi_family_name', decoded);
+      if (studentId && String(studentId).trim()) {
+        localStorage.setItem('kelvi_family_student_id', String(studentId).trim());
+      }
+    }
+  } catch (e) { /* ignore */ }
+})();
+
 function checkWelcome() {
   if (childName) {
     document.getElementById('welcome-overlay').classList.add('hidden');

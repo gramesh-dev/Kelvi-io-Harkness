@@ -71,7 +71,7 @@ CREATE TABLE platform_roles (
 -- End users can only create type='family' (see rls.sql).
 CREATE TABLE organizations (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    type        TEXT NOT NULL CHECK (type IN ('school', 'family', 'district')),
+    type        TEXT NOT NULL CHECK (type IN ('school', 'family', 'district', 'solo')),
     name        TEXT NOT NULL,
     slug        TEXT UNIQUE,
     parent_id   UUID REFERENCES organizations(id),
@@ -93,7 +93,8 @@ CREATE TABLE org_memberships (
     profile_id  UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     role        TEXT NOT NULL CHECK (role IN (
                     'parent', 'family_admin',
-                    'teacher', 'school_admin'
+                    'teacher', 'school_admin',
+                    'solo_learner'
                 )),
     is_active   BOOLEAN NOT NULL DEFAULT true,
     joined_at   TIMESTAMPTZ NOT NULL DEFAULT now(),

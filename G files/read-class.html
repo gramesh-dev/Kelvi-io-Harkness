@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read the class · Kelvi School</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8F7F4; --surface: #F0EDE6; --deeper: #E8E3DA; --divider: #D9D4C9;
+  --text-primary: #2F2B25; --text-muted: #6F6A61; --text-faint: #9A9488;
+  --accent: #3A6B5C; --accent-dark: #2D5347; --accent-light: #EBF3EF;
+  --family: #B8784E; --family-light: #F5EDE5;
+  --student: #5A7080; --student-light: #E8EEF2;
+  --font-heading: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --chat-max: 760px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;font-family:var(--font-body);border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:50}
+.tb-left{display:flex;align-items:center;gap:12px}
+.tb-back{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;transition:color .12s}
+.tb-back:hover{color:var(--accent)}
+.tb-divider{width:1px;height:16px;background:var(--divider)}
+.tb-title{font-family:var(--font-heading);font-size:15px}
+
+/* MAIN */
+.main{max-width:var(--chat-max);margin:0 auto;padding:28px 24px 60px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.problem-header{background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px}
+.problem-title{font-family:var(--font-heading);font-size:20px;margin-bottom:6px}
+.problem-meta{font-size:12px;color:var(--text-muted)}
+
+/* BRIEF */
+.brief-card{background:var(--bg);border:1px solid var(--accent);border-left:4px solid var(--accent);border-radius:var(--radius-lg);padding:20px;margin-bottom:28px}
+.brief-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.brief-body{font-size:14px;line-height:1.7;white-space:pre-wrap}
+.brief-empty{color:var(--text-muted);font-style:italic;padding:6px 0;font-size:13px}
+.brief-generate{background:var(--accent);color:var(--bg);padding:8px 16px;border-radius:var(--radius);font-size:12px;font-weight:500;transition:background .12s}
+.brief-generate:hover{background:var(--accent-dark)}
+.brief-generate:disabled{opacity:.5;cursor:not-allowed}
+
+/* TRANSCRIPT LIST */
+.roster{display:flex;flex-direction:column;gap:10px}
+.row{background:var(--bg);border:1px solid var(--divider);border-radius:var(--radius-lg);padding:14px 18px;transition:all .15s}
+.row:hover{border-color:var(--accent)}
+.row-head{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.row-name{font-weight:500;font-size:14px}
+.row-meta{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:10px}
+.row-badge{background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.row-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--divider)}
+.row.open .row-body{display:block}
+.row-chevron{font-size:11px;color:var(--text-faint);transition:transform .15s}
+.row.open .row-chevron{transform:rotate(180deg)}
+
+/* TRANSCRIPT */
+.turns{display:flex;flex-direction:column;gap:12px;max-height:440px;overflow-y:auto;padding-right:4px}
+.turn{padding:10px 14px;border-radius:var(--radius);font-size:13px;line-height:1.55;white-space:pre-wrap}
+.turn-student{background:var(--surface);border:1px solid var(--divider);align-self:flex-end;max-width:80%}
+.turn-kelvi{background:var(--bg);color:var(--text-primary)}
+.turn-label{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+.row-actions{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.btn-sm{padding:6px 12px;border:1px solid var(--divider);border-radius:var(--radius);font-size:12px;color:var(--text-muted);background:var(--bg);transition:all .12s;font-family:var(--font-body)}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);font-size:14px;line-height:1.7}
+.empty-state strong{color:var(--text-primary);display:block;margin-bottom:8px;font-size:16px;font-family:var(--font-heading)}
+
+.individual-brief{background:var(--accent-light);border-left:3px solid var(--accent);padding:10px 14px;border-radius:var(--radius);margin-top:10px;font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text-primary)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--divider);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <a class="tb-back" id="tb-back" href="classes.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to class
+    </a>
+    <div class="tb-divider"></div>
+    <div class="tb-title">Read the class</div>
+  </div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const classId = params.get('class');
+const problemId = params.get('problem');
+
+let problem = null;
+let transcripts = [];
+
+// ── LOAD ──────────────────────────────────────────────
+function load() {
+  const problems = JSON.parse(localStorage.getItem('kelvi_problems') || '{}');
+  problem = problems[problemId];
+
+  const all = JSON.parse(localStorage.getItem('kelvi_student_transcripts_' + classId) || '[]');
+  transcripts = all.filter(t => t.problemId === problemId);
+
+  if (classId) {
+    document.getElementById('tb-back').href = 'ta.html?class=' + encodeURIComponent(classId);
+  }
+
+  render();
+}
+
+function render() {
+  const main = document.getElementById('main');
+
+  if (!problem) {
+    main.innerHTML = `
+      <div class="empty-state">
+        <strong>Problem not found</strong>
+        This problem may have been created on another device. If you're testing, generate the problem on this browser first, then come back.
+      </div>`;
+    return;
+  }
+
+  const studentCount = transcripts.length;
+  const savedBrief = localStorage.getItem('kelvi_brief_' + problemId);
+
+  main.innerHTML = `
+    <div class="problem-header">
+      <div class="section-label">Problem</div>
+      <div class="problem-title">${escapeHtml(problem.title)}</div>
+      <div class="problem-meta">${studentCount} ${studentCount === 1 ? 'student has' : 'students have'} worked on this · ${new Date(problem.createdAt).toLocaleDateString()}</div>
+    </div>
+
+    <div class="brief-card">
+      <div class="brief-title">
+        <span>Class thinking brief</span>
+        ${studentCount > 0 ? `<button class="brief-generate" id="gen-brief" onclick="generateClassBrief()">${savedBrief ? 'Regenerate' : 'Read the class'}</button>` : ''}
+      </div>
+      <div class="brief-body" id="brief-body">${savedBrief ? escapeHtml(savedBrief) : '<div class="brief-empty">' + (studentCount === 0 ? 'No student transcripts yet. Once students open the link and start talking to Kelvi, their thinking will appear here — and Kelvi can read the class for you.' : "Click \"Read the class\" to generate a thinking brief across all student transcripts. Kelvi will name what's shared, where students got stuck, who's worth bringing to discussion, and any articulation gaps.") + '</div>'}</div>
+    </div>
+
+    ${studentCount > 0 ? `<div class="section-label" style="margin-top:24px">Student transcripts</div>` : ''}
+    <div class="roster" id="roster">
+      ${transcripts.map((t, i) => renderRow(t, i)).join('')}
+    </div>
+  `;
+}
+
+function renderRow(t, i) {
+  const turnCount = t.messages.filter(m => m.role === 'assistant').length;
+  const updated = new Date(t.updatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const savedBrief = localStorage.getItem('kelvi_student_brief_' + problemId + '_' + t.studentName);
+  return `
+    <div class="row" id="row-${i}">
+      <div class="row-head" onclick="toggleRow(${i})">
+        <div>
+          <div class="row-name">${escapeHtml(t.studentName)}</div>
+          <div class="row-meta">${turnCount} ${turnCount === 1 ? 'exchange' : 'exchanges'} · ${updated}</div>
+        </div>
+        <div class="row-chevron">▾</div>
+      </div>
+      <div class="row-body">
+        ${savedBrief ? `<div class="individual-brief" style="margin-bottom:14px"><strong>Kelvi's read:</strong>\n${escapeHtml(savedBrief)}</div>` : ''}
+        <div class="turns">
+          ${t.messages.slice(1).map(m => `
+            <div class="turn ${m.role === 'user' ? 'turn-student' : 'turn-kelvi'}">
+              <div class="turn-label">${m.role === 'user' ? escapeHtml(t.studentName) : 'Kelvi'}</div>
+              ${escapeHtml(m.content)}
+            </div>
+          `).join('')}
+        </div>
+        <div class="row-actions">
+          <button class="btn-sm" onclick="generateStudentBrief('${escapeAttr(t.studentName)}', ${i})">Read this student's thinking</button>
+          <button class="btn-sm" onclick="copyTranscript(${i})">Copy transcript</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleRow(i) {
+  const row = document.getElementById('row-' + i);
+  row.classList.toggle('open');
+}
+
+function copyTranscript(i) {
+  const t = transcripts[i];
+  const text = t.messages.slice(1).map(m => `${m.role === 'user' ? t.studentName : 'Kelvi'}: ${m.content}`).join('\n\n');
+  navigator.clipboard.writeText(text);
+  alert('Transcript copied');
+}
+
+// ── KELVI BRIEF GENERATION ────────────────────────────
+function getApiKey() {
+  return localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+}
+
+async function callKelvi(system, userMessage) {
+  const key = getApiKey();
+  if (!key) {
+    alert('No API key found on this device. Open Kelvi School → Settings to add one.');
+    return null;
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1200,
+      system: system,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) { alert('Error: ' + data.error.message); return null; }
+  return data.content[0].text;
+}
+
+const BRIEF_SYSTEM = `You are Kelvi School — a reading interface for teachers. You read student transcripts and surface thinking, not judgment.
+
+When a teacher asks you to read the class, produce a short brief:
+- What thinking was shared across students
+- Where students got stuck together
+- Whose work is worth bringing to discussion, and why
+- Articulation gaps — students who produced correct answers without visible reasoning about WHY
+- Anyone who skipped or didn't engage
+
+When reading a single student:
+- Describe the specific move they made. Paraphrase by default. Never fabricate quotes from unclear text.
+- Name the thinking (procedural, conceptual, generative) and what you saw that made you say so.
+- Identify the moment reasoning moved, got stuck, or surprised you.
+- End with what's worth picking up next — one specific move the teacher could make.
+
+Flag articulation gaps explicitly. A correct answer without visible reasoning is not the same as understanding.
+Flag any moment where Kelvi (the AI) accepted a wrong claim without redirecting, introduced a theorem prematurely, or confirmed correctness.
+
+Write directly to the teacher. No preamble. No headings. Plain prose. Keep it tight.`;
+
+async function generateClassBrief() {
+  const btn = document.getElementById('gen-brief');
+  const body = document.getElementById('brief-body');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Reading…';
+  body.innerHTML = '<div class="brief-empty">Kelvi is reading the class…</div>';
+
+  const transcriptsText = transcripts.map(t => {
+    const convo = t.messages.slice(1).map(m =>
+      `${m.role === 'user' ? t.studentName : 'Kelvi'}: ${m.content}`
+    ).join('\n');
+    return `=== ${t.studentName} ===\n${convo}`;
+  }).join('\n\n\n');
+
+  const prompt = `Problem: ${problem.title}\n\n${problem.body}\n\n---\n\nStudent transcripts:\n\n${transcriptsText}\n\n---\n\nRead the class for me. What thinking was shared? Where did students get stuck together? Whose work is worth bringing to discussion? Any articulation gaps I should know about?`;
+
+  const reply = await callKelvi(BRIEF_SYSTEM, prompt);
+  if (reply) {
+    localStorage.setItem('kelvi_brief_' + problemId, reply);
+    body.innerHTML = escapeHtml(reply);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Regenerate';
+}
+
+async function generateStudentBrief(studentName, rowIndex) {
+  const t = transcripts[rowIndex];
+  const row = document.getElementById('row-' + rowIndex);
+  const actionsDiv = row.querySelector('.row-actions');
+  const existingBrief = row.querySelector('.individual-brief');
+
+  // Show loading state
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'individual-brief';
+  loadingDiv.innerHTML = '<span class="spinner"></span> Kelvi is reading ' + escapeHtml(studentName) + "'s thinking…";
+  if (existingBrief) existingBrief.replaceWith(loadingDiv);
+  else row.querySelector('.row-body').insertBefore(loadingDiv, row.querySelector('.turns'));
+
+  const convo = t.messages.slice(1).map(m =>
+    `${m.role === 'user' ? t.studentName : 'Kelvi'}: ${m.content}`
+  ).join('\n');
+
+  const prompt = `Problem: ${problem.title}\n\n${problem.body}\n\n---\n\nStudent: ${studentName}\n\nTranscript:\n${convo}\n\n---\n\nRead this student's thinking. What moves did they make? Where did their reasoning surface, shift, or stall? What's worth picking up with them next?`;
+
+  const reply = await callKelvi(BRIEF_SYSTEM, prompt);
+  if (reply) {
+    localStorage.setItem('kelvi_student_brief_' + problemId + '_' + studentName, reply);
+    const finalDiv = document.createElement('div');
+    finalDiv.className = 'individual-brief';
+    finalDiv.innerHTML = "<strong>Kelvi's read:</strong>\n" + escapeHtml(reply);
+    loadingDiv.replaceWith(finalDiv);
+  } else {
+    loadingDiv.remove();
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function escapeAttr(s) {
+  return String(s || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+load();
+</script>
+</body>
+</html>

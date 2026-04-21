@@ -26,7 +26,7 @@ export default async function LearnPage() {
             Add a child first to start a learning session.
           </p>
           <a
-            href="/app/children"
+            href="/family/children"
             className="text-kelvi-600 font-medium hover:underline"
           >
             Go to Children

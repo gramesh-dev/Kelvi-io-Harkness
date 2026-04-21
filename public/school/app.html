@@ -319,7 +319,7 @@ input,textarea,select{font-family:var(--font-body)}
     <!-- ── HOME PANEL ── -->
     <div class="panel active" id="panel-home">
       <div class="home-center">
-        <h1 class="home-heading" id="home-heading">Hey Gayatri. What are your students thinking about?</h1>
+        <h1 class="home-heading" id="home-heading">What are your students thinking about?</h1>
         <p class="home-sub">See how your students are thinking, plan for what comes next — just ask.</p>
         <div class="home-suggestions">
           <div class="sugg-row" onclick="useSuggestion('Show me how my class is thinking about this week&#39;s topic')"><span>Show me how my class is thinking about this week's topic</span><span class="sugg-arrow">→</span></div>
@@ -1349,7 +1349,7 @@ function showSettingsTab(tab) {
       </div>`;
 
   } else if (tab==='members') {
-    const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Gayatri Ramesh","email":"gramesh@exeter.edu","role":"Admin","grade":""}]');
+    const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Teacher","email":"","role":"Admin","grade":""}]');
     const total = members.length;
     const admins = members.filter(m=>m.role==='Admin').length;
     const teachers = members.filter(m=>m.role==='Teacher').length;
@@ -1508,7 +1508,7 @@ function addMember() {
   const role = document.getElementById('new-member-role').value;
   const name = document.getElementById('new-member-name').value.trim() || email.split('@')[0];
   if (!email) { alert('Please enter an email.'); return; }
-  const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Gayatri Ramesh","email":"gramesh@exeter.edu","role":"Admin","grade":""}]');
+  const members = JSON.parse(localStorage.getItem('kelvi_members') || '[{"name":"Teacher","email":"","role":"Admin","grade":""}]');
   members.push({ name, email, role, grade: '' });
   localStorage.setItem('kelvi_members', JSON.stringify(members));
   closeModal('add-member-modal');

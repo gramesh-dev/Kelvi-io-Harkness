@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getPostAuthRedirectPath } from "@/lib/auth/post-auth";
+import { markKelviRoleSetupComplete } from "@/lib/auth/profile-metadata";
 
 /**
  * First-time family setup: create org + first membership.
@@ -72,6 +73,11 @@ export async function createFamilyOrg(formData: FormData) {
 
   if (memberError) {
     return { error: memberError.message };
+  }
+
+  const marked = await markKelviRoleSetupComplete(user.id);
+  if (marked.error) {
+    return { error: marked.error };
   }
 
   redirect(await getPostAuthRedirectPath());

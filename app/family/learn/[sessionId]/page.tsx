@@ -43,7 +43,7 @@ export default async function ChatPage({
           </p>
         </div>
         <a
-          href="/app/learn"
+          href="/family/learn"
           className="text-sm text-text-secondary hover:text-text-primary transition"
         >
           New session

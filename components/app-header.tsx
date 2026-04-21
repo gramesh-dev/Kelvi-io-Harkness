@@ -5,10 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
-  { href: "/app", label: "Dashboard" },
-  { href: "/app/children", label: "Children" },
-  { href: "/app/learn", label: "Learn" },
-  { href: "/app/settings", label: "Settings" },
+  { href: "/family", label: "Dashboard" },
+  { href: "/family/children", label: "Children" },
+  { href: "/family/learn", label: "Learn" },
+  { href: "/family/settings", label: "Settings" },
+  { href: "/family/account", label: "My account" },
 ];
 
 export function AppHeader({
@@ -34,7 +35,7 @@ export function AppHeader({
     <header className="shrink-0 border-b border-kelvi-border bg-kelvi-cream">
       <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/app" className="flex items-center gap-2.5 shrink-0">
+          <Link href="/family" className="flex items-center gap-2.5 shrink-0">
             <span
               className="w-8 h-8 rounded-full bg-kelvi-teal shrink-0"
               aria-hidden
@@ -56,8 +57,8 @@ export function AppHeader({
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm md:gap-x-8">
           {navItems.map((item) => {
             const active =
-              item.href === "/app"
-                ? pathname === "/app"
+              item.href === "/family"
+                ? pathname === "/family"
                 : pathname.startsWith(item.href);
             return (
               <Link

@@ -718,11 +718,11 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
         </div>
 
         <!-- Email -->
-        <input id="family-email" type="email" placeholder="Enter your email" value="gramesh@kelvi.io"
+        <input id="family-email" type="email" placeholder="Enter your email" autocomplete="email"
           style="width:100%;padding:12px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:10px;box-sizing:border-box"
           onfocus="this.style.borderColor='var(--family)'" onblur="this.style.borderColor='var(--divider)'">
 
-        <input id="family-pass" type="password" placeholder="Password"
+        <input id="family-pass" type="password" placeholder="Password" autocomplete="current-password"
           style="width:100%;padding:12px 14px;border:1.5px solid var(--divider);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);margin-bottom:14px;box-sizing:border-box"
           onfocus="this.style.borderColor='var(--family)'" onblur="this.style.borderColor='var(--divider)'"
           onkeydown="if(event.key==='Enter')doFamilyLogin()">

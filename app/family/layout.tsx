@@ -30,7 +30,7 @@ export default async function AppLayout({
     .eq("is_active", true);
 
   if (!memberships || memberships.length === 0) {
-    redirect("/onboarding");
+    redirect("/role-setup");
   }
 
   const orgs =

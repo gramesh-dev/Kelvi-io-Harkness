@@ -66,7 +66,7 @@ export default async function DashboardPage() {
               Your children
             </h2>
             <Link
-              href="/app/children"
+              href="/family/children"
               className="text-sm text-kelvi-600 hover:underline"
             >
               Manage
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                 No children added yet
               </p>
               <Link
-                href="/app/children"
+                href="/family/children"
                 className="text-sm text-kelvi-600 font-medium hover:underline"
               >
                 Add your first child
@@ -113,7 +113,7 @@ export default async function DashboardPage() {
               Recent sessions
             </h2>
             <Link
-              href="/app/learn"
+              href="/family/learn"
               className="text-sm text-kelvi-600 hover:underline"
             >
               Start learning

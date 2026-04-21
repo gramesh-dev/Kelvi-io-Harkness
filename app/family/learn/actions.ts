@@ -49,5 +49,5 @@ export async function createSession(formData: FormData) {
     return { error: error.message };
   }
 
-  redirect(`/app/learn/${session.id}`);
+  redirect(`/family/learn/${session.id}`);
 }
