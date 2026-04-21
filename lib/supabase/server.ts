@@ -1,14 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getSupabasePublicCredentials } from "./public-env";
+import { getSupabasePublicCredentialsOrPlaceholder } from "./public-env";
 
 export async function createClient() {
-  const creds = getSupabasePublicCredentials();
-  if (!creds) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or anon/publishable key (NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY)."
-    );
-  }
+  const creds = getSupabasePublicCredentialsOrPlaceholder();
 
   const cookieStore = await cookies();
 
