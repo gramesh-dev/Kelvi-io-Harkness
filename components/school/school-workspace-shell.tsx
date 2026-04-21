@@ -8,12 +8,16 @@ import { useCallback, useState } from "react";
 const paths = {
   dashboard: "/school",
   classes: "/school/classes",
+  newClass: "/school/classes/new",
   account: "/school/account",
 } as const;
 
 function titleForPath(pathname: string): { title: string; meta?: string } {
   if (pathname === paths.dashboard || pathname === "/school/") {
     return { title: "Dashboard", meta: "Overview and activity" };
+  }
+  if (pathname.startsWith(paths.newClass)) {
+    return { title: "Add a class", meta: "Create a classroom in your school" };
   }
   if (pathname.startsWith(paths.classes)) {
     return { title: "Classes", meta: "Rosters and assignments" };
@@ -104,20 +108,20 @@ export function SchoolWorkspaceShell({
     {
       href: paths.dashboard,
       label: "Home",
-      icon: <IconHome className="h-4 w-4 shrink-0 opacity-70" />,
+      icon: <IconHome className="h-5 w-5 shrink-0 opacity-70" />,
       match: (p) => p === paths.dashboard || p === "/school/",
     },
     {
       href: "#",
       label: "My chats",
-      icon: <IconChats className="h-4 w-4 shrink-0 opacity-70" />,
+      icon: <IconChats className="h-5 w-5 shrink-0 opacity-70" />,
       match: () => false,
       disabled: true,
     },
     {
       href: "#",
       label: "Math library",
-      icon: <IconLibrary className="h-4 w-4 shrink-0 opacity-70" />,
+      icon: <IconLibrary className="h-5 w-5 shrink-0 opacity-70" />,
       match: () => false,
       disabled: true,
     },
@@ -127,7 +131,7 @@ export function SchoolWorkspaceShell({
     {
       href: paths.account,
       label: "Settings & account",
-      icon: <IconSettings className="h-4 w-4 shrink-0 opacity-70" />,
+      icon: <IconSettings className="h-5 w-5 shrink-0 opacity-70" />,
       match: (p) => p.startsWith(paths.account),
     },
   ];
@@ -135,7 +139,7 @@ export function SchoolWorkspaceShell({
   function NavButton({ item }: { item: NavItem }) {
     const active = item.match(pathname ?? "");
     const base =
-      "flex items-center gap-2.5 rounded-lg px-4 py-2 text-[13px] transition-colors";
+      "flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-sm transition-colors";
     if (item.disabled) {
       return (
         <div
@@ -177,11 +181,11 @@ export function SchoolWorkspaceShell({
             <span>Kelvi</span>
           </Link>
           {orgName ? (
-            <p className="mt-2 truncate pl-[30px] text-[11px] text-kelvi-school-muted" title={orgName}>
+            <p className="mt-2 truncate pl-[30px] text-xs leading-snug text-kelvi-school-muted" title={orgName}>
               {orgName}
             </p>
           ) : (
-            <p className="mt-2 pl-[30px] text-[11px] text-kelvi-school-muted">School workspace</p>
+            <p className="mt-2 pl-[30px] text-xs text-kelvi-school-muted">School workspace</p>
           )}
         </div>
 
@@ -191,21 +195,22 @@ export function SchoolWorkspaceShell({
           ))}
 
           <div className="mt-3 flex items-center justify-between px-4 pb-1 pt-2">
-            <span className="text-[10px] font-bold uppercase tracking-wide text-kelvi-school-muted/80">
+            <span className="text-xs font-bold uppercase tracking-wide text-kelvi-school-muted/80">
               Classes
             </span>
-            <span
-              className="text-kelvi-school-muted/50 cursor-not-allowed text-lg leading-none"
-              title="Coming soon"
-              aria-hidden
+            <Link
+              href={paths.newClass}
+              className="text-kelvi-teal hover:text-kelvi-teal-hover inline-flex h-7 min-w-7 items-center justify-center rounded-md text-lg font-medium leading-none transition hover:bg-kelvi-school-deep/50"
+              title="Add a class"
+              aria-label="Add a class"
             >
               +
-            </span>
+            </Link>
           </div>
 
           <Link
             href={paths.classes}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] transition-colors ${
+            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-colors ${
               pathname?.startsWith(paths.classes)
                 ? "bg-kelvi-school-deep font-medium text-kelvi-school-ink"
                 : "text-kelvi-school-muted hover:bg-kelvi-school-deep/80 hover:text-kelvi-school-ink"
@@ -232,13 +237,13 @@ export function SchoolWorkspaceShell({
               {(userName || userEmail).slice(0, 1).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs text-kelvi-school-muted">{userName || userEmail}</p>
+              <p className="truncate text-sm text-kelvi-school-muted">{userName || userEmail}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => void signOut()}
-            className="mt-2 w-full rounded-md py-1.5 text-left text-[11px] text-kelvi-school-muted/90 transition hover:text-kelvi-school-ink"
+            className="mt-2 w-full rounded-md py-2 text-left text-sm text-kelvi-school-muted/90 transition hover:text-kelvi-school-ink"
           >
             Log out
           </button>
@@ -247,7 +252,7 @@ export function SchoolWorkspaceShell({
 
       {/* Main column */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border bg-kelvi-school-bg px-4 md:px-5">
+        <header className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-kelvi-school-bg px-4 py-2 md:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -268,16 +273,16 @@ export function SchoolWorkspaceShell({
               </svg>
             </button>
             <div className="min-w-0">
-              <h1 className="truncate font-serif text-[15px] font-medium text-kelvi-school-ink md:text-base">{main.title}</h1>
+              <h1 className="truncate font-serif text-lg font-medium text-kelvi-school-ink md:text-xl">{main.title}</h1>
               {main.meta ? (
-                <p className="hidden truncate text-[11px] text-kelvi-school-muted sm:block">{main.meta}</p>
+                <p className="hidden truncate text-xs text-kelvi-school-muted sm:block md:text-sm">{main.meta}</p>
               ) : null}
             </div>
           </div>
         </header>
 
         {/* Knowledge strip — matches prototype bar; content TBD */}
-        <div className="flex min-h-[36px] shrink-0 flex-wrap items-center gap-2 border-b border-border bg-kelvi-school-surface/80 px-4 py-2 text-[11px] text-kelvi-school-muted md:px-5">
+        <div className="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-kelvi-school-surface/80 px-4 py-2.5 text-xs text-kelvi-school-muted md:px-5 md:text-sm">
           <span className="font-bold uppercase tracking-wide text-kelvi-school-muted/70">Knowledge</span>
           <span className="text-kelvi-school-muted/60">—</span>
           <span className="text-kelvi-school-muted/90">Class resources and assignments will appear here.</span>

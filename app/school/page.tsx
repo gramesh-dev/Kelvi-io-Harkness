@@ -22,18 +22,18 @@ export default async function SchoolDashboardPage() {
         <h2 className="font-serif text-2xl font-normal text-kelvi-school-ink md:text-3xl">
           Welcome back, {first}
         </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-kelvi-school-muted">
+        <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-kelvi-school-muted">
           Your school workspace: classes, rosters, student sessions, and parent invites will
           connect here as we roll them out.
         </p>
       </section>
 
-      <section className="mx-auto grid max-w-xl gap-3 border border-border bg-surface px-0 py-0 rounded-xl overflow-hidden">
+      <section className="mx-auto grid max-w-xl gap-3 overflow-hidden rounded-xl border border-border bg-surface px-0 py-0">
         <Link
           href="/school/classes"
           className="group flex items-center justify-between gap-4 border-b border-border px-5 py-4 text-left transition hover:bg-kelvi-school-surface/90"
         >
-          <span className="text-sm text-kelvi-school-muted transition group-hover:text-kelvi-school-ink">
+          <span className="text-base text-kelvi-school-muted transition group-hover:text-kelvi-school-ink">
             View classes &amp; rosters
           </span>
           <span className="text-kelvi-school-muted/50" aria-hidden>
@@ -44,7 +44,7 @@ export default async function SchoolDashboardPage() {
           href="/school/account"
           className="group flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-kelvi-school-surface/90"
         >
-          <span className="text-sm text-kelvi-school-muted transition group-hover:text-kelvi-school-ink">
+          <span className="text-base text-kelvi-school-muted transition group-hover:text-kelvi-school-ink">
             Settings &amp; account
           </span>
           <span className="text-kelvi-school-muted/50" aria-hidden>

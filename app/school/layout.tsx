@@ -47,7 +47,9 @@ export default async function SchoolLayout({
       userName={profile?.full_name ?? user.email ?? ""}
       userEmail={user.email ?? ""}
     >
-      <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8">{children}</div>
+      <div className="school-main-content mx-auto w-full max-w-3xl px-5 py-8 text-base leading-relaxed md:px-8 lg:max-w-[40rem]">
+        {children}
+      </div>
     </SchoolWorkspaceShell>
   );
 }
