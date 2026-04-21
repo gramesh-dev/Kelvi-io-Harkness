@@ -1,4 +1,25 @@
 /**
+ * Data API screens sometimes show `https://xxx.supabase.co/rest/v1` — that path is only
+ * for PostgREST. Auth lives at `/auth/v1` off the project origin; if the base URL includes
+ * `/rest/v1`, OAuth becomes `.../rest/v1/auth/v1/authorize` and fails with "No API key".
+ */
+export function normalizeSupabaseProjectUrl(raw: string): string {
+  const trimmed = raw.trim();
+  try {
+    const u = new URL(trimmed);
+    const p = u.pathname.replace(/\/$/, "") || "";
+    if (p === "/rest/v1" || p.startsWith("/rest/v1/")) {
+      return u.origin;
+    }
+    return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
+  } catch {
+    return trimmed
+      .replace(/\/rest\/v1\/?$/, "")
+      .replace(/\/$/, "");
+  }
+}
+
+/**
  * Public Supabase URL + anon/publishable key for browser, SSR, and Edge middleware.
  * Vercel setups often use NEXT_PUBLIC_SUPABASE_ANON_KEY; .env.local.example uses the
  * publishable key name — support both so middleware never receives undefined keys.
@@ -7,12 +28,12 @@ export function getSupabasePublicCredentials(): {
   url: string;
   anonKey: string;
 } | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-  if (!url || !anonKey) return null;
-  return { url, anonKey };
+  if (!rawUrl || !anonKey) return null;
+  return { url: normalizeSupabaseProjectUrl(rawUrl), anonKey };
 }
 
 /**
