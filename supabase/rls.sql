@@ -101,6 +101,24 @@ RETURNS BOOLEAN AS $$
     );
 $$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
 
+-- Teachers and school admins in a school org (used for classroom INSERT, etc.)
+CREATE OR REPLACE FUNCTION is_school_staff(target_org_id UUID)
+RETURNS BOOLEAN AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM public.org_memberships om
+        JOIN public.organizations o ON o.id = om.org_id
+        WHERE om.profile_id = auth.uid()
+          AND om.org_id = target_org_id
+          AND om.is_active = true
+          AND o.type = 'school'
+          AND om.role IN ('school_admin', 'teacher')
+    );
+$$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
+
+REVOKE ALL ON FUNCTION is_school_staff(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION is_school_staff(UUID) TO authenticated;
+
 CREATE OR REPLACE FUNCTION can_access_student(target_student_id UUID)
 RETURNS BOOLEAN AS $$
     SELECT
@@ -378,7 +396,9 @@ CREATE POLICY class_select ON classrooms FOR SELECT USING (
 );
 
 CREATE POLICY class_insert ON classrooms FOR INSERT WITH CHECK (
-    is_org_admin(org_id) OR is_platform_admin()
+    is_platform_admin()
+    OR is_org_admin(org_id)
+    OR is_school_staff(org_id)
 );
 
 CREATE POLICY class_update ON classrooms FOR UPDATE USING (
@@ -397,8 +417,12 @@ CREATE POLICY ct_select ON classroom_teachers FOR SELECT USING (
 );
 
 CREATE POLICY ct_insert ON classroom_teachers FOR INSERT WITH CHECK (
-    is_org_admin((SELECT org_id FROM classrooms WHERE id = classroom_id))
-    OR is_platform_admin()
+    is_platform_admin()
+    OR is_org_admin((SELECT org_id FROM classrooms WHERE id = classroom_id))
+    OR (
+        profile_id = auth.uid()
+        AND is_school_staff((SELECT org_id FROM classrooms WHERE id = classroom_id))
+    )
 );
 
 
