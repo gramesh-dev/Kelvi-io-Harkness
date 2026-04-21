@@ -1,13 +1,23 @@
 import { createServerClient } from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabasePublicCredentials } from "./public-env";
 
 export async function updateSession(request: NextRequest) {
+  const creds = getSupabasePublicCredentials();
+  if (!creds) {
+    console.error(
+      "[middleware] Missing NEXT_PUBLIC_SUPABASE_URL and/or anon key. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY on Vercel."
+    );
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
-    {
+  let user: User | null = null;
+
+  try {
+    const supabase = createServerClient(creds.url, creds.anonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -22,12 +32,14 @@ export async function updateSession(request: NextRequest) {
           );
         },
       },
-    }
-  );
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (e) {
+    console.error("[middleware] Supabase session error:", e);
+    return NextResponse.next({ request });
+  }
 
   const path = request.nextUrl.pathname;
 
