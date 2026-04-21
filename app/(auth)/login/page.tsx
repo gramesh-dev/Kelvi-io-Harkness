@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { hasRealSupabasePublicConfig } from "@/lib/supabase/public-env";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
 
 export default function LoginPage() {
@@ -16,8 +17,12 @@ export default function LoginPage() {
 
   const [intentProduct, setIntentProduct] = useState<string | null>(null);
   const [signupHref, setSignupHref] = useState("/signup");
+  const [callbackHint, setCallbackHint] = useState("");
+
+  const supabaseReady = hasRealSupabasePublicConfig();
 
   useEffect(() => {
+    setCallbackHint(`${window.location.origin}/callback`);
     const p = new URLSearchParams(window.location.search);
     if (p.get("reset") === "success") setPasswordResetOk(true);
     const intent = p.get("intent");
@@ -109,10 +114,20 @@ export default function LoginPage() {
             </div>
           )}
 
+          {!supabaseReady && (
+            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
+              Google sign-in needs Supabase env on the server that built this app. In Vercel, add{" "}
+              <code className="text-xs">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+              <code className="text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> (or publishable key)
+              for <strong>Production</strong>, then redeploy. In Supabase → URL configuration, allow{" "}
+              <code className="text-xs break-all">{callbackHint || "https://your-domain/callback"}</code>.
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleGoogle}
-            disabled={loading}
+            disabled={loading || !supabaseReady}
             className="w-full flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg bg-white text-text-primary font-medium hover:bg-surface-secondary transition disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>

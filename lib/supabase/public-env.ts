@@ -37,3 +37,8 @@ export function getSupabasePublicCredentialsOrPlaceholder(): {
     }
   );
 }
+
+/** True when real `NEXT_PUBLIC_SUPABASE_*` were present at build time (not the build placeholder). */
+export function hasRealSupabasePublicConfig(): boolean {
+  return getSupabasePublicCredentials() !== null;
+}
