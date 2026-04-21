@@ -33,16 +33,14 @@ export default async function SchoolClassesPage(props: { searchParams: Search })
     : { data: null };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-base leading-relaxed text-kelvi-school-muted">
-            Open a class to manage the roster, sessions, and parent invites.
-          </p>
-        </div>
+    <div className="space-y-10">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+        <p className="max-w-2xl text-[1.0625rem] leading-relaxed text-kelvi-school-muted md:text-lg">
+          Open a class to manage the roster, sessions, and parent invites.
+        </p>
         <Link
           href="/school/classes/new"
-          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-kelvi-teal px-4 py-2.5 text-base font-medium text-white transition hover:bg-kelvi-teal-hover"
+          className="inline-flex shrink-0 items-center justify-center rounded-xl bg-kelvi-teal px-6 py-3.5 text-lg font-medium text-white shadow-sm transition hover:bg-kelvi-teal-hover"
         >
           Add a class
         </Link>
@@ -68,27 +66,27 @@ export default async function SchoolClassesPage(props: { searchParams: Search })
           </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
           {classrooms.map((c) => (
             <li
               key={c.id}
-              className="flex flex-col gap-1 px-5 py-4 text-left sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-2 px-6 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:py-6"
             >
               <div>
-                <p className="text-base font-medium text-kelvi-school-ink">{c.name}</p>
-                <p className="text-sm text-kelvi-school-muted">
+                <p className="text-lg font-semibold text-kelvi-school-ink md:text-xl">{c.name}</p>
+                <p className="mt-1 text-base text-kelvi-school-muted">
                   {[c.grade_level, c.subject, c.academic_year].filter(Boolean).join(" · ") ||
                     "Class workspace"}
                 </p>
               </div>
-              <span className="text-sm text-kelvi-school-muted/80">Detail view coming soon</span>
+              <span className="text-base text-kelvi-school-muted/90">Detail view coming soon</span>
             </li>
           ))}
         </ul>
       )}
 
       <p className="text-center">
-        <Link href="/school" className="text-base font-medium text-kelvi-teal hover:text-kelvi-teal-hover">
+        <Link href="/school" className="text-lg font-medium text-kelvi-teal hover:text-kelvi-teal-hover">
           ← Back to dashboard
         </Link>
       </p>

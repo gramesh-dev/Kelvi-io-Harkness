@@ -47,7 +47,11 @@ export default async function SchoolLayout({
       userName={profile?.full_name ?? user.email ?? ""}
       userEmail={user.email ?? ""}
     >
-      <div className="school-main-content mx-auto w-full max-w-3xl px-5 py-8 text-base leading-relaxed md:px-8 lg:max-w-[40rem]">
+      {/*
+        Match marketing `public/index.html` `.container`: max-width 1120px, centered.
+        Body text uses the same comfortable size as the landing page.
+      */}
+      <div className="school-main-content mx-auto w-full max-w-[1120px] px-6 py-8 text-[1.0625rem] leading-relaxed sm:px-8">
         {children}
       </div>
     </SchoolWorkspaceShell>

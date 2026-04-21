@@ -108,20 +108,20 @@ export function SchoolWorkspaceShell({
     {
       href: paths.dashboard,
       label: "Home",
-      icon: <IconHome className="h-5 w-5 shrink-0 opacity-70" />,
+      icon: <IconHome className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
       match: (p) => p === paths.dashboard || p === "/school/",
     },
     {
       href: "#",
       label: "My chats",
-      icon: <IconChats className="h-5 w-5 shrink-0 opacity-70" />,
+      icon: <IconChats className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
       match: () => false,
       disabled: true,
     },
     {
       href: "#",
       label: "Math library",
-      icon: <IconLibrary className="h-5 w-5 shrink-0 opacity-70" />,
+      icon: <IconLibrary className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
       match: () => false,
       disabled: true,
     },
@@ -131,7 +131,7 @@ export function SchoolWorkspaceShell({
     {
       href: paths.account,
       label: "Settings & account",
-      icon: <IconSettings className="h-5 w-5 shrink-0 opacity-70" />,
+      icon: <IconSettings className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
       match: (p) => p.startsWith(paths.account),
     },
   ];
@@ -139,7 +139,7 @@ export function SchoolWorkspaceShell({
   function NavButton({ item }: { item: NavItem }) {
     const active = item.match(pathname ?? "");
     const base =
-      "flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-sm transition-colors";
+      "flex items-center gap-3 rounded-lg px-4 py-3 text-[0.95rem] leading-snug transition-colors md:text-base";
     if (item.disabled) {
       return (
         <div
@@ -167,25 +167,25 @@ export function SchoolWorkspaceShell({
   }
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-kelvi-school-bg text-kelvi-school-ink">
-      {/* Sidebar — prototype width 240px */}
+    <div className="flex h-[100dvh] overflow-hidden bg-kelvi-school-bg text-kelvi-school-ink antialiased">
+      {/* Sidebar — slightly wider for readability; shadow separates from main */}
       <aside
-        className={`relative flex h-full w-[240px] shrink-0 flex-col border-r border-border bg-kelvi-school-surface transition-[width,opacity] duration-200 md:w-[240px] ${
-          sidebarOpen ? "opacity-100" : "w-0 overflow-hidden border-0 p-0 opacity-0 md:w-0"
+        className={`relative flex h-full w-[min(100%,17rem)] shrink-0 flex-col border-r border-border/90 bg-kelvi-school-surface shadow-[4px_0_24px_-12px_rgba(47,43,37,0.08)] transition-[width,opacity] duration-200 md:w-[17.25rem] ${
+          sidebarOpen ? "opacity-100" : "w-0 overflow-hidden border-0 p-0 opacity-0 shadow-none md:w-0"
         }`}
         aria-hidden={!sidebarOpen}
       >
-        <div className="shrink-0 border-b border-border px-4 pb-3 pt-4">
-          <Link href="/school" className="sb-brand flex items-center gap-2 font-serif text-lg font-normal text-kelvi-teal">
+        <div className="shrink-0 border-b border-border px-4 pb-3 pt-5">
+          <Link href="/school" className="sb-brand flex items-center gap-2.5 font-serif text-xl font-normal text-kelvi-teal">
             <KelviTriLogo />
             <span>Kelvi</span>
           </Link>
           {orgName ? (
-            <p className="mt-2 truncate pl-[30px] text-xs leading-snug text-kelvi-school-muted" title={orgName}>
+            <p className="mt-2 truncate pl-[30px] text-sm leading-snug text-kelvi-school-muted" title={orgName}>
               {orgName}
             </p>
           ) : (
-            <p className="mt-2 pl-[30px] text-xs text-kelvi-school-muted">School workspace</p>
+            <p className="mt-2 pl-[30px] text-sm text-kelvi-school-muted">School workspace</p>
           )}
         </div>
 
@@ -195,7 +195,7 @@ export function SchoolWorkspaceShell({
           ))}
 
           <div className="mt-3 flex items-center justify-between px-4 pb-1 pt-2">
-            <span className="text-xs font-bold uppercase tracking-wide text-kelvi-school-muted/80">
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-kelvi-school-muted/80 md:text-xs">
               Classes
             </span>
             <Link
@@ -210,7 +210,7 @@ export function SchoolWorkspaceShell({
 
           <Link
             href={paths.classes}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-colors ${
+            className={`flex items-center gap-2.5 rounded-lg px-4 py-3 text-[0.95rem] transition-colors md:text-base ${
               pathname?.startsWith(paths.classes)
                 ? "bg-kelvi-school-deep font-medium text-kelvi-school-ink"
                 : "text-kelvi-school-muted hover:bg-kelvi-school-deep/80 hover:text-kelvi-school-ink"
@@ -231,29 +231,29 @@ export function SchoolWorkspaceShell({
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-border px-3 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-kelvi-teal text-[10px] font-semibold text-white">
+        <div className="shrink-0 border-t border-border px-3 py-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-kelvi-teal text-xs font-semibold text-white">
               {(userName || userEmail).slice(0, 1).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-kelvi-school-muted">{userName || userEmail}</p>
+              <p className="truncate text-base text-kelvi-school-muted">{userName || userEmail}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => void signOut()}
-            className="mt-2 w-full rounded-md py-2 text-left text-sm text-kelvi-school-muted/90 transition hover:text-kelvi-school-ink"
+            className="mt-3 w-full rounded-md py-1.5 text-left text-base text-kelvi-school-muted/90 transition hover:text-kelvi-school-ink"
           >
             Log out
           </button>
         </div>
       </aside>
 
-      {/* Main column */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-kelvi-school-bg px-4 py-2 md:px-5">
-          <div className="flex min-w-0 items-center gap-3">
+      {/* Main column — light surface; inner chrome aligns to same 1120px column as body (marketing-style) */}
+      <div className="flex min-w-0 flex-1 flex-col bg-surface/35">
+        <header className="shrink-0 border-b border-border bg-kelvi-school-bg py-3">
+          <div className="mx-auto flex min-h-[3.5rem] w-full max-w-[1120px] items-center gap-3 px-6 sm:px-8">
             <button
               type="button"
               onClick={() => setSidebarOpen((o) => !o)}
@@ -273,22 +273,26 @@ export function SchoolWorkspaceShell({
               </svg>
             </button>
             <div className="min-w-0">
-              <h1 className="truncate font-serif text-lg font-medium text-kelvi-school-ink md:text-xl">{main.title}</h1>
+              <h1 className="truncate font-serif text-xl font-medium text-kelvi-school-ink md:text-2xl">{main.title}</h1>
               {main.meta ? (
-                <p className="hidden truncate text-xs text-kelvi-school-muted sm:block md:text-sm">{main.meta}</p>
+                <p className="hidden truncate text-sm text-kelvi-school-muted sm:block md:text-base">{main.meta}</p>
               ) : null}
             </div>
           </div>
         </header>
 
         {/* Knowledge strip — matches prototype bar; content TBD */}
-        <div className="flex min-h-10 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-kelvi-school-surface/80 px-4 py-2.5 text-xs text-kelvi-school-muted md:px-5 md:text-sm">
-          <span className="font-bold uppercase tracking-wide text-kelvi-school-muted/70">Knowledge</span>
-          <span className="text-kelvi-school-muted/60">—</span>
-          <span className="text-kelvi-school-muted/90">Class resources and assignments will appear here.</span>
+        <div className="shrink-0 border-b border-border bg-kelvi-school-surface py-3 text-sm text-kelvi-school-muted md:text-[0.95rem]">
+          <div className="mx-auto flex min-h-11 w-full max-w-[1120px] flex-wrap items-center gap-2 px-6 sm:px-8">
+            <span className="font-bold uppercase tracking-wide text-kelvi-school-muted/70">Knowledge</span>
+            <span className="text-kelvi-school-muted/60">—</span>
+            <span className="text-kelvi-school-muted/90">Class resources and assignments will appear here.</span>
+          </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-y-contain">
+          {children}
+        </div>
       </div>
     </div>
   );

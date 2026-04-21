@@ -3,7 +3,7 @@ import { CreateClassForm } from "@/app/school/classes/new/create-class-form";
 
 export default function NewClassPage() {
   return (
-    <div className="mx-auto max-w-xl space-y-8">
+    <div className="mx-auto w-full max-w-xl space-y-8 text-left">
       <div>
         <Link
           href="/school/classes"
