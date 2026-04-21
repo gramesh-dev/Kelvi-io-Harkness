@@ -33,6 +33,13 @@
   --color-text-secondary: #3d3d3d;
   --color-text-muted: #5c5c5c;
 
+  /* School workspace (aligned with `G files/app.html` + site palette) */
+  --color-kelvi-school-bg: #f8f7f4;
+  --color-kelvi-school-surface: #f0ede6;
+  --color-kelvi-school-deep: #e8e3da;
+  --color-kelvi-school-ink: #2f2b25;
+  --color-kelvi-school-muted: #6f6a61;
+
   --font-family-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-family-serif: var(--font-serif), ui-serif, Georgia, "Times New Roman",
     serif;

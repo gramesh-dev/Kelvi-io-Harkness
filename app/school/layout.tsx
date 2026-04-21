@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SchoolAppHeader } from "@/components/school-app-header";
+import { SchoolWorkspaceShell } from "@/components/school/school-workspace-shell";
 
 export default async function SchoolLayout({
   children,
@@ -42,17 +42,12 @@ export default async function SchoolLayout({
   const org = schoolOrg.organizations as { name?: string } | undefined;
 
   return (
-    <div className="min-h-screen flex flex-col bg-kelvi-cream">
-      <SchoolAppHeader
-        userName={profile?.full_name ?? user.email ?? ""}
-        userEmail={user.email ?? ""}
-        orgName={org?.name}
-      />
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="max-w-6xl w-full mx-auto px-6 py-8 flex-1 flex flex-col min-h-0">
-          {children}
-        </div>
-      </div>
-    </div>
+    <SchoolWorkspaceShell
+      orgName={org?.name}
+      userName={profile?.full_name ?? user.email ?? ""}
+      userEmail={user.email ?? ""}
+    >
+      <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8">{children}</div>
+    </SchoolWorkspaceShell>
   );
 }
