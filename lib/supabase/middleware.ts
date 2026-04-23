@@ -116,11 +116,12 @@ export async function updateSession(request: NextRequest) {
       path.startsWith("/post-login");
 
     const isAdminActionRequest = path.startsWith("/admin") && request.method !== "GET";
+    const isServerActionRequest = Boolean(request.headers.get("next-action"));
 
     // Let admin server-action posts reach route handlers. The admin page/actions
     // do their own platform-admin checks, and redirect responses here can break
     // the expected RSC action protocol in the browser.
-    if (user && isAdminActionRequest) {
+    if (user && (isAdminActionRequest || isServerActionRequest)) {
       return supabaseResponse;
     }
 
