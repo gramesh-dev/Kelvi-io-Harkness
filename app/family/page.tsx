@@ -21,8 +21,12 @@ function lastPlanet(sessions: { topic: string | null; metadata: unknown }[]): st
 }
 
 function relativeDay(dateStr: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
   const diff = Math.floor(
-    (new Date().setHours(0,0,0,0) - new Date(new Date(dateStr).setHours(0,0,0,0))) / 86400000
+    (today.getTime() - target.getTime()) / 86400000
   );
   if (diff === 0) return "Today";
   if (diff === 1) return "Yesterday";
