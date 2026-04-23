@@ -92,8 +92,10 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   const queryStatus = ["pending", "accepted", "revoked"].includes(String(sp.status ?? ""))
     ? String(sp.status)
     : "all";
+  const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+  const dataClient = serviceRoleAvailable ? createServiceClient() : supabase;
 
-  let invitesQuery = supabase
+  let invitesQuery = dataClient
     .from("beta_access_invites")
     .select(
       "email,status,allowed_roles,invited_by,invited_at,accepted_at,last_login_at,login_count,note"
@@ -108,7 +110,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   }
 
   const { data: invitesData } = await invitesQuery.limit(200);
-  const { data: waitlistData } = await supabase
+  const { data: waitlistData } = await dataClient
     .from("waitlist_requests")
     .select("id,first_name,last_name,email,organization,role_requested,status,created_at")
     .order("created_at", { ascending: false })
@@ -120,7 +122,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   const inviterById = new Map<string, string>();
 
   if (inviterIds.length > 0) {
-    const { data: profiles } = await supabase
+    const { data: profiles } = await dataClient
       .from("profiles")
       .select("id,full_name,email")
       .in("id", inviterIds);
@@ -130,7 +132,6 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   }
 
   const loginByEmail = new Map<string, string>();
-  const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   if (serviceRoleAvailable) {
     try {
       const adminClient = createServiceClient();

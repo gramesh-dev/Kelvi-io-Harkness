@@ -640,6 +640,14 @@
       openWaitlistModal(footerWaitlistEmail.value.trim());
     });
 
+    const startupParams = new URLSearchParams(window.location.search);
+    if (startupParams.get('waitlist') === '1' || window.location.hash === '#signup') {
+      openWaitlistModal('');
+      if (window.location.hash === '#signup') {
+        history.replaceState({}, '', `${window.location.pathname}${window.location.search}`);
+      }
+    }
+
     waitlistForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       waitlistStatus.textContent = 'Submitting...';

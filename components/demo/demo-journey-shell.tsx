@@ -108,7 +108,7 @@ export function DemoJourneyShell({ role, fixture }: DemoJourneyShellProps) {
                   Create account
                 </Link>
                 <Link
-                  href="/index.html#signup"
+                  href="/index.html?waitlist=1"
                   className="rounded-lg bg-kelvi-teal px-4 py-2 text-sm font-semibold text-white hover:bg-kelvi-teal-hover"
                 >
                   Join waitlist
