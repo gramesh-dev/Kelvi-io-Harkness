@@ -92,8 +92,15 @@ async function requirePlatformAdminUser() {
 export async function sendBetaInviteAction(formData: FormData) {
   const { user, supabase } = await requirePlatformAdminUser();
   const email = normalizeEmail(String(formData.get("email") ?? ""));
-  const note = String(formData.get("note") ?? "").trim() || null;
-  const allowedRoles = parseAllowedRoles(formData.getAll("roles"));
+  const requestId = String(formData.get("request_id") ?? "").trim() || null;
+  const roleRequested = String(formData.get("role_requested") ?? "").trim().toLowerCase();
+  const roleFromWaitlist = mapWaitlistRoleToAllowedRoles(roleRequested);
+  const note =
+    String(formData.get("note") ?? "").trim() ||
+    (requestId ? `Invited from waitlist (${roleRequested || "unspecified"})` : null);
+  const submittedRoles = parseAllowedRoles(formData.getAll("roles"));
+  const allowedRoles =
+    submittedRoles.length > 0 ? submittedRoles : roleFromWaitlist.length > 0 ? roleFromWaitlist : [...BETA_ALLOWED_ROLES];
 
   if (!email || !email.includes("@")) {
     redirect("/admin?notice=invalid-email");
@@ -115,8 +122,15 @@ export async function sendBetaInviteAction(formData: FormData) {
     redirect("/admin?notice=invite-email-failed");
   }
 
+  if (requestId) {
+    await admin
+      .from("waitlist_requests")
+      .update({ status: "contacted" })
+      .eq("id", requestId);
+  }
+
   revalidatePath("/admin");
-  redirect("/admin?notice=invite-sent");
+  redirect(requestId ? "/admin?notice=waitlist-invited" : "/admin?notice=invite-sent");
 }
 
 export async function resendBetaInviteAction(formData: FormData) {
@@ -185,42 +199,6 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
   if (roleRequested === "school") return ["school"];
   if (roleRequested === "individual") return ["individual"];
   return [...BETA_ALLOWED_ROLES];
-}
-
-export async function inviteWaitlistRequestAction(formData: FormData) {
-  const { user, supabase } = await requirePlatformAdminUser();
-  const requestId = String(formData.get("request_id") ?? "").trim();
-  const email = normalizeEmail(String(formData.get("email") ?? ""));
-  const roleRequested = String(formData.get("role_requested") ?? "").trim().toLowerCase();
-
-  if (!requestId || !email || !email.includes("@")) {
-    redirect("/admin?notice=invite-update-failed");
-  }
-
-  const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
-  const admin = serviceRoleAvailable ? createServiceClient() : supabase;
-  const result = await upsertBetaInviteAndSendEmail({
-    admin,
-    invitedBy: user.id,
-    email,
-    note: `Invited from waitlist (${roleRequested || "unspecified"})`,
-    allowedRoles: mapWaitlistRoleToAllowedRoles(roleRequested),
-  });
-
-  if (!result.ok && result.reason === "save") {
-    redirect("/admin?notice=invite-save-failed");
-  }
-  if (!result.ok && result.reason === "email") {
-    redirect("/admin?notice=invite-email-failed");
-  }
-
-  await admin
-    .from("waitlist_requests")
-    .update({ status: "contacted" })
-    .eq("id", requestId);
-
-  revalidatePath("/admin");
-  redirect("/admin?notice=waitlist-invited");
 }
 
 export async function archiveWaitlistRequestAction(formData: FormData) {

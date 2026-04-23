@@ -10,7 +10,6 @@ import {
 import {
   sendBetaInviteAction,
   resendBetaInviteAction,
-  inviteWaitlistRequestAction,
   archiveWaitlistRequestAction,
   updateBetaInviteStatusAction,
 } from "@/app/admin/actions";
@@ -268,7 +267,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                       <div className="flex flex-wrap gap-2">
                         {row.status !== "archived" ? (
                           <>
-                            <form action={inviteWaitlistRequestAction}>
+                            <form action={sendBetaInviteAction}>
                               <input type="hidden" name="request_id" value={row.id} />
                               <input type="hidden" name="email" value={row.email} />
                               <input type="hidden" name="role_requested" value={row.role_requested} />
