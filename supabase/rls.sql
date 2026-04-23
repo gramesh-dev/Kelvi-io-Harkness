@@ -683,3 +683,30 @@ CREATE POLICY cri_update ON public.classroom_roster_invites FOR UPDATE USING (
     OR invited_by = auth.uid()
     OR public.is_org_admin(org_id)
 );
+
+-- ── CLOSED BETA INVITES (temporary invite-only gate) ──────────────────────
+
+ALTER TABLE IF EXISTS public.beta_access_invites ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS beta_access_invites_select ON public.beta_access_invites;
+CREATE POLICY beta_access_invites_select ON public.beta_access_invites FOR SELECT USING (
+    public.is_platform_admin()
+    OR lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+);
+
+DROP POLICY IF EXISTS beta_access_invites_insert ON public.beta_access_invites;
+CREATE POLICY beta_access_invites_insert ON public.beta_access_invites FOR INSERT WITH CHECK (
+    public.is_platform_admin()
+);
+
+DROP POLICY IF EXISTS beta_access_invites_update ON public.beta_access_invites;
+CREATE POLICY beta_access_invites_update ON public.beta_access_invites FOR UPDATE USING (
+    public.is_platform_admin()
+) WITH CHECK (
+    public.is_platform_admin()
+);
+
+DROP POLICY IF EXISTS beta_access_invites_delete ON public.beta_access_invites;
+CREATE POLICY beta_access_invites_delete ON public.beta_access_invites FOR DELETE USING (
+    public.is_platform_admin()
+);

@@ -2,6 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import type { User } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabasePublicCredentials } from "./public-env";
+import {
+  evaluateInviteOnlyAccess,
+  isInviteOnlyModeEnabled,
+} from "@/lib/auth/invite-only";
 
 function copyCookiesTo(from: NextResponse, to: NextResponse) {
   try {
@@ -105,10 +109,22 @@ export async function updateSession(request: NextRequest) {
     const isProtectedApp =
       path.startsWith("/family") ||
       path.startsWith("/school") ||
+      path.startsWith("/admin") ||
       path.startsWith("/solo") ||
       path.startsWith("/student") ||
       path.startsWith("/role-setup") ||
       path.startsWith("/post-login");
+
+    if (user && isInviteOnlyModeEnabled()) {
+      const access = await evaluateInviteOnlyAccess(supabase, user);
+      const inviteGatePaths =
+        isProtectedApp || path.startsWith("/post-login") || path.startsWith("/signup");
+      if (!access.allowed && inviteGatePaths && !path.startsWith("/api/auth/signout")) {
+        return redirectPreservingCookies(request, supabaseResponse, "/api/auth/signout", {
+          next: "/login?invite=required",
+        });
+      }
+    }
 
     if (!user && isProtectedApp && !isPublicFamilyGalaxy) {
       const qp =

@@ -4,6 +4,12 @@ import {
   type MembershipRow,
 } from "@/lib/auth/home-path";
 import { hasCompletedKelviRoleSetup } from "@/lib/auth/role-setup";
+import {
+  evaluateInviteOnlyAccess,
+  isInviteOnlyModeEnabled,
+  isPlatformAdmin,
+} from "@/lib/auth/invite-only";
+import { recordInviteOnlyLogin } from "@/lib/auth/invite-only-server";
 
 /** Map internal home paths to URLs (Next routes + static shells in `public/`). */
 export function mapHomePathToDashboardUrl(internal: string): string {
@@ -34,6 +40,23 @@ export async function getPostAuthRedirectPath(): Promise<string> {
 
   if (!user) {
     return "/login";
+  }
+
+  let isPlatformAdminUser = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+  if (isInviteOnlyModeEnabled()) {
+    const access = await evaluateInviteOnlyAccess(supabase, user);
+    if (!access.allowed) {
+      await supabase.auth.signOut();
+      return "/login?invite=required";
+    }
+    isPlatformAdminUser = access.isAdmin || isPlatformAdminUser;
+    if (!access.isAdmin && user.email) {
+      await recordInviteOnlyLogin(user.email);
+    }
+  }
+
+  if (isPlatformAdminUser) {
+    return "/admin";
   }
 
   const { data: profile } = await supabase

@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/client";
 import { hasRealSupabasePublicConfig } from "@/lib/supabase/public-env";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
 
+const inviteOnlyMode =
+  (process.env.NEXT_PUBLIC_INVITE_ONLY_MODE ?? "").toLowerCase() === "true";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +21,7 @@ export default function LoginPage() {
   const [intentProduct, setIntentProduct] = useState<string | null>(null);
   const [signupHref, setSignupHref] = useState("/signup");
   const [callbackHint, setCallbackHint] = useState("");
+  const [inviteRequired, setInviteRequired] = useState(false);
 
   const supabaseReady = hasRealSupabasePublicConfig();
 
@@ -25,6 +29,7 @@ export default function LoginPage() {
     setCallbackHint(`${window.location.origin}/callback`);
     const p = new URLSearchParams(window.location.search);
     if (p.get("reset") === "success") setPasswordResetOk(true);
+    if (p.get("invite") === "required") setInviteRequired(true);
     const intent = p.get("intent");
     const labels: Record<string, string> = {
       school: "Kelvi School",
@@ -116,6 +121,13 @@ export default function LoginPage() {
           {passwordResetOk && (
             <div className="p-3 rounded-lg bg-green-50 text-green-800 text-sm">
               Your password was updated. Sign in with your new password.
+            </div>
+          )}
+
+          {inviteRequired && (
+            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
+              This environment is invite-only right now. Ask an admin to add your email before
+              signing in.
             </div>
           )}
 
@@ -220,15 +232,21 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-text-secondary">
-            Don&apos;t have an account?{" "}
-            <Link
-              href={signupHref}
-              className="text-kelvi-600 font-medium hover:underline"
-            >
-              Sign up
-            </Link>
-          </p>
+          {inviteOnlyMode ? (
+            <p className="text-center text-sm text-text-secondary">
+              Invite-only beta is enabled. Ask an admin for access.
+            </p>
+          ) : (
+            <p className="text-center text-sm text-text-secondary">
+              Don&apos;t have an account?{" "}
+              <Link
+                href={signupHref}
+                className="text-kelvi-600 font-medium hover:underline"
+              >
+                Sign up
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

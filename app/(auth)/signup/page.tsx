@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
 
+const inviteOnlyMode =
+  (process.env.NEXT_PUBLIC_INVITE_ONLY_MODE ?? "").toLowerCase() === "true";
+
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -79,6 +82,33 @@ export default function SignupPage() {
               under Supabase → Authentication → URL configuration → Redirect
               URLs, then sign up again or use Log in if you already confirmed.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (inviteOnlyMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-kelvi-cream px-4">
+        <div className="w-full max-w-md">
+          <div className="flex flex-col items-center mb-8">
+            <KelviWordmark />
+            <p className="mt-3 text-kelvi-slate">Invite-only access</p>
+          </div>
+          <div className="bg-surface rounded-xl border border-border p-8 space-y-4 text-center">
+            <p className="text-text-primary">
+              Sign up is temporarily disabled while we run closed beta testing.
+            </p>
+            <p className="text-sm text-text-secondary">
+              Ask an admin for an invite email, then come back to log in.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center rounded-lg bg-kelvi-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-kelvi-700"
+            >
+              Back to login
+            </Link>
           </div>
         </div>
       </div>
