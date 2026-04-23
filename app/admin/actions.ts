@@ -28,6 +28,17 @@ function parseAllowedRoles(values: FormDataEntryValue[]): BetaAllowedRole[] {
   return chosen.length > 0 ? chosen : [...BETA_ALLOWED_ROLES];
 }
 
+async function sendInviteEmail(admin = createServiceClient(), email: string) {
+  const redirectTo = `${appBaseUrl()}/callback`;
+  return admin.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: redirectTo,
+    },
+  });
+}
+
 async function requirePlatformAdminUser() {
   const supabase = await createClient();
   const {
@@ -72,14 +83,7 @@ export async function sendBetaInviteAction(formData: FormData) {
     redirect("/admin?notice=invite-save-failed");
   }
 
-  const redirectTo = `${appBaseUrl()}/callback`;
-  const otpResult = await admin.auth.signInWithOtp({
-    email,
-    options: {
-      shouldCreateUser: true,
-      emailRedirectTo: redirectTo,
-    },
-  });
+  const otpResult = await sendInviteEmail(admin, email);
 
   if (otpResult.error) {
     redirect("/admin?notice=invite-email-failed");
@@ -87,6 +91,49 @@ export async function sendBetaInviteAction(formData: FormData) {
 
   revalidatePath("/admin");
   redirect("/admin?notice=invite-sent");
+}
+
+export async function resendBetaInviteAction(formData: FormData) {
+  const user = await requirePlatformAdminUser();
+  const email = normalizeEmail(String(formData.get("email") ?? ""));
+  if (!email || !email.includes("@")) {
+    redirect("/admin?notice=invalid-email");
+  }
+
+  const admin = createServiceClient();
+  const { data: invite } = await admin
+    .from("beta_access_invites")
+    .select("allowed_roles,note")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (!invite) {
+    redirect("/admin?notice=invite-save-failed");
+  }
+
+  const nowIso = new Date().toISOString();
+  const { error: updateError } = await admin
+    .from("beta_access_invites")
+    .update({
+      invited_by: user.id,
+      invited_at: nowIso,
+      status: "pending",
+      allowed_roles: invite.allowed_roles ?? [...BETA_ALLOWED_ROLES],
+      note: invite.note ?? null,
+    })
+    .eq("email", email);
+
+  if (updateError) {
+    redirect("/admin?notice=invite-update-failed");
+  }
+
+  const otpResult = await sendInviteEmail(admin, email);
+  if (otpResult.error) {
+    redirect("/admin?notice=invite-email-failed");
+  }
+
+  revalidatePath("/admin");
+  redirect("/admin?notice=invite-resent");
 }
 
 export async function updateBetaInviteStatusAction(formData: FormData) {

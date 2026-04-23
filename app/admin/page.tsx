@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/invite-only";
 import {
   sendBetaInviteAction,
+  resendBetaInviteAction,
   updateBetaInviteStatusAction,
 } from "@/app/admin/actions";
 
@@ -24,7 +25,7 @@ type InviteRow = {
   note: string | null;
 };
 
-type SearchParams = Promise<{ notice?: string }>;
+type SearchParams = Promise<{ notice?: string; q?: string; status?: string }>;
 
 const noticeText: Record<string, string> = {
   "invite-sent": "Invite email sent successfully.",
@@ -33,11 +34,26 @@ const noticeText: Record<string, string> = {
   "invite-save-failed": "Could not save invite. Try again.",
   "invite-email-failed": "Invite saved, but email sending failed.",
   "invite-update-failed": "Could not update invite status.",
+  "invite-resent": "Invite email re-sent.",
 };
 
 function fmtDate(value: string | null): string {
   if (!value) return "—";
   return new Date(value).toLocaleString();
+}
+
+function fmtRelative(value: string | null): string {
+  if (!value) return "—";
+  const then = new Date(value).getTime();
+  const now = Date.now();
+  const sec = Math.max(0, Math.floor((now - then) / 1000));
+  if (sec < 60) return "just now";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  return `${day}d ago`;
 }
 
 export default async function AdminPage(props: { searchParams: SearchParams }) {
@@ -56,14 +72,27 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
     redirect("/post-login");
   }
 
+  const queryText = (sp.q ?? "").trim();
+  const queryStatus = ["pending", "accepted", "revoked"].includes(String(sp.status ?? ""))
+    ? String(sp.status)
+    : "all";
+
   const admin = createServiceClient();
-  const { data: invitesData } = await admin
+  let invitesQuery = admin
     .from("beta_access_invites")
     .select(
       "email,status,allowed_roles,invited_by,invited_at,accepted_at,last_login_at,login_count,note"
     )
-    .order("invited_at", { ascending: false })
-    .limit(200);
+    .order("invited_at", { ascending: false });
+
+  if (queryText) {
+    invitesQuery = invitesQuery.ilike("email", `%${queryText}%`);
+  }
+  if (queryStatus !== "all") {
+    invitesQuery = invitesQuery.eq("status", queryStatus);
+  }
+
+  const { data: invitesData } = await invitesQuery.limit(200);
 
   const invites = (invitesData ?? []) as InviteRow[];
   const inviterIds = Array.from(new Set(invites.map((x) => x.invited_by).filter(Boolean))) as string[];
@@ -163,6 +192,42 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
           <h2 className="text-2xl font-semibold text-kelvi-school-ink">Invites and logins</h2>
           <span className="text-sm text-kelvi-school-ink/60">{invites.length} total</span>
         </div>
+        <form className="mb-4 grid gap-3 md:grid-cols-[1fr_auto_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={queryText}
+            placeholder="Search by email"
+            className="rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-kelvi-teal"
+          />
+          <select
+            name="status"
+            defaultValue={queryStatus}
+            className="rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-kelvi-teal"
+          >
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="revoked">Revoked</option>
+          </select>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-kelvi-school-ink hover:bg-kelvi-school-surface"
+            >
+              Apply
+            </button>
+            <Link
+              href={`/admin/invites-export${queryText || queryStatus !== "all" ? `?${new URLSearchParams({
+                ...(queryText ? { q: queryText } : {}),
+                ...(queryStatus !== "all" ? { status: queryStatus } : {}),
+              }).toString()}` : ""}`}
+              className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+            >
+              Export CSV
+            </Link>
+          </div>
+        </form>
         {invites.length === 0 ? (
           <p className="text-sm text-kelvi-school-ink/70">No invites yet.</p>
         ) : (
@@ -176,6 +241,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                   <th className="py-2 pr-4 font-medium">Invited</th>
                   <th className="py-2 pr-4 font-medium">Accepted</th>
                   <th className="py-2 pr-4 font-medium">Last login</th>
+                  <th className="py-2 pr-4 font-medium">Last seen</th>
                   <th className="py-2 pr-4 font-medium">Count</th>
                   <th className="py-2 pr-4 font-medium">Invited by</th>
                   <th className="py-2 pr-4 font-medium">Actions</th>
@@ -201,12 +267,24 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                     <td className="py-3 pr-4 text-kelvi-school-ink/70">
                       {fmtDate(inv.last_login_at ?? loginByEmail.get(inv.email.toLowerCase()) ?? null)}
                     </td>
+                    <td className="py-3 pr-4 text-kelvi-school-ink/70">
+                      {fmtRelative(inv.last_login_at ?? loginByEmail.get(inv.email.toLowerCase()) ?? null)}
+                    </td>
                     <td className="py-3 pr-4 text-kelvi-school-ink/70">{inv.login_count}</td>
                     <td className="py-3 pr-4 text-kelvi-school-ink/70">
                       {inv.invited_by ? inviterById.get(inv.invited_by) ?? inv.invited_by : "—"}
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex flex-wrap gap-2">
+                        <form action={resendBetaInviteAction}>
+                          <input type="hidden" name="email" value={inv.email} />
+                          <button
+                            type="submit"
+                            className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+                          >
+                            Resend
+                          </button>
+                        </form>
                         {inv.status !== "revoked" ? (
                           <form action={updateBetaInviteStatusAction}>
                             <input type="hidden" name="email" value={inv.email} />
