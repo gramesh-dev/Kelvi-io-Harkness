@@ -2,10 +2,15 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { getClassroomForStaff } from "@/lib/school/classroom-access";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export type CreateClassFormState = { error?: string } | undefined;
+
+export type RosterInviteFormState =
+  | { error?: string; ok?: boolean; inviteUrl?: string }
+  | undefined;
 
 const RLS_HINT =
   "If this persists, apply the migration `20260421120000_school_staff_create_classrooms.sql` in Supabase SQL Editor, or set SUPABASE_SERVICE_ROLE_KEY in .env.local (server-only) for inserts after verification.";
@@ -128,5 +133,77 @@ export async function createClassroomAction(
 
   revalidatePath("/school");
   revalidatePath("/school/classes");
-  redirect(`/school/classes?created=${encodeURIComponent(created.id)}`);
+  redirect(`/school/classes/${created.id}`);
+}
+
+/**
+ * Invite-only roster: create a pending invite. Parent opens link, signs in with that email,
+ * accepts — then student + SOA + roster + guardian row are created (see migration + RPC).
+ */
+export async function createRosterInviteAction(
+  _prev: RosterInviteFormState,
+  formData: FormData
+): Promise<RosterInviteFormState> {
+  const classroomId = String(formData.get("classroom_id") ?? "").trim();
+  const parentEmail = String(formData.get("parent_email") ?? "").trim();
+  const childFullName = String(formData.get("child_full_name") ?? "").trim();
+  const childDisplayName = String(formData.get("child_display_name") ?? "").trim() || null;
+
+  if (!classroomId) {
+    return { error: "Missing class." };
+  }
+  if (!parentEmail) {
+    return { error: "Parent or guardian email is required." };
+  }
+  if (!childFullName) {
+    return { error: "Student name is required." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "You must be signed in." };
+  }
+
+  const classroom = await getClassroomForStaff(supabase, user.id, classroomId);
+  if (!classroom) {
+    return { error: "Class not found or you do not have access." };
+  }
+
+  const { data: inviteId, error: rpcError } = await supabase.rpc("create_classroom_roster_invite", {
+    p_classroom_id: classroomId,
+    p_parent_email: parentEmail,
+    p_child_full_name: childFullName,
+    p_child_display_name: childDisplayName,
+  });
+
+  if (rpcError || !inviteId) {
+    return { error: rpcError?.message ?? "Could not create invitation." };
+  }
+
+  const { data: row } = await supabase
+    .from("classroom_roster_invites")
+    .select("token")
+    .eq("id", inviteId as string)
+    .single();
+
+  if (!row?.token) {
+    return { error: "Invite created but could not load link. Refresh and try again." };
+  }
+
+  const rawBase =
+    (typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()) ||
+    (typeof process.env.NEXT_PUBLIC_APP_URL === "string" && process.env.NEXT_PUBLIC_APP_URL.trim()) ||
+    "";
+  const base = rawBase.replace(/\/$/, "");
+  const inviteUrl =
+    base.length > 0
+      ? `${base}/roster-invite/${row.token}`
+      : `/roster-invite/${row.token}`;
+
+  revalidatePath("/school/classes");
+  revalidatePath(`/school/classes/${classroomId}`);
+  return { ok: true, inviteUrl };
 }

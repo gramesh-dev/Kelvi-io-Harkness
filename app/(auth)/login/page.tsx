@@ -59,7 +59,12 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/post-login");
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next && next.startsWith("/") && !next.startsWith("//")) {
+      router.push(next);
+    } else {
+      router.push("/post-login");
+    }
     router.refresh();
   }
 

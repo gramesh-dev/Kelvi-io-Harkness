@@ -51,7 +51,11 @@ export default async function SchoolLayout({
         Match marketing `public/index.html` `.container`: max-width 1120px, centered.
         Body text uses the same comfortable size as the landing page.
       */}
-      <div className="school-main-content mx-auto w-full max-w-[1120px] px-6 py-8 text-[1.0625rem] leading-relaxed sm:px-8">
+      {/*
+        flex-1 + min-h-0: fill the shell scroll area so pages can vertically center
+        (e.g. dashboard) — max-width alone is often invisible when main column < 1120px.
+      */}
+      <div className="school-main-content mx-auto flex min-h-0 w-full max-w-[1120px] flex-1 flex-col px-6 py-6 text-lg leading-relaxed text-kelvi-school-ink md:text-xl sm:px-8">
         {children}
       </div>
     </SchoolWorkspaceShell>

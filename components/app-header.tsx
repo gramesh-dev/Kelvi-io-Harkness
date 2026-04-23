@@ -16,10 +16,12 @@ export function AppHeader({
   userName,
   userEmail,
   orgName,
+  dashboardHref = "/family",
 }: {
   userName: string;
   userEmail: string;
   orgName?: string;
+  dashboardHref?: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -35,7 +37,7 @@ export function AppHeader({
     <header className="shrink-0 border-b border-kelvi-border bg-kelvi-cream">
       <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/family" className="flex items-center gap-2.5 shrink-0">
+          <Link href={dashboardHref} className="flex items-center gap-2.5 shrink-0">
             <span
               className="w-8 h-8 rounded-full bg-kelvi-teal shrink-0"
               aria-hidden

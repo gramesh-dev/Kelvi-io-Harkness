@@ -12,20 +12,13 @@ const paths = {
   account: "/school/account",
 } as const;
 
-function titleForPath(pathname: string): { title: string; meta?: string } {
-  if (pathname === paths.dashboard || pathname === "/school/") {
-    return { title: "Dashboard", meta: "Overview and activity" };
-  }
-  if (pathname.startsWith(paths.newClass)) {
-    return { title: "Add a class", meta: "Create a classroom in your school" };
-  }
-  if (pathname.startsWith(paths.classes)) {
-    return { title: "Classes", meta: "Rosters and assignments" };
-  }
-  if (pathname.startsWith(paths.account)) {
-    return { title: "Settings & account", meta: "Profile and membership" };
-  }
-  return { title: "School", meta: undefined };
+/** e.g. "Jordan's dashboard" — first name; falls back to email local-part or "Your dashboard" */
+function dashboardHeadingLabel(fullName: string, email: string): string {
+  const raw = fullName?.trim() || email?.split("@")[0]?.trim() || "";
+  if (!raw) return "Your dashboard";
+  const first = raw.split(/\s+/)[0] ?? raw;
+  const possessive = first.toLowerCase().endsWith("s") ? `${first}'` : `${first}'s`;
+  return `${possessive} dashboard`;
 }
 
 function IconHome(props: React.SVGProps<SVGSVGElement>) {
@@ -102,26 +95,26 @@ export function SchoolWorkspaceShell({
     router.refresh();
   }, [router]);
 
-  const main = titleForPath(pathname ?? "");
+  const headerTitle = dashboardHeadingLabel(userName, userEmail);
 
   const navPrimary: NavItem[] = [
     {
       href: paths.dashboard,
       label: "Home",
-      icon: <IconHome className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
+      icon: <IconHome className="h-5 w-5 shrink-0 opacity-90 md:h-6 md:w-6" />,
       match: (p) => p === paths.dashboard || p === "/school/",
     },
     {
       href: "#",
       label: "My chats",
-      icon: <IconChats className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
+      icon: <IconChats className="h-5 w-5 shrink-0 opacity-90 md:h-6 md:w-6" />,
       match: () => false,
       disabled: true,
     },
     {
       href: "#",
       label: "Math library",
-      icon: <IconLibrary className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
+      icon: <IconLibrary className="h-5 w-5 shrink-0 opacity-90 md:h-6 md:w-6" />,
       match: () => false,
       disabled: true,
     },
@@ -131,7 +124,7 @@ export function SchoolWorkspaceShell({
     {
       href: paths.account,
       label: "Settings & account",
-      icon: <IconSettings className="h-[1.125rem] w-[1.125rem] shrink-0 opacity-75 md:h-5 md:w-5" />,
+      icon: <IconSettings className="h-5 w-5 shrink-0 opacity-90 md:h-6 md:w-6" />,
       match: (p) => p.startsWith(paths.account),
     },
   ];
@@ -139,11 +132,11 @@ export function SchoolWorkspaceShell({
   function NavButton({ item }: { item: NavItem }) {
     const active = item.match(pathname ?? "");
     const base =
-      "flex items-center gap-3 rounded-lg px-4 py-3 text-[0.95rem] leading-snug transition-colors md:text-base";
+      "flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-lg leading-snug transition-colors md:text-xl md:py-4";
     if (item.disabled) {
       return (
         <div
-          className={`${base} cursor-not-allowed text-kelvi-school-muted/70`}
+          className={`${base} cursor-not-allowed text-kelvi-school-muted/80`}
           title="Coming soon"
         >
           {item.icon}
@@ -156,8 +149,8 @@ export function SchoolWorkspaceShell({
         href={item.href}
         className={`${base} ${
           active
-            ? "bg-kelvi-school-deep text-kelvi-school-ink font-medium"
-            : "text-kelvi-school-muted hover:bg-kelvi-school-deep/80 hover:text-kelvi-school-ink"
+            ? "bg-kelvi-teal/15 font-semibold text-kelvi-teal shadow-[inset_3px_0_0_0_var(--color-kelvi-teal)]"
+            : "text-kelvi-school-ink/85 hover:bg-kelvi-teal/10 hover:text-kelvi-teal"
         }`}
       >
         {item.icon}
@@ -168,39 +161,45 @@ export function SchoolWorkspaceShell({
 
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-kelvi-school-bg text-kelvi-school-ink antialiased">
-      {/* Sidebar — slightly wider for readability; shadow separates from main */}
+      {/* Sidebar — wide rail, teal-tinted gradient, larger type */}
       <aside
-        className={`relative flex h-full w-[min(100%,17rem)] shrink-0 flex-col border-r border-border/90 bg-kelvi-school-surface shadow-[4px_0_24px_-12px_rgba(47,43,37,0.08)] transition-[width,opacity] duration-200 md:w-[17.25rem] ${
+        className={`relative flex h-full w-[min(100%,21rem)] shrink-0 flex-col border-r border-kelvi-teal/25 bg-gradient-to-b from-kelvi-teal/[0.14] via-kelvi-school-surface to-[color-mix(in_oklab,var(--color-kelvi-teal)_8%,var(--color-kelvi-school-surface))] shadow-[6px_0_32px_-16px_rgba(0,90,88,0.18)] transition-[width,opacity] duration-200 md:w-[21.5rem] ${
           sidebarOpen ? "opacity-100" : "w-0 overflow-hidden border-0 p-0 opacity-0 shadow-none md:w-0"
         }`}
         aria-hidden={!sidebarOpen}
       >
-        <div className="shrink-0 border-b border-border px-4 pb-3 pt-5">
-          <Link href="/school" className="sb-brand flex items-center gap-2.5 font-serif text-xl font-normal text-kelvi-teal">
-            <KelviTriLogo />
+        <div className="shrink-0 border-b border-kelvi-teal/20 bg-kelvi-teal/12 px-5 pb-4 pt-6">
+          <Link
+            href="/school"
+            className="sb-brand flex items-center gap-3 font-serif text-3xl font-normal text-kelvi-teal drop-shadow-sm"
+          >
+            <KelviTriLogo className="scale-110" />
             <span>Kelvi</span>
           </Link>
           {orgName ? (
-            <p className="mt-2 truncate pl-[30px] text-sm leading-snug text-kelvi-school-muted" title={orgName}>
+            <p
+              className="mt-3 truncate pl-[34px] text-lg font-medium leading-snug text-kelvi-school-ink/80"
+              title={orgName}
+            >
               {orgName}
             </p>
           ) : (
-            <p className="mt-2 pl-[30px] text-sm text-kelvi-school-muted">School workspace</p>
+            <p className="mt-3 pl-[34px] text-lg text-kelvi-school-ink/70">School workspace</p>
           )}
         </div>
 
-        <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-2">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
           {navPrimary.map((item) => (
             <NavButton key={item.label} item={item} />
           ))}
 
-          <div className="mt-3 flex items-center justify-between px-4 pb-1 pt-2">
-            <span className="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-kelvi-school-muted/80 md:text-xs">
+          <div className="mt-4 flex items-center justify-between px-2 pb-1.5 pt-2">
+            <span className="text-xs font-bold uppercase tracking-[0.1em] text-kelvi-teal/90 md:text-sm">
               Classes
             </span>
             <Link
               href={paths.newClass}
-              className="text-kelvi-teal hover:text-kelvi-teal-hover inline-flex h-7 min-w-7 items-center justify-center rounded-md text-lg font-medium leading-none transition hover:bg-kelvi-school-deep/50"
+              className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-kelvi-teal/20 text-xl font-semibold text-kelvi-teal transition hover:bg-kelvi-teal/30 hover:text-kelvi-teal-hover"
               title="Add a class"
               aria-label="Add a class"
             >
@@ -210,13 +209,13 @@ export function SchoolWorkspaceShell({
 
           <Link
             href={paths.classes}
-            className={`flex items-center gap-2.5 rounded-lg px-4 py-3 text-[0.95rem] transition-colors md:text-base ${
+            className={`flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-lg transition-colors md:text-xl md:py-4 ${
               pathname?.startsWith(paths.classes)
-                ? "bg-kelvi-school-deep font-medium text-kelvi-school-ink"
-                : "text-kelvi-school-muted hover:bg-kelvi-school-deep/80 hover:text-kelvi-school-ink"
+                ? "bg-kelvi-teal/15 font-semibold text-kelvi-teal shadow-[inset_3px_0_0_0_var(--color-kelvi-teal)]"
+                : "text-kelvi-school-ink/85 hover:bg-kelvi-teal/10 hover:text-kelvi-teal"
             }`}
           >
-            <svg width="7" height="7" viewBox="0 0 28 28" fill="none" className="shrink-0" aria-hidden>
+            <svg width="10" height="10" viewBox="0 0 28 28" fill="none" className="shrink-0" aria-hidden>
               <circle cx="14" cy="6" r="5" fill="#B8784E" />
               <circle cx="6" cy="21" r="5" fill="#3A6B5C" />
               <circle cx="22" cy="21" r="5" fill="#5A7080" />
@@ -224,26 +223,18 @@ export function SchoolWorkspaceShell({
             <span>All classes</span>
           </Link>
 
-          <div className="my-2 h-px shrink-0 bg-border" />
+          <div className="my-2 h-px shrink-0 bg-kelvi-teal/15" />
 
           {navAfterClasses.map((item) => (
             <NavButton key={item.label} item={item} />
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-border px-3 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-kelvi-teal text-xs font-semibold text-white">
-              {(userName || userEmail).slice(0, 1).toUpperCase()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-base text-kelvi-school-muted">{userName || userEmail}</p>
-            </div>
-          </div>
+        <div className="shrink-0 border-t border-kelvi-teal/20 bg-kelvi-teal/[0.08] px-4 py-4">
           <button
             type="button"
             onClick={() => void signOut()}
-            className="mt-3 w-full rounded-md py-1.5 text-left text-base text-kelvi-school-muted/90 transition hover:text-kelvi-school-ink"
+            className="w-full rounded-lg py-2.5 text-left text-xl font-medium text-kelvi-teal transition hover:bg-kelvi-teal/15 hover:text-kelvi-teal-hover"
           >
             Log out
           </button>
@@ -252,19 +243,19 @@ export function SchoolWorkspaceShell({
 
       {/* Main column — light surface; inner chrome aligns to same 1120px column as body (marketing-style) */}
       <div className="flex min-w-0 flex-1 flex-col bg-surface/35">
-        <header className="shrink-0 border-b border-border bg-kelvi-school-bg py-3">
-          <div className="mx-auto flex min-h-[3.5rem] w-full max-w-[1120px] items-center gap-3 px-6 sm:px-8">
+        <header className="shrink-0 border-b border-kelvi-teal/15 bg-gradient-to-r from-kelvi-teal/[0.06] to-kelvi-school-bg py-4 md:py-5">
+          <div className="mx-auto flex min-h-[3.25rem] w-full max-w-[1120px] items-center gap-4 px-6 sm:px-8">
             <button
               type="button"
               onClick={() => setSidebarOpen((o) => !o)}
-              className="rounded-md p-1.5 text-kelvi-school-muted transition hover:bg-kelvi-school-deep/50 hover:text-kelvi-school-ink"
+              className="shrink-0 rounded-lg p-2 text-kelvi-teal transition hover:bg-kelvi-teal/15 hover:text-kelvi-teal-hover"
               aria-expanded={sidebarOpen}
               aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
             >
-              <svg className="h-5 w-5 md:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="h-6 w-6 md:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-              <svg className="hidden h-5 w-5 md:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="hidden h-6 w-6 md:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 {sidebarOpen ? (
                   <path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                 ) : (
@@ -272,23 +263,18 @@ export function SchoolWorkspaceShell({
                 )}
               </svg>
             </button>
-            <div className="min-w-0">
-              <h1 className="truncate font-serif text-xl font-medium text-kelvi-school-ink md:text-2xl">{main.title}</h1>
-              {main.meta ? (
-                <p className="hidden truncate text-sm text-kelvi-school-muted sm:block md:text-base">{main.meta}</p>
-              ) : null}
-            </div>
+            <h1 className="min-w-0 flex-1 truncate font-serif text-3xl font-medium tracking-tight text-kelvi-teal md:text-4xl">
+              {headerTitle}
+            </h1>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="shrink-0 rounded-lg border border-kelvi-teal/25 px-4 py-2 text-sm font-medium text-kelvi-teal/80 transition hover:border-kelvi-teal/50 hover:bg-kelvi-teal/10 hover:text-kelvi-teal"
+            >
+              Log out
+            </button>
           </div>
         </header>
-
-        {/* Knowledge strip — matches prototype bar; content TBD */}
-        <div className="shrink-0 border-b border-border bg-kelvi-school-surface py-3 text-sm text-kelvi-school-muted md:text-[0.95rem]">
-          <div className="mx-auto flex min-h-11 w-full max-w-[1120px] flex-wrap items-center gap-2 px-6 sm:px-8">
-            <span className="font-bold uppercase tracking-wide text-kelvi-school-muted/70">Knowledge</span>
-            <span className="text-kelvi-school-muted/60">—</span>
-            <span className="text-kelvi-school-muted/90">Class resources and assignments will appear here.</span>
-          </div>
-        </div>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-y-contain">
           {children}

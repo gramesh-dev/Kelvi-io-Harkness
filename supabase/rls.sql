@@ -653,3 +653,33 @@ CREATE POLICY subs_select ON subscriptions FOR SELECT USING (
 );
 
 -- No INSERT/UPDATE/DELETE policies. Service-role only.
+
+-- ── CLASSROOM ROSTER INVITES (invite-only enrollment) ─────────────────
+-- Full DDL + RPCs: migration `20260422100000_classroom_roster_invites_only.sql`.
+
+ALTER TABLE IF EXISTS public.classroom_roster_invites ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS cri_select ON public.classroom_roster_invites;
+CREATE POLICY cri_select ON public.classroom_roster_invites FOR SELECT USING (
+    public.is_platform_admin()
+    OR invited_by = auth.uid()
+    OR public.is_org_admin(org_id)
+    OR EXISTS (
+        SELECT 1 FROM public.classroom_teachers ct
+        WHERE ct.classroom_id = classroom_roster_invites.classroom_id
+          AND ct.profile_id = auth.uid()
+    )
+);
+
+DROP POLICY IF EXISTS cri_insert ON public.classroom_roster_invites;
+CREATE POLICY cri_insert ON public.classroom_roster_invites FOR INSERT WITH CHECK (
+    public.is_platform_admin()
+    OR invited_by = auth.uid()
+);
+
+DROP POLICY IF EXISTS cri_update ON public.classroom_roster_invites;
+CREATE POLICY cri_update ON public.classroom_roster_invites FOR UPDATE USING (
+    public.is_platform_admin()
+    OR invited_by = auth.uid()
+    OR public.is_org_admin(org_id)
+);

@@ -74,6 +74,10 @@ button{cursor:pointer;font-family:inherit}
   font-family:var(--font-serif);font-size:13px;font-weight:500;
 }
 .topbar-uname{font-size:12px;color:var(--text-muted);font-weight:500}
+.topbar-signout{font-size:12px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid var(--divider);transition:all .15s;font-family:var(--font-body)}
+.topbar-signout:hover{color:var(--text-primary);border-color:var(--text-faint)}
+.topbar.space-mode .topbar-signout{color:rgba(240,232,204,0.55);border-color:rgba(245,230,168,0.15)}
+.topbar.space-mode .topbar-signout:hover{color:rgba(240,232,204,0.9);border-color:rgba(245,230,168,0.35)}
 
 /* ── MAIN ── */
 .main{padding-top:56px;height:100vh;overflow:hidden;position:relative}
@@ -172,12 +176,12 @@ button{cursor:pointer;font-family:inherit}
 /* Arya — the galactic core, large italic serif */
 .galaxy-core-name{
   font-family:var(--font-serif);font-style:italic;font-weight:400;
-  font-size:clamp(22px, 2.4vw, 32px);line-height:1;
+  font-size:clamp(26px, 2.8vw, 38px);line-height:1;
   color:#F5E6A8;letter-spacing:-0.005em;
   text-shadow:
-    0 0 22px rgba(245,230,168,0.45),
-    0 0 44px rgba(245,230,168,0.18),
-    0 2px 14px rgba(0,0,0,0.7);
+    0 0 28px rgba(245,230,168,0.55),
+    0 0 56px rgba(245,230,168,0.22),
+    0 2px 16px rgba(0,0,0,0.8);
   margin:0;
 }
 .galaxy[data-palette="saffron"] .galaxy-core-name{
@@ -188,8 +192,8 @@ button{cursor:pointer;font-family:inherit}
     0 2px 18px rgba(0,0,0,0.6);
 }
 .galaxy-core-label{
-  margin-top:10px;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;
-  color:rgba(240,232,204,0.45);
+  margin-top:10px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(240,232,204,0.6);font-weight:500;
 }
 @keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 .galaxy[data-palette="saffron"] .kelvi-sun{
@@ -200,29 +204,29 @@ button{cursor:pointer;font-family:inherit}
 /* bottom ribbon: avatar + resume + hint — full-width bar pinned to the bottom */
 .galaxy-ribbon{
   position:absolute;left:0;right:0;bottom:0;
-  display:flex;align-items:center;justify-content:center;gap:28px;
-  background:rgba(20,18,40,0.82);backdrop-filter:blur(16px);
-  border-top:1px solid rgba(245,230,168,0.12);
-  padding:14px 32px;z-index:60;
-  box-shadow:0 -8px 28px rgba(0,0,0,0.35);
+  display:flex;align-items:center;justify-content:center;gap:32px;
+  background:rgba(14,12,32,0.92);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(245,230,168,0.18);
+  padding:18px 40px 22px;z-index:60;
+  box-shadow:0 -12px 40px rgba(0,0,0,0.5);
 }
-.galaxy[data-palette="saffron"] .galaxy-ribbon{background:rgba(10,17,40,0.85);border-color:rgba(229,163,33,0.18)}
-.ribbon-id{display:flex;align-items:center;gap:10px}
-.ribbon-id .avatar-circle{width:34px;height:34px;font-size:14px;margin:0;border-width:1.5px}
-.ribbon-id-text{text-align:left;line-height:1.1}
-.ribbon-id-text .center-name{font-family:var(--font-serif);font-style:italic;font-size:14px;color:#F5E6A8;margin:0}
-.ribbon-id-text .center-sub{font-size:10px;color:rgba(240,232,204,0.55);letter-spacing:0.05em;text-transform:uppercase;margin:0}
-.ribbon-div{width:1px;height:28px;background:rgba(245,230,168,0.14);flex-shrink:0}
+.galaxy[data-palette="saffron"] .galaxy-ribbon{background:rgba(8,14,34,0.93);border-color:rgba(229,163,33,0.22)}
+.ribbon-id{display:flex;align-items:center;gap:12px}
+.ribbon-id .avatar-circle{width:40px;height:40px;font-size:16px;margin:0;border-width:2px}
+.ribbon-id-text{text-align:left;line-height:1.25}
+.ribbon-id-text .center-name{font-family:var(--font-serif);font-style:italic;font-size:17px;color:#F5E6A8;margin:0}
+.ribbon-id-text .center-sub{font-size:12px;color:rgba(240,232,204,0.75);letter-spacing:0.06em;text-transform:uppercase;margin:0}
+.ribbon-div{width:1px;height:36px;background:rgba(245,230,168,0.2);flex-shrink:0}
 .galaxy-ribbon .today{
   margin:0;padding:4px 0;background:none;backdrop-filter:none;border:none;
   min-width:0;max-width:none;cursor:pointer;
 }
 .galaxy-ribbon .today:hover{background:none;border:none;transform:none}
-.galaxy-ribbon .today-label{font-size:9px;margin-bottom:2px}
-.galaxy-ribbon .today-text{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
-.ribbon-hint{display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(240,232,204,0.6)}
+.galaxy-ribbon .today-label{font-size:11px;margin-bottom:3px;letter-spacing:0.16em}
+.galaxy-ribbon .today-text{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.ribbon-hint{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(240,232,204,0.8)}
 @media (max-width:860px){
-  .galaxy-ribbon{flex-direction:column;gap:8px;padding:14px 18px}
+  .galaxy-ribbon{flex-direction:column;gap:10px;padding:16px 20px 20px}
   .ribbon-div{display:none}
   .galaxy-ribbon .today-text{white-space:normal;max-width:none}
 }
@@ -254,8 +258,8 @@ button{cursor:pointer;font-family:inherit}
   text-shadow:0 2px 10px rgba(0,0,0,0.7);
 }
 .center-sub{
-  font-size:9px;color:rgba(240,232,204,0.55);letter-spacing:0.15em;
-  text-transform:uppercase;margin-top:3px;font-weight:500;
+  font-size:11px;color:rgba(240,232,204,0.7);letter-spacing:0.12em;
+  text-transform:uppercase;margin-top:4px;font-weight:500;
 }
 /* today's invitation card under the centre avatar */
 .today{
@@ -265,8 +269,8 @@ button{cursor:pointer;font-family:inherit}
   cursor:pointer;transition:all .18s ease;
 }
 .today:hover{background:rgba(26,24,48,0.75);border-color:rgba(245,230,168,0.28);transform:translateY(-1px)}
-.today-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gx-resume);margin-bottom:3px}
-.today-text{font-family:var(--font-serif);font-style:italic;font-size:12.5px;line-height:1.45;color:rgba(245,230,168,0.92)}
+.today-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gx-resume);margin-bottom:4px}
+.today-text{font-family:var(--font-serif);font-style:italic;font-size:14px;line-height:1.5;color:rgba(245,230,168,0.95)}
 .galaxy[data-palette="saffron"] .today{background:rgba(10,17,40,0.60);border-color:rgba(229,163,33,0.20)}
 .galaxy[data-palette="saffron"] .today:hover{border-color:rgba(229,163,33,0.42)}
 
@@ -290,16 +294,17 @@ button{cursor:pointer;font-family:inherit}
 
 .p-label{
   position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
-  font-family:var(--font-serif);font-size:12px;font-weight:500;font-style:italic;
+  font-family:var(--font-serif);font-size:14px;font-weight:500;font-style:italic;
   color:var(--gx-accent);white-space:nowrap;letter-spacing:0.02em;
-  opacity:0.85;transition:opacity .2s;
-  text-shadow:0 2px 8px rgba(0,0,0,0.7);pointer-events:none;
+  opacity:1;transition:opacity .2s;
+  text-shadow:0 2px 10px rgba(0,0,0,0.85);pointer-events:none;
 }
 .p-sub{
-  position:absolute;top:calc(100% + 28px);left:50%;transform:translateX(-50%);
-  font-size:9px;font-weight:500;color:rgba(240,232,204,0.55);white-space:nowrap;
-  letter-spacing:0.08em;text-transform:uppercase;opacity:0;transition:opacity .2s;pointer-events:none;
+  position:absolute;top:calc(100% + 30px);left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:600;color:rgba(240,232,204,0.7);white-space:nowrap;
+  letter-spacing:0.1em;text-transform:uppercase;opacity:0;transition:opacity .2s;pointer-events:none;
 }
+.planet:hover .p-sub{opacity:1}
 
 /* each planet is absolutely positioned from its centre via transform */
 .planet{transform:translate(-50%,-50%)}
@@ -619,13 +624,14 @@ button{cursor:pointer;font-family:inherit}
 
 /* ── GEOMETRY V4 ── */
 .geo-scene{position:absolute;inset:0;overflow-y:auto;background:var(--bg);padding-top:56px}
-.geo-back-row{padding:28px 48px 0}
+.geo-inner{max-width:860px;margin:0 auto;padding:0 48px}
+.geo-back-row{padding-top:28px}
 .geo-back-btn{background:none;border:1px solid var(--divider);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
 .geo-back-btn:hover{border-color:var(--family);color:var(--family)}
-.geo-badge{display:flex;align-items:center;gap:14px;padding:32px 48px 0}
+.geo-badge{display:flex;align-items:center;gap:14px;padding-top:32px}
 .geo-planet-dot{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#DCC094,#A07D4A 55%,#6C502C);box-shadow:0 2px 6px rgba(0,0,0,0.2);flex-shrink:0}
 .geo-planet-label{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-faint);font-weight:500}
-.geo-hero{padding:40px 48px 24px;max-width:780px}
+.geo-hero{padding-top:40px;padding-bottom:24px}
 .geo-hero-eyebrow{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px;font-weight:500}
 .geo-hero-prompt{font-family:var(--font-heading);font-style:italic;font-size:clamp(28px,3.4vw,46px);line-height:1.15;letter-spacing:-0.015em;color:var(--text-primary)}
 .geo-hero-prompt-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
@@ -639,9 +645,9 @@ button{cursor:pointer;font-family:inherit}
 .geo-btn-primary:hover{background:var(--accent-dark)}
 .geo-btn-secondary{background:none;border:none;color:var(--text-muted);padding:10px 16px;font-size:14px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
 .geo-btn-secondary:hover{color:var(--text-primary)}
-.geo-wander-row{padding:24px 48px 16px;border-top:1px solid var(--divider);margin-top:8px}
+.geo-wander-row{padding-top:24px;padding-bottom:16px;border-top:1px solid var(--divider);margin-top:8px}
 .geo-wander-text{font-family:var(--font-heading);font-style:italic;font-size:18px;color:var(--text-primary)}
-.geo-accordion{padding:0 48px}
+.geo-accordion{}
 .geo-level{border-top:1px solid var(--divider)}
 .geo-level-header{display:flex;align-items:baseline;justify-content:space-between;padding:20px 0;cursor:pointer;user-select:none}
 .geo-level-header:hover .geo-level-name{color:var(--family)}
@@ -661,7 +667,7 @@ button{cursor:pointer;font-family:inherit}
 .geo-activity-prompt{font-size:13px;color:var(--text-muted);font-style:italic;font-family:var(--font-heading);line-height:1.4}
 .geo-activity-visited{width:6px;height:6px;border-radius:50%;background:var(--family);flex-shrink:0;margin-left:auto}
 @media(max-width:700px){
-  .geo-hero,.geo-back-row,.geo-badge,.geo-wander-row,.geo-accordion{padding-left:24px;padding-right:24px}
+  .geo-inner{padding-left:20px;padding-right:20px}
   .geo-level-body{padding-left:28px}
 }
 /* ── JOURNAL ── */
@@ -738,7 +744,7 @@ button{cursor:pointer;font-family:inherit}
 </div>
 
 <div class="topbar" id="topbar">
-  <a href="index.html" class="topbar-brand">
+  <a href="/family" class="topbar-brand">
     <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
     <span>Kelvi</span>
     <span class="sb-label">Family</span>
@@ -751,6 +757,7 @@ button{cursor:pointer;font-family:inherit}
   <div class="topbar-right">
     <span class="topbar-uname" id="tb-name">Explorer</span>
     <div class="topbar-avatar" id="tb-avatar">?</div>
+    <a href="/api/auth/signout" class="topbar-signout" title="Log out">Log out</a>
     <button class="settings-btn" onclick="openSettings()" title="Settings" aria-label="Settings">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     </button>
@@ -806,19 +813,21 @@ button{cursor:pointer;font-family:inherit}
   <!-- ══ GEOMETRY PLANET ══ -->
   <div class="panel" id="panel-geometry">
     <div class="geo-scene">
-      <div class="geo-back-row">
-        <button class="geo-back-btn" onclick="showPanel('galaxy')">← Back to galaxy</button>
+      <div class="geo-inner">
+        <div class="geo-back-row">
+          <button class="geo-back-btn" onclick="showPanel('galaxy')">← Back to galaxy</button>
+        </div>
+        <div class="geo-badge">
+          <div class="geo-planet-dot"></div>
+          <div class="geo-planet-label">Geometry Planet</div>
+        </div>
+        <div id="geo-hero"></div>
+        <div class="geo-wander-row">
+          <span class="geo-wander-text">Or wander into —</span>
+        </div>
+        <div id="geo-accordion"></div>
+        <div style="height:60px"></div>
       </div>
-      <div class="geo-badge">
-        <div class="geo-planet-dot"></div>
-        <div class="geo-planet-label">Geometry Planet</div>
-      </div>
-      <div id="geo-hero"></div>
-      <div class="geo-wander-row">
-        <span class="geo-wander-text">Or wander into —</span>
-      </div>
-      <div id="geo-accordion"></div>
-      <div style="height:60px"></div>
     </div>
   </div>
 
@@ -1356,7 +1365,7 @@ function computeLayoutBounds() {
   const gx = document.getElementById('galaxy');
   const w = gx.clientWidth, h = gx.clientHeight;
   const topPad   = 60;   // below topbar, for Observatory label
-  const botPad   = 150;  // above ribbon, for lower planets' labels
+  const botPad   = 260;  // above ribbon, for lower planets' labels
   const sidePad  = 140;  // for outer-planet labels at left/right extremes
   // Positions range over ~[-1.15, 1.15] on x and ~[-1.0, 0.6] on y, so divide
   // by the max magnitude to keep everything inside the visible frame.
@@ -1950,18 +1959,71 @@ function saveSessions(sessions) {
 function saveCurrentSession() {
   if (!msgs || msgs.length < 2) return;          // need at least one exchange
   if (!currentActivity) return;
+  const endedAt = new Date().toISOString();
   const session = {
     id: Date.now(),
-    timestamp: new Date().toISOString(),
+    timestamp: currentActivity.startedAt || endedAt,
     activity: { ...currentActivity },
     messages: msgs.map(m => ({ role: m.role, content: m.content })),
     pcg: null,   // filled in async after save
     msgCount: msgs.length,
+    endedAt,
   };
   const sessions = getSessions();
   sessions.unshift(session);
   saveSessions(sessions);
   classifySessionAsync(session.id);
+  syncSessionToSupabase(session);
+}
+
+async function syncSessionToSupabase(session) {
+  const params = new URLSearchParams(window.location.search);
+  const studentId = params.get('student');
+  if (!studentId) return;
+  try {
+    const res = await fetch('/api/galaxy/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        student_id: studentId,
+        topic: session.activity?.name || session.activity?.prompt || null,
+        message_count: session.msgCount,
+        started_at: session.timestamp,
+        ended_at: session.endedAt,
+        planet: session.activity?.planet || null,
+        messages: session.messages || [],
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // Store the Supabase session ID back into localStorage so PCG PATCH can reference it
+      if (data.id) {
+        const sessions = getSessions();
+        const match = sessions.find(s => s.id === session.id);
+        if (match) {
+          match.supabaseId = data.id;
+          saveSessions(sessions);
+        }
+      }
+    }
+  } catch (_) {
+    // silent — localStorage is the offline fallback
+  }
+}
+
+async function patchPcgToSupabase(localSessionId, pcg) {
+  const sessions = getSessions();
+  const session = sessions.find(s => s.id === localSessionId);
+  if (!session?.supabaseId) return;
+  try {
+    await fetch('/api/galaxy/sessions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ session_id: session.supabaseId, pcg }),
+    });
+  } catch (_) { /* silent */ }
 }
 
 async function classifySessionAsync(sessionId) {
@@ -1998,17 +2060,50 @@ async function classifySessionAsync(sessionId) {
       const fresh = getSessions();
       const s = fresh.find(x => x.id === sessionId);
       if (s) { s.pcg = pcg; saveSessions(fresh); }
+      patchPcgToSupabase(sessionId, pcg);
       if (document.getElementById('panel-journal').classList.contains('active')) renderJournal();
     }
   } catch(e) { /* silent fail */ }
 }
 
-function renderJournal() {
-  const sessions = getSessions();
+async function renderJournal() {
   const empty = document.getElementById('journal-empty');
   const list  = document.getElementById('journal-list');
   const nameEl = document.getElementById('journal-name');
   if (nameEl) nameEl.textContent = childName || 'Arya';
+
+  // Try fetching from Supabase first; fall back to localStorage
+  let sessions = [];
+  const studentId = new URLSearchParams(window.location.search).get('student');
+  if (studentId) {
+    try {
+      const res = await fetch(`/api/galaxy/sessions?student_id=${encodeURIComponent(studentId)}`, {
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // Normalise to the same shape the rest of the journal code expects
+        sessions = (data.sessions || []).map(s => {
+          const meta = s.metadata || {};
+          return {
+            id: s.id,
+            timestamp: s.started_at,
+            endedAt: s.ended_at,
+            msgCount: s.message_count,
+            pcg: meta.pcg || null,
+            activity: {
+              name: s.topic || 'Session',
+              prompt: s.topic || '',
+              planet: meta.planet || 'Geometry',
+            },
+            messages: (s.messages || []).map(m => ({ role: m.role, content: m.content })),
+          };
+        });
+      }
+    } catch (_) { /* fall through to localStorage */ }
+  }
+  // Fall back to localStorage if API returned nothing
+  if (sessions.length === 0) sessions = getSessions();
 
   if (sessions.length === 0) {
     empty.style.display = 'flex';
@@ -2081,7 +2176,7 @@ function openPlanet(key) {
 }
 
 function openActivity(id, name, prompt, planet) {
-  currentActivity = { id, name, prompt, planet: planet || 'Geometry' };
+  currentActivity = { id, name, prompt, planet: planet || 'Geometry', startedAt: new Date().toISOString() };
   document.getElementById('chat-activity-name').textContent = name;
   document.getElementById('chat-activity-prompt').textContent = prompt;
   document.getElementById('chat-msgs').innerHTML = '';
