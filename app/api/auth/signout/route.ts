@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const next = url.searchParams.get("next");
   const supabase = await createClient();
   await supabase.auth.signOut();
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const base = url.origin;
   const fallback = "/login";
   const safeNext =
     next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;

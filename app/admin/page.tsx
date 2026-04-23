@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -90,11 +91,21 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto w-full max-w-[1200px] space-y-6 px-6 py-8 sm:px-8">
       <header className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-wider text-kelvi-teal">Admin</p>
-        <h1 className="font-serif text-4xl text-kelvi-school-ink">Invite-only control panel</h1>
-        <p className="text-kelvi-school-ink/75">
-          Manage tester invites and monitor who has logged into this environment.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-kelvi-teal">Admin</p>
+            <h1 className="font-serif text-4xl text-kelvi-school-ink">Invite-only control panel</h1>
+            <p className="text-kelvi-school-ink/75">
+              Manage tester invites and monitor who has logged into this environment.
+            </p>
+          </div>
+          <Link
+            href="/api/auth/signout?next=/login"
+            className="rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-kelvi-school-ink hover:bg-kelvi-school-surface"
+          >
+            Log out
+          </Link>
+        </div>
       </header>
 
       {notice ? (
