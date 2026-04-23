@@ -10,6 +10,8 @@ import {
 import {
   sendBetaInviteAction,
   resendBetaInviteAction,
+  inviteWaitlistRequestAction,
+  archiveWaitlistRequestAction,
   updateBetaInviteStatusAction,
 } from "@/app/admin/actions";
 
@@ -25,6 +27,17 @@ type InviteRow = {
   note: string | null;
 };
 
+type WaitlistRow = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  organization: string | null;
+  role_requested: string;
+  status: "new" | "reviewed" | "contacted" | "archived";
+  created_at: string;
+};
+
 type SearchParams = Promise<{ notice?: string; q?: string; status?: string }>;
 
 const noticeText: Record<string, string> = {
@@ -35,6 +48,9 @@ const noticeText: Record<string, string> = {
   "invite-email-failed": "Invite saved, but email sending failed.",
   "invite-update-failed": "Could not update invite status.",
   "invite-resent": "Invite email re-sent.",
+  "waitlist-invited": "Waitlist request invited successfully.",
+  "waitlist-archived": "Waitlist request archived.",
+  "waitlist-archive-failed": "Could not archive waitlist request.",
 };
 
 function fmtDate(value: string | null): string {
@@ -77,8 +93,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
     ? String(sp.status)
     : "all";
 
-  const admin = createServiceClient();
-  let invitesQuery = admin
+  let invitesQuery = supabase
     .from("beta_access_invites")
     .select(
       "email,status,allowed_roles,invited_by,invited_at,accepted_at,last_login_at,login_count,note"
@@ -93,13 +108,19 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   }
 
   const { data: invitesData } = await invitesQuery.limit(200);
+  const { data: waitlistData } = await supabase
+    .from("waitlist_requests")
+    .select("id,first_name,last_name,email,organization,role_requested,status,created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
 
   const invites = (invitesData ?? []) as InviteRow[];
+  const waitlist = (waitlistData ?? []) as WaitlistRow[];
   const inviterIds = Array.from(new Set(invites.map((x) => x.invited_by).filter(Boolean))) as string[];
   const inviterById = new Map<string, string>();
 
   if (inviterIds.length > 0) {
-    const { data: profiles } = await admin
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("id,full_name,email")
       .in("id", inviterIds);
@@ -109,10 +130,18 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   }
 
   const loginByEmail = new Map<string, string>();
-  const { data: usersPage } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
-  for (const u of usersPage?.users ?? []) {
-    if (!u.email) continue;
-    loginByEmail.set(u.email.toLowerCase(), u.last_sign_in_at ?? "");
+  const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+  if (serviceRoleAvailable) {
+    try {
+      const adminClient = createServiceClient();
+      const { data: usersPage } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 200 });
+      for (const u of usersPage?.users ?? []) {
+        if (!u.email) continue;
+        loginByEmail.set(u.email.toLowerCase(), u.last_sign_in_at ?? "");
+      }
+    } catch {
+      // Non-fatal: fallback to beta_access_invites.last_login_at only.
+    }
   }
 
   const notice = sp.notice ? noticeText[sp.notice] : "";
@@ -140,6 +169,13 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
       {notice ? (
         <div className="rounded-lg border border-kelvi-teal/30 bg-kelvi-teal/10 px-4 py-3 text-sm text-kelvi-school-ink">
           {notice}
+        </div>
+      ) : null}
+
+      {!serviceRoleAvailable ? (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          SUPABASE_SERVICE_ROLE_KEY is missing in this deployment. Invite list works, but email
+          resend/send and auth-admin login telemetry may be limited until the key is added.
         </div>
       ) : null}
 
@@ -185,6 +221,84 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
             </button>
           </div>
         </form>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-surface p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-kelvi-school-ink">Waitlist requests</h2>
+          <span className="text-sm text-kelvi-school-ink/60">{waitlist.length} recent</span>
+        </div>
+        {waitlist.length === 0 ? (
+          <p className="text-sm text-kelvi-school-ink/70">No waitlist requests yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="border-b border-border text-kelvi-school-ink/70">
+                <tr>
+                  <th className="py-2 pr-4 font-medium">Name</th>
+                  <th className="py-2 pr-4 font-medium">Email</th>
+                  <th className="py-2 pr-4 font-medium">Organization</th>
+                  <th className="py-2 pr-4 font-medium">Role requested</th>
+                  <th className="py-2 pr-4 font-medium">Status</th>
+                  <th className="py-2 pr-4 font-medium">Submitted</th>
+                  <th className="py-2 pr-4 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {waitlist.map((row) => (
+                  <tr key={row.id} className="border-b border-border/60 align-top">
+                    <td className="py-3 pr-4 text-kelvi-school-ink">
+                      {row.first_name} {row.last_name}
+                    </td>
+                    <td className="py-3 pr-4 text-kelvi-school-ink/80">{row.email}</td>
+                    <td className="py-3 pr-4 text-kelvi-school-ink/70">{row.organization || "—"}</td>
+                    <td className="py-3 pr-4 text-kelvi-school-ink/70 capitalize">
+                      {row.role_requested}
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span className="rounded-full bg-kelvi-school-surface px-2 py-0.5 text-xs font-medium capitalize text-kelvi-school-ink">
+                        {row.status}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-kelvi-school-ink/70">
+                      {fmtDate(row.created_at)} ({fmtRelative(row.created_at)})
+                    </td>
+                    <td className="py-3 pr-4">
+                      <div className="flex flex-wrap gap-2">
+                        {row.status !== "archived" ? (
+                          <>
+                            <form action={inviteWaitlistRequestAction}>
+                              <input type="hidden" name="request_id" value={row.id} />
+                              <input type="hidden" name="email" value={row.email} />
+                              <input type="hidden" name="role_requested" value={row.role_requested} />
+                              <button
+                                type="submit"
+                                className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+                              >
+                                Invite
+                              </button>
+                            </form>
+                            <form action={archiveWaitlistRequestAction}>
+                              <input type="hidden" name="request_id" value={row.id} />
+                              <button
+                                type="submit"
+                                className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                              >
+                                Delete
+                              </button>
+                            </form>
+                          </>
+                        ) : (
+                          <span className="text-xs text-kelvi-school-ink/50">Archived</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="rounded-2xl border border-border bg-surface p-6">

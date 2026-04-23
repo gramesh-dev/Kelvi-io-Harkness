@@ -383,7 +383,7 @@
       <p class="subhead fade-in">Kelvi is an AI that helps learners move forward through their own reasoning, not by being handed answers.</p>
       <div class="cta-row fade-in">
         <a href="/demo" class="btn-primary">Demo</a>
-        <a href="#signup" class="btn-outline">Join the waitlist</a>
+        <a href="#" class="btn-outline" id="heroWaitlistBtn">Join the waitlist</a>
       </div>
       <p class="support-line fade-in">An AI companion for questioning and reasoning.</p>
     </div>
@@ -521,8 +521,8 @@
       <div class="footer-content">
         <p class="footer-tagline">The question is the answer.</p>
         <p class="footer-body">Join the early community of teachers, families, and learners exploring a different kind of math platform — one built for reasoning, not just results.</p>
-        <form class="signup-form" onsubmit="handleSignup(event)">
-          <input type="email" placeholder="your@email.com" required>
+        <form class="signup-form" id="footerWaitlistForm">
+          <input type="email" id="footerWaitlistEmail" placeholder="your@email.com" required>
           <button type="submit" class="btn-primary">Join the waitlist</button>
         </form>
       </div>
@@ -535,6 +535,48 @@
       </div>
     </div>
   </footer>
+
+  <div class="modal-overlay" id="waitlistModal" role="dialog" aria-modal="true" aria-labelledby="waitlistTitle">
+    <div class="modal-box" style="max-width:720px;">
+      <button class="modal-close" id="waitlistCloseBtn" aria-label="Close waitlist form">✕</button>
+      <h3 class="modal-heading" id="waitlistTitle">Join the waitlist</h3>
+      <p class="modal-sub">Tell us a little about you. We&apos;ll reach out with early access updates.</p>
+      <form id="waitlistModalForm" style="display:grid;gap:0.85rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;">
+          <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
+            First name
+            <input name="firstName" required style="padding:0.75rem 0.85rem;border:1px solid var(--divider);border-radius:8px;background:var(--surface);font:inherit;color:var(--text-primary);" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
+            Last name
+            <input name="lastName" required style="padding:0.75rem 0.85rem;border:1px solid var(--divider);border-radius:8px;background:var(--surface);font:inherit;color:var(--text-primary);" />
+          </label>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
+          Email
+          <input name="email" type="email" required style="padding:0.75rem 0.85rem;border:1px solid var(--divider);border-radius:8px;background:var(--surface);font:inherit;color:var(--text-primary);" />
+        </label>
+        <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
+          Organization (optional)
+          <input name="organization" style="padding:0.75rem 0.85rem;border:1px solid var(--divider);border-radius:8px;background:var(--surface);font:inherit;color:var(--text-primary);" placeholder="School or company" />
+        </label>
+        <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
+          Role requested
+          <select name="roleRequested" required style="padding:0.75rem 0.85rem;border:1px solid var(--divider);border-radius:8px;background:var(--surface);font:inherit;color:var(--text-primary);">
+            <option value="">Select one</option>
+            <option value="family">Family</option>
+            <option value="school">School</option>
+            <option value="individual">Individual learner</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+          <p id="waitlistStatus" style="font-size:0.82rem;color:var(--text-muted);margin:0;"></p>
+          <button type="submit" class="btn-primary" style="height:44px;padding:0 1.5rem;">Submit request</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     const nav = document.getElementById('nav');
@@ -562,13 +604,69 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    function handleSignup(e) {
-      e.preventDefault();
-      const input = e.target.querySelector('input');
-      input.value = '';
-      input.placeholder = "Thanks! We'll be in touch.";
-      setTimeout(() => { input.placeholder = 'your@email.com'; }, 3000);
+    const waitlistModal = document.getElementById('waitlistModal');
+    const waitlistCloseBtn = document.getElementById('waitlistCloseBtn');
+    const waitlistStatus = document.getElementById('waitlistStatus');
+    const waitlistForm = document.getElementById('waitlistModalForm');
+    const heroWaitlistBtn = document.getElementById('heroWaitlistBtn');
+    const footerWaitlistForm = document.getElementById('footerWaitlistForm');
+    const footerWaitlistEmail = document.getElementById('footerWaitlistEmail');
+
+    function openWaitlistModal(prefillEmail) {
+      if (prefillEmail) {
+        const emailInput = waitlistForm.querySelector('input[name="email"]');
+        emailInput.value = prefillEmail;
+      }
+      waitlistStatus.textContent = '';
+      waitlistModal.classList.add('open');
     }
+
+    function closeWaitlistModal() {
+      waitlistModal.classList.remove('open');
+    }
+
+    heroWaitlistBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openWaitlistModal('');
+    });
+
+    waitlistCloseBtn.addEventListener('click', closeWaitlistModal);
+    waitlistModal.addEventListener('click', (e) => {
+      if (e.target === waitlistModal) closeWaitlistModal();
+    });
+
+    footerWaitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      openWaitlistModal(footerWaitlistEmail.value.trim());
+    });
+
+    waitlistForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      waitlistStatus.textContent = 'Submitting...';
+      const fd = new FormData(waitlistForm);
+      const payload = {
+        firstName: (fd.get('firstName') || '').toString().trim(),
+        lastName: (fd.get('lastName') || '').toString().trim(),
+        email: (fd.get('email') || '').toString().trim(),
+        organization: (fd.get('organization') || '').toString().trim(),
+        roleRequested: (fd.get('roleRequested') || '').toString().trim(),
+        source: 'public_index',
+      };
+
+      try {
+        const res = await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('Request failed');
+        waitlistStatus.textContent = 'Thanks! Your request has been submitted.';
+        waitlistForm.reset();
+        footerWaitlistEmail.value = '';
+      } catch {
+        waitlistStatus.textContent = 'Could not submit right now. Please try again in a moment.';
+      }
+    });
 
   </script>
 

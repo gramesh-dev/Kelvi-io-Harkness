@@ -710,3 +710,19 @@ DROP POLICY IF EXISTS beta_access_invites_delete ON public.beta_access_invites;
 CREATE POLICY beta_access_invites_delete ON public.beta_access_invites FOR DELETE USING (
     public.is_platform_admin()
 );
+
+-- ── WAITLIST REQUESTS (public marketing form intake) ───────────────────────
+
+ALTER TABLE IF EXISTS public.waitlist_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS waitlist_requests_select ON public.waitlist_requests;
+CREATE POLICY waitlist_requests_select ON public.waitlist_requests FOR SELECT USING (
+    public.is_platform_admin()
+);
+
+DROP POLICY IF EXISTS waitlist_requests_update ON public.waitlist_requests;
+CREATE POLICY waitlist_requests_update ON public.waitlist_requests FOR UPDATE USING (
+    public.is_platform_admin()
+) WITH CHECK (
+    public.is_platform_admin()
+);
