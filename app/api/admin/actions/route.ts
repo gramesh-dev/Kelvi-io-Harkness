@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { getSupabasePublicCredentialsOrPlaceholder } from "@/lib/supabase/public-env";
 import {
   isPlatformAdmin,
   normalizeEmail,
@@ -32,42 +31,35 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
   return [...BETA_ALLOWED_ROLES];
 }
 
+/**
+ * Authenticate the admin using the same pattern as /api/debug-cookies:
+ * createClient() from lib/supabase/server uses cookies() from next/headers,
+ * which sees the full cookie store including any tokens refreshed by middleware.
+ */
 async function getAdminUser(request: NextRequest) {
-  // Authenticate via Bearer token sent by AdminActionForm.
-  // The browser-side Supabase client provides the access token via getSession(),
-  // which is reliable regardless of how POST requests handle cookies on Vercel.
-  const authHeader = request.headers.get("Authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  let user = null;
+  let getUserError: string | null = null;
 
-  console.log("[api/admin/actions] getAdminUser", {
-    hasBearer: Boolean(token),
-    cookieCount: request.cookies.getAll().length,
-    sbCookies: request.cookies.getAll().filter(c => c.name.startsWith("sb-")).map(c => c.name),
-  });
-
-  if (!token) {
-    return { user: null, serviceClient: null, error: "unauthenticated" as const };
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+    user = data?.user ?? null;
+    getUserError = error?.message ?? null;
+  } catch (e) {
+    getUserError = String(e);
   }
 
-  // Validate the access token against Supabase auth using the service key.
-  const serviceClient = createServiceClient();
-  const { data: { user }, error } = await serviceClient.auth.getUser(token);
-
-  console.log("[api/admin/actions] tokenAuth", {
+  console.log("[api/admin/actions] getAdminUser", {
     userId: user?.id ?? null,
     email: user?.email ?? null,
-    error: error?.message ?? null,
+    error: getUserError,
+    sbCookies: request.cookies.getAll().filter(c => c.name.startsWith("sb-")).map(c => c.name),
   });
 
   if (!user) return { user: null, serviceClient: null, error: "unauthenticated" as const };
 
-  // Build an anon client scoped to this user's session for RLS-safe reads if needed.
-  const creds = getSupabasePublicCredentialsOrPlaceholder();
-  const userSupabase = createServerClient(creds.url, creds.anonKey, {
-    cookies: { getAll: () => request.cookies.getAll(), setAll: () => {} },
-  });
-
-  const ok = await isPlatformAdmin(userSupabase, user.id, user.email ?? null);
+  const serviceClient = createServiceClient();
+  const ok = await isPlatformAdmin(serviceClient, user.id, user.email ?? null);
   if (!ok) return { user: null, serviceClient: null, error: "forbidden" as const };
 
   return { user, serviceClient, error: null };

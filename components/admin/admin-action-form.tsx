@@ -2,17 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ReactNode } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 /**
- * Wraps an admin mutation form. Submits to /api/admin/actions via fetch
- * (Route Handlers correctly read session cookies on Vercel; Server Actions do not).
- *
- * Props:
- *   action   – one of the action keys handled by the API route
- *   fields   – hidden field values merged into the POST body
- *   onDone   – optional callback after success (default: router.refresh())
- *   children – the visible form content (inputs, buttons)
+ * Wraps an admin mutation form. Submits to /api/admin/actions via fetch.
+ * Auth is handled server-side via session cookies — no client-side getSession()
+ * needed. The browser always includes cookies on same-origin POST requests.
+ * A 401 from the server means the session is gone; only then redirect to login.
  */
 export function AdminActionForm({
   action,
@@ -37,7 +32,6 @@ export function AdminActionForm({
     setError(null);
     setLoading(true);
 
-    // Collect visible form fields
     const formData = new FormData(e.currentTarget);
     const body: Record<string, unknown> = { action, ...fields };
     formData.forEach((value, key) => {
@@ -49,33 +43,24 @@ export function AdminActionForm({
       }
     });
 
-    // roles[] checkboxes → array
     const roles = formData.getAll("roles") as string[];
     if (roles.length > 0) body["roles"] = roles;
 
     try {
-      // Get the current access token from the browser-side Supabase client.
-      // This is more reliable than relying on cookies being present in the
-      // POST request (cookie forwarding is inconsistent on Vercel for POSTs).
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        // Session is gone — send to login so the user can re-authenticate.
-        window.location.href = "/login?next=/admin";
-        return;
-      }
-
       const res = await fetch("/api/admin/actions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(body),
       });
 
       const data = await res.json().catch(() => ({}));
+
+      if (res.status === 401 || res.status === 403) {
+        setError("Not authenticated. Please refresh the page or log in again.");
+        setLoading(false);
+        return;
+      }
 
       if (!res.ok) {
         setError(data.error ?? `Error ${res.status}`);
