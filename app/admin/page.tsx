@@ -7,12 +7,7 @@ import {
   isPlatformAdmin,
   type BetaAllowedRole,
 } from "@/lib/auth/invite-only";
-import {
-  sendBetaInviteAction,
-  resendBetaInviteAction,
-  archiveWaitlistRequestAction,
-  updateBetaInviteStatusAction,
-} from "@/app/admin/actions";
+import { AdminActionForm } from "@/components/admin/admin-action-form";
 
 type InviteRow = {
   email: string;
@@ -179,9 +174,10 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
         </div>
       ) : null}
 
+      {/* ── Send invite ─────────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <h2 className="text-2xl font-semibold text-kelvi-school-ink">Send invite</h2>
-        <form action={sendBetaInviteAction} className="mt-4 grid gap-4 md:grid-cols-2">
+        <AdminActionForm action="sendInvite" className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="space-y-1">
             <span className="text-sm font-medium text-kelvi-school-ink">Tester email</span>
             <input
@@ -220,9 +216,10 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
               Send invite email
             </button>
           </div>
-        </form>
+        </AdminActionForm>
       </section>
 
+      {/* ── Waitlist requests ────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-kelvi-school-ink">Waitlist requests</h2>
@@ -267,26 +264,28 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                       <div className="flex flex-wrap gap-2">
                         {row.status !== "archived" ? (
                           <>
-                            <form action={sendBetaInviteAction}>
-                              <input type="hidden" name="request_id" value={row.id} />
-                              <input type="hidden" name="email" value={row.email} />
-                              <input type="hidden" name="role_requested" value={row.role_requested} />
+                            <AdminActionForm
+                              action="sendInvite"
+                              fields={{ request_id: row.id, email: row.email, role_requested: row.role_requested }}
+                            >
                               <button
                                 type="submit"
                                 className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
                               >
                                 Invite
                               </button>
-                            </form>
-                            <form action={archiveWaitlistRequestAction}>
-                              <input type="hidden" name="request_id" value={row.id} />
+                            </AdminActionForm>
+                            <AdminActionForm
+                              action="archiveRequest"
+                              fields={{ request_id: row.id }}
+                            >
                               <button
                                 type="submit"
                                 className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
                               >
                                 Delete
                               </button>
-                            </form>
+                            </AdminActionForm>
                           </>
                         ) : (
                           <span className="text-xs text-kelvi-school-ink/50">Archived</span>
@@ -301,6 +300,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
         )}
       </section>
 
+      {/* ── Invites and logins ───────────────────────────────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-kelvi-school-ink">Invites and logins</h2>
@@ -390,37 +390,38 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex flex-wrap gap-2">
-                        <form action={resendBetaInviteAction}>
-                          <input type="hidden" name="email" value={inv.email} />
+                        <AdminActionForm action="resendInvite" fields={{ email: inv.email }}>
                           <button
                             type="submit"
                             className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
                           >
                             Resend
                           </button>
-                        </form>
+                        </AdminActionForm>
                         {inv.status !== "revoked" ? (
-                          <form action={updateBetaInviteStatusAction}>
-                            <input type="hidden" name="email" value={inv.email} />
-                            <input type="hidden" name="status" value="revoked" />
+                          <AdminActionForm
+                            action="updateInviteStatus"
+                            fields={{ email: inv.email, status: "revoked" }}
+                          >
                             <button
                               type="submit"
                               className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
                             >
                               Revoke
                             </button>
-                          </form>
+                          </AdminActionForm>
                         ) : (
-                          <form action={updateBetaInviteStatusAction}>
-                            <input type="hidden" name="email" value={inv.email} />
-                            <input type="hidden" name="status" value="pending" />
+                          <AdminActionForm
+                            action="updateInviteStatus"
+                            fields={{ email: inv.email, status: "pending" }}
+                          >
                             <button
                               type="submit"
                               className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
                             >
                               Re-enable
                             </button>
-                          </form>
+                          </AdminActionForm>
                         )}
                       </div>
                     </td>
