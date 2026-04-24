@@ -2,11 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import {
-  BETA_ALLOWED_ROLES,
-  isPlatformAdmin,
-  type BetaAllowedRole,
-} from "@/lib/auth/invite-only";
+import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
+import { BETA_ALLOWED_ROLES, type BetaAllowedRole } from "@/lib/auth/invite-only";
 import { AdminActionForm } from "@/components/admin/admin-action-form";
 
 type InviteRow = {
@@ -68,35 +65,21 @@ function fmtRelative(value: string | null): string {
 
 export default async function AdminPage(props: { searchParams: SearchParams }) {
   const sp = await props.searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await getCurrentPlatformAdmin();
 
-  if (!user) {
-    redirect("/login");
+  if (!auth.ok) {
+    if (auth.code === "not-authenticated") {
+      redirect("/login?next=/admin");
+    }
+    redirect("/admin/unauthorized");
   }
-
-  const allowed = await isPlatformAdmin(supabase, user.id, user.email ?? null);
-  if (!allowed) {
-    redirect("/post-login");
-  }
-
-  // getSession() reads from the cookie store and may return an already-expired
-  // token if the SSR client silently refreshed it during getUser() but
-  // couldn't persist the new cookies (next/headers is read-only in Server
-  // Components). refreshSession() forces a fresh token exchange and returns
-  // the current access_token so AdminActionForm can send it as a Bearer header.
-  const {
-    data: { session },
-  } = await supabase.auth.refreshSession();
-  const accessToken = session?.access_token ?? null;
 
   const queryText = (sp.q ?? "").trim();
   const queryStatus = ["pending", "accepted", "revoked"].includes(String(sp.status ?? ""))
     ? String(sp.status)
     : "all";
   const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+  const supabase = await createClient();
   const dataClient = serviceRoleAvailable ? createServiceClient() : supabase;
 
   let invitesQuery = dataClient
@@ -179,15 +162,15 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
 
       {!serviceRoleAvailable ? (
         <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          SUPABASE_SERVICE_ROLE_KEY is missing in this deployment. Invite list works, but email
-          resend/send and auth-admin login telemetry may be limited until the key is added.
+          SUPABASE_SERVICE_ROLE_KEY is missing in this deployment. Invite list may be limited, and
+          sending or re-sending invite emails requires this key.
         </div>
       ) : null}
 
       {/* ── Send invite ─────────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <h2 className="text-2xl font-semibold text-kelvi-school-ink">Send invite</h2>
-        <AdminActionForm action="sendInvite" accessToken={accessToken} className="mt-4 grid gap-4 md:grid-cols-2">
+        <AdminActionForm action="send_invite" className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="space-y-1">
             <span className="text-sm font-medium text-kelvi-school-ink">Tester email</span>
             <input
@@ -275,9 +258,12 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                         {row.status !== "archived" ? (
                           <>
                             <AdminActionForm
-                              action="sendInvite"
-                              accessToken={accessToken}
-                              fields={{ request_id: row.id, email: row.email, role_requested: row.role_requested }}
+                              action="invite_waitlist"
+                              fields={{
+                                request_id: row.id,
+                                email: row.email,
+                                role_requested: row.role_requested,
+                              }}
                             >
                               <button
                                 type="submit"
@@ -286,11 +272,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                                 Invite
                               </button>
                             </AdminActionForm>
-                            <AdminActionForm
-                              action="archiveRequest"
-                              accessToken={accessToken}
-                              fields={{ request_id: row.id }}
-                            >
+                            <AdminActionForm action="delete_waitlist" fields={{ request_id: row.id }}>
                               <button
                                 type="submit"
                                 className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
@@ -402,7 +384,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex flex-wrap gap-2">
-                        <AdminActionForm action="resendInvite" accessToken={accessToken} fields={{ email: inv.email }}>
+                        <AdminActionForm action="resend_invite" fields={{ email: inv.email }}>
                           <button
                             type="submit"
                             className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
@@ -411,11 +393,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                           </button>
                         </AdminActionForm>
                         {inv.status !== "revoked" ? (
-                          <AdminActionForm
-                            action="updateInviteStatus"
-                            accessToken={accessToken}
-                            fields={{ email: inv.email, status: "revoked" }}
-                          >
+                          <AdminActionForm action="revoke_invite" fields={{ email: inv.email }}>
                             <button
                               type="submit"
                               className="rounded-md border border-red-200 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
@@ -424,11 +402,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                             </button>
                           </AdminActionForm>
                         ) : (
-                          <AdminActionForm
-                            action="updateInviteStatus"
-                            accessToken={accessToken}
-                            fields={{ email: inv.email, status: "pending" }}
-                          >
+                          <AdminActionForm action="send_invite" fields={{ email: inv.email }}>
                             <button
                               type="submit"
                               className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"

@@ -49,7 +49,6 @@ export async function isPlatformAdmin(
   const isBootstrap = adminEmailsParsed.includes(userEmail);
 
   if (isBootstrap) {
-    console.log("[isPlatformAdmin]", { userEmail, adminEmailsParsed, isAdmin: true, via: "bootstrap" });
     return true;
   }
 
@@ -60,9 +59,7 @@ export async function isPlatformAdmin(
     .eq("role", "platform_admin")
     .maybeSingle();
 
-  const isAdmin = Boolean(data);
-  console.log("[isPlatformAdmin]", { userEmail, adminEmailsParsed, isAdmin, via: "platform_roles" });
-  return isAdmin;
+  return Boolean(data);
 }
 
 export async function evaluateInviteOnlyAccess(

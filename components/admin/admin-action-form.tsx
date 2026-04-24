@@ -2,25 +2,35 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ReactNode } from "react";
+import type { AdminMutationAction } from "@/lib/auth/admin-mutations";
+
+const NOTICE_LABELS: Record<string, string> = {
+  "invite-sent": "Invite email sent successfully.",
+  "invite-updated": "Invite status updated.",
+  "invite-resent": "Invite email re-sent.",
+  "waitlist-invited": "Waitlist request invited successfully.",
+  "waitlist-archived": "Waitlist request archived.",
+};
+
+type JsonResponse = {
+  ok?: boolean;
+  code?: string;
+  message?: string;
+  notice?: string;
+};
 
 /**
- * Wraps an admin mutation form. Submits to /api/admin/actions via fetch.
- *
- * Auth uses a Bearer token passed as a prop from the server component — the
- * server reads the access token from the session cookie (which works reliably
- * server-side) and passes it down. This avoids depending on the browser
- * forwarding cookies with POST requests, which is inconsistent on Vercel.
+ * Submits admin mutations to POST /api/admin/actions with cookie-based auth.
+ * No Supabase client, no Bearer token, no redirects on failure.
  */
 export function AdminActionForm({
   action,
-  accessToken,
   fields = {},
   onDone,
   className,
   children,
 }: {
-  action: string;
-  accessToken?: string | null;
+  action: AdminMutationAction;
   fields?: Record<string, string | string[]>;
   onDone?: (notice: string) => void;
   className?: string;
@@ -29,66 +39,52 @@ export function AdminActionForm({
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const body: Record<string, unknown> = { action, ...fields };
-    formData.forEach((value, key) => {
-      if (key in body) {
-        const existing = body[key];
-        body[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
-      } else {
-        body[key] = value;
-      }
-    });
-
+    const payload: Record<string, unknown> = { ...fields };
+    for (const [key, value] of formData.entries()) {
+      if (key === "roles") continue;
+      payload[key] = value;
+    }
     const roles = formData.getAll("roles") as string[];
-    if (roles.length > 0) body["roles"] = roles;
-
-    console.log("posting admin action to /api/admin/actions", {
-      action,
-      origin: window.location.origin,
-      hasToken: Boolean(accessToken),
-    });
+    if (roles.length > 0) {
+      payload.roles = roles;
+    }
 
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (accessToken) {
-        headers["Authorization"] = `Bearer ${accessToken}`;
-      }
-
       const res = await fetch("/api/admin/actions", {
         method: "POST",
-        headers,
         credentials: "include",
-        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, payload }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as JsonResponse;
 
       if (res.status === 401 || res.status === 403) {
-        const detail = data.debug ? ` — debug: ${JSON.stringify(data.debug)}` : "";
-        setError(`Not authenticated (${res.status}). Please refresh or log in again.${detail}`);
-        setLoading(false);
+        setError(data.message ?? "You are not allowed to perform this action.");
         return;
       }
 
-      if (!res.ok) {
-        setError(data.error ?? `Error ${res.status}`);
-        setLoading(false);
+      if (!res.ok || !data.ok) {
+        setError(data.message ?? `Request failed (${res.status}).`);
         return;
       }
 
+      const noticeKey = typeof data.notice === "string" ? data.notice : "";
+      const label = NOTICE_LABELS[noticeKey] ?? "Saved.";
+      setSuccess(label);
       formRef.current?.reset();
       if (onDone) {
-        onDone(data.notice ?? "");
+        onDone(noticeKey);
       } else {
         router.refresh();
       }
@@ -101,11 +97,16 @@ export function AdminActionForm({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className={className}>
-      {error && (
+      {success ? (
+        <div className="mb-3 rounded-lg border border-kelvi-teal/30 bg-kelvi-teal/10 px-3 py-2 text-sm text-kelvi-school-ink">
+          {success}
+        </div>
+      ) : null}
+      {error ? (
         <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </div>
-      )}
+      ) : null}
       <fieldset disabled={loading} className="contents">
         {children}
       </fieldset>

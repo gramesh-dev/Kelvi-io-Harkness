@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { isPlatformAdmin } from "@/lib/auth/invite-only";
+import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
 
 type InviteExportRow = {
   email: string;
@@ -20,18 +19,21 @@ function csvEscape(value: unknown): string {
 }
 
 export async function GET(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getCurrentPlatformAdmin();
+  if (!auth.ok) {
+    const message =
+      auth.code === "not-authenticated" ? "Not authenticated." : "Forbidden.";
+    return NextResponse.json(
+      { ok: false as const, code: auth.code, message },
+      { status: auth.status }
+    );
   }
 
-  const allowed = await isPlatformAdmin(supabase, user.id, user.email ?? null);
-  if (!allowed) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
+    return NextResponse.json(
+      { ok: false as const, code: "config", message: "Service role key is not configured." },
+      { status: 500 }
+    );
   }
 
   const url = new URL(request.url);
