@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
   isPlatformAdmin,
@@ -32,10 +31,10 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
 }
 
 /**
- * Authenticate the admin using the exact same pattern as /api/debug-cookies:
- *   const supabase = await createClient();
- *   const { data, error } = await supabase.auth.getUser();
- * Returns a debug object on failure so the caller can surface it in the response.
+ * Authenticate the admin via Bearer token sent from the server-rendered page.
+ * The admin page (server component) reads the access token from the session
+ * cookie and passes it to AdminActionForm as a prop, which forwards it here
+ * as Authorization: Bearer <token>. We validate it with the service client.
  */
 async function getAdminUser(request: NextRequest) {
   const allCookies = request.cookies.getAll();
@@ -44,6 +43,7 @@ async function getAdminUser(request: NextRequest) {
   const debug = {
     routeName: "/api/admin/actions",
     hasCookieHeader: Boolean(request.headers.get("cookie")),
+    hasBearerToken: false,
     supabaseCookieNames: sbCookieNames,
     getUserUserId: null as string | null,
     getUserEmail: null as string | null,
@@ -52,10 +52,19 @@ async function getAdminUser(request: NextRequest) {
     isAdminError: null as string | null,
   };
 
-  // Exact same auth path as /api/debug-cookies
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+  debug.hasBearerToken = Boolean(token);
+
+  if (!token) {
+    console.log("[api/admin/actions] no Bearer token", debug);
+    return { user: null, serviceClient: null, error: "unauthenticated" as const, debug };
+  }
+
+  const serviceClient = createServiceClient();
+
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await serviceClient.auth.getUser(token);
     debug.getUserUserId = data?.user?.id ?? null;
     debug.getUserEmail = data?.user?.email ?? null;
     debug.getUserError = error?.message ?? null;
@@ -69,13 +78,8 @@ async function getAdminUser(request: NextRequest) {
     return { user: null, serviceClient: null, error: "unauthenticated" as const, debug };
   }
 
-  const serviceClient = createServiceClient();
   try {
-    const ok = await isPlatformAdmin(
-      serviceClient,
-      debug.getUserUserId,
-      debug.getUserEmail ?? null
-    );
+    const ok = await isPlatformAdmin(serviceClient, debug.getUserUserId, debug.getUserEmail ?? null);
     debug.isAdminCheck = ok;
     if (!ok) {
       return { user: null, serviceClient: null, error: "forbidden" as const, debug };

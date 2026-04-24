@@ -5,18 +5,22 @@ import { useRef, useState, type ReactNode } from "react";
 
 /**
  * Wraps an admin mutation form. Submits to /api/admin/actions via fetch.
- * Auth is handled server-side via session cookies — no client-side getSession()
- * needed. The browser always includes cookies on same-origin POST requests.
- * A 401 from the server means the session is gone; only then redirect to login.
+ *
+ * Auth uses a Bearer token passed as a prop from the server component — the
+ * server reads the access token from the session cookie (which works reliably
+ * server-side) and passes it down. This avoids depending on the browser
+ * forwarding cookies with POST requests, which is inconsistent on Vercel.
  */
 export function AdminActionForm({
   action,
+  accessToken,
   fields = {},
   onDone,
   className,
   children,
 }: {
   action: string;
+  accessToken?: string | null;
   fields?: Record<string, string | string[]>;
   onDone?: (notice: string) => void;
   className?: string;
@@ -46,10 +50,23 @@ export function AdminActionForm({
     const roles = formData.getAll("roles") as string[];
     if (roles.length > 0) body["roles"] = roles;
 
+    console.log("posting admin action to /api/admin/actions", {
+      action,
+      origin: window.location.origin,
+      hasToken: Boolean(accessToken),
+    });
+
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch("/api/admin/actions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         credentials: "include",
         body: JSON.stringify(body),
       });
@@ -57,7 +74,7 @@ export function AdminActionForm({
       const data = await res.json().catch(() => ({}));
 
       if (res.status === 401 || res.status === 403) {
-        const detail = data.debug ? ` [debug: ${JSON.stringify(data.debug)}]` : "";
+        const detail = data.debug ? ` — debug: ${JSON.stringify(data.debug)}` : "";
         setError(`Not authenticated (${res.status}). Please refresh or log in again.${detail}`);
         setLoading(false);
         return;

@@ -82,6 +82,14 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
     redirect("/post-login");
   }
 
+  // Get the access token server-side so AdminActionForm can send it as a
+  // Bearer header. This avoids relying on the browser forwarding cookies with
+  // POST requests (which is unreliable on some Vercel/browser combinations).
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const accessToken = session?.access_token ?? null;
+
   const queryText = (sp.q ?? "").trim();
   const queryStatus = ["pending", "accepted", "revoked"].includes(String(sp.status ?? ""))
     ? String(sp.status)
@@ -177,7 +185,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
       {/* ── Send invite ─────────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <h2 className="text-2xl font-semibold text-kelvi-school-ink">Send invite</h2>
-        <AdminActionForm action="sendInvite" className="mt-4 grid gap-4 md:grid-cols-2">
+        <AdminActionForm action="sendInvite" accessToken={accessToken} className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="space-y-1">
             <span className="text-sm font-medium text-kelvi-school-ink">Tester email</span>
             <input
@@ -266,6 +274,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                           <>
                             <AdminActionForm
                               action="sendInvite"
+                              accessToken={accessToken}
                               fields={{ request_id: row.id, email: row.email, role_requested: row.role_requested }}
                             >
                               <button
@@ -277,6 +286,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                             </AdminActionForm>
                             <AdminActionForm
                               action="archiveRequest"
+                              accessToken={accessToken}
                               fields={{ request_id: row.id }}
                             >
                               <button
@@ -390,7 +400,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex flex-wrap gap-2">
-                        <AdminActionForm action="resendInvite" fields={{ email: inv.email }}>
+                        <AdminActionForm action="resendInvite" accessToken={accessToken} fields={{ email: inv.email }}>
                           <button
                             type="submit"
                             className="rounded-md border border-kelvi-teal/30 px-2 py-1 text-xs font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
@@ -401,6 +411,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                         {inv.status !== "revoked" ? (
                           <AdminActionForm
                             action="updateInviteStatus"
+                            accessToken={accessToken}
                             fields={{ email: inv.email, status: "revoked" }}
                           >
                             <button
@@ -413,6 +424,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
                         ) : (
                           <AdminActionForm
                             action="updateInviteStatus"
+                            accessToken={accessToken}
                             fields={{ email: inv.email, status: "pending" }}
                           >
                             <button
