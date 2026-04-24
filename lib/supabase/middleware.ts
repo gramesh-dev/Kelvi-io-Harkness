@@ -96,6 +96,17 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
+    console.log("[middleware]", {
+      path,
+      method: request.method,
+      hasUser: Boolean(user),
+      userEmail: user?.email ?? null,
+      inviteOnlyEnabled: isInviteOnlyModeEnabled(),
+      hasAdminEmails: Boolean(process.env.INVITE_ONLY_ADMIN_EMAILS),
+      adminEmailsValue: (process.env.INVITE_ONLY_ADMIN_EMAILS ?? "").slice(0, 40),
+      hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    });
+
     if (user && path === "/school/index.html") {
       return redirectPreservingCookies(request, supabaseResponse, "/school");
     }
@@ -138,7 +149,15 @@ export async function updateSession(request: NextRequest) {
       const access = await evaluateInviteOnlyAccess(supabase, user);
       const inviteGatePaths =
         isProtectedApp || path.startsWith("/post-login") || path.startsWith("/signup");
+      console.log("[middleware] invite-gate", {
+        path,
+        allowed: access.allowed,
+        isAdmin: access.isAdmin,
+        inviteStatus: access.inviteStatus,
+        inviteGatePaths,
+      });
       if (!access.allowed && inviteGatePaths && !path.startsWith("/api/auth/signout")) {
+        console.log("[middleware] invite-gate BLOCKING — signing out and redirecting to login");
         return redirectPreservingCookies(request, supabaseResponse, "/api/auth/signout", {
           next: "/login?invite=required",
         });
