@@ -78,11 +78,28 @@ async function requirePlatformAdminUser() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: getUserError,
   } = await supabase.auth.getUser();
+
+  console.log("[admin/actions] requirePlatformAdminUser", {
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    getUserError: getUserError?.message ?? null,
+    hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    hasAnonKey: Boolean(
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+    ),
+    hasServiceKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    hasAdminEmails: Boolean(process.env.INVITE_ONLY_ADMIN_EMAILS),
+    supabaseUrlPrefix: (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").slice(0, 20),
+  });
+
   if (!user) {
     redirect("/login");
   }
   const ok = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+  console.log("[admin/actions] isPlatformAdmin →", { ok, email: user.email });
   if (!ok) {
     redirect("/post-login");
   }

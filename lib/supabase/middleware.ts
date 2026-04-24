@@ -56,7 +56,16 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet, headersToSet) {
+          // Step 1: write refreshed tokens onto request.cookies so that
+          // NextResponse.next({ request }) forwards them to server actions
+          // and route handlers (which read from next/headers cookies()).
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
+          // Step 2: create the forwarded response with the updated request.
           supabaseResponse = NextResponse.next({ request });
+          // Step 3: also write to response cookies so the browser receives
+          // the refreshed tokens and stores them for future requests.
           cookiesToSet.forEach(({ name, value, options }) => {
             try {
               supabaseResponse.cookies.set(name, value, options ?? {});
