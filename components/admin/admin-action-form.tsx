@@ -17,6 +17,7 @@ type JsonResponse = {
   code?: string;
   message?: string;
   notice?: string;
+  debug?: Record<string, unknown>;
 };
 
 /**
@@ -70,7 +71,12 @@ export function AdminActionForm({
       const data = (await res.json().catch(() => ({}))) as JsonResponse;
 
       if (res.status === 401 || res.status === 403) {
-        setError(data.message ?? "You are not allowed to perform this action.");
+        const base = data.message ?? "You are not allowed to perform this action.";
+        const dbg =
+          data.debug && typeof data.debug === "object"
+            ? ` — ${JSON.stringify(data.debug)}`
+            : "";
+        setError(`${base}${dbg}`);
         return;
       }
 

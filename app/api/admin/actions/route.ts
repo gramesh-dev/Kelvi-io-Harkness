@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import type { AdminMutationAction } from "@/lib/auth/admin-mutations";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -60,14 +63,22 @@ export async function POST(request: NextRequest) {
     return jsonError(400, "bad_request", "Missing action.");
   }
 
-  const auth = await getCurrentPlatformAdmin();
+  const auth = await getCurrentPlatformAdmin({
+    request,
+    debugRoute: "/api/admin/actions",
+  });
   if (!auth.ok) {
     const message =
       auth.code === "not-authenticated"
         ? "Not authenticated."
         : "You do not have platform admin access.";
     return NextResponse.json(
-      { ok: false as const, code: auth.code, message },
+      {
+        ok: false as const,
+        code: auth.code,
+        message,
+        ...(auth.debug ? { debug: auth.debug } : {}),
+      },
       { status: auth.status }
     );
   }

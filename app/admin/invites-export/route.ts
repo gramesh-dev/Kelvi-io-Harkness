@@ -1,6 +1,9 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type InviteExportRow = {
   email: string;
@@ -18,13 +21,21 @@ function csvEscape(value: unknown): string {
   return `"${raw.replace(/"/g, '""')}"`;
 }
 
-export async function GET(request: Request) {
-  const auth = await getCurrentPlatformAdmin();
+export async function GET(request: NextRequest) {
+  const auth = await getCurrentPlatformAdmin({
+    request,
+    debugRoute: "/admin/invites-export",
+  });
   if (!auth.ok) {
     const message =
       auth.code === "not-authenticated" ? "Not authenticated." : "Forbidden.";
     return NextResponse.json(
-      { ok: false as const, code: auth.code, message },
+      {
+        ok: false as const,
+        code: auth.code,
+        message,
+        ...(auth.debug ? { debug: auth.debug } : {}),
+      },
       { status: auth.status }
     );
   }
