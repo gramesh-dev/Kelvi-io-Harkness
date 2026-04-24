@@ -44,16 +44,25 @@ export async function isPlatformAdmin(
   userId: string,
   email?: string | null
 ): Promise<boolean> {
-  if (isBootstrapAdminEmail(email ?? null)) {
+  const adminEmailsParsed = getBootstrapAdminEmails();
+  const userEmail = normalizeEmail(email ?? "");
+  const isBootstrap = adminEmailsParsed.includes(userEmail);
+
+  if (isBootstrap) {
+    console.log("[isPlatformAdmin]", { userEmail, adminEmailsParsed, isAdmin: true, via: "bootstrap" });
     return true;
   }
+
   const { data } = await supabase
     .from("platform_roles")
     .select("id")
     .eq("profile_id", userId)
     .eq("role", "platform_admin")
     .maybeSingle();
-  return Boolean(data);
+
+  const isAdmin = Boolean(data);
+  console.log("[isPlatformAdmin]", { userEmail, adminEmailsParsed, isAdmin, via: "platform_roles" });
+  return isAdmin;
 }
 
 export async function evaluateInviteOnlyAccess(

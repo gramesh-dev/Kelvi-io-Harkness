@@ -32,37 +32,65 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
 }
 
 /**
- * Authenticate the admin using the same pattern as /api/debug-cookies:
- * createClient() from lib/supabase/server uses cookies() from next/headers,
- * which sees the full cookie store including any tokens refreshed by middleware.
+ * Authenticate the admin using the exact same pattern as /api/debug-cookies:
+ *   const supabase = await createClient();
+ *   const { data, error } = await supabase.auth.getUser();
+ * Returns a debug object on failure so the caller can surface it in the response.
  */
 async function getAdminUser(request: NextRequest) {
-  let user = null;
-  let getUserError: string | null = null;
+  const allCookies = request.cookies.getAll();
+  const sbCookieNames = allCookies.filter(c => c.name.startsWith("sb-")).map(c => c.name);
 
+  const debug = {
+    routeName: "/api/admin/actions",
+    hasCookieHeader: Boolean(request.headers.get("cookie")),
+    supabaseCookieNames: sbCookieNames,
+    getUserUserId: null as string | null,
+    getUserEmail: null as string | null,
+    getUserError: null as string | null,
+    isAdminCheck: null as boolean | null,
+    isAdminError: null as string | null,
+  };
+
+  // Exact same auth path as /api/debug-cookies
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
-    user = data?.user ?? null;
-    getUserError = error?.message ?? null;
+    debug.getUserUserId = data?.user?.id ?? null;
+    debug.getUserEmail = data?.user?.email ?? null;
+    debug.getUserError = error?.message ?? null;
   } catch (e) {
-    getUserError = String(e);
+    debug.getUserError = String(e);
   }
 
-  console.log("[api/admin/actions] getAdminUser", {
-    userId: user?.id ?? null,
-    email: user?.email ?? null,
-    error: getUserError,
-    sbCookies: request.cookies.getAll().filter(c => c.name.startsWith("sb-")).map(c => c.name),
-  });
+  console.log("[api/admin/actions] getAdminUser", debug);
 
-  if (!user) return { user: null, serviceClient: null, error: "unauthenticated" as const };
+  if (!debug.getUserUserId) {
+    return { user: null, serviceClient: null, error: "unauthenticated" as const, debug };
+  }
 
   const serviceClient = createServiceClient();
-  const ok = await isPlatformAdmin(serviceClient, user.id, user.email ?? null);
-  if (!ok) return { user: null, serviceClient: null, error: "forbidden" as const };
+  try {
+    const ok = await isPlatformAdmin(
+      serviceClient,
+      debug.getUserUserId,
+      debug.getUserEmail ?? null
+    );
+    debug.isAdminCheck = ok;
+    if (!ok) {
+      return { user: null, serviceClient: null, error: "forbidden" as const, debug };
+    }
+  } catch (e) {
+    debug.isAdminError = String(e);
+    return { user: null, serviceClient: null, error: "forbidden" as const, debug };
+  }
 
-  return { user, serviceClient, error: null };
+  return {
+    user: { id: debug.getUserUserId, email: debug.getUserEmail },
+    serviceClient,
+    error: null,
+    debug,
+  };
 }
 
 async function sendInviteEmail(serviceClient: ReturnType<typeof createServiceClient>, email: string) {
@@ -81,12 +109,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing action" }, { status: 400 });
   }
 
-  const { user, serviceClient, error: authError } = await getAdminUser(request);
+  const { user, serviceClient, error: authError, debug } = await getAdminUser(request);
   if (authError === "unauthenticated") {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json(
+      { ok: false, notice: "not-authenticated", error: "Not authenticated", debug },
+      { status: 401 }
+    );
   }
   if (authError === "forbidden" || !user || !serviceClient) {
-    return NextResponse.json({ error: "Not an admin" }, { status: 403 });
+    return NextResponse.json(
+      { ok: false, notice: "not-authenticated", error: "Not an admin", debug },
+      { status: 403 }
+    );
   }
 
   const nowIso = new Date().toISOString();

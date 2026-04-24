@@ -57,7 +57,8 @@ export function AdminActionForm({
       const data = await res.json().catch(() => ({}));
 
       if (res.status === 401 || res.status === 403) {
-        setError("Not authenticated. Please refresh the page or log in again.");
+        const detail = data.debug ? ` [debug: ${JSON.stringify(data.debug)}]` : "";
+        setError(`Not authenticated (${res.status}). Please refresh or log in again.${detail}`);
         setLoading(false);
         return;
       }
