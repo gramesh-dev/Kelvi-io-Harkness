@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getSupabasePublicCredentialsOrPlaceholder } from "@/lib/supabase/public-env";
 import {
   isPlatformAdmin,
   normalizeEmail,
@@ -31,27 +32,37 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
   return [...BETA_ALLOWED_ROLES];
 }
 
-async function getAdminUser() {
-  // Route Handlers correctly read cookies() from next/headers on Vercel.
-  // Server Actions cannot reliably do so (confirmed: debug-cookies proves
-  // route handlers work; server action forms redirect to /login).
-  const supabase = await createClient();
+async function getAdminUser(request: NextRequest) {
+  // Read cookies directly from request.cookies (not cookies() from next/headers).
+  // Confirmed pattern: GET /api/debug-cookies with request.cookies.getAll() returned
+  // the session and getUser() succeeded. POST route handlers behave the same way for
+  // request.cookies, but cookies() from next/headers is unreliable for POST on Vercel.
+  const creds = getSupabasePublicCredentialsOrPlaceholder();
+  const supabase = createServerClient(creds.url, creds.anonKey, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: () => {}, // auth check only — no need to update cookies here
+    },
+  });
+
   const { data: { user }, error } = await supabase.auth.getUser();
 
   console.log("[api/admin/actions] getAdminUser", {
     userId: user?.id ?? null,
     email: user?.email ?? null,
     error: error?.message ?? null,
+    cookieCount: request.cookies.getAll().length,
+    sbCookies: request.cookies.getAll().filter(c => c.name.startsWith("sb-")).map(c => c.name),
   });
 
-  if (!user) return { user: null, supabase, serviceClient: null, error: "unauthenticated" };
+  if (!user) return { user: null, serviceClient: null, error: "unauthenticated" as const };
 
   const ok = await isPlatformAdmin(supabase, user.id, user.email ?? null);
-  if (!ok) return { user: null, supabase, serviceClient: null, error: "forbidden" };
+  if (!ok) return { user: null, serviceClient: null, error: "forbidden" as const };
 
   const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const serviceClient = serviceRoleAvailable ? createServiceClient() : supabase;
-  return { user, supabase, serviceClient, error: null };
+  return { user, serviceClient, error: null };
 }
 
 async function sendInviteEmail(serviceClient: ReturnType<typeof createServiceClient>, email: string) {
@@ -70,7 +81,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing action" }, { status: 400 });
   }
 
-  const { user, serviceClient, error: authError } = await getAdminUser();
+  const { user, serviceClient, error: authError } = await getAdminUser(request);
   if (authError === "unauthenticated") {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
