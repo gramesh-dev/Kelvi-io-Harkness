@@ -7,46 +7,26 @@ import {
   isInviteOnlyModeEnabled,
 } from "@/lib/auth/invite-only";
 
-function copyCookiesTo(from: NextResponse, to: NextResponse) {
-  try {
-    from.cookies.getAll().forEach(({ name, value }) => {
-      try {
-        to.cookies.set(name, value);
-      } catch {
-        /* ignore single-cookie failures on Edge */
-      }
-    });
-  } catch {
-    /* ignore */
-  }
-}
-
-function redirectPreservingCookies(
-  request: NextRequest,
-  supabaseResponse: NextResponse,
-  pathname: string,
-  searchParams?: Record<string, string>
-) {
-  const url = new URL(pathname, request.url);
-  if (searchParams) {
-    Object.entries(searchParams).forEach(([k, v]) => url.searchParams.set(k, v));
-  }
-  const res = NextResponse.redirect(url);
-  copyCookiesTo(supabaseResponse, res);
-  return res;
-}
-
 export async function updateSession(request: NextRequest) {
   try {
     const creds = getSupabasePublicCredentials();
     if (!creds) {
       console.error(
-        "[middleware] Missing NEXT_PUBLIC_SUPABASE_URL and/or anon key. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY on Vercel."
+        "[middleware] Missing NEXT_PUBLIC_SUPABASE_URL and/or anon key."
       );
       return NextResponse.next({ request });
     }
 
+    // Official Supabase SSR pattern:
+    // 1. supabaseResponse starts as NextResponse.next({ request })
+    // 2. setAll writes tokens to BOTH request.cookies AND supabaseResponse.cookies
+    // 3. supabaseResponse (or a redirect that carries its cookies) is always returned
     let supabaseResponse = NextResponse.next({ request });
+
+    // Collect cookies with full options so redirects can copy them correctly.
+    // copyCookiesTo(supabaseResponse) would lose Secure/HttpOnly/SameSite/Path.
+    type CookieSpec = { name: string; value: string; options: object };
+    const pendingCookies: CookieSpec[] = [];
 
     let user: User | null = null;
 
@@ -55,46 +35,55 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet, headersToSet) {
-          // Step 1: write refreshed tokens onto request.cookies so that
-          // NextResponse.next({ request }) forwards them to server actions
-          // and route handlers (which read from next/headers cookies()).
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-          // Step 2: create the forwarded response with the updated request.
+        setAll(cookiesToSet) {
+          // Capture full specs so redirect responses get all cookie attributes.
+          pendingCookies.push(...cookiesToSet);
+          // Write to request so downstream Node.js handlers see refreshed tokens.
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          // Recreate with updated request so the forwarded request carries the tokens.
           supabaseResponse = NextResponse.next({ request });
-          // Step 3: also write to response cookies so the browser receives
-          // the refreshed tokens and stores them for future requests.
+          // Write to response so the browser stores the refreshed tokens.
           cookiesToSet.forEach(({ name, value, options }) => {
-            try {
-              supabaseResponse.cookies.set(name, value, options ?? {});
-            } catch (e) {
-              console.error("[middleware] cookie set failed:", name, e);
-            }
+            supabaseResponse.cookies.set(
+              name,
+              value,
+              options as Parameters<typeof supabaseResponse.cookies.set>[2]
+            );
           });
-          if (headersToSet && typeof headersToSet === "object") {
-            Object.entries(headersToSet).forEach(([key, value]) => {
-              try {
-                supabaseResponse.headers.set(key, String(value));
-              } catch {
-                /* ignore */
-              }
-            });
-          }
         },
       },
     });
 
-    try {
-      const { data } = await supabase.auth.getUser();
-      user = data.user;
-    } catch (e) {
-      console.error("[middleware] Supabase getUser error:", e);
-      return NextResponse.next({ request });
-    }
+    // IMPORTANT (official Supabase guidance): do not put any logic between
+    // createServerClient and getUser(). getUser() refreshes the session and
+    // calls setAll if new tokens were issued.
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
 
     const path = request.nextUrl.pathname;
+
+    // Helper: build a redirect that carries all refreshed session cookies with
+    // their original attributes (Secure, HttpOnly, SameSite, Path, etc.).
+    function redirectWithCookies(
+      pathname: string,
+      searchParams?: Record<string, string>
+    ): NextResponse {
+      const url = new URL(pathname, request.url);
+      if (searchParams) {
+        Object.entries(searchParams).forEach(([k, v]) =>
+          url.searchParams.set(k, v)
+        );
+      }
+      const res = NextResponse.redirect(url);
+      pendingCookies.forEach(({ name, value, options }) => {
+        res.cookies.set(
+          name,
+          value,
+          options as Parameters<typeof res.cookies.set>[2]
+        );
+      });
+      return res;
+    }
 
     console.log("[middleware]", {
       path,
@@ -108,7 +97,7 @@ export async function updateSession(request: NextRequest) {
     });
 
     if (user && path === "/school/index.html") {
-      return redirectPreservingCookies(request, supabaseResponse, "/school");
+      return redirectWithCookies("/school");
     }
 
     if (
@@ -116,7 +105,7 @@ export async function updateSession(request: NextRequest) {
       path === "/student/index.html" &&
       !request.nextUrl.searchParams.has("app")
     ) {
-      return redirectPreservingCookies(request, supabaseResponse, "/solo");
+      return redirectWithCookies("/solo");
     }
 
     const isAuthEntry =
@@ -138,9 +127,9 @@ export async function updateSession(request: NextRequest) {
     const isAdminActionRequest = path.startsWith("/admin") && request.method !== "GET";
     const isServerActionRequest = Boolean(request.headers.get("next-action"));
 
-    // Let admin server-action posts reach route handlers. The admin page/actions
-    // do their own platform-admin checks, and redirect responses here can break
-    // the expected RSC action protocol in the browser.
+    // Server actions and admin POSTs: session has been refreshed above.
+    // Return supabaseResponse (not an early exit before getUser) so cookies
+    // are always propagated. Skip redirect logic — actions do their own checks.
     if (isAdminActionRequest || isServerActionRequest) {
       return supabaseResponse;
     }
@@ -157,26 +146,17 @@ export async function updateSession(request: NextRequest) {
         inviteGatePaths,
       });
       if (!access.allowed && inviteGatePaths && !path.startsWith("/api/auth/signout")) {
-        console.log("[middleware] invite-gate BLOCKING — signing out and redirecting to login");
-        return redirectPreservingCookies(request, supabaseResponse, "/api/auth/signout", {
-          next: "/login?invite=required",
-        });
+        console.log("[middleware] invite-gate BLOCKING");
+        return redirectWithCookies("/api/auth/signout", { next: "/login?invite=required" });
       }
     }
 
     if (!user && isProtectedApp && !isPublicFamilyGalaxy) {
-      const qp =
-        path !== "/login" ? { next: path } : undefined;
-      return redirectPreservingCookies(
-        request,
-        supabaseResponse,
-        "/login",
-        qp
-      );
+      return redirectWithCookies("/login", path !== "/login" ? { next: path } : undefined);
     }
 
     if (user && isAuthEntry) {
-      return redirectPreservingCookies(request, supabaseResponse, "/post-login");
+      return redirectWithCookies("/post-login");
     }
 
     return supabaseResponse;
