@@ -1,46 +1,33 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabasePublicCredentialsOrPlaceholder } from "@/lib/supabase/public-env";
 
 /**
  * OAuth PKCE callback.
  *
- * IMPORTANT: we use createServerClient directly (not createClient from
- * lib/supabase/server) so we can capture the session cookies from setAll and
- * explicitly set them on the NextResponse.redirect() object.
+ * We use createServerClient directly (NOT createClient from lib/supabase/server)
+ * because cookies().set() mutations from next/headers are NOT flushed into a
+ * NextResponse.redirect() response object — the tokens were never reaching the
+ * browser on Vercel, causing "no sb-* cookies" and a permanent login redirect.
  *
- * Using createClient() relies on cookies() from next/headers, whose .set()
- * calls do NOT automatically merge into a NextResponse.redirect() — so on
- * Vercel the session tokens were never sent to the browser, producing the
- * "no Supabase cookies in browser" symptom.
+ * Fix: capture cookies in setAll → explicitly apply to the redirect response.
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
 
   if (code) {
     const creds = getSupabasePublicCredentialsOrPlaceholder();
 
-    // Collect every Set-Cookie that Supabase wants to issue (session tokens).
     type CookieSpec = { name: string; value: string; options: object };
     const pendingCookies: CookieSpec[] = [];
 
     const supabase = createServerClient(creds.url, creds.anonKey, {
       cookies: {
-        getAll: () => {
-          // Parse request cookies for PKCE code verifier.
-          const pairs: { name: string; value: string }[] = [];
-          request.headers
-            .get("cookie")
-            ?.split(";")
-            .forEach((part) => {
-              const [k, ...rest] = part.trim().split("=");
-              if (k) pairs.push({ name: k.trim(), value: rest.join("=").trim() });
-            });
-          return pairs;
-        },
+        // NextRequest.cookies gives proper parsed access to the cookie header
+        // (includes the PKCE code verifier stored by the browser-side auth helper).
+        getAll: () => request.cookies.getAll(),
         setAll: (cookies) => {
-          // Capture — do NOT call next/headers cookies() here.
           pendingCookies.push(...cookies);
         },
       },
@@ -48,9 +35,15 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
+    console.log("[callback] exchangeCodeForSession", {
+      error: error?.message ?? null,
+      cookiesSet: pendingCookies.map((c) => c.name),
+    });
+
     if (!error) {
       const response = NextResponse.redirect(`${origin}/post-login`);
-      // Apply session cookies with full attributes (Secure, HttpOnly, SameSite, Path).
+      // Explicitly set every session cookie (with full Secure/HttpOnly/SameSite/Path
+      // attributes) on the redirect response so the browser receives them.
       pendingCookies.forEach(({ name, value, options }) => {
         response.cookies.set(
           name,
