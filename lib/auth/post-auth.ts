@@ -36,9 +36,23 @@ export async function getPostAuthRedirectPath(): Promise<string> {
   const supabase = await createClient();
   const {
     data: { user },
+    error: getUserError,
   } = await supabase.auth.getUser();
 
+  console.log("[post-auth] getUser()", {
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    error: getUserError?.message ?? null,
+    hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    hasAnonKey: Boolean(
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+    ),
+    supabaseUrlPrefix: (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").slice(0, 20),
+  });
+
   if (!user) {
+    console.log("[post-auth] no user from getUser() — redirecting to /login");
     return "/login";
   }
 
