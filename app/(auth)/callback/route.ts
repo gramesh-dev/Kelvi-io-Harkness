@@ -22,15 +22,47 @@ export async function GET(request: NextRequest) {
     type CookieSpec = { name: string; value: string; options: object };
     const pendingCookies: CookieSpec[] = [];
 
+    // The PKCE code verifier cookie name is derived from the Supabase project
+    // ref (e.g. "sb-bewxjautfsgpzafrfowl-auth-token-code-verifier"). If the
+    // browser client was initialised with a placeholder URL (because
+    // NEXT_PUBLIC_SUPABASE_URL was not set for this Vercel environment at
+    // build time), the verifier ends up stored as
+    // "sb-placeholder-auth-token-code-verifier". The server client uses the
+    // real URL, so it looks for the wrong name and exchangeCodeForSession
+    // silently fails. We remap any mismatched verifier cookie so both names
+    // are visible to the server client.
+    const realRef = new URL(creds.url).hostname.split(".")[0];
+    const getAll = () => {
+      const incoming = request.cookies.getAll();
+      const extras: { name: string; value: string }[] = [];
+      for (const c of incoming) {
+        const m = c.name.match(/^sb-(.+)-auth-token-code-verifier$/);
+        if (m && m[1] !== realRef) {
+          extras.push({
+            name: `sb-${realRef}-auth-token-code-verifier`,
+            value: c.value,
+          });
+        }
+      }
+      return extras.length ? [...incoming, ...extras] : incoming;
+    };
+
     const supabase = createServerClient(creds.url, creds.anonKey, {
       cookies: {
-        // NextRequest.cookies gives proper parsed access to the cookie header
-        // (includes the PKCE code verifier stored by the browser-side auth helper).
-        getAll: () => request.cookies.getAll(),
+        getAll,
         setAll: (cookies) => {
           pendingCookies.push(...cookies);
         },
       },
+    });
+
+    const remappedVerifier = getAll().find(
+      (c) => c.name === `sb-${realRef}-auth-token-code-verifier`
+    );
+    console.log("[callback] pre-exchange", {
+      realRef,
+      verifierFound: !!remappedVerifier,
+      cookieNames: request.cookies.getAll().map((c) => c.name),
     });
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);

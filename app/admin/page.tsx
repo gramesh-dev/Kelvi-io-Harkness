@@ -82,12 +82,14 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
     redirect("/post-login");
   }
 
-  // Get the access token server-side so AdminActionForm can send it as a
-  // Bearer header. This avoids relying on the browser forwarding cookies with
-  // POST requests (which is unreliable on some Vercel/browser combinations).
+  // getSession() reads from the cookie store and may return an already-expired
+  // token if the SSR client silently refreshed it during getUser() but
+  // couldn't persist the new cookies (next/headers is read-only in Server
+  // Components). refreshSession() forces a fresh token exchange and returns
+  // the current access_token so AdminActionForm can send it as a Bearer header.
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.refreshSession();
   const accessToken = session?.access_token ?? null;
 
   const queryText = (sp.q ?? "").trim();
