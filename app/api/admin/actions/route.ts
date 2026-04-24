@@ -33,35 +33,43 @@ function mapWaitlistRoleToAllowedRoles(roleRequested: string): BetaAllowedRole[]
 }
 
 async function getAdminUser(request: NextRequest) {
-  // Read cookies directly from request.cookies (not cookies() from next/headers).
-  // Confirmed pattern: GET /api/debug-cookies with request.cookies.getAll() returned
-  // the session and getUser() succeeded. POST route handlers behave the same way for
-  // request.cookies, but cookies() from next/headers is unreliable for POST on Vercel.
-  const creds = getSupabasePublicCredentialsOrPlaceholder();
-  const supabase = createServerClient(creds.url, creds.anonKey, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: () => {}, // auth check only — no need to update cookies here
-    },
-  });
-
-  const { data: { user }, error } = await supabase.auth.getUser();
+  // Authenticate via Bearer token sent by AdminActionForm.
+  // The browser-side Supabase client provides the access token via getSession(),
+  // which is reliable regardless of how POST requests handle cookies on Vercel.
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
   console.log("[api/admin/actions] getAdminUser", {
-    userId: user?.id ?? null,
-    email: user?.email ?? null,
-    error: error?.message ?? null,
+    hasBearer: Boolean(token),
     cookieCount: request.cookies.getAll().length,
     sbCookies: request.cookies.getAll().filter(c => c.name.startsWith("sb-")).map(c => c.name),
   });
 
+  if (!token) {
+    return { user: null, serviceClient: null, error: "unauthenticated" as const };
+  }
+
+  // Validate the access token against Supabase auth using the service key.
+  const serviceClient = createServiceClient();
+  const { data: { user }, error } = await serviceClient.auth.getUser(token);
+
+  console.log("[api/admin/actions] tokenAuth", {
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    error: error?.message ?? null,
+  });
+
   if (!user) return { user: null, serviceClient: null, error: "unauthenticated" as const };
 
-  const ok = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+  // Build an anon client scoped to this user's session for RLS-safe reads if needed.
+  const creds = getSupabasePublicCredentialsOrPlaceholder();
+  const userSupabase = createServerClient(creds.url, creds.anonKey, {
+    cookies: { getAll: () => request.cookies.getAll(), setAll: () => {} },
+  });
+
+  const ok = await isPlatformAdmin(userSupabase, user.id, user.email ?? null);
   if (!ok) return { user: null, serviceClient: null, error: "forbidden" as const };
 
-  const serviceRoleAvailable = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
-  const serviceClient = serviceRoleAvailable ? createServiceClient() : supabase;
   return { user, serviceClient, error: null };
 }
 
