@@ -68,7 +68,25 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
   const auth = await getCurrentPlatformAdmin();
 
   if (!auth.ok) {
-    if (auth.code === "not-authenticated") {
+    if (auth.code === "misconfigured_public_env") {
+      return (
+        <div className="mx-auto max-w-2xl space-y-4 px-6 py-16 sm:px-8">
+          <h1 className="font-serif text-2xl text-kelvi-school-ink">Supabase env not available</h1>
+          <p className="text-sm text-kelvi-school-ink/90">{auth.message}</p>
+          <p className="text-sm text-kelvi-school-ink/70">
+            In Vercel → Project → Settings → Environment Variables, add{" "}
+            <code className="rounded bg-kelvi-school-surface px-1">NEXT_PUBLIC_SUPABASE_URL</code>{" "}
+            (project base URL, not <code className="rounded bg-kelvi-school-surface px-1">/rest/v1</code>) and{" "}
+            <code className="rounded bg-kelvi-school-surface px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> or{" "}
+            <code className="rounded bg-kelvi-school-surface px-1">
+              NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+            </code>{" "}
+            for <strong>Preview</strong> and <strong>Production</strong>, then redeploy.
+          </p>
+        </div>
+      );
+    }
+    if (auth.code === "not-authenticated" || auth.code === "placeholder_session_cookies") {
       redirect("/login?next=/admin");
     }
     redirect("/admin/unauthorized");

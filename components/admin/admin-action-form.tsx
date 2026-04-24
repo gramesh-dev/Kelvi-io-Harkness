@@ -70,7 +70,7 @@ export function AdminActionForm({
 
       const data = (await res.json().catch(() => ({}))) as JsonResponse;
 
-      if (res.status === 401 || res.status === 403) {
+      if (res.status === 401 || res.status === 403 || res.status === 503) {
         const base = data.message ?? "You are not allowed to perform this action.";
         const dbg =
           data.debug && typeof data.debug === "object"

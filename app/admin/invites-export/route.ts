@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
   });
   if (!auth.ok) {
     const message =
-      auth.code === "not-authenticated" ? "Not authenticated." : "Forbidden.";
+      auth.message ??
+      (auth.code === "not-platform-admin" ? "Forbidden." : "Not authenticated.");
     return NextResponse.json(
       {
         ok: false as const,

@@ -1,9 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
-
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 import type { AdminMutationAction } from "@/lib/auth/admin-mutations";
 import { createServiceClient } from "@/lib/supabase/service";
 import {
@@ -11,6 +8,9 @@ import {
   normalizeEmail,
   type BetaAllowedRole,
 } from "@/lib/auth/invite-only";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function appBaseUrl(): string {
   return (
@@ -46,8 +46,18 @@ async function sendInviteEmail(serviceClient: ReturnType<typeof createServiceCli
   });
 }
 
-function jsonError(status: 401 | 403 | 400 | 404 | 500, code: string, message: string) {
+function jsonError(status: 401 | 403 | 400 | 404 | 500 | 503, code: string, message: string) {
   return NextResponse.json({ ok: false as const, code, message }, { status });
+}
+
+function adminAuthFailureMessage(
+  auth: Extract<Awaited<ReturnType<typeof getCurrentPlatformAdmin>>, { ok: false }>
+): string {
+  if (auth.message) return auth.message;
+  if (auth.code === "not-platform-admin") {
+    return "You do not have platform admin access.";
+  }
+  return "Not authenticated.";
 }
 
 export async function POST(request: NextRequest) {
@@ -68,10 +78,7 @@ export async function POST(request: NextRequest) {
     debugRoute: "/api/admin/actions",
   });
   if (!auth.ok) {
-    const message =
-      auth.code === "not-authenticated"
-        ? "Not authenticated."
-        : "You do not have platform admin access.";
+    const message = adminAuthFailureMessage(auth);
     return NextResponse.json(
       {
         ok: false as const,
