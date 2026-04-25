@@ -1,0 +1,108 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+const navItems = [
+  { href: "/solo", label: "Home" },
+  { href: "/solo/account", label: "My account" },
+];
+
+export function SoloAppHeader({
+  userName,
+  userEmail,
+  orgName,
+  showAdminLink = false,
+}: {
+  userName: string;
+  userEmail: string;
+  orgName?: string;
+  showAdminLink?: boolean;
+}) {
+  const pathname = usePathname();
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
+
+  return (
+    <header className="shrink-0 border-b border-kelvi-border bg-kelvi-cream">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link href="/solo" className="flex items-center gap-2.5 shrink-0">
+            <span
+              className="w-8 h-8 rounded-full bg-kelvi-teal shrink-0"
+              aria-hidden
+            />
+            <span className="font-serif text-2xl font-bold text-kelvi-ink tracking-tight">
+              Kelvi
+            </span>
+            <span className="text-sm font-medium text-kelvi-muted">Student</span>
+          </Link>
+          {orgName ? (
+            <span
+              className="hidden sm:inline text-sm text-kelvi-muted border-l border-black/10 pl-3 truncate max-w-[10rem] md:max-w-xs"
+              title={orgName}
+            >
+              {orgName}
+            </span>
+          ) : null}
+        </div>
+
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm md:gap-x-8">
+          {navItems.map((item) => {
+            const active =
+              item.href === "/solo"
+                ? pathname === "/solo"
+                : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={
+                  active
+                    ? "text-kelvi-teal font-semibold"
+                    : "text-kelvi-muted hover:text-kelvi-ink transition"
+                }
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          {showAdminLink ? (
+            <Link
+              href="/admin"
+              className={
+                pathname.startsWith("/admin")
+                  ? "text-kelvi-teal font-semibold"
+                  : "text-kelvi-muted hover:text-kelvi-ink transition"
+              }
+            >
+              Admin
+            </Link>
+          ) : null}
+          <span
+            className="hidden md:inline h-4 w-px bg-black/10 self-center"
+            aria-hidden
+          />
+          <span
+            className="hidden lg:inline text-xs text-kelvi-muted truncate max-w-[8rem]"
+            title={userEmail}
+          >
+            {userName}
+          </span>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="text-kelvi-muted hover:text-kelvi-ink font-medium transition"
+          >
+            Log out
+          </button>
+        </nav>
+      </div>
+    </header>
+  );
+}

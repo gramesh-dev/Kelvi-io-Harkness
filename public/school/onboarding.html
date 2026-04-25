@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School — Welcome</title>
+<link rel="stylesheet" href="../shared/kelvi.css">
+<style>
+.ob-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+.ob-box { max-width: 520px; width: 100%; animation: fadeUp .5s ease; }
+.ob-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.ob-heading { font-family: var(--font-heading); font-size: 1.9rem; font-weight: 400; margin-bottom: 8px; }
+.ob-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
+.ob-field { margin-bottom: 16px; }
+.ob-field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; }
+.ob-actions { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="ob-wrap">
+  <div class="ob-box">
+    <a href="../index.html" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:24px">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+      <span style="font-family:var(--font-heading);font-size:1.2rem;color:var(--accent)">Kelvi School</span>
+    </a>
+    <div class="ob-eyebrow">Welcome</div>
+    <div class="ob-heading">What should Kelvi call you?</div>
+    <div class="ob-sub">Sign in with your school account to continue. AI is provided by Kelvi — no API key needed.</div>
+    <div class="ob-field">
+      <label>Your name (optional, for this demo)</label>
+      <input class="input" id="ob-name" placeholder="Dr. Ramesh" type="text" autofocus>
+    </div>
+    <div class="ob-actions">
+      <a class="btn btn-ghost btn-sm" href="/login?intent=school">← Sign in with Kelvi</a>
+      <button class="btn btn-primary" onclick="obFinish()">Continue to workspace →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/kelvi.js"></script>
+<script>
+function obFinish() {
+  const name = document.getElementById('ob-name').value.trim();
+  const user = KelviAuth.getUser() || {};
+  KelviAuth.setUser({ ...user, name: name || user.name || 'Teacher', role: 'teacher' });
+  const teacher = { name: name || 'Teacher', email: user.email || '', setupComplete: true, createdAt: new Date().toISOString() };
+  KelviSchool.setTeacher(teacher);
+  window.location.href = 'classes.html';
+}
+</script>
+</body>
+</html>

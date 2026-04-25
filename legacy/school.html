@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<style>
+:root {
+  --p: #00827F; --pd: #006B68; --pl: #F0FAF9; --pm: #C2E0DE;
+  --gold: #C9A84C; --navy: #1A1A2E; --gray: #5F6B7A;
+  --warm: #F8F7F4; --border: #E8E4E0; --muted: #B4B2A9;
+}
+
+body[data-mode="questioning"] { --p:#00827F; --pd:#006B68; --pl:#F0FAF9; --pm:#C2E0DE; }
+body[data-mode="guided"]      { --p:#B8860B; --pd:#8B6508; --pl:#FDF6E3; --pm:#E8C96A; }
+body[data-mode="exploration"] { --p:#A0522D; --pd:#7A3B1E; --pl:#FDF0E8; --pm:#D4956A; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--warm); color: var(--navy); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── HEADER ── */
+header {
+  background: var(--p); padding: 0 24px; height: 56px;
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1); flex-shrink: 0; transition: background 0.3s;
+}
+
+.logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+.logo-svg { width: 36px; height: 36px; }
+
+.lw { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; line-height: 1; }
+.ls { font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-top: 2px; }
+
+.divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+
+/* Mode pills — teacher only */
+.mode-pills { display: flex; gap: 6px; }
+.mp {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 14px;
+  border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.3);
+  background: transparent; color: rgba(255,255,255,0.65);
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.mp:hover { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.5); }
+.mp.active { background: white; color: var(--p); border-color: white; font-weight: 500; }
+
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.role-badge { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+.header-api { font-size: 12px; padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.8); font-family: 'DM Sans', sans-serif; outline: none; width: 200px; }
+.header-api::placeholder { color: rgba(255,255,255,0.45); }
+.header-api:focus { border-color: rgba(255,255,255,0.7); }
+
+/* ── ROLE SELECTOR ── */
+#role-screen {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 60px 24px; text-align: center;
+}
+
+.role-hero-logo { margin-bottom: 28px; }
+#role-screen h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px,5vw,42px); color: var(--navy); margin-bottom: 10px; line-height: 1.2; }
+#role-screen p { font-size: 15px; color: var(--gray); margin-bottom: 44px; max-width: 400px; line-height: 1.6; }
+
+.role-cards { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.role-card {
+  width: 210px; padding: 28px 22px; border-radius: 18px;
+  border: 1.5px solid var(--border); background: white;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.role-card:hover { border-color: var(--p); transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,130,127,0.1); }
+.role-card svg { margin-bottom: 14px; }
+.role-card h2 { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--navy); margin-bottom: 7px; }
+.role-card p { font-size: 12px; color: var(--gray); line-height: 1.55; }
+
+/* ── APP SHELL ── */
+#app-shell { display: none; flex-direction: column; flex: 1; }
+
+/* ── TEACHER SETUP ── */
+#teacher-setup {
+  flex: 1; max-width: 640px; width: 100%; margin: 0 auto;
+  padding: 32px 24px; display: flex; flex-direction: column; gap: 0;
+}
+
+.setup-heading { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 6px; }
+.setup-sub { font-size: 13px; color: var(--gray); margin-bottom: 28px; line-height: 1.5; }
+
+.setup-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+.mode-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 28px; }
+.mode-card-btn {
+  padding: 16px 12px; border-radius: 12px; border: 2px solid var(--border);
+  background: white; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.mode-card-btn:hover { border-color: var(--p); }
+.mode-card-btn.selected { border-color: var(--p); background: var(--pl); }
+.mode-card-btn .mc-name { font-size: 13px; font-weight: 500; color: var(--navy); margin-bottom: 3px; }
+.mode-card-btn .mc-ages { font-size: 11px; color: var(--muted); }
+
+/* ── PROBLEM BOX (Claude-style) ── */
+.problem-box {
+  border: 1px solid var(--border); border-radius: 14px;
+  background: white; transition: border-color 0.15s;
+  margin-bottom: 24px; overflow: hidden;
+}
+.problem-box:focus-within { border-color: var(--p); }
+.problem-box.dragover { border-color: var(--p); background: var(--pl); }
+
+.prob-preview { padding: 0; }
+.prob-preview img { width: 100%; max-height: 160px; object-fit: contain; border-bottom: 1px solid var(--border); background: var(--warm); }
+.prob-preview .pdf-badge { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--pd); background: var(--pl); }
+.prob-preview .pdf-remove { background: none; border: none; cursor: pointer; color: var(--muted); margin-left: auto; font-size: 14px; }
+
+.prob-textarea {
+  width: 100%; padding: 14px 16px 8px; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--navy);
+  background: transparent; resize: none; line-height: 1.6;
+  min-height: 90px;
+}
+
+.prob-actions {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px 10px; border-top: 1px solid var(--border);
+}
+
+.plus-wrap { position: relative; }
+.plus-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: white;
+  font-size: 20px; line-height: 1; color: var(--muted);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+}
+.plus-btn:hover { border-color: var(--p); color: var(--p); }
+.plus-btn.open { border-color: var(--p); color: var(--p); background: var(--pl); }
+
+.plus-menu {
+  display: none; position: absolute; bottom: 40px; left: 0;
+  background: white; border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; min-width: 160px; z-index: 10;
+}
+.plus-menu.open { display: block; }
+.plus-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; font-size: 13px; color: var(--navy);
+  cursor: pointer; transition: background 0.1s;
+}
+.plus-item:hover { background: var(--warm); }
+
+.drag-hint { font-size: 11px; color: var(--muted); }
+
+.generate-btn {
+  width: 100%; padding: 14px; background: var(--navy); color: white;
+  border: none; border-radius: 12px; font-family: 'DM Serif Display', serif;
+  font-size: 16px; cursor: pointer; transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.generate-btn:hover { background: #2a2a4a; }
+
+.link-confirm {
+  text-align: center; font-size: 13px; color: var(--p);
+  margin-top: 10px; display: none;
+}
+
+.steps-section { margin-bottom: 28px; display: none; }
+.steps-section.visible { display: block; }
+.step-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--p); color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.3s; }
+.step-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--navy); background: white; outline: none; }
+.step-input:focus { border-color: var(--p); }
+.step-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 4px; }
+.add-step { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--p); background: none; border: 1px dashed var(--pm); border-radius: 8px; padding: 7px 16px; cursor: pointer; width: 100%; margin-top: 4px; transition: all 0.15s; }
+.add-step:hover { background: var(--pl); }
+
+/* ── STUDENT CHAT ── */
+#student-chat { display: none; flex-direction: column; flex: 1; }
+
+.chat-header-problem {
+  background: var(--pl); border-bottom: 1px solid var(--pm);
+  padding: 12px 24px; font-size: 14px; color: var(--navy);
+  line-height: 1.6; transition: all 0.3s; display: none;
+}
+.chat-header-problem.visible { display: block; }
+.chp-label { font-size: 10px; letter-spacing: 2px; color: var(--p); text-transform: uppercase; margin-bottom: 4px; font-weight: 500; }
+
+.chat-main {
+  flex: 1; display: flex; flex-direction: column;
+  max-width: 680px; width: 100%; margin: 0 auto;
+  padding: 24px 24px 0;
+}
+
+.chat-messages {
+  flex: 1; display: flex; flex-direction: column; gap: 16px;
+  overflow-y: auto; padding-bottom: 16px;
+  min-height: 300px; max-height: calc(100vh - 280px);
+}
+
+.message { display: flex; flex-direction: column; gap: 4px; max-width: 86%; }
+.message.student { align-self: flex-end; }
+.message.kelvi { align-self: flex-start; }
+.msg-label { font-size: 11px; color: var(--muted); padding: 0 4px; letter-spacing: 0.5px; }
+.message.student .msg-label { text-align: right; }
+
+.msg-bubble {
+  padding: 12px 16px; border-radius: 14px;
+  font-size: 15px; line-height: 1.65;
+}
+.message.student .msg-bubble { background: var(--p); color: white; border-bottom-right-radius: 4px; transition: background 0.3s; }
+.message.kelvi .msg-bubble { background: white; color: var(--navy); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+
+.qbadge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 8px; margin-bottom: 4px; font-weight: 500; letter-spacing: 0.5px; }
+.qbadge.P { background: #FDF6E3; color: #8B6914; }
+.qbadge.C { background: var(--pl); color: var(--pd); }
+.qbadge.G { background: #FEF9EC; color: #8B5E10; }
+
+.speak-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #C17F24; padding: 0 3px; transition: color 0.15s; }
+.speak-btn:hover { color: #A06010; }
+
+.kadi-btn {
+  border-color: #E8C46A !important;
+  color: #C17F24 !important;
+  font-size: 22px !important;
+}
+.kadi-btn:hover { background: #FEF9EC !important; border-color: #C17F24 !important; }
+.kadi-btn.listening { border-color: #C17F24 !important; background: #FEF9EC !important; color: #C17F24 !important; }
+
+/* Typing */
+.typing { display: none; align-self: flex-start; padding: 12px 16px; background: white; border: 1px solid var(--border); border-radius: 14px; border-bottom-left-radius: 4px; gap: 4px; align-items: center; }
+.typing.visible { display: flex; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+.dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-5px);opacity:1}}
+
+/* Input bar */
+.input-bar {
+  border-top: 1px solid var(--border); background: white;
+  padding: 16px 24px; display: flex; gap: 10px;
+  align-items: flex-end; max-width: 680px; width: 100%; margin: 0 auto;
+}
+.input-bar textarea {
+  flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--navy); background: var(--warm); outline: none; resize: none;
+  min-height: 44px; max-height: 120px; line-height: 1.5; transition: border-color 0.15s;
+}
+.input-bar textarea:focus { border-color: var(--p); background: white; }
+
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--border);
+  background: white; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 18px; color: var(--muted); flex-shrink: 0;
+  transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--p); color: var(--p); }
+.icon-btn.listening { border-color: var(--gold); background: #FDF6E3; color: var(--gold); animation: pulse 1.2s infinite; }
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4)}50%{box-shadow:0 0 0 6px rgba(201,168,76,0)}}
+
+.send-btn {
+  height: 44px; padding: 0 20px; background: var(--p); color: white;
+  border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; cursor: pointer; flex-shrink: 0; transition: background 0.3s;
+}
+.send-btn:hover { background: var(--pd); }
+.send-btn:disabled { background: var(--muted); cursor: not-allowed; }
+
+.img-preview-chat { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.preview-item { position: relative; }
+.preview-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+.preview-remove { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--navy); color: white; border: none; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+
+/* Bottom bar */
+.bottom-bar {
+  border-top: 1px solid var(--border); padding: 10px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 680px; width: 100%; margin: 0 auto; background: var(--warm);
+}
+.bottom-actions { display: flex; gap: 8px; }
+.bab { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.bab:hover { border-color: var(--p); color: var(--p); }
+.bab.gold { border-color: var(--gold); color: #8B6914; }
+.bab.gold:hover { background: var(--gold); color: white; }
+.end-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 14px; border-radius: 8px; border: 1px solid var(--pm); color: var(--pd); background: transparent; cursor: pointer; transition: all 0.15s; }
+.end-btn:hover { background: var(--pl); }
+
+/* Accessibility */
+.a11y-bar { display: flex; gap: 6px; align-items: center; padding: 8px 0; flex-wrap: wrap; }
+.a11y-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.a11y-btn:hover { border-color: var(--p); color: var(--p); }
+.a11y-btn.on { background: var(--p); color: white; border-color: var(--p); }
+
+body.dyslexia-mode .msg-bubble { font-size: 17px; letter-spacing: 0.04em; line-height: 1.9; }
+body.large-text .msg-bubble { font-size: 18px; }
+body.high-contrast { background: #111; }
+body.high-contrast .message.kelvi .msg-bubble { background: #222; color: white; border-color: #444; }
+body.high-contrast .input-bar { background: #111; }
+body.high-contrast .input-bar textarea { background: #222; color: white; border-color: #444; }
+
+/* Desmos */
+.desmos-panel { display: none; border-top: 1px solid var(--border); background: white; }
+.desmos-panel.open { display: block; }
+.desmos-toolbar { display: flex; gap: 8px; align-items: center; padding: 10px 24px; border-bottom: 1px solid var(--border); max-width: 680px; margin: 0 auto; width: 100%; }
+.desmos-input { flex: 1; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--navy); background: var(--warm); outline: none; }
+.desmos-input:focus { border-color: var(--p); }
+.db { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.db:hover { border-color: var(--p); color: var(--p); }
+.db.primary { background: var(--p); color: white; border-color: var(--p); }
+#dc { width: 100%; height: 300px; }
+
+footer { text-align: center; padding: 12px; font-size: 11px; color: var(--gold); letter-spacing: 2px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<script src="config.js"></script>
+<body data-mode="questioning">
+
+<!-- ROLE SELECTOR -->
+<div id="role-screen" style="display:flex;flex-direction:column;min-height:100vh">
+  <header>
+    <a class="logo-link" href="school.html">
+      <svg class="logo-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
+        <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
+        <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
+        <ellipse cx="88" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
+        <circle cx="88" cy="108" r="20" fill="#F4C97A"/>
+        <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#5C3A1E"/>
+        <path d="M68,100 Q65,113 67,126" fill="#5C3A1E"/>
+        <path d="M108,100 Q111,113 109,126" fill="#5C3A1E"/>
+        <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+        <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+        <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
+        <ellipse cx="172" cy="154" rx="20" ry="23" fill="#F8E4B0"/>
+        <circle cx="172" cy="113" r="18" fill="#F4C97A"/>
+        <ellipse cx="172" cy="98" rx="18" ry="9" fill="#4A3728"/>
+        <ellipse cx="157" cy="99" rx="6" ry="7" fill="#4A3728"/>
+        <ellipse cx="187" cy="99" rx="6" ry="7" fill="#4A3728"/>
+        <circle cx="166" cy="112" r="3" fill="#3D2B1F"/>
+        <circle cx="178" cy="112" r="3" fill="#3D2B1F"/>
+        <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div><div class="lw">Kelvi</div><div class="ls">SCHOOL</div></div>
+    </a>
+  </header>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center">
+    <h1 style="font-family:'DM Serif Display',serif;font-size:clamp(26px,4vw,38px);color:#1A1A2E;margin-bottom:10px">Mathematics thinking partner</h1>
+    <p style="font-size:15px;color:#5F6B7A;margin-bottom:44px;max-width:380px;line-height:1.6">Kelvi helps students get to the answer by asking better questions.</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="startAs('teacher')">
+        <svg width="68" height="68" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="130" cy="130" r="125" fill="#00827F"/>
+          <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.5"/>
+          <path d="M104,155 Q104,195 119,206 Q130,212 141,206 Q156,195 156,155 Q143,145 130,145 Q117,145 104,155Z" fill="#C9A84C"/>
+          <ellipse cx="130" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
+          <circle cx="130" cy="108" r="20" fill="#F4C97A"/>
+          <path d="M110,100 Q111,87 130,90 Q149,87 150,100" fill="#5C3A1E"/>
+          <path d="M110,100 Q107,113 109,126" fill="#5C3A1E"/>
+          <path d="M150,100 Q153,113 151,126" fill="#5C3A1E"/>
+          <ellipse cx="124" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+          <ellipse cx="136" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+          <path d="M124,117 Q130,122 136,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <h2>I'm a teacher</h2>
+        <p>Set up the problem and mode, then share a link with students.</p>
+      </div>
+      <div class="role-card" onclick="startAs('student')">
+        <svg width="68" height="68" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="130" cy="130" r="125" fill="#00827F"/>
+          <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="1.5" opacity="0.5"/>
+          <path d="M104,158 Q104,190 117,199 Q130,205 143,199 Q156,190 156,158 Q143,148 130,148 Q117,148 104,158Z" fill="#E8F5F4"/>
+          <ellipse cx="130" cy="154" rx="22" ry="24" fill="#F8E4B0"/>
+          <circle cx="130" cy="112" r="18" fill="#F4C97A"/>
+          <ellipse cx="130" cy="97" rx="18" ry="9" fill="#4A3728"/>
+          <circle cx="123" cy="111" r="2.8" fill="#3D2B1F"/>
+          <circle cx="137" cy="111" r="2.8" fill="#3D2B1F"/>
+          <path d="M119,105 Q123,103 127,105" fill="none" stroke="#3D2B1F" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M133,105 Q137,103 141,105" fill="none" stroke="#3D2B1F" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M123,121 Q130,127 137,121" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <h2>I'm a student</h2>
+        <p>Your teacher should have sent you a link. Click it to get started.</p>
+      </div>
+    </div>
+  </div>
+  <footer>The question is the answer.</footer>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <header>
+    <a class="logo-link" href="school.html">
+      <svg class="logo-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="130" cy="130" r="125" fill="rgba(0,0,0,0.2)"/>
+        <circle cx="130" cy="130" r="117" fill="none" stroke="#C9A84C" stroke-width="2" opacity="0.5"/>
+        <path d="M63,155 Q63,188 75,197 Q88,203 101,197 Q113,188 113,155 Q100,145 88,145 Q76,145 63,155Z" fill="#C9A84C"/>
+        <ellipse cx="88" cy="151" rx="22" ry="25" fill="#F8E4B0"/>
+        <circle cx="88" cy="108" r="20" fill="#F4C97A"/>
+        <path d="M68,100 Q69,87 88,90 Q107,87 108,100" fill="#5C3A1E"/>
+        <path d="M68,100 Q65,113 67,126" fill="#5C3A1E"/>
+        <path d="M108,100 Q111,113 109,126" fill="#5C3A1E"/>
+        <ellipse cx="82" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+        <ellipse cx="94" cy="108" rx="3" ry="2.5" fill="#3D2B1F"/>
+        <path d="M79,117 Q88,123 97,117" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M147,158 Q147,188 159,197 Q172,203 185,197 Q197,188 197,158 Q184,148 172,148 Q160,148 147,158Z" fill="#E8F5F4"/>
+        <ellipse cx="172" cy="154" rx="20" ry="23" fill="#F8E4B0"/>
+        <circle cx="172" cy="113" r="18" fill="#F4C97A"/>
+        <ellipse cx="172" cy="98" rx="18" ry="9" fill="#4A3728"/>
+        <ellipse cx="157" cy="99" rx="6" ry="7" fill="#4A3728"/>
+        <ellipse cx="187" cy="99" rx="6" ry="7" fill="#4A3728"/>
+        <circle cx="166" cy="112" r="3" fill="#3D2B1F"/>
+        <circle cx="178" cy="112" r="3" fill="#3D2B1F"/>
+        <path d="M166,122 Q172,128 178,122" fill="none" stroke="#3D2B1F" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div><div class="lw">Kelvi</div><div class="ls">SCHOOL</div></div>
+    </a>
+    <div class="divider teacher-only"></div>
+    <div class="mode-pills teacher-only">
+      <button class="mp active" id="pill-q" onclick="setMode('questioning')">Questioning</button>
+      <button class="mp" id="pill-g" onclick="setMode('guided')">Guided</button>
+      <button class="mp" id="pill-e" onclick="setMode('exploration')">Exploration</button>
+    </div>
+    <div class="header-right">
+      <span class="role-badge" id="role-badge">TEACHER</span>
+    </div>
+  </header>
+
+  <!-- TEACHER SETUP -->
+  <div id="teacher-setup">
+    <div class="setup-heading">Set up your session</div>
+    <div class="setup-sub">Choose a mode, type the problem, then generate a link for your students. <a href="quest.html" style="color:var(--p);text-decoration:none;font-weight:500">Build a Quest →</a></div>
+
+    <span class="setup-label">Mode</span>
+    <div class="mode-cards" id="mode-cards">
+      <div class="mode-card-btn selected" id="mc-questioning" onclick="selectMode('questioning')">
+        <div class="mc-name">Questioning</div>
+        <div class="mc-ages">Grades 6–12</div>
+      </div>
+      <div class="mode-card-btn" id="mc-guided" onclick="selectMode('guided')">
+        <div class="mc-name">Guided</div>
+        <div class="mc-ages">Grades 2–6</div>
+      </div>
+      <div class="mode-card-btn" id="mc-exploration" onclick="selectMode('exploration')">
+        <div class="mc-name">Exploration</div>
+        <div class="mc-ages">Any age</div>
+      </div>
+    </div>
+
+    <span class="setup-label">Problem or context</span>
+
+    <!-- Claude-style problem input box -->
+    <div class="problem-box" id="problem-box"
+      ondragover="probDragOver(event)"
+      ondragleave="probDragLeave(event)"
+      ondrop="probDrop(event)">
+      <div class="prob-preview" id="prob-preview"></div>
+      <textarea class="prob-textarea" id="problem-input" placeholder="Type or paste the problem here..." rows="3"></textarea>
+      <div class="prob-actions">
+        <div class="plus-wrap">
+          <button class="plus-btn" id="plus-btn" onclick="togglePlusMenu()" title="Add attachment">+</button>
+          <div class="plus-menu" id="plus-menu">
+            <label class="plus-item">
+              <span>📷</span> Upload image
+              <input type="file" accept="image/*" onchange="handleImg(event)" style="display:none">
+            </label>
+            <label class="plus-item">
+              <span>📄</span> Upload PDF
+              <input type="file" accept=".pdf" onchange="handlePDF(event)" style="display:none">
+            </label>
+          </div>
+        </div>
+        <span class="drag-hint" id="drag-hint">or drag &amp; drop here</span>
+      </div>
+    </div>
+
+    <div class="steps-section" id="steps-section">
+      <span class="setup-label">Activity steps</span>
+      <div id="steps-list"></div>
+      <button class="add-step" onclick="addStep()">+ Add step</button>
+    </div>
+
+    <button class="generate-btn" onclick="generateLink()">
+      Generate student link →
+    </button>
+    <div class="link-confirm" id="link-confirm">✓ Link copied to clipboard — share it with your students</div>
+    <div style="margin-top:12px;padding:12px 14px;background:var(--pl);border-radius:10px;border:1px solid var(--pm);font-size:12px;color:var(--pd);line-height:1.6">
+      <strong>Sharing a worksheet?</strong> Share the student link and the worksheet PDF separately. Students can upload the PDF directly in their chat when they arrive.
+    </div>
+  </div>
+
+  <!-- STUDENT CHAT -->
+  <div id="student-chat">
+    <div class="chat-header-problem" id="chp">
+      <div class="chp-label">Problem</div>
+      <div id="chp-text"></div>
+    </div>
+
+    <div class="chat-main">
+      <div class="a11y-bar">
+        <button class="a11y-btn" id="a-dys" onclick="toggleA('dyslexia-mode','a-dys')">Dyslexia font</button>
+        <button class="a11y-btn" id="a-lg" onclick="toggleA('large-text','a-lg')">Large text</button>
+        <button class="a11y-btn" id="a-hc" onclick="toggleA('high-contrast','a-hc')">High contrast</button>
+        <button class="a11y-btn" id="a-rd" onclick="toggleRead()" style="border-color:#E8C46A;color:#8B6914">🔊 Read aloud</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message kelvi">
+          <div class="msg-label">Kelvi <button class="speak-btn" onclick="spk(this)">🔊</button></div>
+          <div class="msg-bubble" id="opening-msg">Look at the problem. What is your first question?</div>
+        </div>
+      </div>
+      <div class="typing" id="typing">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="img-preview-chat" id="img-preview-chat"></div>
+    </div>
+
+    <div class="desmos-panel" id="desmos-panel">
+      <div class="desmos-toolbar">
+        <input type="text" class="desmos-input" id="desmos-expr" placeholder="e.g. y = x^2 + 3x - 4" onkeydown="if(event.key==='Enter')plotExpr()">
+        <button class="db primary" onclick="plotExpr()">Plot</button>
+        <button class="db" onclick="clearDesmos()">Clear</button>
+        <button class="db" onclick="sendGraph()" style="border-color:#C9A84C;color:#8B6914">Send to Kelvi</button>
+      </div>
+      <div id="dc"></div>
+    </div>
+
+    <div class="input-bar">
+      <div class="plus-wrap">
+        <button class="plus-btn" id="student-plus-btn" onclick="toggleStudentMenu()" title="Attach worksheet or image">+</button>
+        <div class="plus-menu" id="student-plus-menu">
+          <label class="plus-item">
+            <span>📄</span> Upload worksheet (PDF)
+            <input type="file" accept=".pdf,image/*" onchange="handleStudentUpload(event)" style="display:none">
+          </label>
+          <label class="plus-item">
+            <span>📷</span> Upload image of work
+            <input type="file" accept="image/*" multiple onchange="handleChatImg(event)" style="display:none">
+          </label>
+        </div>
+      </div>
+      <textarea id="chat-input" placeholder="Ask a question about the problem..." rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="icon-btn kadi-btn" id="mic-btn" onclick="toggleSpeech()" title="Speak">🎤</button>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div style="border-top:1px solid var(--border);background:var(--warm);padding:8px 24px;max-width:680px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center">
+      <div class="bottom-actions">
+        <button class="bab" id="graph-btn" onclick="toggleDesmos()">Show graph</button>
+        <button class="bab gold" onclick="exportChat()">Copy transcript</button>
+      </div>
+      <button class="end-btn" onclick="endSession()">End session</button>
+    </div>
+  </div>
+
+  <footer>The question is the answer.</footer>
+</div>
+
+<script>
+// ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
+const PROMPTS = {
+questioning: `You are Kelvi in MATH QUESTIONING MODE. Develop students into better mathematical questioners — from procedural to conceptual to generative questions.
+CORE: The student asks the questions. You coach quality. Never drive. Never let a student stay lost.
+THREE QUESTION TYPES: PROCEDURAL "How do I...?" → CONCEPTUAL "Why does this work?" → GENERATIVE "What if I changed...?"
+RESPONSES: PROCEDURAL → nudge toward conceptual. CONCEPTUAL → name it, push deeper. GENERATIVE → celebrate, pursue it. STATEMENT → "Can you turn that into a question?"
+FRUSTRATION: Level 1 → smaller entry point. Level 2 → simpler parallel problem. Level 3 → first step as a question.
+RULES: Never give answers. Never confirm right/wrong. Never use correct/right/wrong/exactly/yes as affirmations. Every response ends with exactly one question. Two to three sentences max.
+CLOSING: Always name something specific the student did well. "What question are you leaving with?"`,
+
+guided: `You are Kelvi in MATH GUIDED ACTIVITY MODE — warm, patient, for younger students. Guide through structured activities one step at a time.
+TONE: Simple vocabulary. Warm. Celebrate small wins. ONE question per response.
+RULES: Never give the answer. Short sentences. If stuck: offer simpler version. Never use correct/right/wrong.
+CLOSING: "What's one thing you understand now that you didn't before?"`,
+
+exploration: `You are Kelvi in MATH EXPLORATION MODE. No problem to solve. No right answer. Follow the student's mathematical curiosity wherever it leads.
+TONE: Open, delighted, genuinely curious. You are exploring together.
+APPROACH: Respond to whatever the student notices. "What else do you notice?" "What happens if you look differently?" "Does this always happen?" When student conjectures, don't confirm — help them test it.
+RULES: Every response ends with exactly one question. Never redirect to a correct path. Follow the student always.
+CLOSING: "What was the most interesting thing you discovered?"` };
+
+const OPENING = {
+  questioning: "Look at the problem. What is your first question?",
+  guided: "Let's explore this together, one step at a time. Look at the first step — what do you notice?",
+  exploration: "Here is something mathematical. Take a moment and look at it. What do you notice first?"
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let role = 'teacher';
+let mode = 'questioning';
+let msgs = [];
+let pendingImgs = [];
+let probImg = null;
+let steps = [];
+let autoRead = false;
+let calc = null;
+let desmosOpen = false;
+let recog = null;
+let isListening = false;
+
+// ── ROLE ──────────────────────────────────────────────────────────────────────
+function startAs(r) {
+  role = r;
+  document.getElementById('role-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'flex';
+  document.getElementById('app-shell').style.flexDirection = 'column';
+  document.getElementById('app-shell').style.minHeight = '100vh';
+  if (r === 'teacher') {
+    document.querySelectorAll('.teacher-only').forEach(el => el.style.display = '');
+    document.getElementById('teacher-setup').style.display = 'flex';
+    document.getElementById('student-chat').style.display = 'none';
+    document.getElementById('role-badge').textContent = 'TEACHER';
+  } else {
+    document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'none');
+    document.getElementById('teacher-setup').style.display = 'none';
+    document.getElementById('student-chat').style.display = 'flex';
+    document.getElementById('student-chat').style.flexDirection = 'column';
+    document.getElementById('student-chat').style.flex = '1';
+    document.getElementById('role-badge').textContent = 'STUDENT';
+    resetChat();
+  }
+}
+
+function loadFromURL() {
+  const p = new URLSearchParams(window.location.search);
+  if (!p.get('role')) return;
+  mode = p.get('mode') || 'questioning';
+  document.body.setAttribute('data-mode', mode);
+  const prob = p.get('p') || '';
+  const rawSteps = p.get('steps') || '';
+  if (rawSteps) steps = rawSteps.split('||').map((t,i) => ({id:i, text:t}));
+  if (prob) document.getElementById('problem-input').value = prob;
+  role = 'student';
+  document.getElementById('role-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'flex';
+  document.getElementById('app-shell').style.flexDirection = 'column';
+  document.getElementById('app-shell').style.minHeight = '100vh';
+  document.querySelectorAll('.teacher-only').forEach(el => el.style.display = 'none');
+  document.getElementById('teacher-setup').style.display = 'none';
+  document.getElementById('student-chat').style.display = 'flex';
+  document.getElementById('student-chat').style.flexDirection = 'column';
+  document.getElementById('student-chat').style.flex = '1';
+  document.getElementById('role-badge').textContent = 'STUDENT';
+  if (prob) {
+    const chp = document.getElementById('chp');
+    chp.classList.add('visible');
+    document.getElementById('chp-text').textContent = prob;
+  }
+  resetChat();
+}
+
+// ── MODE ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.body.setAttribute('data-mode', m);
+  ['questioning','guided','exploration'].forEach(x => {
+    document.getElementById('pill-'+x[0]).classList.toggle('active', x === m);
+  });
+  selectMode(m);
+}
+
+function selectMode(m) {
+  mode = m;
+  document.body.setAttribute('data-mode', m);
+  ['questioning','guided','exploration'].forEach(x => {
+    const el = document.getElementById('mc-'+x);
+    if (el) el.classList.toggle('selected', x === m);
+    const pill = document.getElementById('pill-'+x[0]);
+    if (pill) pill.classList.toggle('active', x === m);
+  });
+  const stepsSection = document.getElementById('steps-section');
+  if (stepsSection) stepsSection.classList.toggle('visible', m === 'guided');
+}
+
+// ── STEPS ─────────────────────────────────────────────────────────────────────
+function addStep() { steps.push({id:Date.now(),text:''}); renderSteps(); }
+function renderSteps() {
+  document.getElementById('steps-list').innerHTML = steps.map((s,i) => `
+    <div class="step-row">
+      <div class="step-num">${i+1}</div>
+      <input class="step-input" placeholder="Step ${i+1}..." value="${s.text.replace(/"/g,'&quot;')}" oninput="steps[${i}].text=this.value">
+      <button class="step-remove" onclick="rmStep(${i})">✕</button>
+    </div>`).join('');
+}
+function rmStep(i) { steps.splice(i,1); renderSteps(); }
+
+// ── STUDENT ATTACHMENT MENU ───────────────────────────────────────────────────
+function toggleStudentMenu() {
+  const menu = document.getElementById('student-plus-menu');
+  const btn = document.getElementById('student-plus-btn');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+function handleStudentUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('student-plus-menu').classList.remove('open');
+  document.getElementById('student-plus-btn').classList.remove('open');
+  if (file.type === 'application/pdf') {
+    // Show PDF as pending attachment — send in next message
+    const preview = document.getElementById('img-preview-chat');
+    preview.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--pl);border-radius:8px;border:1px solid var(--pm);font-size:13px;color:var(--pd)">
+      📄 ${file.name}
+      <button onclick="clearStudentPDF()" style="background:none;border:none;cursor:pointer;color:var(--muted);margin-left:4px">✕</button>
+    </div>`;
+    // Store for next send
+    window._pendingPDF = file;
+  } else {
+    addChatImg(file);
+  }
+}
+
+function clearStudentPDF() {
+  window._pendingPDF = null;
+  document.getElementById('img-preview-chat').innerHTML = '';
+}
+
+// ── PLUS MENU ─────────────────────────────────────────────────────────────────
+function togglePlusMenu() {
+  const menu = document.getElementById('plus-menu');
+  const btn = document.getElementById('plus-btn');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.plus-wrap')) {
+    document.querySelectorAll('.plus-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.plus-btn').forEach(b => b.classList.remove('open'));
+  }
+});
+
+// ── DRAG AND DROP ON PROBLEM BOX ──────────────────────────────────────────────
+function probDragOver(e) { e.preventDefault(); document.getElementById('problem-box').classList.add('dragover'); }
+function probDragLeave(e) { document.getElementById('problem-box').classList.remove('dragover'); }
+function probDrop(e) {
+  e.preventDefault();
+  document.getElementById('problem-box').classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files);
+  const img = files.find(f => f.type.startsWith('image/'));
+  const pdf = files.find(f => f.type === 'application/pdf');
+  if (img) readProbImg(img);
+  else if (pdf) readProbPDF(pdf);
+}
+
+// ── IMAGE / PDF UPLOAD ────────────────────────────────────────────────────────
+function handleImg(e) {
+  if (e.target.files[0]) readProbImg(e.target.files[0]);
+  document.getElementById('plus-menu').classList.remove('open');
+  document.getElementById('plus-btn').classList.remove('open');
+}
+function handlePDF(e) {
+  if (e.target.files[0]) readProbPDF(e.target.files[0]);
+  document.getElementById('plus-menu').classList.remove('open');
+  document.getElementById('plus-btn').classList.remove('open');
+}
+
+function readProbImg(file) {
+  const r = new FileReader();
+  r.onload = ev => {
+    probImg = ev.target.result;
+    document.getElementById('prob-preview').innerHTML =
+      `<img src="${probImg}"><button onclick="clearProbImg()" style="position:absolute;top:6px;right:8px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px">✕</button>`;
+    document.getElementById('prob-preview').style.position = 'relative';
+  };
+  r.readAsDataURL(file);
+}
+
+function readProbPDF(file) {
+  probImg = null;
+  document.getElementById('prob-preview').innerHTML =
+    `<div class="pdf-badge">📄 ${file.name}<button class="pdf-remove" onclick="clearProbImg()">✕</button></div>`;
+}
+
+function clearProbImg() {
+  probImg = null;
+  document.getElementById('prob-preview').innerHTML = '';
+}
+
+// ── GENERATE LINK ─────────────────────────────────────────────────────────────
+function generateLink() {
+  const prob = document.getElementById('problem-input').value.trim();
+  const stepStr = steps.map(s=>s.text).filter(Boolean).join('||');
+  const url = new URL(window.location.href.split('?')[0]);
+  url.searchParams.set('role','student');
+  url.searchParams.set('mode', mode);
+  if (prob) url.searchParams.set('p', prob);
+  if (stepStr) url.searchParams.set('steps', stepStr);
+  navigator.clipboard.writeText(url.toString()).then(() => {
+    const el = document.getElementById('link-confirm');
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  });
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function resetChat() {
+  msgs = [];
+  document.getElementById('chat-messages').innerHTML = `
+    <div class="message kelvi">
+      <div class="msg-label">Kelvi <button class="speak-btn" onclick="spk(this)">🔊</button></div>
+      <div class="msg-bubble">${OPENING[mode]}</div>
+    </div>`;
+}
+
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+
+function classifyQ(t) {
+  const s = t.toLowerCase();
+  if (/what if|what would happen|could this|suppose|imagine|what else could|is there another/.test(s)) return 'G';
+  if (/why|what does.*mean|how does.*connect|why does|make sense|relationship|explain why/.test(s)) return 'C';
+  if (/how do i|what.*formula|what.*next|how to|how.*find|what.*step/.test(s)) return 'P';
+  return null;
+}
+
+function handleChatImg(e) { Array.from(e.target.files).forEach(addChatImg); }
+function addChatImg(file) {
+  const r = new FileReader();
+  r.onload = ev => { pendingImgs.push({data:ev.target.result,name:file.name}); renderChatImgs(); };
+  r.readAsDataURL(file);
+}
+function renderChatImgs() {
+  document.getElementById('img-preview-chat').innerHTML = pendingImgs.map((img,i) =>
+    `<div class="preview-item"><img src="${img.data}"><button class="preview-remove" onclick="rmChatImg(${i})">✕</button></div>`
+  ).join('');
+}
+function rmChatImg(i) { pendingImgs.splice(i,1); renderChatImgs(); }
+function eh(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendMessage() {
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text && pendingImgs.length === 0) return;
+  const prob = document.getElementById('problem-input').value.trim();
+  const stxt = steps.map((s,i)=>`Step ${i+1}: ${s.text}`).filter(s=>s).join('\n');
+  let uc = [];
+  pendingImgs.forEach(img => { const[m,b]=img.data.split(','); uc.push({type:'image',source:{type:'base64',media_type:m.match(/:(.*?);/)[1],data:b}}); });
+  if (probImg && msgs.length===0) { const[m,b]=probImg.split(','); uc.unshift({type:'image',source:{type:'base64',media_type:m.match(/:(.*?);/)[1],data:b}}); }
+  if (window._pendingPDF) {
+    const pdfData = await new Promise(res => { const r=new FileReader(); r.onload=e=>res(e.target.result); r.readAsDataURL(window._pendingPDF); });
+    const[m,b]=pdfData.split(',');
+    uc.unshift({type:'document',source:{type:'base64',media_type:'application/pdf',data:b}});
+    window._pendingPDF = null;
+    document.getElementById('img-preview-chat').innerHTML = '';
+  }
+  if (text) uc.push({type:'text',text});
+  if (uc.length===1&&uc[0].type==='text') uc = text;
+  const qtype = classifyQ(text);
+  let display = pendingImgs.map(img=>`<img src="${img.data}" style="max-width:180px;border-radius:6px;display:block;margin-bottom:4px">`).join('');
+  if (qtype) display += `<div class="qbadge ${qtype}">${{P:'Procedural',C:'Conceptual',G:'Generative'}[qtype]}</div>`;
+  display += text ? eh(text) : '';
+  appendMsg('student', display);
+  msgs.push({role:'user',content:uc});
+  pendingImgs=[]; renderChatImgs(); inp.value='';
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('typing').classList.add('visible');
+  let sys = PROMPTS[mode];
+  if (prob) sys += `\n\nProblem: ${prob}`;
+  if (stxt) sys += `\n\nActivity steps:\n${stxt}`;
+  try {
+    const res = await fetch(KELVI_API_BASE + '/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages:msgs})});
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.content[0].text;
+    msgs.push({role:'assistant',content:reply});
+    appendMsg('kelvi', eh(reply));
+  } catch(err) { appendMsg('kelvi',`<span style="color:var(--pd)">Something went wrong. Please try again.</span>`); }
+  document.getElementById('typing').classList.remove('visible');
+  document.getElementById('send-btn').disabled = false;
+}
+
+function appendMsg(role, html) {
+  const c = document.getElementById('chat-messages');
+  const d = document.createElement('div');
+  d.className = `message ${role}`;
+  const spk = role==='kelvi' ? ` <button class="speak-btn" onclick="spk(this)">🔊</button>` : '';
+  d.innerHTML = `<div class="msg-label">${role==='student'?'You':'Kelvi'}${spk}</div><div class="msg-bubble">${html}</div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  if (role==='kelvi' && autoRead) { window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(d.querySelector('.msg-bubble').textContent); u.rate=.9; window.speechSynthesis.speak(u); }
+}
+
+function endSession() { if(confirm('End this session?')) window.location.href='school.html'; }
+
+function exportChat() {
+  const msgs2 = document.querySelectorAll('.message');
+  let t = `KELVI SCHOOL TRANSCRIPT\n${new Date().toLocaleString()}\nMode: ${mode}\n\n`;
+  const prob = document.getElementById('problem-input').value.trim();
+  if (prob) t += `PROBLEM:\n${prob}\n\n`;
+  t += `CONVERSATION:\n\n`;
+  msgs2.forEach(m => {
+    const s = m.querySelector('.msg-label').textContent.replace('🔊','').trim();
+    const b = m.querySelector('.msg-bubble').textContent;
+    t += `${s.toUpperCase()}:\n${b}\n\n`;
+  });
+  navigator.clipboard.writeText(t).then(() => alert('Transcript copied.'));
+}
+
+// ── ACCESSIBILITY ─────────────────────────────────────────────────────────────
+function toggleA(cls, id) { document.body.classList.toggle(cls); document.getElementById(id).classList.toggle('on'); }
+function toggleRead() { autoRead=!autoRead; document.getElementById('a-rd').classList.toggle('on',autoRead); }
+function spk(btn) { const b=btn.closest('.message').querySelector('.msg-bubble'); if(!b)return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(b.textContent); u.rate=.9; window.speechSynthesis.speak(u); }
+
+// ── SPEECH ────────────────────────────────────────────────────────────────────
+function toggleSpeech() {
+  if(!('webkitSpeechRecognition'in window)&&!('SpeechRecognition'in window)){alert('Speech recognition requires Chrome.');return;}
+  if(isListening){recog.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog=new SR(); recog.continuous=false; recog.interimResults=true; recog.lang='en-US';
+  const mic=document.getElementById('mic-btn'), ci=document.getElementById('chat-input');
+  recog.onstart=()=>{isListening=true;mic.classList.add('listening');ci.placeholder='Listening...';};
+  recog.onresult=e=>{ci.value=Array.from(e.results).map(r=>r[0].transcript).join('');};
+  recog.onend=()=>{isListening=false;mic.classList.remove('listening');ci.placeholder='Ask a question about the problem...';if(ci.value.trim())sendMessage();};
+  recog.onerror=()=>{isListening=false;mic.classList.remove('listening');};
+  recog.start();
+}
+
+// ── DESMOS ────────────────────────────────────────────────────────────────────
+let exprCount = 0;
+function initDesmos() { if(calc)return; calc=Desmos.GraphingCalculator(document.getElementById('dc'),{expressionsCollapsed:true,settingsMenu:false,zoomButtons:true,border:false,backgroundColor:'#F8F7F4'}); }
+function toggleDesmos() {
+  desmosOpen=!desmosOpen;
+  document.getElementById('desmos-panel').classList.toggle('open',desmosOpen);
+  document.getElementById('graph-btn').textContent=desmosOpen?'Hide graph':'Show graph';
+  if(desmosOpen) initDesmos();
+}
+function plotExpr() { const e=document.getElementById('desmos-expr').value.trim(); if(!e)return; initDesmos(); calc.setExpression({id:'e'+(++exprCount),latex:e}); document.getElementById('desmos-expr').value=''; }
+function clearDesmos() { if(calc){calc.setBlank();exprCount=0;} }
+function sendGraph() {
+  if(!calc)return;
+  const ex=calc.getState().expressions.list.filter(e=>e.latex&&e.type==='expression').map(e=>e.latex).join(', ');
+  if(!ex){alert('Add an expression first.');return;}
+  const i=document.getElementById('chat-input');
+  i.value=`Here is my graph — I plotted: ${ex}. What does this show about the problem?`;
+  i.focus();
+}
+
+loadFromURL();
+</script>
+</body>
+</html>

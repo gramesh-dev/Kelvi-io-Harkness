@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi School — My Classes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8F7F4; --surface: #F0EDE6; --deeper: #E8E3DA; --divider: #D9D4C9;
+  --text-primary: #2F2B25; --text-muted: #6F6A61; --text-faint: #9A9488;
+  --accent: #3A6B5C; --accent-dark: #2D5347; --accent-light: #EBF3EF;
+  --family: #B8784E; --student: #5A7080;
+  --font-heading: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --shadow: 0 4px 16px rgba(47,43,37,.08);
+  --shadow-lg: 0 8px 32px rgba(47,43,37,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--font-body)}
+
+/* TOPBAR */
+.topbar{height:56px;background:var(--bg);border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.topbar-brand{font-family:var(--font-heading);font-size:1.25rem;color:var(--accent);display:flex;align-items:center;gap:6px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer}
+.topbar-name{font-size:12px;color:var(--text-muted);font-weight:500}
+
+/* LAYOUT */
+.page{max-width:900px;margin:0 auto;padding:40px 28px 80px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* CLASS CARDS GRID */
+.classes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:28px}
+.class-card{background:var(--surface);border:1.5px solid var(--divider);border-radius:var(--radius-xl);padding:24px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.class-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.class-card-stripe{position:absolute;top:0;left:0;right:0;height:4px}
+.class-name{font-family:var(--font-heading);font-size:1.15rem;font-weight:400;margin-bottom:4px}
+.class-meta{font-size:12px;color:var(--text-muted);margin-bottom:16px}
+.class-pcg-strip{display:flex;gap:6px;margin-bottom:16px}
+.pcg-dot{width:10px;height:10px;border-radius:50%}
+.class-stats{display:flex;gap:16px}
+.class-stat{font-size:11px;color:var(--text-muted)}
+.class-stat strong{color:var(--text-primary);font-size:13px;display:block}
+.class-footer{margin-top:16px;padding-top:14px;border-top:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+.class-last{font-size:11px;color:var(--text-faint)}
+.class-open{font-size:12px;color:var(--accent);font-weight:500}
+
+/* ADD CLASS CARD */
+.add-card{background:transparent;border:1.5px dashed var(--divider);border-radius:var(--radius-xl);padding:24px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;gap:10px}
+.add-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.add-icon{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1.5px solid var(--divider);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text-muted)}
+.add-label{font-size:13px;color:var(--text-muted);font-weight:500}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;border:none;transition:all .12s;font-family:var(--font-body)}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-ghost{background:none;color:var(--text-muted);border:1px solid var(--divider)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(47,43,37,.45);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius-xl);padding:28px;max-width:460px;width:100%;margin:16px;box-shadow:0 24px 60px rgba(47,43,37,.18);animation:modalIn .2s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-title{font-family:var(--font-heading);font-size:1.3rem;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px;line-height:1.6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.input{width:100%;padding:10px 13px;border:1.5px solid var(--divider);border-radius:var(--radius);font-size:13px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);transition:border-color .12s}
+.input:focus{border-color:var(--accent)}
+.select{width:100%;padding:10px 13px;border:1.5px solid var(--divider);border-radius:var(--radius);font-size:13px;font-family:var(--font-body);outline:none;background:var(--bg);color:var(--text-primary);cursor:pointer}
+.modal-actions{display:flex;gap:8px;margin-top:20px}
+
+/* COLOR PICKER */
+.color-picker{display:flex;gap:8px;margin-top:6px}
+.color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .12s}
+.color-swatch.selected{border-color:var(--text-primary);transform:scale(1.15)}
+
+/* SUMMARY STRIP */
+.summary-strip{display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius-lg);margin-top:24px;overflow:hidden}
+.ss-stat{flex:1;padding:14px 20px;text-align:center;border-right:1px solid var(--divider)}
+.ss-stat:last-child{border-right:none}
+.ss-val{font-size:1.4rem;font-weight:500;color:var(--text-primary);font-family:var(--font-heading)}
+.ss-lab{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-top:2px}
+.ss-pcg{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 20px;border-right:1px solid var(--divider)}
+.ss-pcg-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;width:120px;gap:2px}
+.ss-pcg-seg{height:100%;border-radius:2px;transition:width .6s ease}
+.ss-alert{flex:1;padding:14px 20px;display:flex;align-items:center;gap:8px}
+.ss-alert-dot{width:8px;height:8px;border-radius:50%;background:var(--family);flex-shrink:0}
+.ss-alert-text{font-size:12px;color:var(--text-muted)}
+.ss-alert-class{font-weight:600;color:var(--family)}
+
+/* CROSS-CLASS PANEL */
+.cross-class-btn{display:flex;align-items:center;gap:8px;margin-top:16px;padding:12px 16px;background:var(--surface);border:1.5px solid var(--divider);border-radius:var(--radius-lg);cursor:pointer;transition:all .15s;width:100%}
+.cross-class-btn:hover{border-color:var(--accent);background:var(--accent-light)}
+.cc-icon{width:32px;height:32px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.cc-label{font-size:13px;font-weight:500;color:var(--text-primary)}
+.cc-sub{font-size:11px;color:var(--text-muted)}
+
+/* CROSS-CLASS MODAL */
+.cc-modal{max-width:680px;height:70vh;display:flex;flex-direction:column}
+.cc-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg);border:1px solid var(--divider);border-radius:var(--radius-lg);margin-bottom:12px}
+.cc-msg-ta{align-self:flex-start;background:var(--surface);border:1px solid var(--divider);border-radius:10px;border-top-left-radius:3px;padding:10px 14px;font-size:13px;line-height:1.7;max-width:90%;color:var(--text-primary)}
+.cc-msg-teacher{align-self:flex-end;background:var(--accent);color:var(--bg);border-radius:10px;border-bottom-right-radius:3px;padding:10px 14px;font-size:13px;max-width:80%}
+.cc-input-row{display:flex;gap:8px}
+.cc-input{flex:1;padding:9px 13px;border:1.5px solid var(--divider);border-radius:var(--radius);font-size:13px;outline:none;background:var(--bg);font-family:var(--font-body)}
+.cc-input:focus{border-color:var(--accent)}
+.typing-dots{display:inline-flex;gap:4px;align-items:center}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:tdot .8s infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.empty-state{text-align:center;padding:80px 24px}
+.empty-icon{font-size:2.5rem;margin-bottom:16px}
+.empty-title{font-family:var(--font-heading);font-size:1.4rem;margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html" class="topbar-brand">
+    <svg width="22" height="22" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="6" r="5" fill="#B8784E"/><circle cx="6" cy="21" r="5" fill="#3A6B5C"/><circle cx="22" cy="21" r="5" fill="#5A7080"/></svg>
+    Kelvi <span style="font-size:.7rem;font-weight:500;color:var(--text-muted);font-family:var(--font-body);margin-left:2px">School</span>
+  </a>
+  <div class="topbar-right">
+    <button class="btn btn-primary" onclick="openAddClass()">+ New class</button>
+    <button class="btn btn-ghost btn-sm" onclick="window.location.href='settings.html'" title="Settings">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Settings
+    </button>
+    <span class="topbar-name" id="tb-name">Teacher</span>
+    <div class="topbar-avatar" id="tb-avatar">T</div>
+    <button onclick="doLogout()" style="background:none;border:1px solid var(--divider);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .12s" onmouseover="this.style.borderColor='var(--text-muted)'" onmouseout="this.style.borderColor='var(--divider)'">Log out</button>
+  </div>
+</div>
+
+<div class="page">
+  <div style="margin-bottom:8px">
+    <div style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Kelvi School</div>
+    <h1 style="font-family:var(--font-heading);font-size:1.9rem;font-weight:400" id="page-heading">My classes</h1>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:4px">Each class has its own Kelvi TA — your AI teaching partner.</p>
+  </div>
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip" id="summary-strip" style="display:none">
+    <div class="ss-stat">
+      <div class="ss-val" id="ss-students">0</div>
+      <div class="ss-lab">Total students</div>
+    </div>
+    <div class="ss-pcg" id="ss-pcg-wrap">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;gap:8px">
+          <span id="ss-p-pct">P —</span><span id="ss-c-pct">C —</span><span id="ss-g-pct">G —</span>
+        </div>
+        <div class="ss-pcg-bar">
+          <div class="ss-pcg-seg" id="ss-bar-p" style="background:var(--student);width:0%"></div>
+          <div class="ss-pcg-seg" id="ss-bar-c" style="background:var(--family);width:0%"></div>
+          <div class="ss-pcg-seg" id="ss-bar-g" style="background:var(--accent);width:0%"></div>
+        </div>
+        <div class="ss-lab" style="margin-top:4px;text-align:center">P/C/G across all classes</div>
+      </div>
+    </div>
+    <div class="ss-stat">
+      <div class="ss-val" id="ss-sessions">0</div>
+      <div class="ss-lab">Total sessions</div>
+    </div>
+    <div class="ss-alert" id="ss-alert" style="display:none">
+      <div class="ss-alert-dot"></div>
+      <div class="ss-alert-text">Needs attention: <span class="ss-alert-class" id="ss-alert-class"></span></div>
+    </div>
+  </div>
+
+  <!-- CROSS-CLASS TA BUTTON -->
+  <button class="cross-class-btn" id="cc-btn" onclick="openCrossClass()" style="display:none">
+    <div class="cc-icon">🎓</div>
+    <div>
+      <div class="cc-label">Ask Kelvi TA across all classes</div>
+      <div class="cc-sub">Compare classes, identify patterns, get portfolio-level insights</div>
+    </div>
+    <svg style="margin-left:auto;flex-shrink:0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+
+  <div class="classes-grid" id="classes-grid"></div>
+</div>
+
+<!-- CROSS-CLASS MODAL -->
+<div class="modal-overlay" id="cc-modal">
+  <div class="modal cc-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div class="modal-title" style="margin-bottom:2px">Cross-class view</div>
+        <div style="font-size:12px;color:var(--text-muted)" id="cc-context"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeCrossClass()">✕</button>
+    </div>
+    <div class="cc-msgs" id="cc-msgs">
+      <div class="cc-msg-ta" id="cc-welcome">Ask me anything about your classes. I can compare thinking across sections, identify which students need support, or give you a portfolio-level summary.</div>
+    </div>
+    <div class="cc-input-row">
+      <input class="cc-input" id="cc-input" placeholder="e.g. Which class has the strongest generative thinking?" onkeydown="if(event.key==='Enter')sendCrossClass()">
+      <button class="btn btn-primary btn-sm" onclick="sendCrossClass()">Ask</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CLASS MODAL — conversational -->
+<script src="../shared/kelvi.js"></script>
+<script>
+const CLASS_COLORS = ['#3A6B5C','#B8784E','#5A7080','#8B5CF6','#EC4899','#C9A84C'];
+let selectedColor = '#3A6B5C';
+let ccMsgs = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!KelviAuth.requireAuth('index.html')) return;
+  const teacher = KelviSchool.getTeacher();
+  const user = KelviAuth.getUser();
+  const name = teacher?.name || user?.name || 'Teacher';
+  const firstName = name.split(' ')[0];
+  document.getElementById('tb-name').textContent = name;
+  document.getElementById('tb-avatar').textContent = name[0].toUpperCase();
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('page-heading').textContent = greeting + ', ' + firstName;
+
+  renderClasses();
+  renderSummary();
+});
+
+function doLogout() {
+  localStorage.removeItem('kelvi_user');
+  window.location.href = 'index.html';
+}
+
+function renderClasses() {
+  const classes = KelviSchool.getClasses();
+  const grid = document.getElementById('classes-grid');
+
+  if (!classes.length) {
+    grid.innerHTML = `
+      <div class="add-card" onclick="openAddClass()" style="grid-column:1/-1;max-width:320px;margin:40px auto">
+        <div class="add-icon">+</div>
+        <div class="add-label">Add your first class</div>
+        <div style="font-size:12px;color:var(--text-faint);text-align:center;max-width:200px">Kelvi TA will become your teaching partner for each class you add.</div>
+      </div>`;
+    return;
+  }
+
+  const cards = classes.map(cls => {
+    const color = cls.color || '#3A6B5C';
+    const sessions = JSON.parse(localStorage.getItem('kelvi_ta_sessions_' + cls.id) || '[]');
+    const lastSession = sessions[0];
+    const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + cls.id) || '[]');
+    const pcgCounts = { P: 0, C: 0, G: 0 };
+    roster.forEach(s => { if (s.pcg) pcgCounts[s.pcg]++; });
+    const total = pcgCounts.P + pcgCounts.C + pcgCounts.G;
+
+    return `<div class="class-card" onclick="openClass('${cls.id}')">
+      <div class="class-card-stripe" style="background:${color}"></div>
+      <div class="class-name">${escHtml(cls.name)}</div>
+      <div class="class-meta">${escHtml(cls.grade || '')}${cls.curriculum ? ' · ' + cls.curriculum : ''}</div>
+      ${total > 0 ? `<div class="class-pcg-strip">
+        ${Array(pcgCounts.P).fill(`<div class="pcg-dot" style="background:#5A7080"></div>`).join('')}
+        ${Array(pcgCounts.C).fill(`<div class="pcg-dot" style="background:#B8784E"></div>`).join('')}
+        ${Array(pcgCounts.G).fill(`<div class="pcg-dot" style="background:#3A6B5C"></div>`).join('')}
+      </div>` : '<div style="height:16px;margin-bottom:16px"></div>'}
+      <div class="class-stats">
+        <div class="class-stat"><strong>${roster.length || 0}</strong>Students</div>
+        <div class="class-stat"><strong>${sessions.length || 0}</strong>Sessions</div>
+        <div class="class-stat"><strong>${total > 0 ? Math.round(pcgCounts.G / total * 100) + '%' : '—'}</strong>Generative</div>
+      </div>
+      <div class="class-footer">
+        <span class="class-last">${lastSession ? 'Last active ' + formatDate(lastSession.date) : 'No sessions yet'}</span>
+        <span class="class-open">Open TA →</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML = cards + `<div class="add-card" onclick="openAddClass()">
+    <div class="add-icon">+</div>
+    <div class="add-label">Add a class</div>
+  </div>`;
+}
+
+function openClass(id) {
+  window.location.href = 'ta.html?class=' + id;
+}
+
+function renderSummary() {
+  const classes = KelviSchool.getClasses();
+  if (classes.length < 2) return; // only show with 2+ classes
+
+  let totalStudents = 0, totalSessions = 0, p = 0, c = 0, g = 0;
+  let lowestG = { cls: null, pct: 100 };
+
+  classes.forEach(cls => {
+    const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + cls.id) || '[]');
+    const sessions = JSON.parse(localStorage.getItem('kelvi_ta_sessions_' + cls.id) || '[]');
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + cls.id) || '{}');
+    totalStudents += roster.length;
+    totalSessions += sessions.length;
+    Object.values(pcgLog).forEach(d => {
+      if (d.pcg === 'P') p++;
+      else if (d.pcg === 'C') c++;
+      else if (d.pcg === 'G') g++;
+    });
+    const total = p + c + g;
+    const gPct = total > 0 ? g / total : 0;
+    if (gPct < lowestG.pct && total > 0) { lowestG = { cls, pct: gPct }; }
+  });
+
+  document.getElementById('ss-students').textContent = totalStudents;
+  document.getElementById('ss-sessions').textContent = totalSessions;
+
+  const total = p + c + g;
+  if (total > 0) {
+    const pp = Math.round(p/total*100), cp = Math.round(c/total*100), gp = Math.round(g/total*100);
+    document.getElementById('ss-p-pct').textContent = 'P ' + pp + '%';
+    document.getElementById('ss-c-pct').textContent = 'C ' + cp + '%';
+    document.getElementById('ss-g-pct').textContent = 'G ' + gp + '%';
+    setTimeout(() => {
+      document.getElementById('ss-bar-p').style.width = pp + '%';
+      document.getElementById('ss-bar-c').style.width = cp + '%';
+      document.getElementById('ss-bar-g').style.width = gp + '%';
+    }, 200);
+  }
+
+  if (lowestG.cls) {
+    document.getElementById('ss-alert-class').textContent = lowestG.cls.name;
+    document.getElementById('ss-alert').style.display = 'flex';
+  }
+
+  document.getElementById('summary-strip').style.display = 'flex';
+  document.getElementById('cc-btn').style.display = 'flex';
+}
+
+function buildCrossClassPrompt() {
+  const classes = KelviSchool.getClasses();
+  const teacher = KelviSchool.getTeacher();
+  const user = KelviAuth.getUser();
+  const name = teacher?.name || user?.name || 'Teacher';
+
+  const classContexts = classes.map(cls => {
+    const roster = JSON.parse(localStorage.getItem('kelvi_roster_' + cls.id) || '[]');
+    const pcgLog = JSON.parse(localStorage.getItem('kelvi_pcg_' + cls.id) || '{}');
+    const knowledge = JSON.parse(localStorage.getItem('kelvi_knowledge_' + cls.id) || '[]');
+    const sessions = JSON.parse(localStorage.getItem('kelvi_ta_sessions_' + cls.id) || '[]');
+
+    const rosterText = roster.map(s =>
+      `  - ${s.name}${pcgLog[s.name] ? ' [' + pcgLog[s.name].pcg + ': ' + (pcgLog[s.name].note || '') + ']' : ' [not assessed]'}`
+    ).join('\n');
+
+    const topicText = knowledge.map(k => `  ${k.type}: ${k.title}`).join('\n');
+
+    return `CLASS: ${cls.name} (${cls.grade || ''} · ${cls.curriculum || ''})
+Sessions: ${sessions.length}
+Roster (${roster.length} students):
+${rosterText || '  No roster'}
+Knowledge:
+${topicText || '  No knowledge uploaded'}`;
+  }).join('\n\n---\n\n');
+
+  return `You are Kelvi TA — the cross-class AI teaching partner for ${name}.
+
+You have access to data across all of ${name}'s classes. Your job is to give portfolio-level insights — comparing classes, identifying patterns across sections, flagging students or groups that need attention.
+
+P/C/G FRAMEWORK:
+- Procedural (P): following steps, applying algorithms
+- Conceptual (C): explaining why, making connections
+- Generative (G): creating, extending, questioning beyond
+
+ALL CLASSES:
+${classContexts}
+
+WHAT YOU DO:
+- Compare P/C/G distributions across classes
+- Identify which class or students need the most support
+- Surface patterns that a teacher might miss looking at one class at a time
+- Answer specific questions about any class or student
+- Help the teacher make decisions about pacing, differentiation, and planning across their whole schedule
+
+STYLE: Direct, analytical, collegial. Never verbose. Treat the teacher as a colleague.`;
+}
+
+function openCrossClass() {
+  const classes = KelviSchool.getClasses();
+  document.getElementById('cc-context').textContent = classes.length + ' classes · ' +
+    classes.reduce((n, c) => n + JSON.parse(localStorage.getItem('kelvi_roster_' + c.id) || '[]').length, 0) + ' students';
+  document.getElementById('cc-modal').classList.add('open');
+  ccMsgs = [];
+  document.getElementById('cc-msgs').innerHTML = '<div class="cc-msg-ta">Ask me anything about your classes. I can compare thinking across sections, identify which students need support, or give you a portfolio-level summary.</div>';
+  setTimeout(() => document.getElementById('cc-input').focus(), 100);
+}
+
+function closeCrossClass() {
+  document.getElementById('cc-modal').classList.remove('open');
+}
+
+async function sendCrossClass() {
+  const input = document.getElementById('cc-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('cc-msgs');
+
+  // User message
+  const userEl = document.createElement('div');
+  userEl.className = 'cc-msg-teacher';
+  userEl.textContent = text;
+  msgs.appendChild(userEl);
+  msgs.scrollTop = 999999;
+
+  // Typing indicator
+  const typingEl = document.createElement('div');
+  typingEl.className = 'cc-msg-ta';
+  typingEl.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typingEl);
+  msgs.scrollTop = 999999;
+
+  ccMsgs.push({ role: 'user', content: text });
+
+  const reply = await KelviAPI.call({
+    system: buildCrossClassPrompt(),
+    messages: ccMsgs,
+    maxTokens: 1500,
+    onError: (err) => {
+      typingEl.textContent = 'Something went wrong: ' + err;
+    }
+  });
+
+  typingEl.remove();
+
+  if (reply) {
+    ccMsgs.push({ role: 'assistant', content: reply });
+    const replyEl = document.createElement('div');
+    replyEl.className = 'cc-msg-ta';
+    replyEl.innerHTML = escHtml(reply).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    msgs.appendChild(replyEl);
+    msgs.scrollTop = 999999;
+  }
+
+  input.focus();
+}
+
+document.getElementById('cc-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCrossClass();
+});
+
+// ── ADD CLASS — instant ────────────────────────
+function openAddClass() {
+  const existing = KelviSchool.getClasses();
+  const n = existing.length + 1;
+  const newClass = KelviSchool.addClass({
+    name: 'Untitled class ' + n,
+    grade: '',
+    curriculum: '',
+    scale: '4',
+    notes: '',
+    color: CLASS_COLORS[existing.length % CLASS_COLORS.length]
+  });
+  const id = newClass?.id || (newClass && newClass.classId) || KelviSchool.getClasses().slice(-1)[0]?.id;
+  if (id) {
+    window.location.href = 'ta.html?class=' + encodeURIComponent(id);
+  } else {
+    renderClasses();
+    renderSummary();
+  }
+}
+
+function selectColor(el) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+
+document.getElementById('cc-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCrossClass();
+});
+</script>
+</body>
+</html>
