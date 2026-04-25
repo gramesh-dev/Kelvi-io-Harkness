@@ -47,6 +47,10 @@ export async function updateSession(request: NextRequest) {
 
     const path = request.nextUrl.pathname;
 
+    /** Static marketing / preview HTML — not the Next app under `/school` or `/family`. */
+    const isPublicMarketingShell =
+      path === "/school/index.html" || path === "/family/index.html";
+
     function redirectWithCookies(
       pathname: string,
       searchParams?: Record<string, string>
@@ -62,17 +66,14 @@ export async function updateSession(request: NextRequest) {
       return res;
     }
 
-    // Admin JSON mutations: refresh session cookies only; never invite-gate or auth redirects.
-    const isApiAdminActionsPost =
-      path === "/api/admin/actions" && request.method === "POST";
+    // Next.js Server Actions (next-action): refresh cookies only; no invite-gate redirects.
     const isServerActionRequest = Boolean(request.headers.get("next-action"));
-    if (isApiAdminActionsPost || isServerActionRequest) {
+    if (isServerActionRequest) {
       return supabaseResponse;
     }
 
-    if (user && path === "/school/index.html") {
-      return redirectWithCookies("/school");
-    }
+    // Keep /school/index.html as the static marketing preview even when signed in
+    // (platform admins often have no school org; Next /school layout would bounce them).
 
     if (user && path === "/student/index.html" && !request.nextUrl.searchParams.has("app")) {
       return redirectWithCookies("/solo");
@@ -86,13 +87,14 @@ export async function updateSession(request: NextRequest) {
     const isPublicFamilyGalaxy = path === "/family/family.html";
 
     const isProtectedApp =
-      path.startsWith("/family") ||
-      path.startsWith("/school") ||
-      path.startsWith("/admin") ||
-      path.startsWith("/solo") ||
-      path.startsWith("/student") ||
-      path.startsWith("/role-setup") ||
-      path.startsWith("/post-login");
+      !isPublicMarketingShell &&
+      (path.startsWith("/family") ||
+        path.startsWith("/school") ||
+        path.startsWith("/admin") ||
+        path.startsWith("/solo") ||
+        path.startsWith("/student") ||
+        path.startsWith("/role-setup") ||
+        path.startsWith("/post-login"));
 
     if (user && isInviteOnlyModeEnabled()) {
       const access = await evaluateInviteOnlyAccess(supabase, user);
@@ -108,6 +110,18 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user && isAuthEntry) {
+      const intent = request.nextUrl.searchParams.get("intent");
+      // Already signed in: product intents go to previews / demo — not /post-login (admins
+      // would loop back to /admin; school/family Next layouts also require org membership).
+      if (intent === "school") {
+        return redirectWithCookies("/school/index.html");
+      }
+      if (intent === "family") {
+        return redirectWithCookies("/family/index.html");
+      }
+      if (intent === "student") {
+        return redirectWithCookies("/student/dashboard");
+      }
       return redirectWithCookies("/post-login");
     }
 

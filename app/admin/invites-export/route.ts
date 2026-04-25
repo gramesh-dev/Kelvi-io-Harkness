@@ -22,23 +22,12 @@ function csvEscape(value: unknown): string {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await getCurrentPlatformAdmin({
-    request,
-    debugRoute: "/admin/invites-export",
-  });
+  const auth = await getCurrentPlatformAdmin({ request });
   if (!auth.ok) {
     const message =
       auth.message ??
       (auth.code === "not-platform-admin" ? "Forbidden." : "Not authenticated.");
-    return NextResponse.json(
-      {
-        ok: false as const,
-        code: auth.code,
-        message,
-        ...(auth.debug ? { debug: auth.debug } : {}),
-      },
-      { status: auth.status }
-    );
+    return NextResponse.json({ ok: false as const, code: auth.code, message }, { status: auth.status });
   }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {

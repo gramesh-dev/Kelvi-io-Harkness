@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ReactNode } from "react";
 import type { AdminMutationAction } from "@/lib/auth/admin-mutations";
+import { executeAdminMutation } from "@/app/admin/actions";
 
 const NOTICE_LABELS: Record<string, string> = {
   "invite-sent": "Invite email sent successfully.",
@@ -12,17 +13,10 @@ const NOTICE_LABELS: Record<string, string> = {
   "waitlist-archived": "Waitlist request archived.",
 };
 
-type JsonResponse = {
-  ok?: boolean;
-  code?: string;
-  message?: string;
-  notice?: string;
-  debug?: Record<string, unknown>;
-};
-
 /**
- * Submits admin mutations to POST /api/admin/actions with cookie-based auth.
- * No Supabase client, no Bearer token, no redirects on failure.
+ * Admin mutations run as a Next.js Server Action (same-origin POST with Next-Action
+ * header). Session cookies are read via cookies() on the server — unlike fetch()
+ * to a separate JSON API route, which can omit HttpOnly cookies in production.
  */
 export function AdminActionForm({
   action,
@@ -61,31 +55,12 @@ export function AdminActionForm({
     }
 
     try {
-      const res = await fetch("/api/admin/actions", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, payload }),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as JsonResponse;
-
-      if (res.status === 401 || res.status === 403 || res.status === 503) {
-        const base = data.message ?? "You are not allowed to perform this action.";
-        const dbg =
-          data.debug && typeof data.debug === "object"
-            ? ` — ${JSON.stringify(data.debug)}`
-            : "";
-        setError(`${base}${dbg}`);
+      const result = await executeAdminMutation({ action, payload });
+      if (!result.ok) {
+        setError(result.message);
         return;
       }
-
-      if (!res.ok || !data.ok) {
-        setError(data.message ?? `Request failed (${res.status}).`);
-        return;
-      }
-
-      const noticeKey = typeof data.notice === "string" ? data.notice : "";
+      const noticeKey = result.notice;
       const label = NOTICE_LABELS[noticeKey] ?? "Saved.";
       setSuccess(label);
       formRef.current?.reset();

@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasRealSupabasePublicConfig } from "@/lib/supabase/public-env";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
+import { isInviteOnlyModeEnabled } from "@/lib/auth/invite-only";
 
-const inviteOnlyMode =
-  (process.env.NEXT_PUBLIC_INVITE_ONLY_MODE ?? "").toLowerCase() === "true";
+const inviteOnlyMode = isInviteOnlyModeEnabled();
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [signupHref, setSignupHref] = useState("/signup");
   const [callbackHint, setCallbackHint] = useState("");
   const [inviteRequired, setInviteRequired] = useState(false);
+  const [configError, setConfigError] = useState(false);
 
   const supabaseReady = hasRealSupabasePublicConfig();
 
@@ -30,6 +31,7 @@ export default function LoginPage() {
     const p = new URLSearchParams(window.location.search);
     if (p.get("reset") === "success") setPasswordResetOk(true);
     if (p.get("invite") === "required") setInviteRequired(true);
+    if (p.get("error") === "config") setConfigError(true);
     const intent = p.get("intent");
     const labels: Record<string, string> = {
       school: "Kelvi School",
@@ -128,6 +130,18 @@ export default function LoginPage() {
             <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
               This environment is invite-only right now. Ask an admin to add your email before
               signing in.
+            </div>
+          )}
+
+          {configError && (
+            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
+              Sign-in could not complete: the server is missing public Supabase settings, or the
+              callback could not save your session. In Vercel, set{" "}
+              <code className="text-xs">NEXT_PUBLIC_SUPABASE_URL</code> (base URL only, not{" "}
+              <code className="text-xs">/rest/v1</code>) and an anon/publishable key for{" "}
+              <strong>Preview</strong> and <strong>Production</strong>, redeploy, then try again. In
+              Supabase → Authentication → URL configuration, add this site&apos;s URL and{" "}
+              <code className="text-xs break-all">{callbackHint || "/callback"}</code>.
             </div>
           )}
 

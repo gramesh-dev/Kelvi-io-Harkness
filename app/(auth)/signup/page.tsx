@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { KelviWordmark } from "@/components/kelvi-wordmark";
+import { isInviteOnlyModeEnabled } from "@/lib/auth/invite-only";
 
-const inviteOnlyMode =
-  (process.env.NEXT_PUBLIC_INVITE_ONLY_MODE ?? "").toLowerCase() === "true";
+const inviteOnlyMode = isInviteOnlyModeEnabled();
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");

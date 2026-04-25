@@ -1,4 +1,3 @@
-import { type NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
 import type { AdminMutationAction } from "@/lib/auth/admin-mutations";
@@ -9,8 +8,9 @@ import {
   type BetaAllowedRole,
 } from "@/lib/auth/invite-only";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export type AdminMutationResult =
+  | { ok: true; notice: string }
+  | { ok: false; message: string; code?: string };
 
 function appBaseUrl(): string {
   return (
@@ -46,52 +46,29 @@ async function sendInviteEmail(serviceClient: ReturnType<typeof createServiceCli
   });
 }
 
-function jsonError(status: 401 | 403 | 400 | 404 | 500 | 503, code: string, message: string) {
-  return NextResponse.json({ ok: false as const, code, message }, { status });
-}
+/**
+ * Shared admin mutation logic. Used by the Server Action (cookies() work here)
+ * so we do not depend on the browser attaching Cookie headers to fetch().
+ */
+export async function runAdminMutation(input: {
+  action: AdminMutationAction;
+  payload: Record<string, unknown>;
+}): Promise<AdminMutationResult> {
+  const { action, payload } = input;
 
-function adminAuthFailureMessage(
-  auth: Extract<Awaited<ReturnType<typeof getCurrentPlatformAdmin>>, { ok: false }>
-): string {
-  if (auth.message) return auth.message;
-  if (auth.code === "not-platform-admin") {
-    return "You do not have platform admin access.";
-  }
-  return "Not authenticated.";
-}
-
-export async function POST(request: NextRequest) {
-  const body = (await request.json().catch(() => null)) as {
-    action?: string;
-    payload?: Record<string, unknown>;
-  } | null;
-
-  const action = body?.action as AdminMutationAction | undefined;
-  const payload = body?.payload ?? {};
-
-  if (!action) {
-    return jsonError(400, "bad_request", "Missing action.");
-  }
-
-  const auth = await getCurrentPlatformAdmin({
-    request,
-    debugRoute: "/api/admin/actions",
-  });
+  const auth = await getCurrentPlatformAdmin();
   if (!auth.ok) {
-    const message = adminAuthFailureMessage(auth);
-    return NextResponse.json(
-      {
-        ok: false as const,
-        code: auth.code,
-        message,
-        ...(auth.debug ? { debug: auth.debug } : {}),
-      },
-      { status: auth.status }
-    );
+    if (auth.message) {
+      return { ok: false, message: auth.message, code: auth.code };
+    }
+    if (auth.code === "not-platform-admin") {
+      return { ok: false, message: "You do not have platform admin access.", code: auth.code };
+    }
+    return { ok: false, message: "Not authenticated.", code: auth.code };
   }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) {
-    return jsonError(500, "config", "Service role key is not configured.");
+    return { ok: false, message: "Service role key is not configured.", code: "config" };
   }
 
   const serviceClient = createServiceClient();
@@ -103,7 +80,7 @@ export async function POST(request: NextRequest) {
       case "send_invite": {
         const email = normalizeEmail(String(payload.email ?? ""));
         if (!email || !email.includes("@")) {
-          return jsonError(400, "invalid_email", "Enter a valid email address.");
+          return { ok: false, message: "Enter a valid email address.", code: "invalid_email" };
         }
         const noteRaw = String(payload.note ?? "").trim();
         const { data: existingInvite } = await serviceClient
@@ -135,16 +112,16 @@ export async function POST(request: NextRequest) {
           { onConflict: "email" }
         );
         if (upsertError) {
-          console.error("[admin/actions] send_invite upsert", upsertError.message);
-          return jsonError(500, "save_failed", "Could not save invite.");
+          console.error("[admin/mutation] send_invite upsert", upsertError.message);
+          return { ok: false, message: "Could not save invite.", code: "save_failed" };
         }
         const { error: emailError } = await sendInviteEmail(serviceClient, email);
         if (emailError) {
-          console.error("[admin/actions] send_invite email", emailError.message);
-          return jsonError(500, "email_failed", "Invite saved but email could not be sent.");
+          console.error("[admin/mutation] send_invite email", emailError.message);
+          return { ok: false, message: "Invite saved but email could not be sent.", code: "email_failed" };
         }
         revalidatePath("/admin");
-        return NextResponse.json({ ok: true as const, notice: "invite-sent" });
+        return { ok: true, notice: "invite-sent" };
       }
 
       case "invite_waitlist": {
@@ -152,7 +129,7 @@ export async function POST(request: NextRequest) {
         const email = normalizeEmail(String(payload.email ?? ""));
         const roleRequested = String(payload.role_requested ?? "").trim().toLowerCase();
         if (!requestId || !email || !email.includes("@")) {
-          return jsonError(400, "bad_request", "Missing waitlist id or email.");
+          return { ok: false, message: "Missing waitlist id or email.", code: "bad_request" };
         }
         const allowedRoles = mapWaitlistRoleToAllowedRoles(roleRequested);
         const note = `Invited from waitlist (${roleRequested || "unspecified"})`;
@@ -168,47 +145,51 @@ export async function POST(request: NextRequest) {
           { onConflict: "email" }
         );
         if (upsertError) {
-          console.error("[admin/actions] invite_waitlist upsert", upsertError.message);
-          return jsonError(500, "save_failed", "Could not save invite.");
+          console.error("[admin/mutation] invite_waitlist upsert", upsertError.message);
+          return { ok: false, message: "Could not save invite.", code: "save_failed" };
         }
         const { error: emailError } = await sendInviteEmail(serviceClient, email);
         if (emailError) {
-          console.error("[admin/actions] invite_waitlist email", emailError.message);
-          return jsonError(500, "email_failed", "Invite saved but email could not be sent.");
+          console.error("[admin/mutation] invite_waitlist email", emailError.message);
+          return { ok: false, message: "Invite saved but email could not be sent.", code: "email_failed" };
         }
         const { error: wlError } = await serviceClient
           .from("waitlist_requests")
           .update({ status: "contacted" })
           .eq("id", requestId);
         if (wlError) {
-          console.error("[admin/actions] invite_waitlist waitlist", wlError.message);
-          return jsonError(500, "waitlist_update_failed", "Invite sent but waitlist row was not updated.");
+          console.error("[admin/mutation] invite_waitlist waitlist", wlError.message);
+          return {
+            ok: false,
+            message: "Invite sent but waitlist row was not updated.",
+            code: "waitlist_update_failed",
+          };
         }
         revalidatePath("/admin");
-        return NextResponse.json({ ok: true as const, notice: "waitlist-invited" });
+        return { ok: true, notice: "waitlist-invited" };
       }
 
       case "delete_waitlist": {
         const requestId = String(payload.request_id ?? "").trim();
         if (!requestId) {
-          return jsonError(400, "bad_request", "Missing request id.");
+          return { ok: false, message: "Missing request id.", code: "bad_request" };
         }
         const { error } = await serviceClient
           .from("waitlist_requests")
           .update({ status: "archived" })
           .eq("id", requestId);
         if (error) {
-          console.error("[admin/actions] delete_waitlist", error.message);
-          return jsonError(500, "archive_failed", "Could not archive waitlist request.");
+          console.error("[admin/mutation] delete_waitlist", error.message);
+          return { ok: false, message: "Could not archive waitlist request.", code: "archive_failed" };
         }
         revalidatePath("/admin");
-        return NextResponse.json({ ok: true as const, notice: "waitlist-archived" });
+        return { ok: true, notice: "waitlist-archived" };
       }
 
       case "resend_invite": {
         const email = normalizeEmail(String(payload.email ?? ""));
         if (!email || !email.includes("@")) {
-          return jsonError(400, "invalid_email", "Enter a valid email address.");
+          return { ok: false, message: "Enter a valid email address.", code: "invalid_email" };
         }
         const { data: invite } = await serviceClient
           .from("beta_access_invites")
@@ -216,7 +197,7 @@ export async function POST(request: NextRequest) {
           .eq("email", email)
           .maybeSingle();
         if (!invite) {
-          return jsonError(404, "not_found", "Invite not found.");
+          return { ok: false, message: "Invite not found.", code: "not_found" };
         }
         const { error: upsertError } = await serviceClient.from("beta_access_invites").upsert(
           {
@@ -230,40 +211,40 @@ export async function POST(request: NextRequest) {
           { onConflict: "email" }
         );
         if (upsertError) {
-          console.error("[admin/actions] resend_invite upsert", upsertError.message);
-          return jsonError(500, "save_failed", "Could not update invite.");
+          console.error("[admin/mutation] resend_invite upsert", upsertError.message);
+          return { ok: false, message: "Could not update invite.", code: "save_failed" };
         }
         const { error: emailError } = await sendInviteEmail(serviceClient, email);
         if (emailError) {
-          console.error("[admin/actions] resend_invite email", emailError.message);
-          return jsonError(500, "email_failed", "Invite updated but email could not be sent.");
+          console.error("[admin/mutation] resend_invite email", emailError.message);
+          return { ok: false, message: "Invite updated but email could not be sent.", code: "email_failed" };
         }
         revalidatePath("/admin");
-        return NextResponse.json({ ok: true as const, notice: "invite-resent" });
+        return { ok: true, notice: "invite-resent" };
       }
 
       case "revoke_invite": {
         const email = normalizeEmail(String(payload.email ?? ""));
         if (!email || !email.includes("@")) {
-          return jsonError(400, "invalid_email", "Enter a valid email address.");
+          return { ok: false, message: "Enter a valid email address.", code: "invalid_email" };
         }
         const { error } = await serviceClient
           .from("beta_access_invites")
           .update({ status: "revoked" })
           .eq("email", email);
         if (error) {
-          console.error("[admin/actions] revoke_invite", error.message);
-          return jsonError(500, "update_failed", "Could not revoke invite.");
+          console.error("[admin/mutation] revoke_invite", error.message);
+          return { ok: false, message: "Could not revoke invite.", code: "update_failed" };
         }
         revalidatePath("/admin");
-        return NextResponse.json({ ok: true as const, notice: "invite-updated" });
+        return { ok: true, notice: "invite-updated" };
       }
 
       default:
-        return jsonError(400, "unknown_action", "Unknown action.");
+        return { ok: false, message: "Unknown action.", code: "unknown_action" };
     }
   } catch (e) {
-    console.error("[admin/actions] unexpected", e);
-    return jsonError(500, "server_error", "Something went wrong.");
+    console.error("[admin/mutation] unexpected", e);
+    return { ok: false, message: "Something went wrong.", code: "server_error" };
   }
 }

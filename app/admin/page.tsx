@@ -163,12 +163,37 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
               Manage tester invites and monitor who has logged into this environment.
             </p>
           </div>
-          <Link
-            href="/api/auth/signout?next=/login"
-            className="rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-kelvi-school-ink hover:bg-kelvi-school-surface"
-          >
-            Log out
-          </Link>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <nav
+              className="flex flex-wrap justify-end gap-2"
+              aria-label="Open product portals"
+            >
+              <Link
+                href="/school/index.html"
+                className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-center text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+              >
+                School
+              </Link>
+              <Link
+                href="/family/index.html"
+                className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-center text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+              >
+                Family
+              </Link>
+              <Link
+                href="/student/dashboard"
+                className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-center text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
+              >
+                Student
+              </Link>
+            </nav>
+            <Link
+              href="/api/auth/signout?next=/login"
+              className="rounded-lg border border-border bg-white px-3 py-2 text-center text-sm font-medium text-kelvi-school-ink hover:bg-kelvi-school-surface"
+            >
+              Log out
+            </Link>
+          </div>
         </div>
       </header>
 

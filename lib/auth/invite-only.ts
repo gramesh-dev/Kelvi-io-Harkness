@@ -10,16 +10,11 @@ type InviteAccessEvaluation = {
   inviteStatus: BetaInviteStatus | null;
 };
 
-function enabledValue(raw: string | undefined): boolean {
-  if (!raw) return false;
-  const v = raw.trim().toLowerCase();
-  return v === "1" || v === "true" || v === "yes" || v === "on";
-}
-
 export function isInviteOnlyModeEnabled(): boolean {
-  return enabledValue(
-    process.env.INVITE_ONLY_MODE ?? process.env.NEXT_PUBLIC_INVITE_ONLY_MODE
-  );
+  // Fencing disabled in code for now. To restore closed beta, return true when env is on, e.g.:
+  // const raw = process.env.INVITE_ONLY_MODE ?? process.env.NEXT_PUBLIC_INVITE_ONLY_MODE;
+  // return ["1","true","yes","on"].includes(String(raw ?? "").trim().toLowerCase());
+  return false;
 }
 
 export function normalizeEmail(email: string): string {
