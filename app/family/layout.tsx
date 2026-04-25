@@ -1,13 +1,7 @@
 import { redirect } from "next/navigation";
-import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { isPlatformAdmin } from "@/lib/auth/invite-only";
-import {
-  logFamilyToLoginDebug,
-  pickSupabaseCookieNames,
-  safeGetUserErrorMessage,
-} from "@/lib/auth/family-to-login-debug";
 
 export const dynamic = "force-dynamic";
 
@@ -20,21 +14,9 @@ export default async function AppLayout({
 
   const {
     data: { user },
-    error: getUserError,
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const cookieHeader = (await headers()).get("cookie");
-    const cookieList = (await cookies()).getAll();
-    logFamilyToLoginDebug({
-      route: "/family",
-      stage: "family-layout",
-      hasCookieHeader: Boolean(cookieHeader),
-      supabaseCookieNames: pickSupabaseCookieNames(cookieList),
-      getUserEmail: null,
-      getUserError: safeGetUserErrorMessage(getUserError),
-      redirectReason: "layout-getuser-null",
-    });
     redirect("/login?next=/family");
   }
 
