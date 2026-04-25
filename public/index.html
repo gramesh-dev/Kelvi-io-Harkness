@@ -383,7 +383,7 @@
       <p class="subhead fade-in">Kelvi is an AI that helps learners move forward through their own reasoning, not by being handed answers.</p>
       <div class="cta-row fade-in">
         <a href="/demo" class="btn-primary">Demo</a>
-        <a href="#" class="btn-outline" id="heroWaitlistBtn">Join the waitlist</a>
+        <a href="#" class="btn-outline" id="heroWaitlistBtn">Register for a live demo</a>
       </div>
       <p class="support-line fade-in">An AI companion for questioning and reasoning.</p>
     </div>
@@ -496,7 +496,7 @@
           <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
             <span>What does Kelvi cost?</span><span class="faq-arrow">›</span>
           </div>
-          <div class="faq-answer">Kelvi is currently in early access. Join the waitlist to be among the first to try it. Pricing will be announced when we launch publicly.</div>
+          <div class="faq-answer">Kelvi is currently in early access. Register for a live demo to see the product with our team. Public pricing will be announced when we launch broadly.</div>
         </div>
       </div>
     </div>
@@ -523,7 +523,7 @@
         <p class="footer-body">Join the early community of teachers, families, and learners exploring a different kind of math platform — one built for reasoning, not just results.</p>
         <form class="signup-form" id="footerWaitlistForm">
           <input type="email" id="footerWaitlistEmail" placeholder="your@email.com" required>
-          <button type="submit" class="btn-primary">Join the waitlist</button>
+          <button type="submit" class="btn-primary">Register for a live demo</button>
         </form>
       </div>
       <div class="footer-bottom">
@@ -538,9 +538,9 @@
 
   <div class="modal-overlay" id="waitlistModal" role="dialog" aria-modal="true" aria-labelledby="waitlistTitle">
     <div class="modal-box" style="max-width:720px;">
-      <button class="modal-close" id="waitlistCloseBtn" aria-label="Close waitlist form">✕</button>
-      <h3 class="modal-heading" id="waitlistTitle">Join the waitlist</h3>
-      <p class="modal-sub">Tell us a little about you. We&apos;ll reach out with early access updates.</p>
+      <button class="modal-close" id="waitlistCloseBtn" aria-label="Close live demo registration">✕</button>
+      <h3 class="modal-heading" id="waitlistTitle">Register for a live demo</h3>
+      <p class="modal-sub">Share your name, organization, and email—we&apos;ll follow up to schedule a short walkthrough.</p>
       <form id="waitlistModalForm" style="display:grid;gap:0.85rem;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;">
           <label style="display:flex;flex-direction:column;gap:0.35rem;font-size:0.82rem;color:var(--text-muted);">
@@ -572,7 +572,7 @@
         </label>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
           <p id="waitlistStatus" style="font-size:0.82rem;color:var(--text-muted);margin:0;"></p>
-          <button type="submit" class="btn-primary" style="height:44px;padding:0 1.5rem;">Submit request</button>
+          <button type="submit" class="btn-primary" style="height:44px;padding:0 1.5rem;">Submit registration</button>
         </div>
       </form>
     </div>
@@ -641,7 +641,7 @@
     });
 
     const startupParams = new URLSearchParams(window.location.search);
-    if (startupParams.get('waitlist') === '1' || window.location.hash === '#signup') {
+    if (startupParams.get('waitlist') === '1' || startupParams.get('demo') === '1' || window.location.hash === '#signup') {
       openWaitlistModal('');
       if (window.location.hash === '#signup') {
         history.replaceState({}, '', `${window.location.pathname}${window.location.search}`);
@@ -668,7 +668,7 @@
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('Request failed');
-        waitlistStatus.textContent = 'Thanks! Your request has been submitted.';
+        waitlistStatus.textContent = 'Thanks! We received your registration and will be in touch.';
         waitlistForm.reset();
         footerWaitlistEmail.value = '';
       } catch {

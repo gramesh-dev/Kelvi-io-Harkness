@@ -308,7 +308,7 @@ body { animation: pageIn 0.5s ease-out; }
     <p class="subhead fade-in">Kelvi helps teachers design richer mathematical conversations, observe student reasoning with AI-powered insights, and move learners from recall to explanation to transfer.</p>
     <div class="cta-row fade-in">
       <a href="school-app.html" class="btn-primary">See Kelvi School</a>
-      <a href="#signup" class="btn-outline">Join the waitlist</a>
+      <a href="#signup" class="btn-outline">Register for a live demo</a>
     </div>
   </div>
 </section>
@@ -442,7 +442,7 @@ body { animation: pageIn 0.5s ease-out; }
       <p class="footer-body">Join the early community of teachers exploring a different kind of math platform — one built for reasoning, not just results.</p>
       <form class="signup-form" onsubmit="handleSignup(event)">
         <input type="email" placeholder="your@school.edu" required>
-        <button type="submit" class="btn-primary">Join the waitlist</button>
+        <button type="submit" class="btn-primary">Register for a live demo</button>
       </form>
     </div>
     <div class="footer-bottom">
@@ -487,7 +487,7 @@ function handleSignup(e) {
   e.preventDefault();
   const input = e.target.querySelector('input');
   input.value = '';
-  input.placeholder = "You're on the list. We'll be in touch.";
+  input.placeholder = "Thanks! We'll reach out about a live demo.";
   setTimeout(() => { input.placeholder = 'your@school.edu'; }, 3000);
 }
 </script>

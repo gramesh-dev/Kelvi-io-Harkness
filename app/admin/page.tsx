@@ -255,14 +255,14 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
         </AdminActionForm>
       </section>
 
-      {/* ── Waitlist requests ────────────────────────────────────────────── */}
+      {/* ── Live demo registrations (waitlist_requests) ─────────────────── */}
       <section className="rounded-2xl border border-border bg-surface p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-kelvi-school-ink">Waitlist requests</h2>
+          <h2 className="text-2xl font-semibold text-kelvi-school-ink">Live demo registrations</h2>
           <span className="text-sm text-kelvi-school-ink/60">{waitlist.length} recent</span>
         </div>
         {waitlist.length === 0 ? (
-          <p className="text-sm text-kelvi-school-ink/70">No waitlist requests yet.</p>
+          <p className="text-sm text-kelvi-school-ink/70">No live demo registrations yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
