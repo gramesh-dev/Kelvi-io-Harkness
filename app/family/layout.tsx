@@ -1,7 +1,26 @@
 import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { isPlatformAdmin } from "@/lib/auth/invite-only";
+
+export const dynamic = "force-dynamic";
+
+type FamilyAuthFailureReason = "no-session" | "no-family-org" | "not-authorized";
+
+async function buildFamilyAuthDebug(
+  getUserEmail: string | null,
+  failureReason: FamilyAuthFailureReason
+) {
+  const cookieHeader = (await headers()).get("cookie");
+  const cookieNames = (await cookies()).getAll().map((c) => c.name);
+  return {
+    hasCookieHeader: Boolean(cookieHeader),
+    supabaseCookieNames: cookieNames.filter((n) => n.startsWith("sb-")),
+    getUserEmail,
+    failureReason,
+  };
+}
 
 export default async function AppLayout({
   children,
@@ -15,7 +34,9 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    const debug = await buildFamilyAuthDebug(null, "no-session");
+    console.warn("[family/auth] no-session", debug);
+    redirect("/login?next=/family");
   }
 
   const { data: profile } = await supabase
@@ -31,11 +52,20 @@ export default async function AppLayout({
     .eq("is_active", true);
 
   const showAdminLink = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+  const hasFamilyMembership = Boolean(
+    memberships?.some((m: any) => m.organizations?.type === "family")
+  );
 
-  if (!memberships || memberships.length === 0) {
-    if (!showAdminLink) {
-      redirect("/role-setup");
-    }
+  if ((!memberships || memberships.length === 0) && !showAdminLink) {
+    const debug = await buildFamilyAuthDebug(user.email ?? null, "no-family-org");
+    console.warn("[family/auth] no-family-org", debug);
+    redirect("/onboarding");
+  }
+
+  if (!showAdminLink && !hasFamilyMembership) {
+    const debug = await buildFamilyAuthDebug(user.email ?? null, "not-authorized");
+    console.warn("[family/auth] not-authorized", debug);
+    redirect("/onboarding");
   }
 
   const orgs =

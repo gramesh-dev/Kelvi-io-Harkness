@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 function calcStreak(sessions: { started_at: string }[]): number {
   if (!sessions.length) return 0;
   const days = new Set(sessions.map((s) => new Date(s.started_at).toDateString()));

@@ -6,6 +6,8 @@ import { getCurrentPlatformAdmin } from "@/lib/auth/admin-auth";
 import { BETA_ALLOWED_ROLES, type BetaAllowedRole } from "@/lib/auth/invite-only";
 import { AdminActionForm } from "@/components/admin/admin-action-form";
 
+export const dynamic = "force-dynamic";
+
 type InviteRow = {
   email: string;
   status: "pending" | "accepted" | "revoked";
@@ -167,6 +169,7 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
             <nav className="flex flex-wrap justify-end gap-2" aria-label="Open product portals">
               <Link
                 href="/family"
+                prefetch={false}
                 className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-center text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
               >
                 Dashboard

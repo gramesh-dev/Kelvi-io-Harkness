@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SoloAppHeader } from "@/components/solo-app-header";
 import { isPlatformAdmin } from "@/lib/auth/invite-only";
 
+export const dynamic = "force-dynamic";
+
 export default async function SoloLayout({
   children,
 }: {

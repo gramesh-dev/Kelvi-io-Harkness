@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SchoolWorkspaceShell } from "@/components/school/school-workspace-shell";
 import { isPlatformAdmin } from "@/lib/auth/invite-only";
 
+export const dynamic = "force-dynamic";
+
 export default async function SchoolLayout({
   children,
 }: {
