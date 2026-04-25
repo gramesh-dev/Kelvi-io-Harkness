@@ -167,13 +167,12 @@ export default async function AdminPage(props: { searchParams: SearchParams }) {
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
             <nav className="flex flex-wrap justify-end gap-2" aria-label="Open product portals">
-              <Link
+              <a
                 href="/family"
-                prefetch={false}
                 className="rounded-lg border border-kelvi-teal/30 px-3 py-2 text-center text-sm font-medium text-kelvi-teal hover:bg-kelvi-teal/10"
               >
                 Dashboard
-              </Link>
+              </a>
             </nav>
             <Link
               href="/api/auth/signout?next=/login"
