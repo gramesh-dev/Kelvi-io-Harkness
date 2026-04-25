@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SchoolWorkspaceShell } from "@/components/school/school-workspace-shell";
+import { isPlatformAdmin } from "@/lib/auth/invite-only";
 
 export default async function SchoolLayout({
   children,
@@ -41,11 +42,14 @@ export default async function SchoolLayout({
 
   const org = schoolOrg.organizations as { name?: string } | undefined;
 
+  const showAdminLink = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+
   return (
     <SchoolWorkspaceShell
       orgName={org?.name}
       userName={profile?.full_name ?? user.email ?? ""}
       userEmail={user.email ?? ""}
+      showAdminLink={showAdminLink}
     >
       {/*
         Match marketing `public/index.html` `.container`: max-width 1120px, centered.

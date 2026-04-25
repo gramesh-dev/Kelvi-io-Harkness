@@ -13,10 +13,12 @@ export function SoloAppHeader({
   userName,
   userEmail,
   orgName,
+  showAdminLink = false,
 }: {
   userName: string;
   userEmail: string;
   orgName?: string;
+  showAdminLink?: boolean;
 }) {
   const pathname = usePathname();
 
@@ -70,6 +72,18 @@ export function SoloAppHeader({
               </Link>
             );
           })}
+          {showAdminLink ? (
+            <Link
+              href="/admin"
+              className={
+                pathname.startsWith("/admin")
+                  ? "text-kelvi-teal font-semibold"
+                  : "text-kelvi-muted hover:text-kelvi-ink transition"
+              }
+            >
+              Admin
+            </Link>
+          ) : null}
           <span
             className="hidden md:inline h-4 w-px bg-black/10 self-center"
             aria-hidden

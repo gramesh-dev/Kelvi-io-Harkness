@@ -17,11 +17,14 @@ export function AppHeader({
   userEmail,
   orgName,
   dashboardHref = "/family",
+  showAdminLink = false,
 }: {
   userName: string;
   userEmail: string;
   orgName?: string;
   dashboardHref?: string;
+  /** Platform admin: extra link to /admin; default portal remains Family. */
+  showAdminLink?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -76,6 +79,26 @@ export function AppHeader({
               </Link>
             );
           })}
+          {showAdminLink ? (
+            <>
+              <span
+                className="rounded-full bg-kelvi-teal/10 px-2 py-0.5 text-xs font-medium text-kelvi-teal"
+                title="Default product view for platform admins"
+              >
+                Family
+              </span>
+              <Link
+                href="/admin"
+                className={
+                  pathname.startsWith("/admin")
+                    ? "text-kelvi-teal font-semibold"
+                    : "text-kelvi-muted hover:text-kelvi-ink transition"
+                }
+              >
+                Admin
+              </Link>
+            </>
+          ) : null}
           <span
             className="hidden md:inline h-4 w-px bg-black/10 self-center"
             aria-hidden

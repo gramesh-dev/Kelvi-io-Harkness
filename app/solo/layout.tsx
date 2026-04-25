@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SoloAppHeader } from "@/components/solo-app-header";
+import { isPlatformAdmin } from "@/lib/auth/invite-only";
 
 export default async function SoloLayout({
   children,
@@ -40,12 +41,15 @@ export default async function SoloLayout({
 
   const org = solo.organizations as { name?: string } | undefined;
 
+  const showAdminLink = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+
   return (
     <div className="min-h-screen flex flex-col bg-kelvi-cream">
       <SoloAppHeader
         userName={profile?.full_name ?? user.email ?? ""}
         userEmail={user.email ?? ""}
         orgName={org?.name}
+        showAdminLink={showAdminLink}
       />
       <div className="flex-1 min-h-0 flex flex-col">
         <div className="max-w-6xl w-full mx-auto px-6 py-8 flex-1 flex flex-col min-h-0">

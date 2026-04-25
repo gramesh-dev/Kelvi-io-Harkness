@@ -69,10 +69,6 @@ export async function getPostAuthRedirectPath(): Promise<string> {
     }
   }
 
-  if (isPlatformAdminUser) {
-    return "/admin";
-  }
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("metadata")
@@ -82,6 +78,9 @@ export async function getPostAuthRedirectPath(): Promise<string> {
   const meta = (profile?.metadata ?? {}) as Record<string, unknown>;
 
   if (!hasCompletedKelviRoleSetup(meta)) {
+    if (isPlatformAdminUser) {
+      return "/family";
+    }
     return "/role-setup";
   }
 
@@ -97,6 +96,10 @@ export async function getPostAuthRedirectPath(): Promise<string> {
 
   if (primary !== "/onboarding") {
     return mapHomePathToDashboardUrl(primary);
+  }
+
+  if (isPlatformAdminUser) {
+    return "/family";
   }
 
   // Segment set but no org (shouldn't happen after role-setup) — finish provisioning.

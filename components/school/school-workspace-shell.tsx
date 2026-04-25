@@ -78,11 +78,13 @@ export function SchoolWorkspaceShell({
   orgName,
   userName,
   userEmail,
+  showAdminLink = false,
 }: {
   children: React.ReactNode;
   orgName?: string;
   userName: string;
   userEmail: string;
+  showAdminLink?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -230,7 +232,19 @@ export function SchoolWorkspaceShell({
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-kelvi-teal/20 bg-kelvi-teal/[0.08] px-4 py-4">
+        <div className="shrink-0 border-t border-kelvi-teal/20 bg-kelvi-teal/[0.08] px-4 py-4 space-y-2">
+          {showAdminLink ? (
+            <Link
+              href="/admin"
+              className={`block w-full rounded-lg py-2.5 text-left text-xl font-medium transition hover:bg-kelvi-teal/15 ${
+                pathname?.startsWith("/admin")
+                  ? "text-kelvi-teal font-semibold"
+                  : "text-kelvi-teal/90 hover:text-kelvi-teal-hover"
+              }`}
+            >
+              Admin
+            </Link>
+          ) : null}
           <button
             type="button"
             onClick={() => void signOut()}

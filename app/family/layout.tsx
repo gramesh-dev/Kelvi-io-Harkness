@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
+import { isPlatformAdmin } from "@/lib/auth/invite-only";
 
 export default async function AppLayout({
   children,
@@ -29,8 +30,12 @@ export default async function AppLayout({
     .eq("profile_id", user.id)
     .eq("is_active", true);
 
+  const showAdminLink = await isPlatformAdmin(supabase, user.id, user.email ?? null);
+
   if (!memberships || memberships.length === 0) {
-    redirect("/role-setup");
+    if (!showAdminLink) {
+      redirect("/role-setup");
+    }
   }
 
   const orgs =
@@ -46,7 +51,8 @@ export default async function AppLayout({
       <AppHeader
         userName={profile?.full_name ?? user.email ?? ""}
         userEmail={user.email ?? ""}
-        orgName={orgs[0]?.name}
+        orgName={orgs[0]?.name ?? (showAdminLink ? "Family (admin preview)" : undefined)}
+        showAdminLink={showAdminLink}
       />
       <div className="flex-1 min-h-0 flex flex-col">
         <div className="max-w-6xl w-full mx-auto px-6 py-8 flex-1 flex flex-col min-h-0">
