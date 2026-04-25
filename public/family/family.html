@@ -2026,9 +2026,34 @@ async function patchPcgToSupabase(localSessionId, pcg) {
   } catch (_) { /* silent */ }
 }
 
+async function callAnthropicViaKelvi(payload) {
+  const localKey = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+  let res = await fetch('/api/galaxy/anthropic', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  let data = await res.json().catch(() => ({}));
+  if (res.ok) return { ok: true, data };
+  if (localKey && (res.status === 401 || res.status === 503)) {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': localKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify(payload),
+    });
+    data = await res.json().catch(() => ({}));
+    if (res.ok) return { ok: true, data };
+  }
+  return { ok: false, data };
+}
+
 async function classifySessionAsync(sessionId) {
-  const key = localStorage.getItem('kelvi_api_key');
-  if (!key) return;
   const sessions = getSessions();
   const session = sessions.find(s => s.id === sessionId);
   if (!session) return;
@@ -2037,22 +2062,13 @@ async function classifySessionAsync(sessionId) {
     .map(m => m.content).join('\n');
   if (!transcript.trim()) return;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 60,
-        system: 'You classify student mathematical thinking. Given a transcript of student responses, return ONLY a JSON object with keys p, c, g representing percentage of thinking that is Procedural, Conceptual, and Generative. Values must sum to 100. Example: {"p":60,"c":30,"g":10}',
-        messages: [{ role: 'user', content: transcript }]
-      })
+    const { ok, data } = await callAnthropicViaKelvi({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 60,
+      system: 'You classify student mathematical thinking. Given a transcript of student responses, return ONLY a JSON object with keys p, c, g representing percentage of thinking that is Procedural, Conceptual, and Generative. Values must sum to 100. Example: {"p":60,"c":30,"g":10}',
+      messages: [{ role: 'user', content: transcript }],
     });
-    const data = await res.json();
+    if (!ok) return;
     const text = data.content?.[0]?.text || '';
     const match = text.match(/\{[^}]+\}/);
     if (match) {
@@ -2244,14 +2260,6 @@ async function sendMsg() {
   typing.classList.add('vis');
   document.getElementById('send-btn').disabled = true;
 
-  const key = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
-  if (!key) {
-    typing.classList.remove('vis');
-    document.getElementById('send-btn').disabled = false;
-    addMessage('assistant', "(No API key set — add one in Settings ⚙︎ to start thinking with Kelvi.)");
-    return;
-  }
-
   try {
     const contextualMsgs = msgs.map((m, i) => {
       if (i === 0 && m.role === 'user' && currentActivity) {
@@ -2260,22 +2268,23 @@ async function sendMsg() {
       return m;
     });
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        system: buildSYS(currentActivity),
-        messages: contextualMsgs
-      })
+    const { ok, data } = await callAnthropicViaKelvi({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 500,
+      system: buildSYS(currentActivity),
+      messages: contextualMsgs,
     });
-    const data = await res.json();
+    if (!ok) {
+      const localKey = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+      const msg =
+        (data && data.error && data.error.message) ||
+        (data && data.message) ||
+        'Could not reach Kelvi AI.';
+      if (!localKey && (msg.indexOf('Sign in') >= 0 || msg.indexOf('not configured') >= 0)) {
+        throw new Error('Sign in to Kelvi in this browser, or add an Anthropic API key in Settings ⚙︎.');
+      }
+      throw new Error(msg);
+    }
     if (data.error) throw new Error(data.error.message || 'API error');
     const reply = data.content[0].text;
     addMessage('assistant', reply);
