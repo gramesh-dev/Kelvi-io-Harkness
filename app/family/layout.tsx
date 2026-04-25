@@ -3,24 +3,13 @@ import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AppHeader } from "@/components/app-header";
 import { isPlatformAdmin } from "@/lib/auth/invite-only";
+import {
+  logFamilyToLoginDebug,
+  pickSupabaseCookieNames,
+  safeGetUserErrorMessage,
+} from "@/lib/auth/family-to-login-debug";
 
 export const dynamic = "force-dynamic";
-
-type FamilyAuthFailureReason = "no-session" | "no-family-org" | "not-authorized";
-
-async function buildFamilyAuthDebug(
-  getUserEmail: string | null,
-  failureReason: FamilyAuthFailureReason
-) {
-  const cookieHeader = (await headers()).get("cookie");
-  const cookieNames = (await cookies()).getAll().map((c) => c.name);
-  return {
-    hasCookieHeader: Boolean(cookieHeader),
-    supabaseCookieNames: cookieNames.filter((n) => n.startsWith("sb-")),
-    getUserEmail,
-    failureReason,
-  };
-}
 
 export default async function AppLayout({
   children,
@@ -31,11 +20,21 @@ export default async function AppLayout({
 
   const {
     data: { user },
+    error: getUserError,
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const debug = await buildFamilyAuthDebug(null, "no-session");
-    console.warn("[family/auth] no-session", debug);
+    const cookieHeader = (await headers()).get("cookie");
+    const cookieList = (await cookies()).getAll();
+    logFamilyToLoginDebug({
+      route: "/family",
+      stage: "family-layout",
+      hasCookieHeader: Boolean(cookieHeader),
+      supabaseCookieNames: pickSupabaseCookieNames(cookieList),
+      getUserEmail: null,
+      getUserError: safeGetUserErrorMessage(getUserError),
+      redirectReason: "layout-getuser-null",
+    });
     redirect("/login?next=/family");
   }
 
@@ -57,14 +56,10 @@ export default async function AppLayout({
   );
 
   if ((!memberships || memberships.length === 0) && !showAdminLink) {
-    const debug = await buildFamilyAuthDebug(user.email ?? null, "no-family-org");
-    console.warn("[family/auth] no-family-org", debug);
     redirect("/onboarding");
   }
 
   if (!showAdminLink && !hasFamilyMembership) {
-    const debug = await buildFamilyAuthDebug(user.email ?? null, "not-authorized");
-    console.warn("[family/auth] not-authorized", debug);
     redirect("/onboarding");
   }
 

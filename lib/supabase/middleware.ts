@@ -6,6 +6,11 @@ import {
   evaluateInviteOnlyAccess,
   isInviteOnlyModeEnabled,
 } from "@/lib/auth/invite-only";
+import {
+  logFamilyToLoginDebug,
+  pickSupabaseCookieNames,
+  safeGetUserErrorMessage,
+} from "@/lib/auth/family-to-login-debug";
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -42,7 +47,7 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
-    const { data } = await supabase.auth.getUser();
+    const { data, error: getUserError } = await supabase.auth.getUser();
     user = data.user;
 
     const path = request.nextUrl.pathname;
@@ -106,6 +111,17 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (!user && isProtectedApp && !isPublicFamilyGalaxy) {
+      if (path.startsWith("/family")) {
+        logFamilyToLoginDebug({
+          route: "/family",
+          stage: "proxy",
+          hasCookieHeader: Boolean(request.headers.get("cookie")),
+          supabaseCookieNames: pickSupabaseCookieNames(request.cookies.getAll()),
+          getUserEmail: null,
+          getUserError: safeGetUserErrorMessage(getUserError),
+          redirectReason: "middleware-no-user-on-family-route",
+        });
+      }
       return redirectWithCookies("/login", path !== "/login" ? { next: path } : undefined);
     }
 
