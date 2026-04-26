@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi · Geometry Solar System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:ital@0;1&family=DM Sans:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'OpenDyslexic';src:url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype')}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+:root{
+  --bg:#E0FFF8;--surface:#C9EDDF;--deeper:#9FD9C4;--divider:#9FE1CB;
+  --text-primary:#1C1917;--text-muted:#4A4540;--text-faint:#7A7268;
+  --accent:#A07D4A;--accent-dark:#7A5E32;--accent-light:#F0E8D8;
+  --family:#B8784E;--family-dark:#9E6640;--family-light:#F5EDE5;
+  --gold:#C9A84C;
+  --font-heading:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;--font-serif:'DM Serif Display',serif;
+}
+.scene{position:fixed;inset:0;display:flex;flex-direction:column}
+/* ── GEOMETRY V4 ── */
+/* ── GEOMETRY CONCEPT MAP ── */
+.geo-scene{position:absolute;inset:0;background:#E0FFF8;display:flex;flex-direction:column;overflow:hidden}
+.geo-scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(29,158,117,0.12) 100%)}
+.geo-topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0;z-index:20;background:#E0FFF8;border-bottom:none}
+.geo-planet-sphere{width:40px;height:40px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(160,125,74,0.5))}
+.geo-planet-info{flex:1}
+.geo-planet-name{font-family:var(--font-heading);font-size:1.1rem;color:#00C896;line-height:1;font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:0.08em}
+.geo-planet-tagline{font-family:var(--font-body);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(29,158,117,0.6);margin-top:3px;font-weight:600}
+.geo-back-btn{background:none;border:1px solid rgba(29,158,117,0.3);padding:5px 12px;border-radius:14px;font-size:12px;color:#007A5C;cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.geo-back-btn:hover{border-color:#00C896;color:#00C896;background:rgba(29,158,117,0.08)}
+/* map canvas */
+.geo-map-wrap{flex:1;position:relative;overflow:hidden;min-height:0;background:#E0FFF8}
+.geo-svg{position:absolute;inset:0;width:100%;height:100%;cursor:default}
+/* hero overlay — slides up from bottom */
+.geo-hero-overlay{position:absolute;bottom:0;left:0;right:0;z-index:30;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.61,.36,1);pointer-events:none;background:#E0FFF8;border-top:1px solid var(--divider)}
+.geo-hero-overlay.open{transform:translateY(0);pointer-events:auto}
+.geo-hero-inner{padding:28px 32px 20px;max-width:680px}
+.geo-hero-eyebrow{font-family:var(--font-body);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A07D4A;margin-bottom:12px;font-weight:600}
+.geo-hero-prompt-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.geo-hero-prompt{font-family:var(--font-heading);font-size:clamp(18px,2.4vw,28px);color:var(--text-primary);line-height:1.25;flex:1;font-weight:400}
+.geo-speak-btn{flex-shrink:0;background:var(--surface);border:1px solid var(--divider);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:4px}
+.geo-speak-btn:hover{background:var(--accent-light);color:var(--accent)}
+.geo-speak-btn .speak-icon{display:flex;align-items:center}
+.geo-hero-sub{font-family:var(--font-body);font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
+.geo-hero-ctas{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.geo-btn-primary{background:#00C896;color:#F5E6A8;padding:11px 22px;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .12s}
+.geo-btn-primary:hover{background:#2D5347}
+.geo-btn-secondary{background:none;border:1px solid var(--divider);border-radius:8px;color:var(--text-muted);padding:11px 14px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
+.geo-btn-secondary:hover{color:var(--text-primary);border-color:var(--text-muted)}
+.geo-dismiss{position:absolute;top:14px;right:18px;background:var(--surface);border:1px solid var(--divider);color:var(--text-muted);font-size:17px;cursor:pointer;line-height:1;font-family:var(--font-body);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.geo-dismiss:hover{background:var(--deeper);color:var(--text-primary)}
+/* ── TOPBAR ADDITIONS ── */
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.settings-btn{background:none;border:none;color:rgba(240,232,204,0.65);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;transition:all .15s}
+.settings-btn:hover{color:#F5E6A8;background:rgba(255,255,255,0.08)}
+.topbar.light-mode .settings-btn{color:var(--text-muted)}
+.topbar.light-mode .settings-btn:hover{color:#00C896;background:#E0FFF8}
+
+/* ── PLANET VIEW ── */
+.planet-scene{position:absolute;inset:56px 0 0 0;background:var(--bg);overflow-y:auto}
+.planet-header{
+  padding:48px 40px 30px;text-align:center;position:relative;
+  background:linear-gradient(180deg, rgba(232,216,184,0.35) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--divider);
+}
+.planet-back{
+  position:absolute;top:16px;left:20px;background:none;border:1px solid var(--divider);
+  padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text-muted);
+  display:flex;align-items:center;gap:6px;transition:all .15s;cursor:pointer;font-family:var(--font-body);
+}
+.planet-back:hover{border-color:#00C896;color:#00C896}
+.planet-visual{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 30%, #DCC094 0%, #A07D4A 55%, #6C502C 100%);
+  box-shadow:0 4px 30px rgba(160,125,74,0.3);position:relative;
+  animation:planetFloat 6s ease-in-out infinite;
+}
+.planet-visual::after{
+  content:'';position:absolute;width:170%;height:22%;left:-35%;top:40%;border-radius:50%;
+  background:linear-gradient(to bottom, transparent 30%, rgba(160,125,74,0.5) 50%, transparent 70%);
+  transform:rotate(-16deg);
+}
+@keyframes planetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.planet-title{font-family:var(--font-heading);font-size:2.6rem;letter-spacing:-0.01em;margin-bottom:8px}
+.planet-tagline{font-family:'DM Sans',sans-serif;font-style:italic;color:var(--text-muted);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.5}
+.planet-meta{display:inline-flex;gap:24px;margin-top:10px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.planet-meta strong{color:var(--text-primary);font-family:var(--font-body);font-weight:600;font-size:13px;display:block;letter-spacing:0;text-transform:none;margin-bottom:2px}
+.levels-wrap{max-width:1280px;margin:0 auto;padding:40px}
+.levels-intro{text-align:center;margin-bottom:30px;color:var(--text-muted);font-size:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.levels-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:16px}
+.level-col{background:#fff;border:1px solid var(--divider);border-radius:14px;padding:20px 18px 24px;min-height:540px;position:relative;transition:all .2s ease}
+.level-col:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(47,43,37,0.08)}
+.level-col::before{content:'';position:absolute;top:0;left:16px;right:16px;height:3px;border-radius:0 0 3px 3px}
+.level-col.l1::before{background:#E09C50}
+.level-col.l2::before{background:#D8AA58}
+.level-col.l3::before{background:#3E9282}
+.level-col.l4::before{background:#5286B4}
+.level-col.l5::before{background:#6856A8}
+.level-num{font-family:var(--font-heading);font-style:italic;font-size:1rem;color:var(--text-muted);letter-spacing:0.05em}
+.level-name{font-family:var(--font-heading);font-size:1.4rem;letter-spacing:-0.01em;margin-bottom:6px;margin-top:-2px}
+.level-pcg{display:inline-block;padding:3px 8px;border-radius:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.pcg-p{background:#F5DDD3;color:#8A4B1E}
+.pcg-c{background:#D6E8DC;color:#2D5347}
+.pcg-g{background:#E8DDF0;color:#48366E}
+.level-desc{font-size:12px;color:var(--text-muted);line-height:1.5;margin:12px 0 18px;min-height:48px}
+.activity{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;position:relative}
+.activity:hover{background:#E0FFF8;border-color:#00C896;transform:translateY(-1px)}
+.activity-title{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.activity-prompt{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic}
+.activity-visited{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* ── CHAT ── */
+.chat-scene{position:absolute;inset:56px 0 0 0;display:flex;flex-direction:column;background:#FFFFFF}
+.chat-header{padding:14px 28px;border-bottom:1px solid #F0F0F0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;flex-shrink:0}
+.chat-back{font-size:13px;color:#333;font-weight:500;background:none;border:none;display:flex;align-items:center;gap:4px;cursor:pointer;font-family:var(--font-body);justify-self:start}
+.chat-back:hover{color:#007A5C}
+.chat-topic{text-align:center}
+.chat-kicker{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:2px}
+.chat-activity-title{font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:var(--text-primary)}
+.chat-header-right{justify-self:end;display:flex;align-items:center;gap:8px}
+.dyslexic-toggle{background:none;border:1px solid var(--divider);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.dyslexic-toggle:hover{border-color:#00C896;color:#00C896}
+.dyslexic-toggle.on{border-color:#00C896;background:#E0FFF8;color:#00C896}
+.activity-banner{padding:24px 32px;background:#FFFFFF;border-bottom:1px solid #F0F0F0;flex-shrink:0;display:flex;align-items:flex-start;gap:12px}
+.activity-banner-text{flex:1}
+.activity-banner-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-family:var(--font-body)}
+.activity-banner-prompt{font-size:clamp(22px,3vw,36px);line-height:1.2;color:#1C1917;font-style:normal;font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-0.02em}
+.activity-banner-speak{flex-shrink:0;background:none;border:1px solid var(--divider);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:2px}
+.activity-banner-speak:hover{background:#E0FFF8;color:#00C896;border-color:#00C896}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{font-family:'OpenDyslexic',sans-serif!important;font-style:normal!important}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px;margin:0 auto;width:100%}
+.msg{max-width:100%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start;width:100%}
+.msg-s{align-self:flex-end;max-width:72%}
+.msg-name{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;padding-left:2px;color:var(--text-faint)}
+.msg-name-s{text-align:right;padding-right:2px}
+.msg-bubble-k{background:none;border:none;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.msg-bubble-s{background:#E0FFF8;border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:transparent;border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center;margin-left:32px}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:#00C896;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-input-bar{padding:14px 20px 20px;display:flex;gap:8px;align-items:flex-end;background:#FFFFFF;flex-shrink:0;max-width:820px;margin:0 auto;width:100%}
+.chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;box-shadow:0 2px 10px rgba(47,43,37,.06);transition:border-color .15s}
+.chat-input:focus{border-color:#00C896}
+.chat-mic{background:#F4F4F4;color:#555;border:1.5px solid #E0E0E0;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;cursor:pointer}
+.chat-mic:hover{background:#E8E8E8;color:#333;border-color:#CCC}
+.chat-mic.recording{background:#D94A4A;border-color:#D94A4A;color:#fff;animation:micPulse 1.2s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+.chat-send{background:#00C896;color:#fff;border:none;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;cursor:pointer}
+.chat-send:hover{background:#007A5C}
+.chat-send:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:6px;vertical-align:middle;display:inline-flex;align-items:center}
+.speak-btn:hover{color:#00C896}
+.speak-btn.speaking{background:#00C896;color:#fff}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{font-family:'OpenDyslexic',sans-serif!important;font-style:normal!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+
+.topbar-apikey{background:rgba(255,255,255,0.6);border:1px solid rgba(29,158,117,0.25);border-radius:8px;padding:4px 10px;font-size:11px;color:#007A5C;font-family:var(--font-body);width:180px;outline:none;transition:all .15s}
+.topbar-apikey::placeholder{color:rgba(29,158,117,0.5)}
+.topbar-apikey:focus{border-color:#00C896;background:rgba(255,255,255,0.8)}
+
+.mic-btn.recording{border-color:#D94A4A;color:#D94A4A;animation:micPulse 1s infinite}
+.autospeak-toggle{background:none;border:1px solid var(--divider);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s;margin-right:4px}
+.autospeak-toggle.on{border-color:#00C896;background:#E0FFF8;color:#00C896}
+.know-btn{
+  background:none;
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:20px;
+  color:rgba(255,255,255,0.75);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.05em;
+  padding:6px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:all .15s;
+}
+.know-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.5)}
+.know-btn.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- MAP SCENE -->
+<div class="scene geo-scene" id="scene-map" style="background:#E0FFF8">
+  <div class="geo-topbar" style="background:#E0FFF8">
+    <svg class="geo-planet-sphere" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="0" cy="0" r="42" fill="#00C896"/>
+        <circle cx="0" cy="0" r="29" fill="none" stroke="white" stroke-width="3.5" opacity="0.85"/>
+        <polygon points="0,-29 25.1,14.5 -25.1,14.5" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round"/>
+        <circle cx="0" cy="-29" r="5" fill="white"/>
+        <circle cx="25.1" cy="14.5" r="5" fill="white"/>
+        <circle cx="-25.1" cy="14.5" r="5" fill="white"/>
+      </svg>
+    <div class="geo-planet-info">
+      <div class="geo-planet-name" style="color:#00C896">GEOMETRY</div>
+      <div class="geo-planet-tagline">Shape · Space · Proof</div>
+    </div>
+    <input class="topbar-apikey" id="topbar-apikey" type="password" placeholder="API key for testing" title="API key" oninput="localStorage.setItem('kelvi_api_key',this.value)">
+    <button class="geo-back-btn" onclick="goGalaxy()">← Galaxy</button>
+  </div>
+  <div class="geo-map-wrap">
+    <svg class="geo-svg" id="geo-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="geo-hero-overlay" id="geo-hero-overlay" style="background:#E0FFF8;border-top:1px solid rgba(160,140,110,0.15)">
+    <div class="geo-hero-inner" id="geo-hero-inner"></div>
+  </div>
+</div>
+
+<!-- CHAT SCENE -->
+<div class="scene" id="scene-chat" style="display:none;background:#FFFFFF">
+  <div class="chat-header">
+    <button class="chat-back" onclick="goMap()">← Geometry</button>
+    <div class="chat-topic">
+      <div class="chat-kicker">Geometry Solar System</div>
+      <div class="chat-activity-title" id="chat-title">Activity</div>
+    </div>
+    <div class="chat-header-right">
+      <button class="dyslexic-toggle" id="dyslexic-btn" onclick="toggleDyslexic()" title="Aa">Aa</button>
+    </div>
+  </div>
+  <div class="activity-banner">
+    <div class="activity-banner-text">
+      <div class="activity-banner-label">The invitation</div>
+      <div class="activity-banner-prompt" id="chat-prompt"></div>
+    </div>
+
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Say what you're thinking…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-mic" id="mic-btn" onclick="toggleMic()" title="Speak">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="know-btn" id="know-btn" onclick="handleKnowBtn()" title="I know what we are doing">I know what we are doing</button>
+        <button class="chat-send" id="send-btn" onclick="sendMsg()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../../shared/kelvi.js"></script>
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let msgs = [];
+let sessionStart = null;
+let currentActivity = null;
+const childName = localStorage.getItem('kelvi_family_name') || 'Explorer';
+let autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+let recognition = null;
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goGalaxy() { saveSession(); window.location.href = 'family.html'; }
+
+function goMap() {
+  saveSession();
+  document.getElementById('scene-chat').style.display = 'none';
+  document.getElementById('scene-map').style.display = 'flex';
+  initVoice();
+  renderGeometry();
+
+  // Pre-fill API key input if already set
+  const keyInput = document.getElementById('topbar-apikey');
+  if (keyInput) {
+    const saved = localStorage.getItem('kelvi_api_key') || '';
+    if (saved) keyInput.value = saved;
+  }
+
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet };
+  sessionStart = Date.now();
+  msgs = [];
+  if (document.getElementById('chat-title')) document.getElementById('chat-title').textContent = name;
+  if (document.getElementById('chat-prompt')) document.getElementById('chat-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('scene-map').style.display = 'none';
+  document.getElementById('scene-chat').style.display = 'flex';
+  document.getElementById('scene-chat').style.flexDirection = 'column';
+  const openers = [
+    "What's the first thing you notice?",
+    "What's your instinct?",
+    "Where would you begin?",
+    "Have you seen anything like this before?"
+  ];
+  setTimeout(() => addMsg('assistant', openers[Math.floor(Math.random()*openers.length)]), 300);
+}
+
+// ── SESSION SAVING ────────────────────────────────────────────────────────────
+function saveSession() {
+  if (!currentActivity || msgs.length < 2) return;
+  const sessions = JSON.parse(localStorage.getItem('kelvi_sessions') || '[]');
+  sessions.unshift({ id:Date.now(), planet:currentActivity.planet, activityName:currentActivity.name, prompt:currentActivity.prompt, date:new Date().toISOString(), duration:sessionStart?Math.round((Date.now()-sessionStart)/60000):0, msgs:msgs.slice() });
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0,50)));
+  currentActivity = null;
+}
+window.addEventListener('beforeunload', saveSession);
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function addMsg(role, content) {
+  msgs.push({role, content});
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role==='user' ? 'msg-s' : 'msg-k');
+  const speakBtn = role==='assistant' ? '<button class="speak-btn" onclick="speakEl(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>' : '';
+  wrap.innerHTML = '<div class="msg-name' + (role==='user'?' msg-name-s':'') + '">' + (role==='user'?escapeHtml(childName):'KELVI') + '</div><div class="' + (role==='user'?'msg-bubble-s':'msg-bubble-k') + '">' + escapeHtml(content) + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role==='assistant') {
+    if (autoSpeak) speakText(content);
+    incrementGeoExchange();
+  }
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; autoResize(input);
+  addMsg('user', text);
+  callAPI();
+}
+
+function callAPI() {
+  const key = localStorage.getItem('kelvi_api_key') || '';
+  if (!key) { addMsg('assistant','No API key — update in Kelvi Family settings.'); return; }
+  document.getElementById('typing').classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, system:buildSYS(currentActivity), messages:msgs.filter(m=>m.role!=='system').slice(-20).map(m=>({'role':m.role,'content':m.content})) })
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant', data.content?.[0]?.text || 'Something went wrong.');
+  }).catch(()=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant','Connection error — check your API key.');
+  });
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function speakEl(el) { const text = typeof el==='string' ? document.getElementById(el)?.textContent : el.closest('.msg-bubble-k')?.textContent; if(text) window.speechSynthesis.speak(new SpeechSynthesisUtterance(text)); }
+function toggleDyslexic() { document.body.classList.toggle('dyslexic'); document.getElementById('dyslexic-btn')?.classList.toggle('on',document.body.classList.contains('dyslexic')); }
+
+
+
+
+
+
+function buildSYS(activity) {
+  const planet = (activity && activity.planet) ? activity.planet : 'Geometry';
+  const activityBlock = activity
+    ? `\n\nACTIVITY: The child has chosen "${activity.name}". The invitation is: "${activity.prompt}". Work within this activity. Do not move to a new topic unless the child explicitly asks.`
+    : '';
+  const name = localStorage.getItem('kelvi_family_name') || 'the child';
+  return `You are Kelvi — a thinking partner for a child named ${name}, aged 4–12, exploring mathematics.
+
+PRINCIPLE 0 — MATHEMATICAL ACCURACY IS NON-NEGOTIABLE. THIS APPLIES TO KELVI TOO.
+If ${name} says something mathematically incorrect, redirect immediately — do not affirm any part of it first, then correct. Just redirect. "Let's check that — if 2 leftovers go to 5 people, how much does each person get?" Wrong facts that compound are the worst failure mode.
+If KELVI makes a mathematical error: correct it immediately and directly in the next response before doing anything else. Do not continue the conversation as if the error didn't happen. Do not soften it. Just correct it: "I made an error — [correct version]. Let's continue from there." Kelvi's credibility depends entirely on mathematical precision. A single uncorrected error poisons the whole session.
+
+PRINCIPLE 1 — NO AFFIRMATION WORDS, EVER. NO MARKDOWN, EVER.
+Never say: "Great!", "Exactly!", "You're right!", "Smart thinking!", "Good job!", "Nice work!", "Correct!", "Perfect!", "Well done!", "That's it!", or any variant. These words are banned. Instead: restate what ${name} just did as a mathematical move and continue. "You found four right angles — all on the same shape. Where else might they show up?"
+Never use markdown formatting: no **bold**, no *italics*, no bullet points, no headers. Plain sentences only. Mathematical terms should be introduced in plain prose — "mathematicians call that a factor" — never bolded or formatted. Formatted text makes Kelvi sound like a textbook. Kelvi does not sound like a textbook.
+
+PRINCIPLE 2 — TWO SENTENCES MAXIMUM.
+Every response is two sentences. Three only if a redirect requires it. Never more. Short responses keep the child talking. Long responses make the child read instead of think.
+
+PRINCIPLE 3 — MATCH THE CHILD'S REGISTER.
+If ${name} says "me don't know" — meet them there. Simple words, short sentences. Do not correct grammar. If they're bored, say something surprising. Never ignore emotional signals.
+
+PRINCIPLE 4 — DON'T ASK A QUESTION AFTER EVERY RESPONSE.
+Mix: a question, then an observation, then a question. One question per response, maximum.
+
+PRINCIPLE 5 — WHEN THEY WANT TO STOP, LET THEM GO WITH A HOOK.
+One warm sentence naming the specific mathematical thing they discovered today. Then one unresolved question to carry with them. Then stop.
+
+PRINCIPLE 6 — READ MOMENTUM.
+If ${name} is on a roll — stay out of the way. A one-word prompt ("And?" / "Or?" / "Always?") is better than a full question. If they're stuck, one concrete foothold. Never a hint ladder.
+
+PRINCIPLE 7 — NEVER LECTURE.
+Do not explain a concept before ${name} has encountered it through their own work. The concept arrives through the question, not through your explanation.
+
+PRINCIPLE 8 — SAFETY IS THE PRODUCT.
+A child who has never felt safe as a learner will not take risks. Kelvi's first job is not to teach mathematics — it is to make ${name} feel that being wrong, confused, or slow is not just acceptable but genuinely interesting. A mistake is data. Treat it that way. The goal is that ${name} leaves every conversation feeling more curious, not more correct.
+
+PRINCIPLE 9 — MISTAKES ARE THE MATERIAL. BUT DO NOT SOFTEN CORRECTIONS.
+When ${name} makes an error, respond with the same tone and curiosity as when they get something right. Never softer. Never harder. Just curious.
+CRITICAL: Do not affirm any part of a wrong answer before correcting it. "You spotted something real though" followed by a correction is the worst pattern — it teaches ${name} that wrong answers get praise. They do not. A wrong answer gets the same neutral, curious redirect as anything else: "Let's check that — [question that surfaces the error]."
+The goal is not to make ${name} feel good about being wrong. The goal is to make ${name} curious about why they were wrong. Those are different things.
+
+PRINCIPLE 10 — READ THE ROOM, ADJUST THE DEPTH.
+When ${name} first arrives at a planet, ask one orienting question before the activity prompt. Their answer tells you everything. A child who says "I don't know what a polygon is" gets a different entry point than one who says "a polygon has straight sides and angles." The galaxy is fully open — every planet is available to every child. There is no wrong planet to visit. Kelvi's job is to find the right door in.
+
+PRINCIPLE 11 — MATHEMATICS IS A LANGUAGE. GIVE CHILDREN THE WORDS.
+When a child discovers or describes a mathematical idea — even imperfectly — give them the precise word for it. Not as a correction, but as a gift: "Mathematicians have a name for exactly what you just found — it's called a tessellation." The word arrives after the idea, never before. A child who knows the word icosidodecahedron, lattice point, or conjecture has been invited into the language of mathematics, not excluded from it. Never withhold vocabulary because it seems too advanced. The right word at the right moment is one of the most powerful things Kelvi can do.
+
+P/C/G — silent classification only, never named to the child:
+- P (following steps, computing): ask "why does that work?"
+- C (connecting, noticing): invite them to push further
+- G (conjecturing, inventing): give space, then ask if it always holds
+
+CURRICULUM: ${planet} Solar System. The full Math Galaxy is open — follow ${name}'s curiosity wherever it leads.${activityBlock}
+PRINCIPLE 18 — THE 3-TURN CEILING.
+Count your exchanges on a single task. After 3 turns, stop asking and name the skill explicitly: tell ${name} what they just did mathematically and why it matters. Do not ask a fourth question on the same task. "You just found three different ways to sort the same objects — that's exactly what mathematicians do when they look for patterns. They call it classification." Then move on. A task without a declared endpoint is not Socratic — it is just grinding. Never grind.
+
+PRINCIPLE 19 — NAME THE WIN.
+When ${name} demonstrates the skill, say so immediately — not "good job" but a precise description of the mathematical move they made: "You just invented a conjecture" / "You found the property that connects all of these" / "That's exactly how mathematicians think about this." The child should never have to guess whether they succeeded. Name it, then move forward.
+
+PRINCIPLE 20 — THE ARTICULATION EXIT.
+If ${name} clicks "I know what we are doing," respond with exactly one thing: "Tell me what you noticed." Then:
+- If their articulation is strong and accurate: mirror it back in precise mathematical language and immediately offer the next question. Do not linger.
+- If their articulation is partial or slightly off: reframe it gently and precisely — "Close — what you've actually been doing is [precise explanation]." Then offer the next question.
+Never ask them to explain again or probe further. One articulation, one response, next question. This is their exit ramp — honour it.`;
+}
+
+function hexToRgba(hex,alpha) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('kelvi_api_key') && !localStorage.getItem('kelvi_family_name')) { window.location.href='family.html'; return; }
+  renderGeometry();
+});
+window.addEventListener('resize', () => { if(document.getElementById('scene-map').style.display!=='none') renderGeometry(); });
+
+// ── PLANET DATA ───────────────────────────────────────────────────────────────
+const GEOM_LEVELS = [
+  {
+    num:'I', key:'arrive', name:'Arrive', pcgKind:'p',
+    activities:[
+      { id:'shape-hunt', title:'The Shape Hunt', questions:[
+        { pcg:'p', prompt:'"Name every different shape you can find in this room."', full:'Look around the room you are in right now. Name every different shape you can find.' },
+        { pcg:'p', prompt:'"Find a shape with exactly 4 sides. Now one with more than 4."', full:'Find a shape in the room that has exactly 4 sides. Now find one with more than 4 sides.' },
+        { pcg:'p', prompt:'"Find the smallest shape in the room. The largest. Describe each."', full:'Find the smallest shape you can see. Find the largest. Describe each one.' },
+        { pcg:'c', prompt:'"Two shapes that seem different — what do they actually have in common?"', full:'Look at two shapes that seem very different from each other. What do they actually have in common?' },
+        { pcg:'c', prompt:'"Find a shape hiding somewhere unexpected."', full:'Find a shape hiding somewhere you would not expect to find one.' },
+        { pcg:'c', prompt:'"Put the shapes you found into groups. What rule did you use?"', full:'Take the shapes you have found. Put them into groups. What rule did you use?' },
+        { pcg:'c', prompt:'"Two shapes that look the same but different sizes. What is the same? What is different?"', full:'Find two shapes that look the same but are different sizes. What is the same about them? What is different?' },
+        { pcg:'g', prompt:'"Invent a rule for a shape nobody in this room has named yet."', full:'Invent a rule for a new shape — one that nobody in this room has named yet. What would you call it?' },
+        { pcg:'g', prompt:'"If you could only keep three shapes in the world, which three? Why?"', full:'If you could only keep three shapes in the entire world and throw out the rest, which three would you keep? Why?' },
+        { pcg:'g', prompt:'"Is there a shape here that does not fit into any group you made?"', full:'Is there a shape in this room that does not fit into any group you have made? What makes it special?' },
+      ]},
+      { id:'sides-corners', title:'Sides and Corners', questions:[
+        { pcg:'p', prompt:'"Draw a triangle. Count the sides. Count the corners."', full:'Draw a triangle. Count its sides. Count its corners. Write the numbers down.' },
+        { pcg:'p', prompt:'"Draw a square. Count sides and corners. What do you notice?"', full:'Draw a square. Count its sides and corners. What do you notice about the numbers?' },
+        { pcg:'p', prompt:'"Draw a shape with 6 sides. How many corners does it have?"', full:'Draw a shape with 6 sides. Count the corners. What do you get?' },
+        { pcg:'c', prompt:'"Shapes with 3, 4, and 6 sides — what do you notice about their corners?"', full:'You have drawn shapes with 3, 4, and 6 sides. What do you notice about the number of corners compared to the number of sides?' },
+        { pcg:'c', prompt:'"Draw four triangles that look completely different. What makes them all triangles?"', full:'Draw four triangles that look as different from each other as possible. What makes them all triangles?' },
+        { pcg:'c', prompt:'"Can you draw a shape where the number of sides is different from the corners?"', full:'Can you draw a shape where the number of sides is different from the number of corners? Try it.' },
+        { pcg:'c', prompt:'"What happens to the corners when you add one more side to a shape?"', full:'Start with a triangle. Add one more side. What happens to the number of corners? Add another side. What do you notice?' },
+        { pcg:'g', prompt:'"Can you make a shape with 0 corners? What would it look like?"', full:'Can you make a shape that has zero corners? What would it look like? Is it still a shape?' },
+        { pcg:'g', prompt:'"Is there a maximum number of sides a shape can have?"', full:'Is there a maximum number of sides a shape can have, or can you keep adding sides forever?' },
+        { pcg:'g', prompt:'"Invent a new shape. Give it a name. Tell me its rules."', full:'Invent a completely new shape. Give it a name. Tell me the rules it follows.' },
+      ]},
+      { id:'sort-shapes', title:'Sorting Shapes', questions:[
+        { pcg:'p', prompt:'"Sort these into two groups: triangle, square, circle, rectangle, pentagon."', full:'Sort these shapes into exactly two groups: triangle, square, circle, rectangle, pentagon. What is your rule?' },
+        { pcg:'p', prompt:'"Sort the same shapes a different way. What new rule did you use?"', full:'Take the same shapes and sort them a completely different way. What new rule did you use?' },
+        { pcg:'p', prompt:'"Which does not belong — triangle, square, rectangle, circle? Why?"', full:'Which shape does not belong: triangle, square, rectangle, circle? Explain why.' },
+        { pcg:'c', prompt:'"Make a sorting rule that uses curves vs. straight lines."', full:'Make a sorting rule based on curves versus straight lines. Which shapes go where?' },
+        { pcg:'c', prompt:'"Sort by number of sides. What happens to circle?"', full:'Sort all the shapes by number of sides. Where does a circle go? What does that tell you?' },
+        { pcg:'c', prompt:'"Can one shape belong to two different groups at the same time?"', full:'Can one shape belong to two different groups at the same time? Find an example.' },
+        { pcg:'c', prompt:'"Sort shapes so every group has exactly 2. What rule works?"', full:'Can you sort shapes so that every group has exactly 2 shapes in it? What rule makes that work?' },
+        { pcg:'g', prompt:'"Invent a sorting rule that no one has thought of before."', full:'Invent a sorting rule for shapes that no one has ever thought of. Does your rule work for every shape?' },
+        { pcg:'g', prompt:'"What is the smallest number of groups you need to sort all shapes?"', full:'What is the smallest number of groups you need to sort all possible shapes? What is the largest?' },
+        { pcg:'g', prompt:'"Design a shape that could fit into any group."', full:'Design a shape that could belong to any sorting group. Is that possible, or does it always get stuck in one?' },
+      ]},
+      { id:'3d-names', title:'The 3D Family', questions:[
+        { pcg:'p', prompt:'"Name as many 3D shapes as you can."', full:'Name as many 3D shapes as you can. (Sphere, cube, cylinder, cone, pyramid — keep going!)' },
+        { pcg:'p', prompt:'"Find something shaped like a cylinder. A sphere. A rectangular box."', full:'Find something in your room shaped like a cylinder. Now a sphere. Now a rectangular prism.' },
+        { pcg:'p', prompt:'"How many flat faces does a cube have? Edges? Corners?"', full:'How many flat faces does a cube have? How many edges? How many corners (vertices)?' },
+        { pcg:'c', prompt:'"What is the difference between a cube and a rectangular prism?"', full:'What is the difference between a cube and a rectangular prism? Are they related?' },
+        { pcg:'c', prompt:'"Which 3D shape has no flat faces at all?"', full:'Which 3D shape has no flat faces at all? What is special about it?' },
+        { pcg:'c', prompt:'"A cone has one flat face and one curved face. What shape has two flat and one curved?"', full:'A cone has one flat face and one curved face. What 3D shape has two flat faces and one curved face?' },
+        { pcg:'c', prompt:'"If you squashed a sphere completely flat, what 2D shape would you get?"', full:'Imagine squashing a sphere completely flat. What 2D shape would you get? What about squashing a cube?' },
+        { pcg:'g', prompt:'"Design a 3D shape that does not exist in your room. Describe all its faces."', full:'Design a 3D shape that does not exist anywhere in your room. Describe all its faces, edges, and corners.' },
+        { pcg:'g', prompt:'"Is there a 3D shape that looks the same from every direction?"', full:'Is there a 3D shape that looks exactly the same no matter which direction you look at it from?' },
+        { pcg:'g', prompt:'"Can you build a 3D shape using only triangular faces? How many triangles?"', full:'Can you build a 3D shape using only triangular faces? What is the fewest number of triangles you need?' },
+      ]},
+    ],
+  },
+  {
+    num:'II', key:'notice', name:'Notice', pcgKind:'p',
+    activities:[
+      { id:'angle-types', title:'Kinds of Angles', questions:[
+        { pcg:'p', prompt:'"Find a right angle in this room. Point to it."', full:'Find a right angle somewhere in this room. Point to it or describe where it is.' },
+        { pcg:'p', prompt:'"Find an angle smaller than a right angle. Where is it?"', full:'Find an angle that is smaller than a right angle (an acute angle). Where is it?' },
+        { pcg:'p', prompt:'"Find an angle larger than a right angle. Where is it?"', full:'Find an angle that is larger than a right angle (an obtuse angle). Where is it?' },
+        { pcg:'p', prompt:'"Use two pencils to make a right angle, then acute, then obtuse."', full:'Use two pencils to make a right angle. Now make an acute angle. Now an obtuse angle.' },
+        { pcg:'c', prompt:'"Look at the corners of a door. Are they all the same kind of angle?"', full:'Look at the corners of a door. Are they all the same kind of angle? What kind?' },
+        { pcg:'c', prompt:'"Can a triangle have two obtuse angles? Try to draw one."', full:'Can a triangle have two obtuse angles? Try to draw one and see what happens.' },
+        { pcg:'c', prompt:'"When you open a book halfway, what kind of angle does it make?"', full:'When you open a book halfway flat, what kind of angle do the two covers make? How do you know?' },
+        { pcg:'c', prompt:'"Find something that has all three kinds of angles at once."', full:'Find something in the room that has a right angle, an acute angle, and an obtuse angle all in the same object.' },
+        { pcg:'g', prompt:'"Can an angle be bigger than a straight line? What would that mean?"', full:'Can an angle be bigger than a straight line — bigger than 180 degrees? What would that look like?' },
+        { pcg:'g', prompt:'"If you keep making an angle bigger, what happens when it goes all the way around?"', full:'If you keep making an angle bigger and bigger, what happens when it goes all the way around? What angle is that?' },
+      ]},
+      { id:'symmetry-fold', title:'Folding Symmetry', questions:[
+        { pcg:'p', prompt:'"Fold a piece of paper in half. Does one side match the other exactly?"', full:'Fold a piece of paper in half. Does one side match the other exactly? How can you tell?' },
+        { pcg:'p', prompt:'"Draw on folded paper, cut it out, unfold it. What do you notice?"', full:'Draw half a shape along the fold of a piece of paper. Cut it out. Unfold it. What do you notice?' },
+        { pcg:'p', prompt:'"How many ways can you fold a square so the two halves match?"', full:'How many different ways can you fold a square piece of paper so the two halves match exactly?' },
+        { pcg:'c', prompt:'"Find something in your room that has symmetry. How many lines?"', full:'Find something in your room that has symmetry. How many lines of symmetry does it have?' },
+        { pcg:'c', prompt:'"Does the letter A have symmetry? What about B? S?"', full:'Does the letter A have a line of symmetry? What about B? What about S? Check each one.' },
+        { pcg:'c', prompt:'"Draw a shape with exactly 2 lines of symmetry. Now exactly 3."', full:'Draw a shape with exactly 2 lines of symmetry. Now draw one with exactly 3.' },
+        { pcg:'c', prompt:'"Can a shape have more than 4 lines of symmetry? Draw one."', full:'Can a shape have more than 4 lines of symmetry? Draw one and count them.' },
+        { pcg:'g', prompt:'"What shape has the most lines of symmetry? Is there a limit?"', full:'What shape has the most lines of symmetry? Is there a shape with an infinite number of lines of symmetry?' },
+        { pcg:'g', prompt:'"Can you fold a shape so it matches itself, but the two halves look different?"', full:'Can you fold a shape so it matches itself perfectly, but the two halves look different from each other? Is that possible?' },
+        { pcg:'g', prompt:'"Design a pattern that has rotational symmetry but not reflective symmetry."', full:'Design a pattern that looks the same when you spin it, but does NOT look the same when you fold it.' },
+      ]},
+      { id:'parallel-perp', title:'Two Special Pairs', questions:[
+        { pcg:'p', prompt:'"Find two lines that will never meet no matter how far they go."', full:'Find two lines in the room that will never meet no matter how far they extend.' },
+        { pcg:'p', prompt:'"Find two lines that meet at a perfect right angle."', full:'Find two lines that meet at a perfect right angle.' },
+        { pcg:'p', prompt:'"Draw two parallel lines. Now draw two perpendicular lines."', full:'Draw two parallel lines. Now draw two perpendicular lines.' },
+        { pcg:'c', prompt:'"Are the sides of a rectangle parallel, perpendicular, or both?"', full:'Look at a rectangle. Are its sides parallel, perpendicular, or both? Look carefully at each pair.' },
+        { pcg:'c', prompt:'"Can you draw a triangle where any two sides are parallel?"', full:'Can you draw a triangle where any two sides are parallel to each other? Try it.' },
+        { pcg:'c', prompt:'"Draw a shape where all sides are parallel to at least one other side."', full:'Draw a shape where every side is parallel to at least one other side in the same shape.' },
+        { pcg:'c', prompt:'"Railroad tracks are parallel. What would happen if they were not?"', full:'Railroad tracks are parallel. What would happen to a train if the tracks were not parallel?' },
+        { pcg:'g', prompt:'"Is it possible for two lines to be both parallel and perpendicular?"', full:'Is it possible for two lines to be both parallel and perpendicular at the same time? Think carefully.' },
+        { pcg:'g', prompt:'"How many pairs of parallel lines does a regular hexagon have?"', full:'How many pairs of parallel lines does a regular hexagon have? How do you count them?' },
+        { pcg:'g', prompt:'"Design a shape with exactly one pair of parallel sides and no perpendicular sides."', full:'Design a shape that has exactly one pair of parallel sides and no perpendicular sides anywhere.' },
+      ]},
+      { id:'polygon-hunt', title:'What Makes a Polygon?', questions:[
+        { pcg:'p', prompt:'"Is a circle a polygon? Why or why not?"', full:'Is a circle a polygon? Explain why or why not.' },
+        { pcg:'p', prompt:'"Is a star shape a polygon? Count its sides and corners."', full:'Is a star shape a polygon? Count its sides and corners and decide.' },
+        { pcg:'p', prompt:'"Draw one polygon, one non-polygon, and one you are not sure about."', full:'Draw three shapes — one that is definitely a polygon, one that is definitely not, and one you are not sure about.' },
+        { pcg:'c', prompt:'"Make your own rule for what makes something a polygon. Test it on 5 shapes."', full:'Make your own rule for what makes a shape a polygon. Test your rule on at least 5 different shapes.' },
+        { pcg:'c', prompt:'"Can a polygon have curved sides? What happens to your rule?"', full:'Can a polygon have curved sides? What happens to your definition if it can?' },
+        { pcg:'c', prompt:'"Is the letter L a polygon? What about the letter O?"', full:'Is the letter L a polygon? What about the letter O? Apply your rule.' },
+        { pcg:'c', prompt:'"What is the minimum number of sides a polygon can have? Why not fewer?"', full:'What is the minimum number of sides a polygon can have? Why can it not have fewer?' },
+        { pcg:'g', prompt:'"Can a polygon cross itself? Draw one and decide if it counts."', full:'Can a polygon cross itself — where one side crosses another? Draw one and decide if it should count as a polygon.' },
+        { pcg:'g', prompt:'"If you keep adding sides to a polygon, what shape does it approach?"', full:'If you keep adding more and more sides to a regular polygon, what shape does it start to look like?' },
+        { pcg:'g', prompt:'"Invent a shape that breaks exactly one of your polygon rules. What would you call it?"', full:'Invent a shape that breaks exactly one rule of your polygon definition. What would you call this new kind of shape?' },
+      ]},
+    ],
+  },
+  {
+    num:'III', key:'question', name:'Question', pcgKind:'c',
+    activities:[
+      { id:'same-perim', title:'Same Fence, Different Garden', questions:[
+        { pcg:'p', prompt:'"12 sticks the same length. Arrange them into a rectangle. How many ways?"', full:'You have 12 sticks all the same length. Arrange them into a rectangle. How many different rectangles are possible?' },
+        { pcg:'p', prompt:'"A rectangle has perimeter 20. Find 3 different length-and-width pairs."', full:'A rectangle has perimeter 20. What could its length and width be? Find 3 different answers.' },
+        { pcg:'p', prompt:'"A square and rectangle both have perimeter 24. Draw both. Which looks bigger inside?"', full:'A square and a rectangle both have perimeter 24. Draw both. Which one looks bigger inside?' },
+        { pcg:'c', prompt:'"Among rectangles with perimeter 24, which has the most area? Make a table."', full:'Among all rectangles with perimeter 24, which one has the most area? Make a table to find out.' },
+        { pcg:'c', prompt:'"Why does a square give more area than a rectangle with the same perimeter?"', full:'Why does a square give more area than any rectangle with the same perimeter? Can you explain it?' },
+        { pcg:'c', prompt:'"A farmer has 100m of fence for the biggest rectangular paddock. What dimensions?"', full:'A farmer has exactly 100 metres of fence. She wants the biggest rectangular paddock. What dimensions should she use?' },
+        { pcg:'c', prompt:'"What if the fence does not have to be a rectangle? Could she get more area?"', full:'What if the fence did not have to make a rectangle — could the farmer get more area with a different shape?' },
+        { pcg:'g', prompt:'"Among ALL shapes with the same perimeter, which gives the most area?"', full:'Among all possible shapes with the same perimeter, which gives the most area? Can you prove it?' },
+        { pcg:'g', prompt:'"Is there a shape with infinite area but finite perimeter?"', full:'Is there a shape that has infinite area but a finite perimeter? Think carefully.' },
+        { pcg:'g', prompt:'"Design a garden with perimeter 24 that beats any rectangle."', full:'Design a garden shape with perimeter 24 that has more area than any rectangle with perimeter 24.' },
+      ]},
+      { id:'triangle-area', title:'Half a Rectangle', questions:[
+        { pcg:'p', prompt:'"Draw a rectangle. Draw a diagonal. What two shapes do you get?"', full:'Draw a rectangle. Draw a diagonal line from one corner to the opposite corner. What two shapes do you get?' },
+        { pcg:'p', prompt:'"What fraction of the rectangle is each triangle? How do you know?"', full:'What fraction of the rectangle is each triangle? How do you know?' },
+        { pcg:'p', prompt:'"Draw three different triangles. For each, find the rectangle it is half of."', full:'Draw three different triangles. For each one, find the rectangle that it is exactly half of.' },
+        { pcg:'c', prompt:'"Is every triangle exactly half of some rectangle? How would you convince someone?"', full:'Is every triangle exactly half of some rectangle? How would you convince someone who does not believe you?' },
+        { pcg:'c', prompt:'"Two triangles — same base and height but look completely different. Same area?"', full:'Two triangles have the same base and the same height but look completely different. Do they have the same area?' },
+        { pcg:'c', prompt:'"A triangle has base 6 and height 4. What is its area? How does this connect to the rectangle?"', full:'A triangle has base 6 and height 4. What is its area? How does your answer connect to the rectangle idea?' },
+        { pcg:'c', prompt:'"Find three triangles with area exactly 12 that look as different as possible."', full:'Find three triangles that all have an area of exactly 12 square units but look as different as possible.' },
+        { pcg:'g', prompt:'"Can you find a triangle that is NOT half of any rectangle? Or is that impossible?"', full:'Can you find a triangle that is NOT half of any rectangle? Or is that always impossible? Explain.' },
+        { pcg:'g', prompt:'"Prove why the divide-by-2 in the triangle area formula is always right."', full:'The area formula for a triangle is base times height divided by 2. Can you prove why the divide-by-2 is always correct?' },
+        { pcg:'g', prompt:'"What if the triangle peak is outside the rectangle — does the formula still work?"', full:'What if the triangle peak (apex) is positioned outside the rectangle? Does the area formula still give the right answer?' },
+      ]},
+      { id:'transformations', title:'Three Ways to Move', questions:[
+        { pcg:'p', prompt:'"Slide your hand across the table. That is translation. What did not change?"', full:'Slide your hand across the table. That is a translation. What did not change about your hand?' },
+        { pcg:'p', prompt:'"Spin a book on the table. That is rotation. Where is the center?"', full:'Spin a book on the table. That is a rotation. Where is the center of rotation?' },
+        { pcg:'p', prompt:'"Flip a shape over. That is reflection. What stays the same? What changes?"', full:'Flip a shape over. That is a reflection. What stays the same? What changes?' },
+        { pcg:'c', prompt:'"Translate a triangle 3 units right. Is it congruent to the original?"', full:'Translate (slide) a triangle 3 units to the right. Is the new triangle congruent to the original? How do you know?' },
+        { pcg:'c', prompt:'"Rotate a square 90 degrees. Does it look different? What about 45 degrees?"', full:'Rotate a square 90 degrees. Does it look different from the original? What about rotating it 45 degrees?' },
+        { pcg:'c', prompt:'"If you reflect a shape twice across the same line, what do you get?"', full:'If you reflect a shape across a line, then reflect it again across the same line, what do you end up with?' },
+        { pcg:'c', prompt:'"Flip then slide. Is that the same as slide then flip?"', full:'Flip a shape, then slide it. Now do it in the other order — slide first, then flip. Do you get the same result?' },
+        { pcg:'g', prompt:'"Can you get from any position of a shape to any other using only slides, spins, flips?"', full:'Can you get from any position of a shape to any other position using only slides, spins, and flips — or are some positions unreachable?' },
+        { pcg:'g', prompt:'"What transformation turns a shape into its mirror image but in the same place?"', full:'What transformation turns a shape into its mirror image but keeps it in exactly the same position?' },
+        { pcg:'g', prompt:'"Is there a transformation that changes the size of a shape? What would you call it?"', full:'Is there a transformation that changes the size of a shape but keeps everything else the same? What would you call it?' },
+      ]},
+      { id:'angle-sum', title:"The Triangle's Secret", questions:[
+        { pcg:'p', prompt:'"Tear the three corners off a paper triangle. Arrange them in a row."', full:'Tear the three corners off a paper triangle. Arrange them in a row touching each other. What do you see?' },
+        { pcg:'p', prompt:'"Measure the three angles of a triangle. Add them. What do you get?"', full:'Measure the three angles of a triangle with a protractor. Add them up. What do you get?' },
+        { pcg:'p', prompt:'"Draw five different triangles. Measure all their angles. What is always true?"', full:'Draw five very different triangles. Measure all three angles of each. What is always true?' },
+        { pcg:'c', prompt:'"Why do the angles always add to 180? Can you explain without measuring?"', full:'Why do the three angles of a triangle always add up to 180 degrees? Can you explain it without measuring?' },
+        { pcg:'c', prompt:'"One angle is 90 degrees. What can you say for certain about the other two?"', full:'One angle of a triangle is 90 degrees. What can you say for certain about the other two angles?' },
+        { pcg:'c', prompt:'"Can a triangle have two obtuse angles? Try to draw one — what happens?"', full:'Can a triangle have two obtuse angles? Try to draw one. What happens?' },
+        { pcg:'c', prompt:'"A triangle has angles in ratio 1:2:3. What are the actual angle measures?"', full:'A triangle has angles in the ratio 1 to 2 to 3. What are the actual angle measures?' },
+        { pcg:'g', prompt:'"On a sphere, can a triangle have three right angles? What is the angle sum?"', full:'On the surface of a sphere, can a triangle have three right angles? What would the angle sum be?' },
+        { pcg:'g', prompt:'"If you know two angles, can you always find the third? Is there ever more than one answer?"', full:'If you know two angles of a triangle, can you always find the third? Is there ever more than one possible answer?' },
+        { pcg:'g', prompt:'"Make up a triangle on a curved surface. What would its angle sum be?"', full:'Imagine a triangle drawn on a curved surface — like the inside of a bowl. What would its angle sum be? More or less than 180?' },
+      ]},
+    ],
+  },
+  {
+    num:'IV', key:'connect', name:'Connect', pcgKind:'c',
+    activities:[
+      { id:'similar-shapes', title:'Big and Small Twins', questions:[
+        { pcg:'p', prompt:'"A photo is 4 by 6. Enlarge it to twice the size. New dimensions?"', full:'A photo is 4cm by 6cm. You enlarge it to twice the size. What are the new dimensions?' },
+        { pcg:'p', prompt:'"A square has side 3. A similar square has side 6. Compare perimeters."', full:'A square has side 3. A similar square has side 6. Compare their perimeters. What do you notice?' },
+        { pcg:'p', prompt:'"Same squares — compare their areas."', full:'Take the same two squares (sides 3 and 6). Compare their areas. What do you notice?' },
+        { pcg:'c', prompt:'"When you double the sides, does the area double too? Try with a triangle."', full:'When you double the sides of a shape, does the area double too? Try it with a triangle.' },
+        { pcg:'c', prompt:'"A map is 1:100. A road is 5cm on the map. How long in real life?"', full:'A map is scaled 1 to 100. A road is 5cm on the map. How long is it in real life?' },
+        { pcg:'c', prompt:'"Triple the sides of a rectangle. By how much does the area grow?"', full:'Triple every side of a rectangle. By what factor does the area grow?' },
+        { pcg:'c', prompt:'"Two similar triangles — one has sides 3, 4, 5. The other has 4 times the area. What are its sides?"', full:'Two similar triangles. One has sides 3, 4, and 5. The other has an area 4 times bigger. What are its sides?' },
+        { pcg:'g', prompt:'"Scale a shape by factor k. What happens to perimeter? To area?"', full:'If you scale a shape by a factor of k, what happens to its perimeter? What happens to its area? Is there a pattern?' },
+        { pcg:'g', prompt:'"Can two shapes be similar but not congruent? Congruent but not similar?"', full:'Can two shapes be similar but not congruent? Can they be congruent but not similar?' },
+        { pcg:'g', prompt:'"Can you double the perimeter but more than double the area?"', full:'Can you design two shapes where doubling the perimeter also more than doubles the area? Is that possible?' },
+      ]},
+      { id:'volume-grows', title:'Why Volume Grows Faster', questions:[
+        { pcg:'p', prompt:'"A cube has side 2cm. What is its volume? Its surface area?"', full:'A cube has side 2cm. What is its volume? What is its surface area?' },
+        { pcg:'p', prompt:'"A cube has side 4cm. What is its volume? Its surface area?"', full:'A cube has side 4cm. What is its volume? What is its surface area?' },
+        { pcg:'p', prompt:'"The side doubled — what happened to the volume?"', full:'The side of the cube doubled from 2 to 4. What happened to the volume?' },
+        { pcg:'c', prompt:'"The side doubled but volume went up by more than double. Why?"', full:'The side doubled but the volume went up by much more than double. Why does that happen?' },
+        { pcg:'c', prompt:'"You double the side of a cube. How much more wrapping paper do you need?"', full:'You double every side of a cube. How much more wrapping paper do you need to wrap it?' },
+        { pcg:'c', prompt:'"A cube side triples. By what factor does the volume grow?"', full:'If the side of a cube triples, by what factor does the volume grow?' },
+        { pcg:'c', prompt:'"Can you double only the volume without changing all three dimensions equally?"', full:'Is there a way to double only the volume of a box without changing all three dimensions by the same factor?' },
+        { pcg:'g', prompt:'"Scale a 3D shape by factor k. What happens to volume? Surface area?"', full:'If you scale a 3D shape by a factor of k, what happens to the volume? What happens to the surface area?' },
+        { pcg:'g', prompt:'"A cereal box has twice the volume of another. Are all its dimensions twice as big?"', full:'One cereal box has twice the volume of another. Does that mean all its dimensions are twice as big?' },
+        { pcg:'g', prompt:'"Design two boxes with the same volume but very different surface areas."', full:'Design two boxes with exactly the same volume but as different surface areas as possible. What is the most extreme difference you can find?' },
+      ]},
+      { id:'pythagorean', title:'The 3-4-5 Pattern', questions:[
+        { pcg:'p', prompt:'"Draw a right triangle with legs 3 and 4. Measure the hypotenuse."', full:'Draw a right triangle with legs of length 3 and 4. Measure the hypotenuse. What do you get?' },
+        { pcg:'p', prompt:'"Square each side of a 3-4-5 triangle: 9, 16, 25. What do you notice?"', full:'Take a 3-4-5 triangle. Square each side: 9, 16, 25. What do you notice?' },
+        { pcg:'p', prompt:'"Does 5 squared equal 3 squared plus 4 squared? Does 13 squared equal 5 squared plus 12 squared?"', full:'Does 5² = 3² + 4²? Does 13² = 5² + 12²? Check both.' },
+        { pcg:'c', prompt:'"Draw squares on each side of a right triangle. What do the areas tell you?"', full:'Draw a right triangle. Draw a square on each of its three sides. What do the areas of the squares tell you?' },
+        { pcg:'c', prompt:'"Is a triangle with sides 6, 8, 10 a right triangle? How can you tell without drawing?"', full:'Is a triangle with sides 6, 8, and 10 a right triangle? How can you tell without drawing it?' },
+        { pcg:'c', prompt:'"Find another Pythagorean triple — three whole numbers where a² + b² = c²."', full:'Find another Pythagorean triple — three whole numbers where a² + b² = c².' },
+        { pcg:'c', prompt:'"Can you have a Pythagorean triple where all three numbers are odd?"', full:'Can you have a Pythagorean triple where all three numbers are odd?' },
+        { pcg:'g', prompt:'"Can you make infinitely many Pythagorean triples starting from one?"', full:'The 3-4-5 triple is special. Can you generate infinitely many Pythagorean triples starting from just one triple?' },
+        { pcg:'g', prompt:'"What happens to the Pythagorean theorem if the triangle is NOT a right triangle?"', full:'What happens to the Pythagorean relationship if the triangle is not a right triangle? Is a² + b² still equal to c²?' },
+        { pcg:'g', prompt:'"Prove the Pythagorean theorem using areas — no algebra."', full:'Prove the Pythagorean theorem using only areas — without any algebra. Can you do it?' },
+      ]},
+      { id:'nets', title:'Unfolding a Cube', questions:[
+        { pcg:'p', prompt:'"Draw a cross of 5 squares. Does it fold into a cube?"', full:'Draw a cross shape made of 5 squares (like a plus sign). Does it fold into a cube?' },
+        { pcg:'p', prompt:'"How many faces does a cube have? How many squares in its net?"', full:'How many faces does a cube have? How many squares must a net of a cube contain?' },
+        { pcg:'p', prompt:'"Try another arrangement of 6 squares. Does it fold into a cube?"', full:'Try a different arrangement of 6 squares. Does it fold into a cube? Try three different arrangements.' },
+        { pcg:'c', prompt:'"There are 11 different cube nets. Can you find more than 5?"', full:'There are exactly 11 different nets of a cube. Can you find more than 5 of them?' },
+        { pcg:'c', prompt:'"Without folding, how do you know which faces will be opposite each other?"', full:'Look at a net of a cube without folding it. How can you tell which faces will end up opposite each other?' },
+        { pcg:'c', prompt:'"Can two different nets fold into the same cube with the same face positions?"', full:'Can two different nets fold into a cube where every face ends up in exactly the same position?' },
+        { pcg:'c', prompt:'"Design the net of a triangular prism. How many faces does it need?"', full:'Design the net of a triangular prism. How many faces does it have? Draw it.' },
+        { pcg:'g', prompt:'"Is there a net of a cube that has a line of symmetry? How many such nets?"', full:'Is there a net of a cube that has a line of symmetry? How many of the 11 nets have a line of symmetry?' },
+        { pcg:'g', prompt:'"Design the net of a shape with more than 6 faces."', full:'Design the net of a 3D shape that has more than 6 faces. How do you know it will fold correctly?' },
+        { pcg:'g', prompt:'"If you could unfold a sphere, what would you get? Is it even possible?"', full:'If you could unfold a sphere like a box, what would the flat net look like? Is that even possible?' },
+      ]},
+    ],
+  },
+  {
+    num:'V', key:'create', name:'Create', pcgKind:'g',
+    activities:[
+      { id:'prove-180', title:'Why 180°?', questions:[
+        { pcg:'p', prompt:'"Measure angles in 5 different triangles. What is always the sum?"', full:'Measure all three angles in five different triangles. What is always the sum?' },
+        { pcg:'p', prompt:'"Tear corners off three different triangles. Arrange each set. What do you always see?"', full:'Tear the corners off three different triangles. Arrange each set of corners together. What do you always see?' },
+        { pcg:'p', prompt:'"Can you draw a triangle whose angles add to more than 180? Less than 180?"', full:'Try to draw a triangle whose angles add to more than 180 degrees. Now try less. What happens?' },
+        { pcg:'c', prompt:'"Prove angles add to 180 using parallel lines."', full:'Prove that the angles of a triangle add to 180 degrees using parallel lines. Can you do it?' },
+        { pcg:'c', prompt:'"A quadrilateral has angle sum 360. How does that connect to triangles?"', full:'The angles of a quadrilateral add to 360 degrees. How does that connect to the triangle angle sum?' },
+        { pcg:'c', prompt:'"Find a formula for the angle sum of any polygon with n sides."', full:'What is the angle sum of a pentagon? A hexagon? Can you find a formula for any polygon with n sides?' },
+        { pcg:'c', prompt:'"A triangle has angles 2x, 3x, and x. Find x."', full:'A triangle has angles 2x, 3x, and x. Find the value of x and the actual angle measures.' },
+        { pcg:'g', prompt:'"On a sphere, can a triangle have three right angles? What is the angle sum?"', full:'On the surface of a sphere, can a triangle have three right angles? What would the angle sum be?' },
+        { pcg:'g', prompt:'"What is the angle sum of a triangle on a saddle-shaped surface?"', full:'What is the angle sum of a triangle drawn on a saddle-shaped surface — more or less than 180 degrees? Why?' },
+        { pcg:'g', prompt:'"Prove the angle sum formula for any polygon using only triangles."', full:'Prove the angle sum formula for any polygon using only the fact that triangles add to 180. Show your reasoning.' },
+      ]},
+      { id:'impossible', title:'An Impossible Triangle', questions:[
+        { pcg:'p', prompt:'"Try to draw a triangle with two right angles. What happens?"', full:'Try to draw a triangle with two right angles. What happens when you try?' },
+        { pcg:'p', prompt:'"Try sides 1, 2, 10. Can you make a triangle? Why not?"', full:'Try to make a triangle with sides 1, 2, and 10. Can you do it? Why or why not?' },
+        { pcg:'p', prompt:'"What is the triangle inequality? Test it on three sets of numbers."', full:'What is the triangle inequality? Test it on three different sets of three numbers.' },
+        { pcg:'c', prompt:'"Can a triangle have two obtuse angles? Prove why not."', full:'Can a triangle have two obtuse angles? Prove why it cannot.' },
+        { pcg:'c', prompt:'"The longest side is opposite the largest angle. Can you show why?"', full:'In any triangle, the longest side is opposite the largest angle. Can you show why this must be true?' },
+        { pcg:'c', prompt:'"Three sticks: 5, 5, 5 — triangle? 5, 5, 10? 5, 5, 11?"', full:'Three sticks 5cm, 5cm, 5cm — can they make a triangle? What about 5, 5, 10? What about 5, 5, 11?' },
+        { pcg:'c', prompt:'"Someone says their triangle has angles 90, 91, and 1. Is this possible?"', full:'Someone says their triangle has angles 90°, 91°, and 1°. Is this possible? Show your reasoning.' },
+        { pcg:'g', prompt:'"What is the largest angle a triangle can have — 179? 180? 181?"', full:'What is the largest angle a triangle can have? Can it be 179°? 180°? 181°? Where is the limit?' },
+        { pcg:'g', prompt:'"Prove that the sum of any two sides is always greater than the third."', full:'For any triangle, prove that the sum of any two sides is always greater than the third side.' },
+        { pcg:'g', prompt:'"Invent a geometry where the impossible triangle becomes possible."', full:'Invent a geometry — with different rules than flat space — where a triangle with two right angles becomes possible.' },
+      ]},
+      { id:'tiling', title:'Tiling the Floor', questions:[
+        { pcg:'p', prompt:'"Can equilateral triangles tile a floor without gaps? Try it."', full:'Can equilateral triangles tile a floor without gaps or overlaps? Try it with cut-out shapes.' },
+        { pcg:'p', prompt:'"Can squares tile? Regular pentagons? Regular hexagons?"', full:'Can squares tile a floor? Can regular pentagons? Can regular hexagons? Try each one.' },
+        { pcg:'p', prompt:'"Which regular polygons tile on their own? Why do some work and others not?"', full:'Which regular polygons can tile a floor on their own? Why do some work and others do not?' },
+        { pcg:'c', prompt:'"At a tiling vertex, angles must add to exactly 360. Why?"', full:'At any point where tiles meet in a tiling, the angles must add to exactly 360 degrees. Why?' },
+        { pcg:'c', prompt:'"A regular pentagon has interior angles of 108. Does 360 divide evenly by 108?"', full:'A regular pentagon has interior angles of 108 degrees. Does 360 divide evenly by 108? What does that tell you?' },
+        { pcg:'c', prompt:'"Combine squares and regular octagons. Do they tile together?"', full:'Try combining squares and regular octagons. Do they tile together without gaps?' },
+        { pcg:'c', prompt:'"Can non-regular shapes tile? Try a scalene triangle. Try any quadrilateral."', full:'Can non-regular shapes tile? Try with a scalene triangle. Try with any quadrilateral.' },
+        { pcg:'g', prompt:'"Any triangle can tile a plane. Any quadrilateral can tile a plane. Prove either."', full:'It is claimed that any triangle can tile a plane, and any quadrilateral can tile a plane. Prove one of these claims.' },
+        { pcg:'g', prompt:'"Design a tile that tiles only when you use at least two different orientations."', full:'Design a tile shape that can tile a floor — but only when you use it in at least two different orientations.' },
+        { pcg:'g', prompt:'"Is there a tiling that uses infinitely many different shapes, all different sizes?"', full:'Is there a tiling of the plane that uses infinitely many different shapes, all different sizes, with no gaps?' },
+      ]},
+      { id:'invent', title:'Invent a Shape', questions:[
+        { pcg:'p', prompt:'"Draw a shape that does not have a common name. Describe its properties."', full:'Draw a shape that does not have a common name. Describe all of its properties.' },
+        { pcg:'p', prompt:'"Give your shape a rule it must follow. How many sides? What angles?"', full:'Give your invented shape a rule it must always follow. How many sides does it have? What are its angles?' },
+        { pcg:'p', prompt:'"Can you draw your shape two completely different ways following the same rule?"', full:'Can you draw your shape in two completely different ways that both follow the same rule?' },
+        { pcg:'c', prompt:'"Invent a shape that is its own reflection."', full:'Invent a shape that looks exactly the same as its own reflection. What makes this possible?' },
+        { pcg:'c', prompt:'"Invent a shape that tiles a floor — but only when rotated, not flipped."', full:'Invent a shape that can tile a floor — but only when rotated. It should not work if you flip it.' },
+        { pcg:'c', prompt:'"Design a shape with exactly 5 lines of symmetry."', full:'Design a shape with exactly 5 lines of symmetry. What does it have to look like?' },
+        { pcg:'c', prompt:'"Can a shape have rotational symmetry but not reflective symmetry?"', full:'Can a shape have rotational symmetry but not reflective symmetry? Design one.' },
+        { pcg:'g', prompt:'"Invent a shape with a property that no shape in any textbook has."', full:'Invent a shape with a property that no shape in any textbook has. Write the definition.' },
+        { pcg:'g', prompt:'"Design a shape that is impossible in 2D but exists in 3D."', full:'Design a shape that is impossible in two dimensions but can exist in three dimensions. Describe it.' },
+        { pcg:'g', prompt:'"Invent a new kind of symmetry — not reflection, not rotation. What would it mean?"', full:'Invent a completely new kind of symmetry — not reflection, not rotation, not translation. What would it mean for a shape to have your new symmetry?' },
+      ]},
+    ],
+  },
+];
+
+const GEO_NODES = [
+  // ── ARRIVE ──
+  { id:'shape-hunt',    li:0, ai:0, label:'Shape Hunt',       nx:0.18, ny:0.35 },
+  { id:'sides-corners', li:0, ai:1, label:'Sides & Corners',  nx:0.12, ny:0.55 },
+  { id:'sort-shapes',   li:0, ai:2, label:'Sorting Shapes',   nx:0.26, ny:0.52 },
+  { id:'3d-names',      li:0, ai:3, label:'3D Family',        nx:0.20, ny:0.68 },
+  // ── NOTICE ──
+  { id:'angle-types',   li:1, ai:0, label:'Kinds of Angles',  nx:0.38, ny:0.22 },
+  { id:'symmetry-fold', li:1, ai:1, label:'Folding Symmetry', nx:0.44, ny:0.40 },
+  { id:'parallel-perp', li:1, ai:2, label:'Two Special Pairs',nx:0.34, ny:0.58 },
+  { id:'polygon-hunt',  li:1, ai:3, label:'What is a Polygon?',nx:0.46, ny:0.62 },
+  // ── QUESTION ──
+  { id:'same-perim',    li:2, ai:0, label:'Same Fence',       nx:0.60, ny:0.18 },
+  { id:'triangle-area', li:2, ai:1, label:'Half a Rectangle', nx:0.64, ny:0.36 },
+  { id:'transformations',li:2,ai:2, label:'Three Ways to Move',nx:0.56, ny:0.50 },
+  { id:'angle-sum',     li:2, ai:3, label:"Triangle's Secret",nx:0.62, ny:0.64 },
+  // ── CONNECT ──
+  { id:'similar-shapes',li:3, ai:0, label:'Big & Small Twins',nx:0.76, ny:0.26 },
+  { id:'volume-grows',  li:3, ai:1, label:'Volume Grows',     nx:0.80, ny:0.44 },
+  { id:'pythagorean',   li:3, ai:2, label:'3-4-5 Pattern',   nx:0.74, ny:0.58 },
+  { id:'nets',          li:3, ai:3, label:'Unfolding a Cube', nx:0.78, ny:0.72 },
+  // ── CREATE ──
+  { id:'prove-180',     li:4, ai:0, label:'Why 180°?',        nx:0.90, ny:0.32 },
+  { id:'impossible',    li:4, ai:1, label:'Impossible Triangle',nx:0.92, ny:0.50 },
+  { id:'tiling',        li:4, ai:2, label:'Tiling the Floor', nx:0.88, ny:0.65 },
+  { id:'invent',        li:4, ai:3, label:'Invent a Shape',   nx:0.93, ny:0.78 },
+];
+
+// Connections: pairs of node ids
+const GEO_EDGES = [
+  ['shape-hunt','sides-corners'],['shape-hunt','sort-shapes'],['sides-corners','sort-shapes'],
+  ['sort-shapes','3d-names'],['sides-corners','polygon-hunt'],
+  ['shape-hunt','angle-types'],['sort-shapes','parallel-perp'],
+  ['angle-types','symmetry-fold'],['symmetry-fold','polygon-hunt'],
+  ['parallel-perp','polygon-hunt'],['angle-types','same-perim'],
+  ['symmetry-fold','triangle-area'],['polygon-hunt','transformations'],
+  ['same-perim','triangle-area'],['triangle-area','transformations'],
+  ['transformations','angle-sum'],['triangle-area','similar-shapes'],
+  ['angle-sum','pythagorean'],['similar-shapes','volume-grows'],
+  ['volume-grows','pythagorean'],['pythagorean','nets'],
+  ['similar-shapes','prove-180'],['volume-grows','impossible'],
+  ['nets','tiling'],['prove-180','impossible'],['impossible','tiling'],['tiling','invent'],
+];
+
+// Level colours
+const GEO_LVL_COLORS = ['#DCC094','#E8A870','#7BBFAD','#85BAE0','#B8A8E8'];
+
+function geoDefaultFocused() {
+  const age = parseInt(localStorage.getItem('kelvi_family_age') || '0');
+  const li = age >= 11 ? 3 : age >= 9 ? 2 : age >= 7 ? 1 : 0;
+  return { li, ai: 0 };
+}
+
+let geoFocused = JSON.parse(localStorage.getItem('kelvi_geo_focused') || 'null') || geoDefaultFocused();
+let geoSelectedNode = null;
+
+function saveGeoFocused() {
+  localStorage.setItem('kelvi_geo_focused', JSON.stringify(geoFocused));
+}
+
+// A node is "available" if its level <= geoFocused.li + 1
+function nodeState(node) {
+  if (node.visited) return 'visited';
+  if (node.li === geoFocused.li && node.ai === geoFocused.ai) return 'active';
+  if (node.li <= geoFocused.li + 1) return 'available';
+  return 'dim';   // visible but not yet reached
+}
+
+
+
+function renderGeometry() {
+  loadGeoVisited();
+  const wrap = document.querySelector('.geo-map-wrap');
+  if (!wrap) return;
+  const W = wrap.clientWidth  || 600;
+  const H = wrap.clientHeight || 420;
+  const svg = document.getElementById('geo-svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  drawGeoMap(svg, W, H);
+  closeGeoHero();
+}
+
+
+function drawGeoMap(svg, W, H) {
+  svg.innerHTML = '';
+
+  // ── Background is now CSS (cream) — just draw a subtle grid/texture ──
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+
+  // Soft radial vignette to give depth without darkness
+  const vig = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
+  vig.setAttribute('id','geo-vig');
+  vig.setAttribute('cx','50%'); vig.setAttribute('cy','50%'); vig.setAttribute('r','65%');
+  [['0%','rgba(225,245,238,0)'],['100%','rgba(29,158,117,0.08)']].forEach(([off,col])=>{
+    const s=document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset',off); s.setAttribute('stop-color',col); vig.appendChild(s);
+  });
+  defs.appendChild(vig);
+  svg.appendChild(defs);
+
+  const vigEl = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  vigEl.setAttribute('x',0); vigEl.setAttribute('y',0);
+  vigEl.setAttribute('width',W); vigEl.setAttribute('height',H);
+  vigEl.setAttribute('fill','url(#geo-vig)');
+  svg.appendChild(vigEl);
+
+  // ── Edges ──
+  GEO_EDGES.forEach(([aId,bId]) => {
+    const a = GEO_NODES.find(n=>n.id===aId), b = GEO_NODES.find(n=>n.id===bId);
+    if (!a||!b) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.nx*W); line.setAttribute('y1',a.ny*H);
+    line.setAttribute('x2',b.nx*W); line.setAttribute('y2',b.ny*H);
+    const aVisited = a.visited, bVisited = b.visited;
+    line.setAttribute('stroke', (aVisited&&bVisited) ? 'rgba(28,25,23,0.35)' : 'rgba(180,160,130,0.20)');
+    line.setAttribute('stroke-width','1.2');
+    line.setAttribute('stroke-dasharray', (aVisited||bVisited) ? '' : '4 6');
+    svg.appendChild(line);
+  });
+
+  // ── Nodes as pie charts ──
+  GEO_NODES.forEach(node => {
+    const cx = node.nx*W, cy = node.ny*H;
+    const color = '#00C896'; // unified accent
+    const isSelected = geoSelectedNode && geoSelectedNode.id === node.id;
+    const isStart = !geoSelectedNode && node.li === geoFocused.li && node.ai === geoFocused.ai;
+    const r = 20;
+    const exchanges = getGeoExchanges(node.id); // 0-10
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform',`translate(${cx},${cy})`);
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => selectGeoNode(node));
+
+    // Pulse ring on start node
+    if (isStart && exchanges === 0) {
+      const pulse = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pulse.setAttribute('r', r+10); pulse.setAttribute('fill','none');
+      pulse.setAttribute('stroke','#00C896'); pulse.setAttribute('stroke-width','1.5'); pulse.setAttribute('opacity','0');
+      const a1 = document.createElementNS('http://www.w3.org/2000/svg','animate');
+      a1.setAttribute('attributeName','opacity'); a1.setAttribute('values','0;0.45;0'); a1.setAttribute('dur','2.2s'); a1.setAttribute('repeatCount','indefinite');
+      const a2 = document.createElementNS('http://www.w3.org/2000/svg','animate');
+      a2.setAttribute('attributeName','r'); a2.setAttribute('values',`${r+6};${r+14};${r+6}`); a2.setAttribute('dur','2.2s'); a2.setAttribute('repeatCount','indefinite');
+      pulse.appendChild(a1); pulse.appendChild(a2); g.appendChild(pulse);
+    }
+
+    // Selected ring
+    if (isSelected) {
+      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('r',r+5); ring.setAttribute('fill','none');
+      ring.setAttribute('stroke',color); ring.setAttribute('stroke-width','2'); ring.setAttribute('opacity','0.5');
+      g.appendChild(ring);
+    }
+
+    // Background circle (empty)
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    bg.setAttribute('r', r); bg.setAttribute('fill','#FFFFFF');
+    g.appendChild(bg);
+
+    // Draw 10 sectors
+    const total = 10;
+    for (let i = 0; i < total; i++) {
+      const startAngle = (i * 36 - 90) * Math.PI / 180;
+      const endAngle = ((i+1) * 36 - 90) * Math.PI / 180;
+      const x1 = Math.cos(startAngle) * r;
+      const y1 = Math.sin(startAngle) * r;
+      const x2 = Math.cos(endAngle) * r;
+      const y2 = Math.sin(endAngle) * r;
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      const d = `M 0 0 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`;
+      path.setAttribute('d', d);
+      path.setAttribute('fill', i < exchanges ? color : 'transparent');
+      path.setAttribute('stroke','#E0FFF8');
+      path.setAttribute('stroke-width','1.5');
+      g.appendChild(path);
+    }
+
+    // Label below node — ALL CAPS, bold, black, DM Sans
+    const words = node.label.toUpperCase().split(' ');
+    const lineH = 15;
+    const labelTop = r + 9;
+    words.forEach((word,wi) => {
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','hanging');
+      t.setAttribute('y', labelTop + wi*lineH);
+      t.setAttribute('font-family','DM Sans,sans-serif');
+      t.setAttribute('font-size','12');
+      t.setAttribute('font-weight','800');
+      t.setAttribute('letter-spacing','0.08em');
+      t.setAttribute('fill', exchanges > 0 ? '#1C1917' : isSelected||isStart ? '#1C1917' : '#7A7268');
+      t.textContent = word;
+      g.appendChild(t);
+    });
+
+    svg.appendChild(g);
+  });
+}
+
+
+// ── EXCHANGE TRACKING (pie chart progress) ─────────────────────────────────
+function geoExchangeKey(id) { return 'kelvi_geo_exchanges_' + id; }
+function getGeoExchanges(id) {
+  return Math.min(10, parseInt(localStorage.getItem(geoExchangeKey(id)) || '0'));
+}
+function incrementGeoExchange() {
+  if (!geoSelectedNode) return;
+  const key = geoExchangeKey(geoSelectedNode.id);
+  const current = getGeoExchanges(geoSelectedNode.id);
+  if (current < 10) {
+    localStorage.setItem(key, current + 1);
+    // Mark visited once any exchange done
+    if (current === 0) {
+      geoSelectedNode.visited = true;
+      localStorage.setItem(geoVisitedKey(geoSelectedNode.id), '1');
+    }
+    // Redraw map to show new sector
+    const wrap = document.querySelector('.geo-map-wrap');
+    if (wrap && document.getElementById('scene-map').style.display !== 'none') {
+      drawGeoMap(document.getElementById('geo-svg'), wrap.clientWidth, wrap.clientHeight);
+    }
+  }
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function selectGeoNode(node) {
+  geoSelectedNode = node;
+  geoFocused = { li: node.li, ai: node.ai };
+  saveGeoFocused();
+  // Redraw map with new selection
+  const wrap = document.querySelector('.geo-map-wrap');
+  const svg = document.getElementById('geo-svg');
+  drawGeoMap(svg, wrap.clientWidth, wrap.clientHeight);
+  openGeoHero(node);
+}
+
+function geoVisitedKey(id) { return 'kelvi_geo_visited_' + id; }
+function loadGeoVisited() {
+  GEO_NODES.forEach(n => {
+    if (localStorage.getItem(geoVisitedKey(n.id))) n.visited = true;
+  });
+}
+
+function getNodeQuestion(node) {
+  const act = GEOM_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_geo_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0') % act.questions.length;
+  return { q: act.questions[idx], idx, total: act.questions.length };
+}
+
+function advanceNodeQuestion(node) {
+  const act = GEOM_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_geo_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0');
+  localStorage.setItem(key, (idx + 1) % act.questions.length);
+}
+
+function openGeoHero(node) {
+  const lvl = GEOM_LEVELS[node.li];
+  const act = lvl.activities[node.ai];
+  const mood = lvl.pcgKind === 'g' ? 'make something new'
+             : lvl.pcgKind === 'c' ? 'think deeper' : 'look closely';
+  const inner = document.getElementById('geo-hero-inner');
+  inner.innerHTML = `
+    <button class="geo-dismiss" onclick="closeGeoHero()">&times;</button>
+
+    <div class="geo-hero-prompt-row">
+      <div class="geo-hero-prompt">${escapeHtml(act.prompt)}</div>
+      <button class="geo-speak-btn" onclick="speakPrompt(this)" title="Listen">
+        <span class="speak-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></span>
+      </button>
+    </div>
+    <div class="geo-hero-sub">${escapeHtml(act.title)} · a question for when you’re in the mood to ${mood}.</div>
+    <div class="geo-hero-ctas">
+      <button class="geo-btn-primary" onclick="beginGeoQuestion()">Begin this question →</button>
+      <button class="geo-btn-secondary" onclick="closeGeoHero()">Keep exploring</button>
+    </div>`;
+  document.getElementById('geo-hero-overlay').classList.add('open');
+}
+
+function closeGeoHero() {
+  document.getElementById('geo-hero-overlay').classList.remove('open');
+}
+
+function beginGeoQuestion() {
+  const node = geoSelectedNode || GEO_NODES.find(n => n.li === geoFocused.li && n.ai === geoFocused.ai);
+  if (!node) return;
+  const lvl = GEOM_LEVELS[node.li];
+  const act = lvl.activities[node.ai];
+  const { q } = getNodeQuestion(node);
+  advanceNodeQuestion(node);   // next visit gets the next question
+  node.visited = true;
+  localStorage.setItem(geoVisitedKey(node.id), '1');
+  openActivity(act.id, act.title, q.full, 'Geometry');
+}
+
+// Resize redraws map
+let geoResizeRaf = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(geoResizeRaf);
+  geoResizeRaf = setTimeout(() => {
+    if (document.getElementById('scene-map').style.display !== 'none') renderGeometry();
+  }, 150);
+});
+
+// ── JOURNAL ─────────────────────────────────────────────────────────────────
+const MAX_SESSIONS = 50;
+
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem('kelvi_sessions') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveSessions(sessions) {
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0, MAX_SESSIONS)));
+}
+
+function saveCurrentSession() {
+  if (!msgs || msgs.length < 2) return;          // need at least one exchange
+  if (!currentActivity) return;
+  const session = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    activity: { ...currentActivity },
+    messages: msgs.map(m => ({ role: m.role, content: m.content })),
+    pcg: null,   // filled in async after save
+    msgCount: msgs.length,
+  };
+  const sessions = getSessions();
+  sessions.unshift(session);
+  saveSessions(sessions);
+  classifySessionAsync(session.id);
+}
+
+async function classifySessionAsync(sessionId) {
+  const key = localStorage.getItem('kelvi_api_key');
+  if (!key) return;
+  const sessions = getSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  const transcript = session.messages
+    .filter(m => m.role === 'user')
+    .map(m => m.content).join('\n');
+  if (!transcript.trim()) return;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 60,
+        system: 'You classify student mathematical thinking. Given a transcript of student responses, return ONLY a JSON object with keys p, c, g representing percentage of thinking that is Procedural, Conceptual, and Generative. Values must sum to 100. Example: {"p":60,"c":30,"g":10}',
+        messages: [{ role: 'user', content: transcript }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const match = text.match(/\{[^}]+\}/);
+    if (match) {
+      const pcg = JSON.parse(match[0]);
+      const fresh = getSessions();
+      const s = fresh.find(x => x.id === sessionId);
+      if (s) { s.pcg = pcg; saveSessions(fresh); }
+          }
+  } catch(e) { /* silent fail */ }
+}
+
+
+
+
+
+function openPlanet(key) {
+  if (key === 'geometry') {
+    window.location.href='planets/geometry.html';
+    renderGeometry();
+  } else if (key === 'data') {
+    window.location.href='planets/data.html';
+    renderData();
+  } else {
+    alert(key.charAt(0).toUpperCase() + key.slice(1) + ' Planet is still being mapped. Start with Geometry or Data!');
+  }
+}
+
+function renderMath(t) {
+  if (typeof katex === 'undefined') return t;
+  t = t.replace(/\$\$([\s\S]*?)\$\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: true }); }
+    catch(e) { return m; }
+  });
+  t = t.replace(/\$([^\$\n]+?)\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: false }); }
+    catch(e) { return m; }
+  });
+  return t;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+
+  addMessage('user', text);
+  msgs.push({ role: 'user', content: text });
+
+  const typing = document.getElementById('typing');
+  typing.classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+
+  const key = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+  if (!key) {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMessage('assistant', "(No API key set — add one in Settings ⚙︎ to start thinking with Kelvi.)");
+    return;
+  }
+
+  try {
+    const contextualMsgs = msgs.map((m, i) => {
+      if (i === 0 && m.role === 'user' && currentActivity) {
+        return { role: 'user', content: 'I am working on an activity called "' + currentActivity.name + '". The invitation is: "' + currentActivity.prompt + '"\n\n' + m.content };
+      }
+      return m;
+    });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: buildSYS(currentActivity),
+        messages: contextualMsgs
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const reply = data.content[0].text;
+    addMessage('assistant', reply);
+  } catch(e) {
+    console.error(e);
+    addMessage('assistant', '(Something went wrong: ' + (e.message || '') + ')');
+  } finally {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('chat-input').focus();
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+
+
+
+function renderQBank() {
+  const container = document.getElementById('qbank-planets');
+  if (!container) return;
+
+  const planets = [
+    { label:'Geometry', sub:'Shape · Space · Proof', levels: GEOM_LEVELS, visitedKey: geoVisitedKey, qPrefix:'kelvi_geo_q_', color:'#3A6B5C' },
+    { label:'Data',     sub:'Graphs · Chance · Inference', levels: DATA_LEVELS, visitedKey: dataGeoVisitedKey, qPrefix:'kelvi_data_q_', color:'#964E82' },
+  ];
+
+  container.innerHTML = planets.map((planet, pi) => {
+    const bodyId = `qbank-body-${pi}`;
+    const nodes = planet.levels.map(lvl =>
+      lvl.activities.map(act => {
+        const visited = !!localStorage.getItem(planet.visitedKey(act.id));
+        const qIdx = parseInt(localStorage.getItem(planet.qPrefix + act.id) || '0');
+        const doneCount = visited ? Math.min(qIdx, act.questions.length) : 0;
+        const questions = act.questions.map((q, i) => {
+          const done = i < doneCount;
+          return `<div class="qb-question">
+            <span class="qb-q-num">${i+1}</span>
+            <span class="qb-q-tag qb-${q.pcg}">${q.pcg.toUpperCase()}</span>
+            <span class="qb-q-text">${escapeHtml(q.full)}</span>
+            ${done ? '<span class="qb-q-done">✓ done</span>' : ''}
+          </div>`;
+        }).join('');
+        return `<div class="qb-node">
+          <div class="qb-node-header" onclick="toggleQBNode(this)">
+            <span class="qb-node-name">${escapeHtml(act.title)}</span>
+            <div class="qb-node-meta">
+              ${visited ? `<span class="qb-node-done">${doneCount} of ${act.questions.length} done</span>` : '<span class="qb-node-count">not started</span>'}
+              <span class="qb-node-toggle">▾</span>
+            </div>
+          </div>
+          <div class="qb-node-body">${questions}</div>
+        </div>`;
+      }).join('')
+    ).join('');
+
+    return `<div class="qbank-section" style="margin-top:${pi>0?'24px':'0'};padding-top:${pi>0?'24px':'0'};${pi>0?'border-top:1px solid var(--divider)':''}">
+      <div class="qbank-header" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.qb-node-toggle').classList.toggle('open')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="qbank-title" style="color:${planet.color}">${planet.label} question bank</div>
+          <div class="qbank-sub">${planet.sub}</div>
+        </div>
+        <span class="qb-node-toggle" style="font-size:20px;color:var(--text-faint);margin-left:16px;flex-shrink:0">▾</span>
+      </div>
+      <div id="${bodyId}" class="open" style="padding-top:16px">${nodes}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleQBNode(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.qb-node-toggle');
+  const open = body.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+
+function toggleDyslexic() {
+  document.body.classList.toggle('dyslexic');
+  const btn = document.getElementById('dyslexic-btn');
+  if (btn) btn.classList.toggle('on', document.body.classList.contains('dyslexic'));
+}
+
+function speakBannerPrompt() {
+  const el = document.getElementById('chat-activity-prompt');
+  if (el) speakText(el.textContent);
+}
+
+// ── VOICE ────────────────────────────────────────────────────────────────────
+let isRecording = false;
+
+function speakText(text) {
+  if (!text) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen') || (v.lang && v.lang.startsWith('en') && !v.name.includes('Google')));
+  if (preferred) u.voice = preferred;
+  window.speechSynthesis.speak(u);
+}
+
+function speakEl(el) {
+  let text;
+  if (typeof el === 'string') {
+    text = document.getElementById(el)?.innerText;
+  } else {
+    const bubble = el.closest ? el.closest('.msg-bubble-k') : null;
+    const hero = el.closest ? el.closest('.geo-hero-inner') : null;
+    if (bubble) text = bubble.innerText;
+    else if (hero) text = hero.querySelector('.geo-hero-prompt')?.innerText;
+  }
+  if (text) speakText(text.replace(/Listen to Kelvi/g,'').trim());
+}
+
+function speakPrompt(btn) { speakEl('chat-prompt'); }
+function speakBannerPrompt() { speakText(document.getElementById('chat-prompt')?.innerText); }
+function speakText_btn(btn) { speakEl(btn); }
+function autoSpeakMessage(btn) {}
+function getSelectedVoice() { return null; }
+
+function toggleMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech input is not supported in this browser. Try Chrome.'); return; }
+  if (isRecording && window._kelviRecognition) { window._kelviRecognition.stop(); return; }
+  const r = new SR();
+  window._kelviRecognition = r;
+  r.continuous = false; r.interimResults = false; r.lang = 'en-US';
+  r.onstart = () => { isRecording = true; document.getElementById('mic-btn')?.classList.add('recording'); };
+  r.onresult = e => {
+    const t = e.results[0][0].transcript;
+    const inp = document.getElementById('chat-input');
+    if (inp) { inp.value = t; autoResize(inp); }
+  };
+  r.onend = r.onerror = () => { isRecording = false; document.getElementById('mic-btn')?.classList.remove('recording'); };
+  r.start();
+}
+
+function toggleAutoSpeak() {
+  autoSpeak = !autoSpeak;
+  localStorage.setItem('kelvi_autospeak', autoSpeak);
+  const btn = document.getElementById('autospeak-btn');
+  if (btn) { btn.classList.toggle('on', autoSpeak); btn.textContent = autoSpeak ? '🔊' : '🔇'; }
+}
+
+function initVoice() {
+  autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+  const btn = document.getElementById('autospeak-btn');
+  if (btn) { btn.classList.toggle('on', autoSpeak); btn.textContent = autoSpeak ? '🔊' : '🔇'; }
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+}
+
+function handleKnowBtn() {
+  addMsg('user', 'I know what we are doing.');
+  const btn = document.getElementById('know-btn');
+  if (btn) btn.classList.add('hidden');
+}
+
+function sendToKelvi(text) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = text; }
+  sendMsg();
+}
+
+</script>
+</body>
+</html>

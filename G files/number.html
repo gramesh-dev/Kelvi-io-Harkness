@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi · Number Solar System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'OpenDyslexic';src:url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype')}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+:root{
+  --bg:#EDFFD0;--surface:rgba(255,255,255,0.4);--deeper:#E0D8C8;--divider:rgba(0,0,0,0.1);
+  --text-primary:#2F2B25;--text-muted:#6F6A61;--text-faint:#9A9488;
+  --accent:#3A6B5C;--accent-dark:#2D5347;--accent-light:#EBF3EF;
+  --family:#B8784E;--family-dark:#9E6640;--family-light:#F5EDE5;
+  --gold:#C9A84C;
+  --font-heading:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;--font-serif:'DM Sans',serif;
+}
+.scene{position:fixed;inset:0;display:flex;flex-direction:column}
+/* ── GEOMETRY V4 ── */
+/* ── GEOMETRY CONCEPT MAP ── */
+.geo-scene{position:absolute;inset:0;background:#EDFFD0;display:flex;flex-direction:column;overflow:hidden}
+.geo-scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(99,153,34,0.12) 100%)}
+.geo-topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0;z-index:20;background:#EDFFD0;border-bottom:none}
+.geo-planet-sphere{width:40px;height:40px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(160,125,74,0.5))}
+.geo-planet-info{flex:1}
+.geo-planet-name{font-family:var(--font-heading);font-size:1.1rem;color:#7CB800;line-height:1;font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:0.08em}
+.geo-planet-tagline{font-family:var(--font-body);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(110,100,85,0.55);margin-top:3px}
+.geo-back-btn{background:none;border:1px solid rgba(110,100,85,0.25);padding:5px 12px;border-radius:14px;font-size:12px;color:rgba(80,70,55,0.7);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.geo-back-btn:hover{border-color:#C4873A;color:#C4873A}
+/* map canvas */
+.geo-map-wrap{flex:1;position:relative;overflow:hidden;min-height:0}
+.geo-svg{position:absolute;inset:0;width:100%;height:100%;cursor:default}
+/* hero overlay — slides up from bottom */
+.geo-hero-overlay{position:absolute;bottom:0;left:0;right:0;z-index:30;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.61,.36,1);pointer-events:none;background:#FFFFFF;border-top:1px solid #F0F0F0}
+.geo-hero-overlay.open{transform:translateY(0);pointer-events:auto}
+.geo-hero-inner{padding:28px 32px 20px;max-width:680px}
+.geo-hero-eyebrow{font-family:var(--font-body);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-weight:700}
+.geo-hero-prompt-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.geo-hero-prompt{font-family:'DM Sans',sans-serif;font-style:normal;font-size:clamp(20px,2.8vw,32px);color:#1C1917;line-height:1.25;flex:1;font-weight:800;letter-spacing:-0.02em}
+.geo-speak-btn{flex-shrink:0;background:#F4F4F4;border:1px solid #E0E0E0;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;transition:all .15s;margin-top:4px}
+.geo-speak-btn:hover{background:#EDFFD0;color:#7CB800}
+.geo-speak-btn .speak-icon{display:flex;align-items:center}
+.geo-hero-sub{font-family:var(--font-body);font-size:13px;color:#888;line-height:1.6;margin-bottom:18px}
+.geo-hero-ctas{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.geo-btn-primary{background:#7CB800;color:#FFFFFF;padding:11px 22px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .12s}
+.geo-btn-primary:hover{background:#4A7000}
+.geo-btn-secondary{background:none;border:1px solid #E0E0E0;border-radius:8px;color:#888;padding:11px 14px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
+.geo-btn-secondary:hover{color:#333;border-color:#AAAAAA}
+.geo-dismiss{position:absolute;top:14px;right:18px;background:#F4F4F4;border:1px solid #E0E0E0;color:#555;font-size:17px;cursor:pointer;line-height:1;font-family:var(--font-body);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.geo-dismiss:hover{background:#E8E8E8;color:#333}
+/* ── TOPBAR ADDITIONS ── */
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.settings-btn{background:none;border:none;color:rgba(240,232,204,0.65);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;transition:all .15s}
+.settings-btn:hover{color:#F5E6A8;background:rgba(255,255,255,0.08)}
+.topbar.light-mode .settings-btn{color:var(--text-muted)}
+.topbar.light-mode .settings-btn:hover{color:#7CB800;background:#EDFFD0}
+
+/* ── PLANET VIEW ── */
+.planet-scene{position:absolute;inset:56px 0 0 0;background:var(--bg);overflow-y:auto}
+.planet-header{
+  padding:48px 40px 30px;text-align:center;position:relative;
+  background:linear-gradient(180deg, rgba(232,216,184,0.35) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--divider);
+}
+.planet-back{
+  position:absolute;top:16px;left:20px;background:none;border:1px solid var(--divider);
+  padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text-muted);
+  display:flex;align-items:center;gap:6px;transition:all .15s;cursor:pointer;font-family:var(--font-body);
+}
+.planet-back:hover{border-color:#7CB800;color:#7CB800}
+.planet-visual{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 30%, #DCC094 0%, #A07D4A 55%, #6C502C 100%);
+  box-shadow:0 4px 30px rgba(160,125,74,0.3);position:relative;
+  animation:planetFloat 6s ease-in-out infinite;
+}
+.planet-visual::after{
+  content:'';position:absolute;width:170%;height:22%;left:-35%;top:40%;border-radius:50%;
+  background:linear-gradient(to bottom, transparent 30%, rgba(160,125,74,0.5) 50%, transparent 70%);
+  transform:rotate(-16deg);
+}
+@keyframes planetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.planet-title{font-family:var(--font-heading);font-size:2.6rem;letter-spacing:-0.01em;margin-bottom:8px}
+.planet-tagline{font-family:'DM Sans',serif;font-style:italic;color:var(--text-muted);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.5}
+.planet-meta{display:inline-flex;gap:24px;margin-top:10px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.planet-meta strong{color:var(--text-primary);font-family:var(--font-body);font-weight:600;font-size:13px;display:block;letter-spacing:0;text-transform:none;margin-bottom:2px}
+.levels-wrap{max-width:1280px;margin:0 auto;padding:40px}
+.levels-intro{text-align:center;margin-bottom:30px;color:var(--text-muted);font-size:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.levels-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:16px}
+.level-col{background:#fff;border:1px solid var(--divider);border-radius:14px;padding:20px 18px 24px;min-height:540px;position:relative;transition:all .2s ease}
+.level-col:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(47,43,37,0.08)}
+.level-col::before{content:'';position:absolute;top:0;left:16px;right:16px;height:3px;border-radius:0 0 3px 3px}
+.level-col.l1::before{background:#E09C50}
+.level-col.l2::before{background:#D8AA58}
+.level-col.l3::before{background:#3E9282}
+.level-col.l4::before{background:#5286B4}
+.level-col.l5::before{background:#6856A8}
+.level-num{font-family:var(--font-heading);font-style:italic;font-size:1rem;color:var(--text-muted);letter-spacing:0.05em}
+.level-name{font-family:var(--font-heading);font-size:1.4rem;letter-spacing:-0.01em;margin-bottom:6px;margin-top:-2px}
+.level-pcg{display:inline-block;padding:3px 8px;border-radius:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.pcg-p{background:#F5DDD3;color:#8A4B1E}
+.pcg-c{background:#D6E8DC;color:#2D5347}
+.pcg-g{background:#E8DDF0;color:#48366E}
+.level-desc{font-size:12px;color:var(--text-muted);line-height:1.5;margin:12px 0 18px;min-height:48px}
+.activity{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;position:relative}
+.activity:hover{background:#EDFFD0;border-color:#7CB800;transform:translateY(-1px)}
+.activity-title{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.activity-prompt{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic}
+.activity-visited{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* ── CHAT ── */
+.chat-scene{position:absolute;inset:56px 0 0 0;display:flex;flex-direction:column;background:#FFFFFF}
+.chat-header{padding:14px 28px;border-bottom:1px solid #F0F0F0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;flex-shrink:0}
+.chat-back{font-size:13px;color:#333;font-weight:500;background:none;border:none;display:flex;align-items:center;gap:4px;cursor:pointer;font-family:var(--font-body);justify-self:start}
+.chat-back:hover{color:#4A7000}
+.chat-topic{text-align:center}
+.chat-kicker{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:2px}
+.chat-activity-title{font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:var(--text-primary)}
+.chat-header-right{justify-self:end;display:flex;align-items:center;gap:8px}
+.dyslexic-toggle{background:none;border:1px solid var(--divider);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.dyslexic-toggle:hover{border-color:#7CB800;color:#7CB800}
+.dyslexic-toggle.on{border-color:#7CB800;background:#EDFFD0;color:#7CB800}
+.activity-banner{padding:24px 32px;background:#FFFFFF;border-bottom:1px solid #F0F0F0;flex-shrink:0}
+.activity-banner-text{flex:1}
+.activity-banner-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-family:var(--font-body)}
+.activity-banner-prompt{font-size:clamp(22px,3vw,36px);line-height:1.2;color:#1C1917;font-style:normal;font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-0.02em}
+.activity-banner-speak{flex-shrink:0;background:none;border:1px solid var(--divider);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:2px}
+.activity-banner-speak:hover{background:#EDFFD0;color:#7CB800;border-color:#7CB800}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px;margin:0 auto;width:100%}
+.msg{max-width:100%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start;width:100%}
+.msg-s{align-self:flex-end;max-width:72%}
+.msg-name{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;padding-left:2px;color:var(--text-faint)}
+.msg-name-s{text-align:right;padding-right:2px}
+.msg-bubble-k{background:transparent;border:none;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.msg-bubble-s{background:#EDFFD0;border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:transparent;border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center;margin-left:32px}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:#7CB800;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-input-bar{padding:14px 20px 20px;display:flex;gap:8px;align-items:flex-end;background:#FFFFFF;flex-shrink:0;max-width:820px;margin:0 auto;width:100%}
+.chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-input:focus{border-color:#7CB800}
+.chat-mic{background:#F4F4F4;color:#555;border:1.5px solid #E0E0E0;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;cursor:pointer}
+.chat-mic:hover{background:#E8E8E8;color:#333;border-color:#CCC}
+.chat-mic.recording{background:#D94A4A;border-color:#D94A4A;color:#fff;animation:micPulse 1.2s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+.chat-send{background:#7CB800;color:#fff;border:none;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;cursor:pointer}
+.chat-send:hover{background:#4A7000}
+.chat-send:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:6px;vertical-align:middle;display:inline-flex;align-items:center}
+.speak-btn:hover{color:#7CB800}
+.speak-btn.speaking{background:#7CB800;color:#fff}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+
+.topbar-apikey{background:rgba(0,0,0,0.04);border:1px solid rgba(110,100,85,0.2);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(60,50,35,0.7);font-family:var(--font-body);width:180px;outline:none;transition:all .15s}
+.topbar-apikey::placeholder{color:rgba(110,100,85,0.35)}
+.topbar-apikey:focus{border-color:#A07D4A;color:var(--text-primary);background:rgba(255,255,255,0.8)}
+
+.mic-btn.recording{border-color:#D94A4A;color:#D94A4A;animation:micPulse 1s infinite}
+.autospeak-toggle{background:none;border:1px solid var(--divider);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s;margin-right:4px}
+.autospeak-toggle.on{border-color:#7CB800;background:#EDFFD0;color:#7CB800}
+.know-btn{
+  background:none;
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:20px;
+  color:rgba(255,255,255,0.75);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.05em;
+  padding:6px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:all .15s;
+}
+.know-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.5)}
+.know-btn.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- MAP SCENE -->
+<div class="scene geo-scene" id="scene-map" style="background:#F5F3EE">
+  <div class="geo-topbar" style="background:#EDFFD0;border-bottom:none">
+    <svg class="geo-planet-sphere" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="0" cy="0" r="42" fill="#7CB800"/>
+        <path d="M -22 0 C -22 -16 -8 -16 0 0 C 8 16 22 16 22 0 C 22 -16 8 -16 0 0 C -8 16 -22 16 -22 0 Z" fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    <div class="geo-planet-info">
+      <div class="geo-planet-name" style="color:#7CB800">Number</div>
+      <div class="geo-planet-tagline">Counting · Patterns · Infinity</div>
+    </div>
+    <input class="topbar-apikey" id="topbar-apikey" type="password" placeholder="API key for testing" title="API key" oninput="localStorage.setItem('kelvi_api_key',this.value)">
+    <button class="geo-back-btn" onclick="goGalaxy()">← Galaxy</button>
+  </div>
+  <div class="geo-map-wrap">
+    <svg class="geo-svg" id="number-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="geo-hero-overlay" id="number-hero-overlay" style="background:#FFFFFF;border-top:1px solid #F0F0F0">
+    <div class="geo-hero-inner" id="number-hero-inner"></div>
+  </div>
+</div>
+
+<!-- CHAT SCENE -->
+<div class="scene" id="scene-chat" style="display:none;background:#FFFFFF">
+  <div class="chat-header">
+    <button class="chat-back" onclick="goMap()">← Number</button>
+    <div class="chat-topic">
+      <div class="chat-kicker">Number Solar System</div>
+      <div class="chat-activity-title" id="chat-title">Activity</div>
+    </div>
+    <div class="chat-header-right">
+      <button class="dyslexic-toggle" id="dyslexic-btn" onclick="toggleDyslexic()" title="Aa">Aa</button>
+    </div>
+  </div>
+  <div class="activity-banner">
+    <div class="activity-banner-text">
+      <div class="activity-banner-label">The invitation</div>
+      <div class="activity-banner-prompt" id="chat-prompt"></div>
+    </div>
+    <button class="activity-banner-speak" onclick="speakEl('chat-prompt')" title="Listen">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+    </button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Say what you're thinking…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-mic" id="mic-btn" onclick="toggleMic()" title="Speak">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="know-btn" id="know-btn" onclick="handleKnowBtn()" title="I know what we are doing">I know what we are doing</button>
+        <button class="chat-send" id="send-btn" onclick="sendMsg()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../../shared/kelvi.js"></script>
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let msgs = [];
+let sessionStart = null;
+let currentActivity = null;
+const childName = localStorage.getItem('kelvi_family_name') || 'Explorer';
+let autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+let recognition = null;
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goGalaxy() { saveSession(); window.location.href = 'family.html'; }
+
+function goMap() {
+  saveSession();
+  document.getElementById('scene-chat').style.display = 'none';
+  document.getElementById('scene-map').style.display = 'flex';
+  initVoice();
+  renderNumber();
+
+  // Pre-fill API key input if already set
+  const keyInput = document.getElementById('topbar-apikey');
+  if (keyInput) {
+    const saved = localStorage.getItem('kelvi_api_key') || '';
+    if (saved) keyInput.value = saved;
+  }
+
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet };
+  sessionStart = Date.now();
+  msgs = [];
+  document.getElementById('chat-title').textContent = name;
+  document.getElementById('chat-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('scene-map').style.display = 'none';
+  document.getElementById('scene-chat').style.display = 'flex';
+  document.getElementById('scene-chat').style.flexDirection = 'column';
+  const openers = [
+    "What's the first thing you notice?",
+    "What's your instinct?",
+    "Where would you begin?",
+    "Have you seen anything like this before?"
+  ];
+  setTimeout(() => addMsg('assistant', openers[Math.floor(Math.random()*openers.length)]), 300);
+}
+
+// ── SESSION SAVING ────────────────────────────────────────────────────────────
+function saveSession() {
+  if (!currentActivity || msgs.length < 2) return;
+  const sessions = JSON.parse(localStorage.getItem('kelvi_sessions') || '[]');
+  sessions.unshift({ id:Date.now(), planet:currentActivity.planet, activityName:currentActivity.name, prompt:currentActivity.prompt, date:new Date().toISOString(), duration:sessionStart?Math.round((Date.now()-sessionStart)/60000):0, msgs:msgs.slice() });
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0,50)));
+  currentActivity = null;
+}
+window.addEventListener('beforeunload', saveSession);
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function addMsg(role, content) {
+  msgs.push({role, content});
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role==='user' ? 'msg-s' : 'msg-k');
+  const speakBtn = role==='assistant' ? '<button class="speak-btn" onclick="speakEl(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>' : '';
+  wrap.innerHTML = '<div class="msg-name' + (role==='user'?' msg-name-s':'') + '">' + (role==='user'?escapeHtml(childName):'KELVI') + '</div><div class="' + (role==='user'?'msg-bubble-s':'msg-bubble-k') + '">' + escapeHtml(content) + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role==='assistant') { if(autoSpeak) speakText(content); incrementNumberExchange(); }
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; autoResize(input);
+  addMsg('user', text);
+  callAPI();
+}
+
+function callAPI() {
+  const key = localStorage.getItem('kelvi_api_key') || '';
+  if (!key) { addMsg('assistant','No API key — update in Kelvi Family settings.'); return; }
+  document.getElementById('typing').classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, system:buildSYS(currentActivity), messages:msgs.filter(m=>m.role!=='system').slice(-20).map(m=>({'role':m.role,'content':m.content})) })
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant', data.content?.[0]?.text || 'Something went wrong.');
+  }).catch(()=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant','Connection error — check your API key.');
+  });
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function speakEl(el) { const text = typeof el==='string' ? document.getElementById(el)?.textContent : el.closest('.msg-bubble-k')?.textContent; if(text) window.speechSynthesis.speak(new SpeechSynthesisUtterance(text)); }
+function toggleDyslexic() { document.body.classList.toggle('dyslexic'); document.getElementById('dyslexic-btn')?.classList.toggle('on',document.body.classList.contains('dyslexic')); }
+
+
+
+
+
+
+function hexToRgba(hex,alpha) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('kelvi_api_key') && !localStorage.getItem('kelvi_family_name')) { window.location.href='family.html'; return; }
+  renderNumber();
+});
+window.addEventListener('resize', () => { if(document.getElementById('scene-map').style.display!=='none') renderNumber(); });
+
+// ── PLANET DATA ───────────────────────────────────────────────────────────────
+const NUMBER_LEVELS = [
+  {
+    num:'I', key:'arrive', name:'Arrive', pcgKind:'p',
+    activities:[
+      { id:'counting-sequences', title:'Counting & Sequences', questions:[
+        { pcg:'p', prompt:'"Count to 20. Now count backwards from 10."', full:'Count to 20 out loud. Now count backwards from 10. What is the same about counting forwards and backwards?' },
+        { pcg:'p', prompt:'"What number comes after 9? After 19? After 99?"', full:'What number comes after 9? After 19? After 99? What pattern do you notice?' },
+        { pcg:'p', prompt:'"Count the objects in the room. How do you keep track?"', full:'Count all the objects on a table or in a bowl. How do you make sure you do not count the same one twice?' },
+        { pcg:'c', prompt:'"Why do we count in tens? Could we count in fives instead?"', full:'Why do humans count in tens? Could we count in fives instead? What would change?' },
+        { pcg:'c', prompt:'"What is the biggest number you can think of? Is there one bigger?"', full:'What is the biggest number you can think of? Is there always a number bigger than that one? How do you know?' },
+        { pcg:'c', prompt:'"Count by 2s. Count by 5s. What is the same and what is different?"', full:'Count by 2s to 20. Count by 5s to 20. What is the same about these sequences? What is different?' },
+        { pcg:'c', prompt:'"Is zero a number? What does it count?"', full:'Is zero a number? What does it count? Would math work without zero?' },
+        { pcg:'g', prompt:'"Invent your own counting sequence. What rule does it follow?"', full:'Invent your own counting sequence starting from 1. What is your rule? Does it go on forever?' },
+        { pcg:'g', prompt:'"Can you count something that keeps changing as you count it?"', full:'Can you count something that keeps changing while you are counting it — like the seconds in a minute? What problem does that create?' },
+        { pcg:'g', prompt:'"Is counting the same as measuring? How are they different?"', full:'Is counting the same as measuring? What can you count that you cannot measure, and what can you measure that you cannot count?' },
+      ]},
+      { id:'one-more-less', title:'One More One Less', questions:[
+        { pcg:'p', prompt:'"Show me one more than 7. One less than 10."', full:'Show me one more than 7. Now show me one less than 10. How did you know without counting from the beginning?' },
+        { pcg:'p', prompt:'"You have 5 apples. You eat one. How many now?"', full:'You have 5 apples. You eat one. How many now? How did you figure that out?' },
+        { pcg:'p', prompt:'"What is one more than 19? One more than 29? One more than 99?"', full:'What is one more than 19? One more than 29? One more than 99? What happens at each of these?' },
+        { pcg:'c', prompt:'"What is one more than the biggest number you know?"', full:'What is one more than the biggest number you know? Is there always an answer to that question?' },
+        { pcg:'c', prompt:'"One more than 9 is 10. Why does the number look so different?"', full:'One more than 9 is 10. The numbers look completely different even though they are so close together. Why does that happen?' },
+        { pcg:'c', prompt:'"Can you find a number where one more makes something unexpected happen?"', full:'Can you find a number where adding one more causes something surprising or unexpected to happen to how the number looks?' },
+        { pcg:'c', prompt:'"Is one less than zero possible? What would it be?"', full:'Is one less than zero possible? What would that number be? Does it make sense?' },
+        { pcg:'g', prompt:'"Design a number system where one more than 9 is still a single digit."', full:'Design a number system where you never need two digits — where one more than the largest single digit just wraps back around. What would that look like?' },
+        { pcg:'g', prompt:'"In what situations does one more not mean what you expect?"', full:'In what real situations does "one more" not mean what you expect — where adding one changes everything?' },
+        { pcg:'g', prompt:'"What if there were a number between every two numbers? Would there be an end?"', full:'What if there were always a number between any two numbers you name? Would the counting ever end? What does that tell you about numbers?' },
+      ]},
+      { id:'place-value', title:'Place Value', questions:[
+        { pcg:'p', prompt:'"What does the 3 in 35 mean? What does the 5 mean?"', full:'What does the digit 3 mean in the number 35? What does the 5 mean? How are they different?' },
+        { pcg:'p', prompt:'"Build 47 using tens and ones blocks."', full:'Build the number 47 using tens blocks and ones blocks. How many of each do you need? Why?' },
+        { pcg:'p', prompt:'"What is the largest three-digit number? The smallest?"', full:'What is the largest three-digit number you can make? What is the smallest three-digit number? How did you decide?' },
+        { pcg:'c', prompt:'"Why does the position of a digit matter?"', full:'Why does the position of a digit change its value? What would happen if position did not matter?' },
+        { pcg:'c', prompt:'"The number 11 has two 1s. Are they worth the same?"', full:'The number 11 has two 1s. Are they worth the same amount? How is that possible?' },
+        { pcg:'c', prompt:'"Why do we use ten symbols — 0 through 9 — and not more or fewer?"', full:'Our number system uses exactly ten symbols: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9. Why ten? Could we use eight or twelve instead?' },
+        { pcg:'c', prompt:'"What if we wrote numbers from left to right but the ones were on the left?"', full:'What if we wrote numbers the opposite way — ones on the left, tens in the middle, hundreds on the right? Would math still work?' },
+        { pcg:'g', prompt:'"Invent a place value system using powers of 5 instead of 10."', full:'Invent a number system where each place is worth 5 times the one before it instead of 10 times. How would you write 25? How about 100?' },
+        { pcg:'g', prompt:'"Why do computers use base 2 — only 0s and 1s?"', full:'Computers represent all numbers using only the digits 0 and 1. Why would anyone choose to do that? How does that work?' },
+        { pcg:'g', prompt:'"Is place value a discovery or an invention?"', full:'Did humans discover place value or invent it? What is the difference? Could there be a world where mathematics worked without it?' },
+      ]},
+      { id:'number-lines', title:'Number Lines', questions:[
+        { pcg:'p', prompt:'"Place 5 and 8 on a number line. Which is further right?"', full:'Draw a number line and place 5 and 8 on it. Which number is further to the right? What does that mean about their size?' },
+        { pcg:'p', prompt:'"Where is 0 on the number line? Where does the line end?"', full:'Draw a number line. Where is zero? Where does the line end on each side? Does it end at all?' },
+        { pcg:'p', prompt:'"What number is exactly in the middle of 2 and 8?"', full:'Find the number that is exactly in the middle of 2 and 8 on a number line. How did you find it?' },
+        { pcg:'c', prompt:'"Can you always find a number between any two numbers on the line?"', full:'Pick any two numbers on the number line. Can you always find a number between them? Does this ever stop being true?' },
+        { pcg:'c', prompt:'"The number line goes left and right. Could it go in a circle?"', full:'A number line goes left and right forever. Could numbers be arranged in a circle instead? What would happen when you got all the way around?' },
+        { pcg:'c', prompt:'"What does distance mean on a number line?"', full:'What does the distance between two numbers on a number line actually mean? How is distance different from the numbers themselves?' },
+        { pcg:'c', prompt:'"Can you fit all the fractions on a number line between 0 and 1?"', full:'Can you fit all the fractions between 0 and 1 on a number line? How many are there? How do you know?' },
+        { pcg:'g', prompt:'"Design a number line that shows very big and very small numbers at the same time."', full:'Design a number line that can show both 1 and 1,000,000 without one of them looking squished. What trick would you use?' },
+        { pcg:'g', prompt:'"What would a two-dimensional number line look like?"', full:'A standard number line is one-dimensional. What would a two-dimensional number line look like? What would you be able to show on it?' },
+        { pcg:'g', prompt:'"Is the number line a mathematical object or a picture of one?"', full:'Is the number line actually mathematics, or is it just a picture that helps us think about mathematics? What is the difference?' },
+      ]},
+    ],
+  },
+  {
+    num:'II', key:'notice', name:'Notice', pcgKind:'p',
+    activities:[
+      { id:'comparing-numbers', title:'Comparing Numbers', questions:[
+        { pcg:'p', prompt:'"Which is bigger: 47 or 74? How do you know?"', full:'Which number is bigger: 47 or 74? How did you decide? Would your method always work?' },
+        { pcg:'p', prompt:'"Put these in order: 23, 5, 142, 89, 16."', full:'Put these numbers in order from smallest to largest: 23, 5, 142, 89, 16. What did you look at first?' },
+        { pcg:'p', prompt:'"Is 1000 closer to 999 or to 0?"', full:'Is 1000 closer to 999 or to 0? How do you measure how close numbers are to each other?' },
+        { pcg:'c', prompt:'"Which is bigger: half of 100 or double of 20?"', full:'Which is bigger: half of 100 or double of 20? How did you figure that out without computing?' },
+        { pcg:'c', prompt:'"Can you compare 3/4 and 7/10 without finding a common denominator?"', full:'Can you tell which is bigger — 3/4 or 7/10 — without finding a common denominator? What other ways could you compare them?' },
+        { pcg:'c', prompt:'"Find two numbers that look different but are actually equal."', full:'Find two numbers that look completely different but are actually equal in value. What does it mean for numbers to be equal?' },
+        { pcg:'c', prompt:'"Is comparing always possible? Can you compare any two numbers?"', full:'Can you always compare any two numbers and say which is bigger? Is there any pair of numbers where it is impossible to say?' },
+        { pcg:'g', prompt:'"Design a situation where the bigger number is actually worse."', full:'Design a real situation where having the bigger number means you are worse off. What does that tell you about what numbers measure?' },
+        { pcg:'g', prompt:'"Are there numbers that cannot be compared?"', full:'Are there types of numbers or mathematical objects that cannot be compared — where asking which is bigger is a meaningless question?' },
+        { pcg:'g', prompt:'"Compare the number of counting numbers to the number of even numbers."', full:'There are infinitely many counting numbers (1, 2, 3…) and infinitely many even numbers (2, 4, 6…). Are there the same number of each? How would you even compare infinities?' },
+      ]},
+      { id:'skip-counting', title:'Skip Counting & Patterns', questions:[
+        { pcg:'p', prompt:'"Count by 3s from 0 to 30. What do you notice?"', full:'Count by 3s starting from 0: 0, 3, 6, 9... Go to 30. What do you notice about the numbers you land on?' },
+        { pcg:'p', prompt:'"Count by 4s. Will you ever land on 10?"', full:'Count by 4s: 0, 4, 8, 12... Will you ever land exactly on 10? How do you know?' },
+        { pcg:'p', prompt:'"Find the pattern: 2, 5, 8, 11, 14... What comes next?"', full:'Look at this sequence: 2, 5, 8, 11, 14. What is the pattern? What are the next three numbers?' },
+        { pcg:'c', prompt:'"Count by 2s and by 3s. Which numbers appear in both lists?"', full:'Count by 2s and count by 3s. Which numbers appear in both lists? What is special about those numbers?' },
+        { pcg:'c', prompt:'"If you count by 6s, will you land on every number that is in the count-by-2s list?"', full:'If you count by 6s, will you land on every number that appears in the count-by-2s sequence? Will you land on every number in the count-by-3s sequence?' },
+        { pcg:'c', prompt:'"Make a pattern where every third term doubles."', full:'Create a number sequence where every third term is double the previous term, and the rest follow some other rule. What does your sequence look like?' },
+        { pcg:'c', prompt:'"Why do patterns in numbers feel satisfying?"', full:'Why do patterns in numbers feel satisfying or beautiful? Is that feeling a mathematical fact or a human feeling?' },
+        { pcg:'g', prompt:'"Create a sequence where the rule changes at every step."', full:'Create a number sequence where the rule for finding the next term changes at every single step. Is it still a sequence? Can someone else figure out your rule?' },
+        { pcg:'g', prompt:'"Find a pattern in the digits of the multiplication table for 9."', full:'Look at the products in the 9 times table. What patterns do you find in the digits? Why do those patterns exist?' },
+        { pcg:'g', prompt:'"Is every pattern eventually predictable, or can a pattern be random?"', full:'Is every pattern eventually predictable if you study it long enough? Or can something be a pattern and still be random? What would that mean?' },
+      ]},
+      { id:'odd-even', title:'Odd & Even', questions:[
+        { pcg:'p', prompt:'"Sort these into odd and even: 3, 8, 15, 22, 7, 100."', full:'Sort these numbers into odd and even: 3, 8, 15, 22, 7, 100. How did you decide which was which?' },
+        { pcg:'p', prompt:'"Add two even numbers. Is the answer even or odd?"', full:'Add two even numbers together. Is the result even or odd? Try several pairs. Does it always work the same way?' },
+        { pcg:'p', prompt:'"Add an odd and an even number. What do you get?"', full:'Add one odd number and one even number. Is the result odd or even? Try several examples. Will it always be this way?' },
+        { pcg:'c', prompt:'"Why is the sum of two odd numbers always even?"', full:'The sum of any two odd numbers is always even. Can you explain why? Not just show it with examples — explain why it must always be true.' },
+        { pcg:'c', prompt:'"What happens when you multiply odd and even numbers together?"', full:'Experiment with multiplying odd and even numbers. Can you predict the result? Can you explain why those rules work?' },
+        { pcg:'c', prompt:'"Is zero odd or even? How do you know?"', full:'Is zero odd or even? How do you decide? Does your reason work for all the other even numbers too?' },
+        { pcg:'c', prompt:'"Are there numbers that are neither odd nor even?"', full:'Every whole number is either odd or even. Does that still hold for negative numbers? For fractions? Is it possible for a number to be neither?' },
+        { pcg:'g', prompt:'"Invent a classification beyond odd and even — a third category."', full:'Odd and even split all whole numbers into two groups. Can you invent a meaningful third category? What rule would determine which group a number falls into?' },
+        { pcg:'g', prompt:'"Prove that you cannot have two consecutive even numbers with no odd number between them."', full:'Prove that between any two consecutive even numbers there is always exactly one odd number. What does consecutive mean, and why must this be true?' },
+        { pcg:'g', prompt:'"What does odd and even mean in base 3 or base 5?"', full:'In base 10 we define odd and even by whether a number is divisible by 2. What would the equivalent of odd and even be in a base 3 or base 5 number system?' },
+      ]},
+      { id:'rounding-estimation', title:'Rounding & Estimation', questions:[
+        { pcg:'p', prompt:'"Round 47 to the nearest ten. Round 73 to the nearest ten."', full:'Round 47 to the nearest ten. Round 73 to the nearest ten. How did you decide which ten each was closer to?' },
+        { pcg:'p', prompt:'"Estimate how many books are on your bookshelf without counting."', full:'Estimate how many books are on a bookshelf without counting them one by one. What strategy did you use? How close were you?' },
+        { pcg:'p', prompt:'"Is 4.5 closer to 4 or to 5?"', full:'Is 4.5 closer to 4 or to 5? What do you do when a number is exactly halfway?' },
+        { pcg:'c', prompt:'"When is an estimate better than an exact answer?"', full:'When is an estimate actually more useful than an exact answer? Give a real example. What makes estimation the right choice?' },
+        { pcg:'c', prompt:'"Round 2.449 to the nearest tenth. Now round 2.45 to the nearest tenth. Do you get the same answer?"', full:'Round 2.449 to the nearest tenth. Now round 2.45 to the nearest tenth. Do you get the same answer? What happens with the 9?' },
+        { pcg:'c', prompt:'"A crowd is estimated at 10,000. What does that actually mean?"', full:'A news report says a crowd was estimated at 10,000 people. What does that number actually mean? How accurate do you think it is?' },
+        { pcg:'c', prompt:'"Design a rounding rule that always rounds up. When would that be useful?"', full:'Design a rounding rule that always rounds up, never down. When would that rule be more useful than the standard rule?' },
+        { pcg:'g', prompt:'"Estimate the number of grains of sand on a beach. Show your reasoning."', full:'Estimate the number of grains of sand on a beach. Do not just guess — build an estimate step by step from things you know. What assumptions did you make?' },
+        { pcg:'g', prompt:'"Is there such a thing as a perfect estimate?"', full:'Can an estimate ever be perfect? If so, is it still an estimate? What is the difference between an estimate and a measurement?' },
+        { pcg:'g', prompt:'"Prove that rounding always introduces error. Can the error ever be zero?"', full:'Prove that rounding always introduces some error — unless what? Can you construct a case where rounding introduces zero error?' },
+      ]},
+    ],
+  },
+  {
+    num:'III', key:'question', name:'Question', pcgKind:'c',
+    activities:[
+      { id:'negative-numbers', title:'Negative Numbers', questions:[
+        { pcg:'p', prompt:'"The temperature is 3 degrees. It drops 5 degrees. What is it now?"', full:'The temperature is 3 degrees. It drops 5 degrees. What is the temperature now? How did you get below zero?' },
+        { pcg:'p', prompt:'"Place -3, -7, 0, 2, -1 on a number line."', full:'Place these numbers on a number line: -3, -7, 0, 2, -1. Which is biggest? Which is smallest?' },
+        { pcg:'p', prompt:'"What is -3 + 5? What is 3 + (-5)?"', full:'What is -3 + 5? What is 3 + (-5)? How are those two problems related?' },
+        { pcg:'c', prompt:'"Why is -(-3) equal to positive 3?"', full:'Why does negative negative 3 equal positive 3? Explain it in a way that would make sense to a 7-year-old.' },
+        { pcg:'c', prompt:'"Is -7 greater or less than -3? Why does the bigger-looking number feel smaller?"', full:'Is -7 greater or less than -3? Why does the number with the bigger digit feel smaller? What does it mean for negative numbers to have size?' },
+        { pcg:'c', prompt:'"What does it mean to owe someone money? How is debt like negative numbers?"', full:'What does it mean to owe someone money? How is debt a real-world example of negative numbers? Where else do negative numbers appear in real life?' },
+        { pcg:'c', prompt:'"Why was the invention of negative numbers controversial?"', full:'For centuries mathematicians refused to accept negative numbers as real. Why? What changed their minds? Were they wrong to be skeptical?' },
+        { pcg:'g', prompt:'"What is the square root of a negative number?"', full:'What is the square root of -1? Can you find a number that, when multiplied by itself, gives -1? What does this question open up?' },
+        { pcg:'g', prompt:'"Design a context where negative numbers are more natural than positive ones."', full:'Design a context or world where negative numbers are the natural starting point and positive numbers are the "weird" ones.' },
+        { pcg:'g', prompt:'"Prove that there are as many negative numbers as positive ones."', full:'Prove that there are exactly as many negative numbers as positive numbers. How would you match them up? What does this tell you about infinity?' },
+      ]},
+      { id:'factors-multiples', title:'Factors & Multiples', questions:[
+        { pcg:'p', prompt:'"List all the factors of 12."', full:'List all the factors of 12. How do you know you have found all of them?' },
+        { pcg:'p', prompt:'"What are the first five multiples of 7?"', full:'What are the first five multiples of 7? What is the relationship between factors and multiples?' },
+        { pcg:'p', prompt:'"Find a number that has exactly three factors."', full:'Find a number that has exactly three factors. How many such numbers can you find?' },
+        { pcg:'c', prompt:'"What is the difference between a factor and a divisor?"', full:'What is the difference between a factor of a number and a divisor of a number? Are they the same thing?' },
+        { pcg:'c', prompt:'"How do factors help you simplify fractions?"', full:'How does knowing the factors of two numbers help you simplify a fraction? Show with an example.' },
+        { pcg:'c', prompt:'"Find the largest number that divides both 36 and 48."', full:'Find the largest number that divides evenly into both 36 and 48. How did you find it? What is this called?' },
+        { pcg:'c', prompt:'"Every number that is a multiple of 6 is also a multiple of 2 and 3. Why?"', full:'Every multiple of 6 is also a multiple of both 2 and 3. Is the reverse true — is every number that is a multiple of 2 and 3 also a multiple of 6? Why?' },
+        { pcg:'g', prompt:'"Which number below 100 has the most factors?"', full:'Which number less than 100 has the most factors? How would you find it? What kind of numbers tend to have many factors?' },
+        { pcg:'g', prompt:'"Perfect numbers: find a number where the factors sum to the number itself."', full:'A perfect number equals the sum of all its factors except itself. 6 = 1+2+3. Can you find another? Why are perfect numbers so rare?' },
+        { pcg:'g', prompt:'"Is there a pattern in which numbers have an odd number of factors?"', full:'Most numbers have an even number of factors. Which numbers have an odd number of factors? Why? Can you prove it?' },
+      ]},
+      { id:'prime-composite', title:'Prime & Composite', questions:[
+        { pcg:'p', prompt:'"Is 7 prime? Is 9 prime? How do you check?"', full:'Is 7 prime? Is 9 prime? What steps do you go through to check whether a number is prime?' },
+        { pcg:'p', prompt:'"List all prime numbers less than 30."', full:'List all the prime numbers less than 30. How do you know you have not missed any?' },
+        { pcg:'p', prompt:'"Write 24 as a product of prime numbers."', full:'Write 24 as a product of prime numbers. How many ways can you do it? Do you always get the same primes?' },
+        { pcg:'c', prompt:'"Why is 1 not considered prime?"', full:'1 has exactly one factor — itself. Why do mathematicians say it is not prime? What breaks if we call 1 a prime number?' },
+        { pcg:'c', prompt:'"The prime numbers seem random. Are they?"', full:'Looking at the list of prime numbers, they seem to appear randomly. Are they truly random? Is there a pattern, even a hidden one?' },
+        { pcg:'c', prompt:'"Every even number greater than 2 seems to be the sum of two primes. Is that always true?"', full:'Every even number greater than 2 that anyone has ever checked is the sum of two prime numbers. Is this always true? Has it been proven? This is called Goldbach Conjecture.' },
+        { pcg:'c', prompt:'"How would you test whether a very large number is prime?"', full:'How would you test whether 1,000,003 is prime without dividing by every number less than it? What shortcut can you use?' },
+        { pcg:'g', prompt:'"Primes get rarer as numbers get larger. Do they ever stop completely?"', full:'Prime numbers get rarer as you go to larger numbers. Do they ever stop completely? Euclid proved they do not — can you reconstruct his argument?' },
+        { pcg:'g', prompt:'"Twin primes: find pairs of primes that differ by 2. Do they go on forever?"', full:'Twin primes are prime pairs that differ by exactly 2: (3,5), (5,7), (11,13)... Do twin primes go on forever? No one knows — this is an unsolved problem.' },
+        { pcg:'g', prompt:'"Why are prime numbers important for keeping secrets?"', full:'Prime numbers are at the heart of modern encryption — keeping your bank details safe online. How does that work? Why are primes useful for keeping secrets?' },
+      ]},
+      { id:'fractions-as-numbers', title:'Fractions as Numbers', questions:[
+        { pcg:'p', prompt:'"Where does 1/2 live on the number line?"', full:'Place 1/2 on the number line. Now place 1/3 and 3/4. Which is furthest to the right?' },
+        { pcg:'p', prompt:'"Is 3/4 the same as 0.75? Show why."', full:'Is 3/4 the same as 0.75? Show why they are the same number, just written differently.' },
+        { pcg:'p', prompt:'"Find a fraction between 1/2 and 3/4."', full:'Find a fraction that lives between 1/2 and 3/4 on the number line. How did you find it?' },
+        { pcg:'c', prompt:'"Are there more fractions than whole numbers?"', full:'There are infinitely many whole numbers and infinitely many fractions. Are there more fractions than whole numbers? How would you even compare?' },
+        { pcg:'c', prompt:'"Can every point on the number line be described as a fraction?"', full:'Can every point on the number line be written as a fraction? Or are there points that cannot be described as any fraction at all?' },
+        { pcg:'c', prompt:'"1/3 as a decimal goes on forever: 0.333... Does it ever equal 1/3 exactly?"', full:'1 divided by 3 gives 0.333333... going on forever. Does this infinite decimal ever exactly equal 1/3? What does that mean about infinite decimals?' },
+        { pcg:'c', prompt:'"Is 0.999... equal to 1?"', full:'Is 0.999999... (9 repeating forever) exactly equal to 1, or is it just very close? This has a definitive mathematical answer — what is it, and why?' },
+        { pcg:'g', prompt:'"Between any two fractions, there is always another fraction. Prove it."', full:'Between any two different fractions there is always another fraction. Prove this is true. What does it mean for the number line to be dense?' },
+        { pcg:'g', prompt:'"Are there numbers on the number line that are not fractions?"', full:'Are there numbers that live on the number line but cannot be written as any fraction? What are they called? Give an example.' },
+        { pcg:'g', prompt:'"Invent a number that is between all the fractions less than 1 and all the fractions greater than 1."', full:'Can you invent a number that is bigger than every fraction less than 1, but smaller than every fraction greater than 1? What would that number be? Is it 1 itself?' },
+      ]},
+    ],
+  },
+  {
+    num:'IV', key:'connect', name:'Connect', pcgKind:'c',
+    activities:[
+      { id:'rational-numbers', title:'Rational Numbers', questions:[
+        { pcg:'p', prompt:'"Write three examples of rational numbers. Write three that look different but are the same."', full:'Write three examples of rational numbers. Now write three pairs of rational numbers that look different but are actually equal.' },
+        { pcg:'p', prompt:'"Is -3/4 a rational number? Where does it live on the number line?"', full:'Is -3/4 a rational number? Where does it live on the number line? What makes a negative fraction rational?' },
+        { pcg:'p', prompt:'"Convert 5/4 to a mixed number. Convert 2 3/4 to an improper fraction."', full:'Convert 5/4 to a mixed number. Convert 2 and 3/4 to an improper fraction. Why might you use one form instead of the other?' },
+        { pcg:'c', prompt:'"Every terminating decimal is rational. Why?"', full:'Every decimal that terminates — like 0.25 or 1.375 — is rational. Why? Can you always write a terminating decimal as a fraction?' },
+        { pcg:'c', prompt:'"Every repeating decimal is rational. Prove it for 0.142857142857..."', full:'Every repeating decimal is a rational number. Can you show that 0.142857142857... (the repeating decimal for 1/7) is rational by finding the fraction?' },
+        { pcg:'c', prompt:'"The rational numbers fill the number line densely but not completely. What does that mean?"', full:'Mathematicians say the rational numbers are dense on the number line — between any two rationals there is another. But they do not fill the line completely. How can both be true?' },
+        { pcg:'c', prompt:'"Is every integer a rational number? Is every rational number an integer?"', full:'Is every integer a rational number? Is every rational number an integer? How do these two sets of numbers relate to each other?' },
+        { pcg:'g', prompt:'"Prove that the sum of two rational numbers is always rational."', full:'Prove that when you add any two rational numbers together, the result is always rational. What does your proof tell you about the structure of rational numbers?' },
+        { pcg:'g', prompt:'"Are there more rational numbers or more integers?"', full:'There are infinitely many integers and infinitely many rational numbers. Are there more rational numbers? Georg Cantor answered this — what did he find?' },
+        { pcg:'g', prompt:'"Can you add all the rational numbers between 0 and 1 together? What do you get?"', full:'If you tried to add all the rational numbers between 0 and 1 together, what would happen? Is the sum finite or infinite?' },
+      ]},
+      { id:'irrational-numbers', title:'Irrational Numbers', questions:[
+        { pcg:'p', prompt:'"√2 is approximately 1.414. Is it exactly 1.414?"', full:'The square root of 2 is approximately 1.414. Is it exactly 1.414? How many decimal places does it actually have?' },
+        { pcg:'p', prompt:'"Is π a fraction? Why or why not?"', full:'Is π (pi) a fraction? Could you write it as one integer divided by another? How do you know?' },
+        { pcg:'p', prompt:'"Place √2 on the number line. Where does it go?"', full:'Place √2 on the number line between two whole numbers. Which two? How do you know it goes there?' },
+        { pcg:'c', prompt:'"Prove that √2 is not a fraction."', full:'Prove that the square root of 2 cannot be written as any fraction. This is one of the oldest proofs in mathematics — can you reconstruct it?' },
+        { pcg:'c', prompt:'"The decimal expansion of π goes on forever without repeating. What does that mean?"', full:'π = 3.14159265358979... and the digits go on forever without any repeating pattern. What does that actually mean? How do we know?' },
+        { pcg:'c', prompt:'"Are there more irrational numbers or more rational numbers?"', full:'There are infinitely many rational numbers and infinitely many irrational numbers. Which infinity is bigger? This has a surprising answer.' },
+        { pcg:'c', prompt:'"Is every square root irrational?"', full:'Is the square root of every number irrational? Or are some square roots rational? How can you tell which is which?' },
+        { pcg:'g', prompt:'"Find an irrational number between 1 and 2. Now find one between 1.4 and 1.5."', full:'Find an irrational number between 1 and 2. Now find one between 1.4 and 1.5. How many irrational numbers live in any interval?' },
+        { pcg:'g', prompt:'"e and π are both irrational. Is π + e irrational?"', full:'Both e and π are irrational numbers. Is their sum π + e also irrational? Is their product? As of today, nobody knows for certain.' },
+        { pcg:'g', prompt:'"Can you construct √2 exactly using a ruler and compass?"', full:'Ancient Greeks were troubled that √2 was not a fraction. But they found a way to construct it exactly using only a ruler and compass. How?' },
+      ]},
+      { id:'number-systems', title:'Number Systems', questions:[
+        { pcg:'p', prompt:'"Draw a diagram showing how natural numbers, integers, rationals and reals relate."', full:'Draw a diagram showing how natural numbers, integers, rational numbers, and real numbers are related. How does each set contain the previous one?' },
+        { pcg:'p', prompt:'"Give an example of a real number that is not rational. One that is not an integer."', full:'Give an example of a real number that is not rational. Give one that is not an integer but is rational. Where do these live in your diagram?' },
+        { pcg:'p', prompt:'"Which number system is the smallest one where you can solve x + 3 = 1?"', full:'Which number system — natural numbers, integers, rationals, reals — is the smallest one where you can always solve x + 3 = 1? Why?' },
+        { pcg:'c', prompt:'"Why did mathematicians need to keep inventing new types of numbers?"', full:'Through history, mathematicians kept needing to invent new types of numbers. What problems forced each expansion? What was missing each time?' },
+        { pcg:'c', prompt:'"The real numbers seem complete. Are they?"', full:'The real numbers seem like they include everything. Are there any "holes" left in the real number line? Or is it truly complete?' },
+        { pcg:'c', prompt:'"Can you add, subtract, multiply and divide within every number system?"', full:'Can you always add, subtract, multiply, and divide within natural numbers, integers, rationals, and reals? Where does division cause problems?' },
+        { pcg:'c', prompt:'"What number system do computers actually use?"', full:'Computers store all numbers in binary — base 2. What number system does a computer actually use when it does arithmetic? What errors can that cause?' },
+        { pcg:'g', prompt:'"What problem do you need complex numbers to solve?"', full:'What mathematical problem requires you to go beyond the real numbers and invent complex numbers? What equation has no real solution?' },
+        { pcg:'g', prompt:'"Is there a number system even bigger than the complex numbers?"', full:'Is there a number system even bigger than the complex numbers? What would you gain, and what would you lose?' },
+        { pcg:'g', prompt:'"Are numbers discovered or invented?"', full:'Are number systems discovered — things that already exist in some abstract universe — or invented by humans to solve problems? What would it mean if they were discovered?' },
+      ]},
+      { id:'absolute-value', title:'Absolute Value & Distance', questions:[
+        { pcg:'p', prompt:'"What is |−8|? What is |5|?"', full:'What is the absolute value of -8? What is the absolute value of 5? What does absolute value actually measure?' },
+        { pcg:'p', prompt:'"What is the distance between -3 and 4 on the number line?"', full:'What is the distance between -3 and 4 on the number line? How does absolute value help you find distance?' },
+        { pcg:'p', prompt:'"Solve |x| = 5. How many solutions are there?"', full:'Solve the equation |x| = 5. How many solutions does it have? Why?' },
+        { pcg:'c', prompt:'"Why is |x| always non-negative?"', full:'Why is the absolute value of any number always zero or positive — never negative? What does this tell you about what absolute value measures?' },
+        { pcg:'c', prompt:'"Is |a + b| always equal to |a| + |b|?"', full:'Is the absolute value of (a + b) always equal to the absolute value of a plus the absolute value of b? When is it equal and when is it less?' },
+        { pcg:'c', prompt:'"Distance on a number line vs. distance in a city — what is the difference?"', full:'The distance between two numbers on a number line is simple. But in a city with blocks, distance is measured differently. What are the two types of distance? When would you use each?' },
+        { pcg:'c', prompt:'"Graph the equation y = |x|. What shape is it? Why?"', full:'Graph the equation y = |x|. What shape does it make? Why does the graph look like a V? What happens at x = 0?' },
+        { pcg:'g', prompt:'"Prove the triangle inequality: |a + b| ≤ |a| + |b|."', full:'Prove the triangle inequality: the absolute value of (a+b) is always less than or equal to |a| + |b|. What does this say geometrically about triangles?' },
+        { pcg:'g', prompt:'"Can you define distance without using subtraction?"', full:'The distance between two numbers uses subtraction: |a - b|. Can you define a notion of distance that does not use subtraction? What properties would it need to have?' },
+        { pcg:'g', prompt:'"How many points on the number line are exactly distance 3 from the origin?"', full:'How many points on the number line are exactly distance 3 from 0? How many in a two-dimensional plane? How does the answer change with dimension?' },
+      ]},
+    ],
+  },
+  {
+    num:'V', key:'create', name:'Create', pcgKind:'g',
+    activities:[
+      { id:'infinity', title:'Infinity & Infinite Series', questions:[
+        { pcg:'p', prompt:'"Does 1/2 + 1/4 + 1/8 + 1/16 + ... ever reach 1?"', full:'Add 1/2 + 1/4 + 1/8 + 1/16 and keep going. Does the sum ever reach 1? What happens as you add more and more terms?' },
+        { pcg:'p', prompt:'"Which is bigger: the set of all counting numbers or the set of all even numbers?"', full:'Which set is bigger: all counting numbers (1, 2, 3, 4...) or all even numbers (2, 4, 6, 8...)? Or are they the same size? How would you decide?' },
+        { pcg:'p', prompt:'"Is there a number between the largest rational and the smallest irrational?"', full:'Between the largest rational number less than 1 and the smallest rational number greater than 1... wait. Is there a largest rational number less than 1?' },
+        { pcg:'c', prompt:'"Hilbert Hotel: a hotel with infinitely many rooms is full. Can it fit one more guest?"', full:'Imagine a hotel with infinitely many rooms, all occupied. A new guest arrives. Can the hotel accommodate them? This is Hilbert Hotel — how does it work?' },
+        { pcg:'c', prompt:'"1 + 2 + 3 + 4 + ... = -1/12? Is this actually true?"', full:'Some mathematicians write that 1 + 2 + 3 + 4 + ... = -1/12. How is that possible? What does it mean? Is it true in any meaningful sense?' },
+        { pcg:'c', prompt:'"Are there different sizes of infinity?"', full:'Georg Cantor showed there are different sizes of infinity. Some infinities are bigger than others. How is that possible? Give an example.' },
+        { pcg:'c', prompt:'"Can an infinite sum have a finite answer?"', full:'1/2 + 1/4 + 1/8 + ... = 1. An infinite number of terms adds up to a finite answer. When does this happen and when does the sum grow without bound?' },
+        { pcg:'g', prompt:'"Prove that there are more real numbers than counting numbers."', full:'Prove that the set of real numbers is strictly larger than the set of counting numbers. Georg Cantor diagonal argument is the key — can you reconstruct it?' },
+        { pcg:'g', prompt:'"Is there an infinity between countable and uncountable?"', full:'Cantor showed some infinities are bigger than others. Is there an infinity strictly between the countable and uncountable infinities? This is the Continuum Hypothesis — one of the great unsolved questions.' },
+        { pcg:'g', prompt:'"Design a process that never ends but produces a definite answer."', full:'Design a mathematical process or sum that goes on forever but converges to a single definite answer. What conditions make that possible?' },
+      ]},
+      { id:'modular-arithmetic', title:'Modular Arithmetic', questions:[
+        { pcg:'p', prompt:'"It is 10 oclock. What time will it be in 5 hours? In 15 hours?"', full:'It is 10 oclock. What time will it be in 5 hours? In 15 hours? In 27 hours? What mathematical process are you using?' },
+        { pcg:'p', prompt:'"What is 17 mod 5? What is 100 mod 7?"', full:'What is 17 mod 5 — that is, what is the remainder when you divide 17 by 5? What is 100 mod 7?' },
+        { pcg:'p', prompt:'"Write all numbers that leave a remainder of 2 when divided by 5."', full:'Write the first ten numbers that leave a remainder of 2 when divided by 5. What do these numbers have in common?' },
+        { pcg:'c', prompt:'"Why does a clock only have 12 numbers even though the day has 24 hours?"', full:'A clock has 12 numbers, but a day has 24 hours. How does the clock handle this? What mathematical structure is this?' },
+        { pcg:'c', prompt:'"In mod 12, what is 7 + 8? Does addition still work the way you expect?"', full:'In mod 12 arithmetic, what is 7 + 8? Does addition still work the same way? What properties of normal addition carry over and which do not?' },
+        { pcg:'c', prompt:'"Can you divide in modular arithmetic? What is 1/2 mod 7?"', full:'In regular arithmetic, 1/2 = 0.5. But in mod 7 arithmetic, what does 1/2 mean? Can you find a number that, when multiplied by 2, gives 1 mod 7?' },
+        { pcg:'c', prompt:'"Why is checking divisibility by 9 the same as summing the digits?"', full:'A number is divisible by 9 if and only if its digits sum to a multiple of 9. Why does this work? What does it have to do with mod 9?' },
+        { pcg:'g', prompt:'"Design a secret code using modular arithmetic."', full:'Design a simple secret code that uses modular arithmetic to encode and decode messages. How would someone break your code?' },
+        { pcg:'g', prompt:'"Why are prime moduli special?"', full:'When you do arithmetic mod p where p is prime, something special happens. What is it? Why do prime numbers make modular arithmetic particularly well-behaved?' },
+        { pcg:'g', prompt:'"Fermat Little Theorem: if p is prime, then a^p ≡ a (mod p). Verify and explore."', full:'Fermat Little Theorem says that for any number a and any prime p, a raised to the power p is congruent to a mod p. Verify this for small cases. What does it mean?' },
+      ]},
+      { id:'number-theory', title:'Number Theory', questions:[
+        { pcg:'p', prompt:'"Find the GCD and LCM of 12 and 18."', full:'Find the greatest common divisor and least common multiple of 12 and 18. What is the relationship between the GCD and LCM?' },
+        { pcg:'p', prompt:'"Is 561 divisible by 3? By 7? By 11? How do you check without dividing?"', full:'Is 561 divisible by 3? By 7? By 11? What shortcuts can you use without doing long division?' },
+        { pcg:'p', prompt:'"Find all solutions to 3x + 5y = 1 where x and y are integers."', full:'Find all integer solutions to 3x + 5y = 1. Is there always a solution? Does it depend on 3 and 5 being coprime?' },
+        { pcg:'c', prompt:'"Why does the Euclidean algorithm find the GCD?"', full:'The Euclidean algorithm repeatedly divides and takes remainders to find the GCD. Why does that work? What is it actually doing?' },
+        { pcg:'c', prompt:'"Pythagorean triples: find sets of three integers where a² + b² = c²."', full:'Find at least three sets of three integers where a² + b² = c². These are called Pythagorean triples. Is there a pattern? How many are there?' },
+        { pcg:'c', prompt:'"Fermat Last Theorem says aⁿ + bⁿ = cⁿ has no solutions for n > 2. Why did it take 350 years to prove?"', full:'Fermat Last Theorem was stated in 1637 and proved in 1995. Why did it take so long? What made it so hard? What does the proof say about mathematics?' },
+        { pcg:'c', prompt:'"What is the Collatz conjecture? Try it on several numbers."', full:'Take any positive integer. If it is even, divide by 2. If it is odd, multiply by 3 and add 1. Keep going. Does it always reach 1? Try several starting numbers. Nobody has proved this.' },
+        { pcg:'g', prompt:'"Why are prime numbers used in internet encryption?"', full:'RSA encryption — used for nearly all secure internet communication — relies entirely on prime numbers. Explain how it works. Why would breaking a large number into its prime factors break the code?' },
+        { pcg:'g', prompt:'"The Riemann Hypothesis is the most important unsolved problem in mathematics. What does it say?"', full:'The Riemann Hypothesis is considered the most important unsolved problem in mathematics, with a $1 million prize for its solution. What does it say about prime numbers? Why does it matter?' },
+        { pcg:'g', prompt:'"Is mathematics discovered or invented? Use number theory as your evidence."', full:'Use number theory as your evidence: are mathematical truths — like the infinitude of primes — discovered facts about reality, or invented constructions of the human mind? Make the strongest case you can for both sides.' },
+      ]},
+      { id:'complex-numbers', title:'Complex Numbers', questions:[
+        { pcg:'p', prompt:'"What is i? What is i²?"', full:'What is the imaginary unit i? What is i squared? Why was this number invented?' },
+        { pcg:'p', prompt:'"Calculate (3 + 2i) + (1 - 4i)."', full:'Calculate (3 + 2i) + (1 - 4i). How does addition with complex numbers work?' },
+        { pcg:'p', prompt:'"Calculate (2 + i)(3 - i). Use i² = -1."', full:'Calculate (2 + i)(3 - i). Use the fact that i² = -1. Does multiplication feel like regular algebra?' },
+        { pcg:'c', prompt:'"Plot 3 + 2i on the complex plane. What is its distance from the origin?"', full:'Plot the complex number 3 + 2i on the complex plane. What is its distance from the origin? What is this called?' },
+        { pcg:'c', prompt:'"What happens when you multiply a complex number by i?"', full:'Take a complex number and multiply it by i. What happens to its position on the complex plane? Multiply by i again. What do you notice?' },
+        { pcg:'c', prompt:'"Euler formula: e^(iπ) + 1 = 0. Why is this called the most beautiful equation?"', full:'Euler formula states that e to the power of iπ plus 1 equals 0. This connects five fundamental constants. Why is this called the most beautiful equation in mathematics?' },
+        { pcg:'c', prompt:'"Do complex numbers have an order? Can you say one complex number is bigger than another?"', full:'For real numbers, we can say one is bigger than another. Can you define an order for complex numbers — a way to compare them? What goes wrong if you try?' },
+        { pcg:'g', prompt:'"The Mandelbrot set is generated by a simple complex number rule. What is it?"', full:'The Mandelbrot set — one of the most complex and beautiful images in mathematics — is generated by a simple rule applied to complex numbers. What is the rule? Why does it produce such complexity?' },
+        { pcg:'g', prompt:'"Every polynomial equation has a solution in complex numbers. Prove it."', full:'The Fundamental Theorem of Algebra says that every polynomial equation with real or complex coefficients has at least one complex solution. Why is this remarkable? What does it say about the complex numbers being "complete"?' },
+        { pcg:'g', prompt:'"Are complex numbers real? Do they exist?"', full:'Complex numbers involve the square root of -1, which seems impossible. But they are used in quantum mechanics to describe physical reality. Are complex numbers real? What does it mean for a mathematical object to exist?' },
+      ]},
+    ],
+  },
+];
+
+
+let numberResizeRaf = 0;
+
+const NUMBER_NODES = [
+  // ARRIVE
+  { id:'counting-sequences', li:0, ai:0, label:'Counting & Sequences', nx:0.10, ny:0.35 },
+  { id:'one-more-less',      li:0, ai:1, label:'One More One Less',    nx:0.18, ny:0.55 },
+  { id:'place-value',        li:0, ai:2, label:'Place Value',          nx:0.12, ny:0.72 },
+  { id:'number-lines',       li:0, ai:3, label:'Number Lines',         nx:0.26, ny:0.48 },
+  // NOTICE
+  { id:'comparing-numbers',  li:1, ai:0, label:'Comparing Numbers',    nx:0.38, ny:0.20 },
+  { id:'skip-counting',      li:1, ai:1, label:'Skip Counting',        nx:0.44, ny:0.38 },
+  { id:'odd-even',           li:1, ai:2, label:'Odd & Even',           nx:0.36, ny:0.58 },
+  { id:'rounding-estimation',li:1, ai:3, label:'Rounding',             nx:0.46, ny:0.72 },
+  // QUESTION
+  { id:'negative-numbers',   li:2, ai:0, label:'Negative Numbers',     nx:0.58, ny:0.18 },
+  { id:'factors-multiples',  li:2, ai:1, label:'Factors & Multiples',  nx:0.64, ny:0.36 },
+  { id:'prime-composite',    li:2, ai:2, label:'Prime & Composite',    nx:0.58, ny:0.54 },
+  { id:'fractions-as-numbers',li:2,ai:3,label:'Fractions as Numbers', nx:0.64, ny:0.70 },
+  // CONNECT
+  { id:'rational-numbers',   li:3, ai:0, label:'Rational Numbers',     nx:0.76, ny:0.22 },
+  { id:'irrational-numbers', li:3, ai:1, label:'Irrational Numbers',   nx:0.80, ny:0.40 },
+  { id:'number-systems',     li:3, ai:2, label:'Number Systems',       nx:0.74, ny:0.58 },
+  { id:'absolute-value',     li:3, ai:3, label:'Absolute Value',       nx:0.80, ny:0.74 },
+  // CREATE
+  { id:'infinity',           li:4, ai:0, label:'Infinity',             nx:0.90, ny:0.28 },
+  { id:'modular-arithmetic', li:4, ai:1, label:'Modular Arithmetic',   nx:0.92, ny:0.46 },
+  { id:'number-theory',      li:4, ai:2, label:'Number Theory',        nx:0.88, ny:0.62 },
+  { id:'complex-numbers',    li:4, ai:3, label:'Complex Numbers',      nx:0.93, ny:0.78 },
+];
+
+const NUMBER_EDGES = [
+  ['counting-sequences','one-more-less'],['counting-sequences','number-lines'],
+  ['counting-sequences','place-value'],['one-more-less','place-value'],
+  ['place-value','comparing-numbers'],['number-lines','comparing-numbers'],
+  ['number-lines','skip-counting'],['place-value','skip-counting'],
+  ['skip-counting','odd-even'],['odd-even','rounding-estimation'],
+  ['comparing-numbers','negative-numbers'],['skip-counting','factors-multiples'],
+  ['odd-even','prime-composite'],['rounding-estimation','fractions-as-numbers'],
+  ['negative-numbers','rational-numbers'],['factors-multiples','rational-numbers'],
+  ['prime-composite','number-systems'],['fractions-as-numbers','rational-numbers'],
+  ['rational-numbers','irrational-numbers'],['irrational-numbers','number-systems'],
+  ['number-systems','absolute-value'],['rational-numbers','absolute-value'],
+  ['number-systems','infinity'],['irrational-numbers','modular-arithmetic'],
+  ['absolute-value','number-theory'],['number-systems','complex-numbers'],
+  ['infinity','complex-numbers'],['number-theory','complex-numbers'],
+];
+
+const NUMBER_LVL_COLORS = ['#C4873A','#D4944A','#B87A6C','#9E7BB5','#7B8ED4'];
+
+let numberFocused = JSON.parse(localStorage.getItem('kelvi_number_focused') || 'null') || { li:0, ai:0 };
+let numberSelectedNode = null;
+
+function saveNumberFocused() {
+  localStorage.setItem('kelvi_number_focused', JSON.stringify(numberFocused));
+}
+
+function numberVisitedKey(id) { return 'kelvi_number_visited_' + id; }
+
+function loadNumberVisited() {
+  NUMBER_NODES.forEach(n => {
+    if (localStorage.getItem(numberVisitedKey(n.id))) n.visited = true;
+  });
+}
+
+function getNumberNodeQuestion(node) {
+  const act = NUMBER_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_number_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0') % act.questions.length;
+  return { q: act.questions[idx], idx, total: act.questions.length };
+}
+
+function advanceNumberNodeQuestion(node) {
+  const act = NUMBER_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_number_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0');
+  localStorage.setItem(key, (idx + 1) % act.questions.length);
+}
+
+function renderNumber() {
+  loadNumberVisited();
+  const wrap = document.querySelector('#scene-map .geo-map-wrap');
+  if (!wrap) return;
+  const W = wrap.clientWidth || 600;
+  const H = wrap.clientHeight || 420;
+  const svg = document.getElementById('number-svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  drawNumberMap(svg, W, H);
+  closeNumberHero();
+}
+
+function drawNumberMap(svg, W, H) {
+  svg.innerHTML = '';
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const vig = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
+  vig.setAttribute('id','num-vig');
+  vig.setAttribute('cx','50%'); vig.setAttribute('cy','50%'); vig.setAttribute('r','65%');
+  [['0%','rgba(245,242,238,0)'],['100%','rgba(220,210,196,0.25)']].forEach(([off,col])=>{
+    const s=document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset',off); s.setAttribute('stop-color',col); vig.appendChild(s);
+  });
+  defs.appendChild(vig);
+  svg.appendChild(defs);
+
+  const vigEl = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  vigEl.setAttribute('x',0); vigEl.setAttribute('y',0);
+  vigEl.setAttribute('width',W); vigEl.setAttribute('height',H);
+  vigEl.setAttribute('fill','url(#num-vig)');
+  svg.appendChild(vigEl);
+
+  NUMBER_EDGES.forEach(([aId,bId]) => {
+    const a = NUMBER_NODES.find(n=>n.id===aId), b = NUMBER_NODES.find(n=>n.id===bId);
+    if (!a||!b) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.nx*W); line.setAttribute('y1',a.ny*H);
+    line.setAttribute('x2',b.nx*W); line.setAttribute('y2',b.ny*H);
+    line.setAttribute('stroke',(a.visited&&b.visited)?'rgba(180,160,130,0.45)':'rgba(180,160,130,0.20)');
+    line.setAttribute('stroke-width','1.2');
+    line.setAttribute('stroke-dasharray',(a.visited||b.visited)?'':'4 6');
+    svg.appendChild(line);
+  });
+
+  // ── Nodes as pie charts ──
+  NUMBER_NODES.forEach(node => {
+    const cx = node.nx*W, cy = node.ny*H;
+    const color = '#7CB800';
+    const isSelected = numberSelectedNode && numberSelectedNode.id === node.id;
+    const isStart = !numberSelectedNode && node.li === numberFocused.li && node.ai === numberFocused.ai;
+    const r = 20;
+    const exchanges = getNumberExchanges(node.id);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform',`translate(${cx},${cy})`);
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => selectNumberNode(node));
+    if (isStart && exchanges===0) {
+      const pulse=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pulse.setAttribute('r',r+10);pulse.setAttribute('fill','none');pulse.setAttribute('stroke',color);pulse.setAttribute('stroke-width','1.5');pulse.setAttribute('opacity','0');
+      const a1=document.createElementNS('http://www.w3.org/2000/svg','animate');a1.setAttribute('attributeName','opacity');a1.setAttribute('values','0;0.45;0');a1.setAttribute('dur','2.2s');a1.setAttribute('repeatCount','indefinite');
+      const a2=document.createElementNS('http://www.w3.org/2000/svg','animate');a2.setAttribute('attributeName','r');a2.setAttribute('values',`${r+6};${r+14};${r+6}`);a2.setAttribute('dur','2.2s');a2.setAttribute('repeatCount','indefinite');
+      pulse.appendChild(a1);pulse.appendChild(a2);g.appendChild(pulse);
+    }
+    if (isSelected) {
+      const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('r',r+5);ring.setAttribute('fill','none');ring.setAttribute('stroke',color);ring.setAttribute('stroke-width','2');ring.setAttribute('opacity','0.5');g.appendChild(ring);
+    }
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    bg.setAttribute('r',r);bg.setAttribute('fill','#FFFFFF');bg.setAttribute('stroke','#1C1917');bg.setAttribute('stroke-width','2');g.appendChild(bg);
+    for (let i=0; i<10; i++) {
+      const sa=(i*36-90)*Math.PI/180,ea=((i+1)*36-90)*Math.PI/180;
+      const x1=Math.cos(sa)*r,y1=Math.sin(sa)*r,x2=Math.cos(ea)*r,y2=Math.sin(ea)*r;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',`M 0 0 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`);
+      path.setAttribute('fill',i<exchanges?color:'transparent');
+      path.setAttribute('stroke','#FFFFFF');path.setAttribute('stroke-width','1.5');g.appendChild(path);
+    }
+    const words=node.label.toUpperCase().split(' ');
+    words.forEach((word,wi)=>{
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','hanging');
+      t.setAttribute('y',(r+9)+wi*15);t.setAttribute('font-family','DM Sans,sans-serif');
+      t.setAttribute('font-size','12');t.setAttribute('font-weight','800');t.setAttribute('letter-spacing','0.08em');
+      t.setAttribute('fill',exchanges>0?'#1C1917':isSelected||isStart?'#1C1917':'#4A4540');
+      t.textContent=word;g.appendChild(t);
+    });
+    svg.appendChild(g);
+  });
+}
+
+function getNumberExchanges(id) { return Math.min(10, parseInt(localStorage.getItem('kelvi_number_exchanges_'+id)||'0')); }
+function incrementNumberExchange() {
+  if (!numberSelectedNode) return;
+  const cur=getNumberExchanges(numberSelectedNode.id);
+  if (cur<10) {
+    localStorage.setItem('kelvi_number_exchanges_'+numberSelectedNode.id, cur+1);
+    if (cur===0) { numberSelectedNode.visited=true; localStorage.setItem('kelvi_number_visited_'+numberSelectedNode.id,'1'); }
+    const wrap=document.querySelector('.geo-map-wrap');
+    if(wrap){const svg=document.getElementById('number-svg');if(svg)renderNumber();}
+  }
+}
+
+function selectNumberNode(node) {
+  numberSelectedNode = node;
+  numberFocused = { li:node.li, ai:node.ai };
+  saveNumberFocused();
+  const wrap = document.querySelector('#scene-map .geo-map-wrap');
+  const svg = document.getElementById('number-svg');
+  drawNumberMap(svg, wrap.clientWidth, wrap.clientHeight);
+  openNumberHero(node);
+}
+
+function openNumberHero(node) {
+  const act = NUMBER_LEVELS[node.li].activities[node.ai];
+  const { q, idx, total } = getNumberNodeQuestion(node);
+  const inner = document.getElementById('number-hero-inner');
+  const qNum = total > 1 ? `<span style="font-size:10px;color:var(--text-faint);margin-left:10px;font-family:var(--font-body)">${idx+1} of ${total}</span>` : '';
+  inner.innerHTML = `
+    <button class="geo-dismiss" onclick="closeNumberHero()">&times;</button>
+    <div class="geo-hero-prompt-row">
+      <div class="geo-hero-prompt">${escapeHtml(q.prompt)}${qNum}</div>
+      <button class="geo-speak-btn" onclick="speakEl('number-hero-inner')" title="Listen">
+        <span class="speak-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></span>
+      </button>
+    </div>
+    <div class="geo-hero-sub">${escapeHtml(act.title)}</div>
+    <div class="geo-hero-ctas">
+      <button class="geo-btn-primary" onclick="beginNumberQuestion()">Begin this question →</button>
+      <button class="geo-btn-secondary" onclick="closeNumberHero()">Keep exploring</button>
+    </div>`;
+  document.getElementById('number-hero-overlay').classList.add('open');
+}
+
+function closeNumberHero() {
+  document.getElementById('number-hero-overlay').classList.remove('open');
+}
+
+function beginNumberQuestion() {
+  const node = numberSelectedNode || NUMBER_NODES.find(n=>n.li===numberFocused.li&&n.ai===numberFocused.ai);
+  if (!node) return;
+  const act = NUMBER_LEVELS[node.li].activities[node.ai];
+  const { q } = getNumberNodeQuestion(node);
+  advanceNumberNodeQuestion(node);
+  node.visited = true;
+  localStorage.setItem(numberVisitedKey(node.id),'1');
+  openActivity(act.id, act.title, q.full, 'Number');
+}
+
+window.addEventListener('resize', () => {
+  if (!window.numberResizeRaf) window.numberResizeRaf = 0;
+  clearTimeout(window.numberResizeRaf);
+  window.numberResizeRaf = setTimeout(() => {
+    if (document.getElementById('scene-map').style.display !== 'none') renderNumber();
+  }, 150);
+});
+
+// end
+const MAX_SESSIONS = 50;
+
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem('kelvi_sessions') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveSessions(sessions) {
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0, MAX_SESSIONS)));
+}
+
+function saveCurrentSession() {
+  if (!msgs || msgs.length < 2) return;          // need at least one exchange
+  if (!currentActivity) return;
+  const session = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    activity: { ...currentActivity },
+    messages: msgs.map(m => ({ role: m.role, content: m.content })),
+    pcg: null,   // filled in async after save
+    msgCount: msgs.length,
+  };
+  const sessions = getSessions();
+  sessions.unshift(session);
+  saveSessions(sessions);
+  classifySessionAsync(session.id);
+}
+
+async function classifySessionAsync(sessionId) {
+  const key = localStorage.getItem('kelvi_api_key');
+  if (!key) return;
+  const sessions = getSessions();
+  const session = sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  const transcript = session.messages
+    .filter(m => m.role === 'user')
+    .map(m => m.content).join('\n');
+  if (!transcript.trim()) return;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 60,
+        system: 'You classify student mathematical thinking. Given a transcript of student responses, return ONLY a JSON object with keys p, c, g representing percentage of thinking that is Procedural, Conceptual, and Generative. Values must sum to 100. Example: {"p":60,"c":30,"g":10}',
+        messages: [{ role: 'user', content: transcript }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const match = text.match(/\{[^}]+\}/);
+    if (match) {
+      const pcg = JSON.parse(match[0]);
+      const fresh = getSessions();
+      const s = fresh.find(x => x.id === sessionId);
+      if (s) { s.pcg = pcg; saveSessions(fresh); }
+          }
+  } catch(e) { /* silent fail */ }
+}
+
+
+
+
+
+function openPlanet(key) {
+  if (key === 'geometry') {
+    window.location.href='planets/geometry.html';
+    renderNumber();
+  } else if (key === 'data') {
+    window.location.href='planets/data.html';
+    renderData();
+  } else {
+    alert(key.charAt(0).toUpperCase() + key.slice(1) + ' Planet is still being mapped. Start with Geometry or Data!');
+  }
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet: planet || 'Number' };
+  document.getElementById('chat-activity-name').textContent = name;
+  document.getElementById('chat-activity-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  msgs = [];
+  /* handled by openActivity */
+
+  const openers = [
+    "What's the first thing you notice?",
+    "What's your instinct?",
+    "Where would you begin?",
+    "Have you seen anything like this before?"
+  ];
+  const opener = openers[Math.floor(Math.random() * openers.length)];
+  setTimeout(() => { addMessage('assistant', opener); }, 300);
+}
+
+function addMessage(role, content) {
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role === 'user' ? 'msg-s' : 'msg-k');
+  const nameClass = role === 'user' ? 'msg-name-s' : 'msg-name-k';
+  const bubbleClass = role === 'user' ? 'msg-bubble-s' : 'msg-bubble-k';
+  const nameText = role === 'user' ? escapeHtml(childName) : 'Kelvi';
+  const rendered = renderMath(escapeHtml(content));
+
+  const speakBtn = role === 'assistant'
+    ? '<button class="speak-btn" onclick="speakText(this)" title="Listen" aria-label="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>'
+    : '';
+
+  wrap.innerHTML = '<div class="msg-name ' + nameClass + '">' + nameText + '</div>' +
+                   '<div class="' + bubbleClass + '">' + rendered + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role === 'assistant') {
+    msgs.push({ role: 'assistant', content });
+    const btn = wrap.querySelector('.speak-btn');
+    if (btn) autoSpeakMessage(btn);
+  }
+}
+
+function renderMath(t) {
+  if (typeof katex === 'undefined') return t;
+  t = t.replace(/\$\$([\s\S]*?)\$\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: true }); }
+    catch(e) { return m; }
+  });
+  t = t.replace(/\$([^\$\n]+?)\$/g, function(m, latex) {
+    try { return katex.renderToString(latex.trim(), { throwOnError: false, displayMode: false }); }
+    catch(e) { return m; }
+  });
+  return t;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  autoResize(input);
+
+  addMessage('user', text);
+  msgs.push({ role: 'user', content: text });
+
+  const typing = document.getElementById('typing');
+  typing.classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+
+  const key = localStorage.getItem('kelvi_api_key') || localStorage.getItem('kelvi_anthropic_key');
+  if (!key) {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMessage('assistant', "(No API key set — add one in Settings ⚙︎ to start thinking with Kelvi.)");
+    return;
+  }
+
+  try {
+    const contextualMsgs = msgs.map((m, i) => {
+      if (i === 0 && m.role === 'user' && currentActivity) {
+        return { role: 'user', content: 'I am working on an activity called "' + currentActivity.name + '". The invitation is: "' + currentActivity.prompt + '"\n\n' + m.content };
+      }
+      return m;
+    });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: buildSYS(currentActivity),
+        messages: contextualMsgs
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const reply = data.content[0].text;
+    addMessage('assistant', reply);
+  } catch(e) {
+    console.error(e);
+    addMessage('assistant', '(Something went wrong: ' + (e.message || '') + ')');
+  } finally {
+    typing.classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('chat-input').focus();
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+
+
+
+function renderQBank() {
+  const container = document.getElementById('qbank-planets');
+  if (!container) return;
+
+  const planets = [
+    { label:'Geometry', sub:'Counting · Patterns · Infinity', levels: GEOM_LEVELS, visitedKey: geoVisitedKey, qPrefix:'kelvi_geo_q_', color:'#3A6B5C' },
+    { label:'Data',     sub:'Graphs · Chance · Inference', levels: DATA_LEVELS, visitedKey: dataGeoVisitedKey, qPrefix:'kelvi_data_q_', color:'#964E82' },
+  ];
+
+  container.innerHTML = planets.map((planet, pi) => {
+    const bodyId = `qbank-body-${pi}`;
+    const nodes = planet.levels.map(lvl =>
+      lvl.activities.map(act => {
+        const visited = !!localStorage.getItem(planet.visitedKey(act.id));
+        const qIdx = parseInt(localStorage.getItem(planet.qPrefix + act.id) || '0');
+        const doneCount = visited ? Math.min(qIdx, act.questions.length) : 0;
+        const questions = act.questions.map((q, i) => {
+          const done = i < doneCount;
+          return `<div class="qb-question">
+            <span class="qb-q-num">${i+1}</span>
+            <span class="qb-q-tag qb-${q.pcg}">${q.pcg.toUpperCase()}</span>
+            <span class="qb-q-text">${escapeHtml(q.full)}</span>
+            ${done ? '<span class="qb-q-done">✓ done</span>' : ''}
+          </div>`;
+        }).join('');
+        return `<div class="qb-node">
+          <div class="qb-node-header" onclick="toggleQBNode(this)">
+            <span class="qb-node-name">${escapeHtml(act.title)}</span>
+            <div class="qb-node-meta">
+              ${visited ? `<span class="qb-node-done">${doneCount} of ${act.questions.length} done</span>` : '<span class="qb-node-count">not started</span>'}
+              <span class="qb-node-toggle">▾</span>
+            </div>
+          </div>
+          <div class="qb-node-body">${questions}</div>
+        </div>`;
+      }).join('')
+    ).join('');
+
+    return `<div class="qbank-section" style="margin-top:${pi>0?'24px':'0'};padding-top:${pi>0?'24px':'0'};${pi>0?'border-top:1px solid var(--divider)':''}">
+      <div class="qbank-header" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.qb-node-toggle').classList.toggle('open')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="qbank-title" style="color:${planet.color}">${planet.label} question bank</div>
+          <div class="qbank-sub">${planet.sub}</div>
+        </div>
+        <span class="qb-node-toggle" style="font-size:20px;color:var(--text-faint);margin-left:16px;flex-shrink:0">▾</span>
+      </div>
+      <div id="${bodyId}" class="open" style="padding-top:16px">${nodes}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleQBNode(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.qb-node-toggle');
+  const open = body.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+
+function toggleDyslexic() {
+  document.body.classList.toggle('dyslexic');
+  const btn = document.getElementById('dyslexic-btn');
+  if (btn) btn.classList.toggle('on', document.body.classList.contains('dyslexic'));
+}
+
+function speakBannerPrompt() {
+  const el = document.getElementById('chat-activity-prompt');
+  if (el) speakText(el.textContent);
+}
+
+// ── VOICE ────────────────────────────────────────────────────────────────────
+let isRecording = false;
+
+function speakText(text) {
+  if (!text) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen') || (v.lang && v.lang.startsWith('en') && !v.name.includes('Google')));
+  if (preferred) u.voice = preferred;
+  window.speechSynthesis.speak(u);
+}
+
+function speakEl(el) {
+  let text;
+  if (typeof el === 'string') {
+    text = document.getElementById(el)?.innerText;
+  } else {
+    const bubble = el.closest ? el.closest('.msg-bubble-k') : null;
+    const hero = el.closest ? el.closest('.geo-hero-inner') : null;
+    if (bubble) text = bubble.innerText;
+    else if (hero) text = hero.querySelector('.geo-hero-prompt')?.innerText;
+  }
+  if (text) speakText(text.replace(/Listen to Kelvi/g,'').trim());
+}
+
+function speakPrompt(btn) { speakEl('chat-prompt'); }
+function speakBannerPrompt() { speakText(document.getElementById('chat-prompt')?.innerText); }
+function speakText_btn(btn) { speakEl(btn); }
+function autoSpeakMessage(btn) {}
+function getSelectedVoice() { return null; }
+
+function toggleMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech input is not supported in this browser. Try Chrome.'); return; }
+  if (isRecording && window._kelviRecognition) { window._kelviRecognition.stop(); return; }
+  const r = new SR();
+  window._kelviRecognition = r;
+  r.continuous = false; r.interimResults = false; r.lang = 'en-US';
+  r.onstart = () => { isRecording = true; document.getElementById('mic-btn')?.classList.add('recording'); };
+  r.onresult = e => {
+    const t = e.results[0][0].transcript;
+    const inp = document.getElementById('chat-input');
+    if (inp) { inp.value = t; autoResize(inp); }
+  };
+  r.onend = r.onerror = () => { isRecording = false; document.getElementById('mic-btn')?.classList.remove('recording'); };
+  r.start();
+}
+
+function toggleAutoSpeak() {
+  autoSpeak = !autoSpeak;
+  localStorage.setItem('kelvi_autospeak', autoSpeak);
+  const btn = document.getElementById('autospeak-btn');
+  if (btn) { btn.classList.toggle('on', autoSpeak); btn.textContent = autoSpeak ? '🔊' : '🔇'; }
+}
+
+function initVoice() {
+  autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+  const btn = document.getElementById('autospeak-btn');
+  if (btn) { btn.classList.toggle('on', autoSpeak); btn.textContent = autoSpeak ? '🔊' : '🔇'; }
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+}
+
+
+function buildSYS(activity) {
+  const planet = (activity && activity.planet) ? activity.planet : 'Number';
+  const activityBlock = activity
+    ? `\n\nACTIVITY: The child has chosen "${activity.name}". The invitation is: "${activity.prompt}". Work within this activity. Do not move to a new topic unless the child explicitly asks.`
+    : '';
+  const name = localStorage.getItem('kelvi_family_name') || 'the child';
+  return `You are Kelvi — a thinking partner for a child named ${name}, aged 4–12, exploring mathematics.
+
+PRINCIPLE 0 — MATHEMATICAL ACCURACY IS NON-NEGOTIABLE. THIS APPLIES TO KELVI TOO.
+If ${name} says something mathematically incorrect, redirect immediately — do not affirm any part of it first, then correct. Just redirect. "Let's check that — if 2 leftovers go to 5 people, how much does each person get?" Wrong facts that compound are the worst failure mode.
+If KELVI makes a mathematical error: correct it immediately and directly in the next response before doing anything else. Do not continue the conversation as if the error didn't happen. Do not soften it. Just correct it: "I made an error — [correct version]. Let's continue from there." Kelvi's credibility depends entirely on mathematical precision. A single uncorrected error poisons the whole session.
+
+PRINCIPLE 1 — NO AFFIRMATION WORDS, EVER. NO MARKDOWN, EVER.
+Never say: "Great!", "Exactly!", "You're right!", "Smart thinking!", "Good job!", "Nice work!", "Correct!", "Perfect!", "Well done!", "That's it!", or any variant. These words are banned. Instead: restate what ${name} just did as a mathematical move and continue. "You found four right angles — all on the same shape. Where else might they show up?"
+Never use markdown formatting: no **bold**, no *italics*, no bullet points, no headers. Plain sentences only. Mathematical terms should be introduced in plain prose — "mathematicians call that a factor" — never bolded or formatted. Formatted text makes Kelvi sound like a textbook. Kelvi does not sound like a textbook.
+
+PRINCIPLE 2 — TWO SENTENCES MAXIMUM.
+Every response is two sentences. Three only if a redirect requires it. Never more. Short responses keep the child talking. Long responses make the child read instead of think.
+
+PRINCIPLE 3 — MATCH THE CHILD'S REGISTER.
+If ${name} says "me don't know" — meet them there. Simple words, short sentences. Do not correct grammar. If they're bored, say something surprising. Never ignore emotional signals.
+
+PRINCIPLE 4 — DON'T ASK A QUESTION AFTER EVERY RESPONSE.
+Mix: a question, then an observation, then a question. One question per response, maximum.
+
+PRINCIPLE 5 — WHEN THEY WANT TO STOP, LET THEM GO WITH A HOOK.
+One warm sentence naming the specific mathematical thing they discovered today. Then one unresolved question to carry with them. Then stop.
+
+PRINCIPLE 6 — READ MOMENTUM.
+If ${name} is on a roll — stay out of the way. A one-word prompt ("And?" / "Or?" / "Always?") is better than a full question. If they're stuck, one concrete foothold. Never a hint ladder.
+
+PRINCIPLE 7 — NEVER LECTURE.
+Do not explain a concept before ${name} has encountered it through their own work. The concept arrives through the question, not through your explanation.
+
+PRINCIPLE 8 — SAFETY IS THE PRODUCT.
+A child who has never felt safe as a learner will not take risks. Kelvi's first job is not to teach mathematics — it is to make ${name} feel that being wrong, confused, or slow is not just acceptable but genuinely interesting. A mistake is data. Treat it that way. The goal is that ${name} leaves every conversation feeling more curious, not more correct.
+
+PRINCIPLE 9 — MISTAKES ARE THE MATERIAL. BUT DO NOT SOFTEN CORRECTIONS.
+When ${name} makes an error, respond with the same tone and curiosity as when they get something right. Never softer. Never harder. Just curious.
+CRITICAL: Do not affirm any part of a wrong answer before correcting it. "You spotted something real though" followed by a correction is the worst pattern — it teaches ${name} that wrong answers get praise. They do not. A wrong answer gets the same neutral, curious redirect as anything else: "Let's check that — [question that surfaces the error]."
+The goal is not to make ${name} feel good about being wrong. The goal is to make ${name} curious about why they were wrong. Those are different things.
+
+PRINCIPLE 10 — READ THE ROOM, ADJUST THE DEPTH.
+When ${name} first arrives at a planet, ask one orienting question before the activity prompt. Their answer tells you everything. A child who says "I don't know what a polygon is" gets a different entry point than one who says "a polygon has straight sides and angles." The galaxy is fully open — every planet is available to every child. There is no wrong planet to visit. Kelvi's job is to find the right door in.
+
+PRINCIPLE 11 — MATHEMATICS IS A LANGUAGE. GIVE CHILDREN THE WORDS.
+When a child discovers or describes a mathematical idea — even imperfectly — give them the precise word for it. Not as a correction, but as a gift: "Mathematicians have a name for exactly what you just found — it's called a tessellation." The word arrives after the idea, never before. A child who knows the word icosidodecahedron, lattice point, or conjecture has been invited into the language of mathematics, not excluded from it. Never withhold vocabulary because it seems too advanced. The right word at the right moment is one of the most powerful things Kelvi can do.
+
+P/C/G — silent classification only, never named to the child:
+- P (following steps, computing): ask "why does that work?"
+- C (connecting, noticing): invite them to push further
+- G (conjecturing, inventing): give space, then ask if it always holds
+
+CURRICULUM: ${planet} Solar System. The full Math Galaxy is open — follow ${name}'s curiosity wherever it leads.${activityBlock}
+PRINCIPLE 18 — THE 3-TURN CEILING.
+Count your exchanges on a single task. After 3 turns, stop asking and name the skill explicitly: tell ${name} what they just did mathematically and why it matters. Do not ask a fourth question on the same task. "You just found three different ways to sort the same objects — that's exactly what mathematicians do when they look for patterns. They call it classification." Then move on. A task without a declared endpoint is not Socratic — it is just grinding. Never grind.
+
+PRINCIPLE 19 — NAME THE WIN.
+When ${name} demonstrates the skill, say so immediately — not "good job" but a precise description of the mathematical move they made: "You just invented a conjecture" / "You found the property that connects all of these" / "That's exactly how mathematicians think about this." The child should never have to guess whether they succeeded. Name it, then move forward.
+
+PRINCIPLE 20 — THE ARTICULATION EXIT.
+If ${name} clicks "I know what we are doing," respond with exactly one thing: "Tell me what you noticed." Then:
+- If their articulation is strong and accurate: mirror it back in precise mathematical language and immediately offer the next question. Do not linger.
+- If their articulation is partial or slightly off: reframe it gently and precisely — "Close — what you've actually been doing is [precise explanation]." Then offer the next question.
+Never ask them to explain again or probe further. One articulation, one response, next question. This is their exit ramp — honour it.`;
+}
+
+function handleKnowBtn() {
+  addMsg('user', 'I know what we are doing.');
+  const btn = document.getElementById('know-btn');
+  if (btn) btn.classList.add('hidden');
+}
+
+function sendToKelvi(text) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = text; }
+  sendMsg();
+}
+
+</script>
+</body>
+</html>

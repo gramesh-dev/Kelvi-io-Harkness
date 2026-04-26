@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi · Observatory Solar System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'OpenDyslexic';src:url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype')}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+:root{
+  --bg:#F3EEFF;--surface:rgba(255,255,255,0.4);--deeper:#E0D8C8;--divider:rgba(0,0,0,0.1);
+  --text-primary:#2F2B25;--text-muted:#6F6A61;--text-faint:#9A9488;
+  --accent:#3A6B5C;--accent-dark:#2D5347;--accent-light:#EBF3EF;
+  --family:#B8784E;--family-dark:#9E6640;--family-light:#F5EDE5;
+  --gold:#C9A84C;
+  --font-heading:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;--font-serif:'DM Sans',serif;
+}
+.scene{position:fixed;inset:0;display:flex;flex-direction:column}
+/* ── GEOMETRY V4 ── */
+/* ── GEOMETRY CONCEPT MAP ── */
+.geo-scene{position:absolute;inset:0;background:#F3EEFF;display:flex;flex-direction:column;overflow:hidden}
+.geo-scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(155,109,209,0.12) 100%)}
+.geo-topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0;z-index:20;background:#F3EEFF;border-bottom:none}
+.geo-planet-sphere{width:40px;height:40px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(160,125,74,0.5))}
+.geo-planet-info{flex:1}
+.geo-planet-name{font-family:var(--font-heading);font-size:1.1rem;color:#8B5CF6;line-height:1;font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:0.08em}
+.geo-planet-tagline{font-family:var(--font-body);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(110,100,85,0.55);margin-top:3px}
+.geo-back-btn{background:none;border:1px solid rgba(110,100,85,0.25);padding:5px 12px;border-radius:14px;font-size:12px;color:rgba(80,70,55,0.7);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.geo-back-btn:hover{border-color:#8888A0;color:#8888A0}
+/* map canvas */
+.geo-map-wrap{flex:1;position:relative;overflow:hidden;min-height:0}
+.geo-svg{position:absolute;inset:0;width:100%;height:100%;cursor:default}
+/* hero overlay — slides up from bottom */
+.geo-hero-overlay{position:absolute;bottom:0;left:0;right:0;z-index:30;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.61,.36,1);pointer-events:none;background:#FFFFFF;border-top:1px solid #F0F0F0}
+.geo-hero-overlay.open{transform:translateY(0);pointer-events:auto}
+.geo-hero-inner{padding:28px 32px 20px;max-width:680px}
+.geo-hero-eyebrow{font-family:var(--font-body);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-weight:700}
+.geo-hero-prompt-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.geo-hero-prompt{font-family:'DM Sans',sans-serif;font-style:normal;font-size:clamp(20px,2.8vw,32px);color:#1C1917;line-height:1.25;flex:1;font-weight:800;letter-spacing:-0.02em}
+.geo-speak-btn{flex-shrink:0;background:#F4F4F4;border:1px solid #E0E0E0;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;transition:all .15s;margin-top:4px}
+.geo-speak-btn:hover{background:#F3EEFF;color:#8B5CF6}
+.geo-speak-btn .speak-icon{display:flex;align-items:center}
+.geo-hero-sub{font-family:var(--font-body);font-size:13px;color:#888;line-height:1.6;margin-bottom:18px}
+.geo-hero-ctas{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.geo-btn-primary{background:#8B5CF6;color:#FFFFFF;padding:11px 22px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .12s}
+.geo-btn-primary:hover{background:#5B21B6}
+.geo-btn-secondary{background:none;border:1px solid #E0E0E0;border-radius:8px;color:#888;padding:11px 14px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
+.geo-btn-secondary:hover{color:#333;border-color:#AAAAAA}
+.geo-dismiss{position:absolute;top:14px;right:18px;background:#F4F4F4;border:1px solid #E0E0E0;color:#555;font-size:17px;cursor:pointer;line-height:1;font-family:var(--font-body);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.geo-dismiss:hover{background:#E8E8E8;color:#333}
+/* ── TOPBAR ADDITIONS ── */
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.settings-btn{background:none;border:none;color:rgba(240,232,204,0.65);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;transition:all .15s}
+.settings-btn:hover{color:#F5E6A8;background:rgba(255,255,255,0.08)}
+.topbar.light-mode .settings-btn{color:var(--text-muted)}
+.topbar.light-mode .settings-btn:hover{color:#8B5CF6;background:#F3EEFF}
+
+/* ── PLANET VIEW ── */
+.planet-scene{position:absolute;inset:56px 0 0 0;background:var(--bg);overflow-y:auto}
+.planet-header{
+  padding:48px 40px 30px;text-align:center;position:relative;
+  background:linear-gradient(180deg, rgba(232,216,184,0.35) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--divider);
+}
+.planet-back{
+  position:absolute;top:16px;left:20px;background:none;border:1px solid var(--divider);
+  padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text-muted);
+  display:flex;align-items:center;gap:6px;transition:all .15s;cursor:pointer;font-family:var(--font-body);
+}
+.planet-back:hover{border-color:#8B5CF6;color:#8B5CF6}
+.planet-visual{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 30%, #DCC094 0%, #A07D4A 55%, #6C502C 100%);
+  box-shadow:0 4px 30px rgba(160,125,74,0.3);position:relative;
+  animation:planetFloat 6s ease-in-out infinite;
+}
+.planet-visual::after{
+  content:'';position:absolute;width:170%;height:22%;left:-35%;top:40%;border-radius:50%;
+  background:linear-gradient(to bottom, transparent 30%, rgba(160,125,74,0.5) 50%, transparent 70%);
+  transform:rotate(-16deg);
+}
+@keyframes planetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.planet-title{font-family:var(--font-heading);font-size:2.6rem;letter-spacing:-0.01em;margin-bottom:8px}
+.planet-tagline{font-family:'DM Sans',serif;font-style:italic;color:var(--text-muted);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.5}
+.planet-meta{display:inline-flex;gap:24px;margin-top:10px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.planet-meta strong{color:var(--text-primary);font-family:var(--font-body);font-weight:600;font-size:13px;display:block;letter-spacing:0;text-transform:none;margin-bottom:2px}
+.levels-wrap{max-width:1280px;margin:0 auto;padding:40px}
+.levels-intro{text-align:center;margin-bottom:30px;color:var(--text-muted);font-size:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.levels-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:16px}
+.level-col{background:#fff;border:1px solid var(--divider);border-radius:14px;padding:20px 18px 24px;min-height:540px;position:relative;transition:all .2s ease}
+.level-col:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(47,43,37,0.08)}
+.level-col::before{content:'';position:absolute;top:0;left:16px;right:16px;height:3px;border-radius:0 0 3px 3px}
+.level-col.l1::before{background:#E09C50}
+.level-col.l2::before{background:#D8AA58}
+.level-col.l3::before{background:#3E9282}
+.level-col.l4::before{background:#5286B4}
+.level-col.l5::before{background:#6856A8}
+.level-num{font-family:var(--font-heading);font-style:italic;font-size:1rem;color:var(--text-muted);letter-spacing:0.05em}
+.level-name{font-family:var(--font-heading);font-size:1.4rem;letter-spacing:-0.01em;margin-bottom:6px;margin-top:-2px}
+.level-pcg{display:inline-block;padding:3px 8px;border-radius:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.pcg-p{background:#F5DDD3;color:#8A4B1E}
+.pcg-c{background:#D6E8DC;color:#2D5347}
+.pcg-g{background:#E8DDF0;color:#48366E}
+.level-desc{font-size:12px;color:var(--text-muted);line-height:1.5;margin:12px 0 18px;min-height:48px}
+.activity{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;position:relative}
+.activity:hover{background:#F3EEFF;border-color:#8B5CF6;transform:translateY(-1px)}
+.activity-title{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.activity-prompt{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic}
+.activity-visited{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* ── CHAT ── */
+.chat-scene{position:absolute;inset:56px 0 0 0;display:flex;flex-direction:column;background:#FFFFFF}
+.chat-header{padding:14px 28px;border-bottom:1px solid #F0F0F0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;flex-shrink:0}
+.chat-back{font-size:13px;color:#333;font-weight:500;background:none;border:none;display:flex;align-items:center;gap:4px;cursor:pointer;font-family:var(--font-body);justify-self:start}
+.chat-back:hover{color:#5B21B6}
+.chat-topic{text-align:center}
+.chat-kicker{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:2px}
+.chat-activity-title{font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:var(--text-primary)}
+.chat-header-right{justify-self:end;display:flex;align-items:center;gap:8px}
+.dyslexic-toggle{background:none;border:1px solid var(--divider);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.dyslexic-toggle:hover{border-color:#8B5CF6;color:#8B5CF6}
+.dyslexic-toggle.on{border-color:#8B5CF6;background:#F3EEFF;color:#8B5CF6}
+.activity-banner{padding:24px 32px;background:#FFFFFF;border-bottom:1px solid #F0F0F0;flex-shrink:0}
+.activity-banner-text{flex:1}
+.activity-banner-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-family:var(--font-body)}
+.activity-banner-prompt{font-size:clamp(22px,3vw,36px);line-height:1.2;color:#1C1917;font-style:normal;font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-0.02em}
+.activity-banner-speak{flex-shrink:0;background:none;border:1px solid var(--divider);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:2px}
+.activity-banner-speak:hover{background:#F3EEFF;color:#8B5CF6;border-color:#8B5CF6}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px;margin:0 auto;width:100%}
+.msg{max-width:100%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start;width:100%}
+.msg-s{align-self:flex-end;max-width:72%}
+.msg-name{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;padding-left:2px;color:var(--text-faint)}
+.msg-name-s{text-align:right;padding-right:2px}
+.msg-bubble-k{background:transparent;border:none;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.msg-bubble-s{background:#F3EEFF;border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:transparent;border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center;margin-left:32px}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:#8B5CF6;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-input-bar{padding:14px 20px 20px;display:flex;gap:8px;align-items:flex-end;background:#FFFFFF;flex-shrink:0;max-width:820px;margin:0 auto;width:100%}
+.chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-input:focus{border-color:#8B5CF6}
+.chat-mic{background:#F4F4F4;color:#555;border:1.5px solid #E0E0E0;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;cursor:pointer}
+.chat-mic:hover{background:#E8E8E8;color:#333;border-color:#CCC}
+.chat-mic.recording{background:#D94A4A;border-color:#D94A4A;color:#fff;animation:micPulse 1.2s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+.chat-send{background:#8B5CF6;color:#fff;border:none;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;cursor:pointer}
+.chat-send:hover{background:#5B21B6}
+.chat-send:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:6px;vertical-align:middle;display:inline-flex;align-items:center}
+.speak-btn:hover{color:#8B5CF6}
+.speak-btn.speaking{background:#8B5CF6;color:#fff}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+
+.topbar-apikey{background:rgba(0,0,0,0.04);border:1px solid rgba(110,100,85,0.2);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(60,50,35,0.7);font-family:var(--font-body);width:180px;outline:none;transition:all .15s}
+.topbar-apikey::placeholder{color:rgba(110,100,85,0.35)}
+.topbar-apikey:focus{border-color:#A07D4A;color:var(--text-primary);background:rgba(255,255,255,0.8)}
+
+.mic-btn.recording{border-color:#D94A4A;color:#D94A4A;animation:micPulse 1s infinite}
+.autospeak-toggle{background:none;border:1px solid var(--divider);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s;margin-right:4px}
+.autospeak-toggle.on{border-color:#8B5CF6;background:#F3EEFF;color:#8B5CF6}
+.know-btn{
+  background:none;
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:20px;
+  color:rgba(255,255,255,0.75);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.05em;
+  padding:6px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:all .15s;
+}
+.know-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.5)}
+.know-btn.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- MAP SCENE -->
+<div class="scene geo-scene" id="scene-map" style="background:#F5F3EE">
+  <div class="geo-topbar" style="background:#F3EEFF;border-bottom:none">
+    <svg class="geo-planet-sphere" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Ground -->
+        <line x1="-40" y1="28" x2="40" y2="28" stroke="#1C1917" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Building base -->
+        <rect x="-18" y="8" width="36" height="20" rx="1" fill="#8B5CF6" stroke="#1C1917" stroke-width="2"/>
+        <!-- Door -->
+        <rect x="-8" y="16" width="16" height="12" rx="1" fill="#1C1917"/>
+        <!-- Dome -->
+        <path d="M -32 8 A 32 32 0 0 1 32 8 Z" fill="#8B5CF6" stroke="#1C1917" stroke-width="2"/>
+        <!-- Dome slit -->
+        <line x1="0" y1="-24" x2="0" y2="8" stroke="#1C1917" stroke-width="2"/>
+        <path d="M -32 8 A 32 32 0 0 1 -14 -22" fill="none" stroke="#1C1917" stroke-width="1.5"/>
+        <!-- Telescope -->
+        <line x1="0" y1="0" x2="-14" y2="-18" stroke="#1C1917" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="-15" cy="-20" r="3.5" fill="#1C1917"/>
+        <!-- Stars -->
+        <circle cx="-38" cy="-32" r="2" fill="#8B5CF6"/>
+        <circle cx="34" cy="-38" r="1.5" fill="#8B5CF6"/>
+        <circle cx="20" cy="-22" r="1.5" fill="#8B5CF6"/>
+        <circle cx="-22" cy="-40" r="1.5" fill="#8B5CF6"/>
+      </svg>
+    <div class="geo-planet-info">
+      <div class="geo-planet-name" style="color:#8B5CF6">Observatory</div>
+      <div class="geo-planet-tagline">Notice · Wonder · Think</div>
+    </div>
+    <input class="topbar-apikey" id="topbar-apikey" type="password" placeholder="API key for testing" title="API key" oninput="localStorage.setItem('kelvi_api_key',this.value)">
+    <button class="geo-back-btn" onclick="goGalaxy()">← Galaxy</button>
+  </div>
+  <div class="geo-map-wrap">
+    <svg class="geo-svg" id="observatory-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="geo-hero-overlay" id="observatory-hero-overlay" style="background:#FFFFFF;border-top:1px solid #F0F0F0">
+    <div class="geo-hero-inner" id="observatory-hero-inner"></div>
+  </div>
+</div>
+
+<!-- CHAT SCENE -->
+<div class="scene" id="scene-chat" style="display:none;background:#FFFFFF">
+  <div class="chat-header">
+    <button class="chat-back" onclick="goMap()">← Observatory</button>
+    <div class="chat-topic">
+      <div class="chat-kicker">Observatory Solar System</div>
+      <div class="chat-activity-title" id="chat-title">Activity</div>
+    </div>
+    <div class="chat-header-right">
+      <button class="dyslexic-toggle" id="dyslexic-btn" onclick="toggleDyslexic()" title="Aa">Aa</button>
+    </div>
+  </div>
+  <div class="activity-banner">
+    <div class="activity-banner-text">
+      <div class="activity-banner-label">The invitation</div>
+      <div class="activity-banner-prompt" id="chat-prompt"></div>
+    </div>
+    <button class="activity-banner-speak" onclick="speakEl('chat-prompt')" title="Listen">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+    </button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Say what you're thinking…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-mic" id="mic-btn" onclick="toggleMic()" title="Speak">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="know-btn" id="know-btn" onclick="handleKnowBtn()" title="I know what we are doing">I know what we are doing</button>
+        <button class="chat-send" id="send-btn" onclick="sendMsg()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../../shared/kelvi.js"></script>
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let msgs = [];
+let sessionStart = null;
+let currentActivity = null;
+const childName = localStorage.getItem('kelvi_family_name') || 'Explorer';
+let autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+let recognition = null;
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goGalaxy() { saveSession(); window.location.href = 'family.html'; }
+
+function goMap() {
+  saveSession();
+  document.getElementById('scene-chat').style.display = 'none';
+  document.getElementById('scene-map').style.display = 'flex';
+  initVoice();
+  renderObservatory();
+
+  // Pre-fill API key input if already set
+  const keyInput = document.getElementById('topbar-apikey');
+  if (keyInput) {
+    const saved = localStorage.getItem('kelvi_api_key') || '';
+    if (saved) keyInput.value = saved;
+  }
+
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet };
+  sessionStart = Date.now();
+  msgs = [];
+  document.getElementById('chat-title').textContent = name;
+  document.getElementById('chat-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('scene-map').style.display = 'none';
+  document.getElementById('scene-chat').style.display = 'flex';
+  document.getElementById('scene-chat').style.flexDirection = 'column';
+  const openers = [
+    "What's the first thing you notice?",
+    "What's your instinct?",
+    "Where would you begin?",
+    "Have you seen anything like this before?"
+  ];
+  setTimeout(() => addMsg('assistant', openers[Math.floor(Math.random()*openers.length)]), 300);
+}
+
+// ── SESSION SAVING ────────────────────────────────────────────────────────────
+function saveSession() {
+  if (!currentActivity || msgs.length < 2) return;
+  const sessions = JSON.parse(localStorage.getItem('kelvi_sessions') || '[]');
+  sessions.unshift({ id:Date.now(), planet:currentActivity.planet, activityName:currentActivity.name, prompt:currentActivity.prompt, date:new Date().toISOString(), duration:sessionStart?Math.round((Date.now()-sessionStart)/60000):0, msgs:msgs.slice() });
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0,50)));
+  currentActivity = null;
+}
+window.addEventListener('beforeunload', saveSession);
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function addMsg(role, content) {
+  msgs.push({role, content});
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role==='user' ? 'msg-s' : 'msg-k');
+  const speakBtn = role==='assistant' ? '<button class="speak-btn" onclick="speakEl(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>' : '';
+  wrap.innerHTML = '<div class="msg-name' + (role==='user'?' msg-name-s':'') + '">' + (role==='user'?escapeHtml(childName):'KELVI') + '</div><div class="' + (role==='user'?'msg-bubble-s':'msg-bubble-k') + '">' + escapeHtml(content) + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role==='assistant') { if(autoSpeak) speakText(content); incrementObservatoryExchange(); }
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; autoResize(input);
+  addMsg('user', text);
+  callAPI();
+}
+
+function callAPI() {
+  const key = localStorage.getItem('kelvi_api_key') || '';
+  if (!key) { addMsg('assistant','No API key — update in Kelvi Family settings.'); return; }
+  document.getElementById('typing').classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, system:buildSYS(currentActivity), messages:msgs.filter(m=>m.role!=='system').slice(-20).map(m=>({'role':m.role,'content':m.content})) })
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant', data.content?.[0]?.text || 'Something went wrong.');
+  }).catch(()=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant','Connection error — check your API key.');
+  });
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function speakText(text){if(!text)return;window.speechSynthesis.cancel();window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));}
+function speakEl(el) { const text = typeof el==='string' ? document.getElementById(el)?.textContent : el.closest('.msg-bubble-k')?.textContent; if(text) window.speechSynthesis.speak(new SpeechSynthesisUtterance(text)); }
+function toggleDyslexic() { document.body.classList.toggle('dyslexic'); document.getElementById('dyslexic-btn')?.classList.toggle('on',document.body.classList.contains('dyslexic')); }
+
+
+
+
+
+
+function hexToRgba(hex,alpha) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('kelvi_api_key') && !localStorage.getItem('kelvi_family_name')) { window.location.href='family.html'; return; }
+  renderObservatory();
+});
+window.addEventListener('resize', () => { if(document.getElementById('scene-map').style.display!=='none') renderObservatory(); });
+
+// ── PLANET DATA ───────────────────────────────────────────────────────────────
+const OBSERVATORY_LEVELS = [
+  {
+    num:'I', key:'arrive', name:'Arrive', pcgKind:'p',
+    activities:[
+      { id:'noticing-wondering', title:'Noticing & Wondering', questions:[
+        { pcg:'p', prompt:'"Look at this pattern: 1, 4, 9, 16. What do you notice? What do you wonder?"', full:'Look at the sequence 1, 4, 9, 16, 25. What do you notice? What do you wonder? Write at least three things you notice and two things you wonder.' },
+        { pcg:'p', prompt:'"Look out a window for one minute. What mathematics do you notice?"', full:'Look out a window or around the room for one minute. Write down every piece of mathematics you notice — shapes, patterns, numbers, angles, symmetry. How many did you find?' },
+        { pcg:'p', prompt:'"What is the most interesting number you can think of? Why is it interesting?"', full:'What is the most interesting number you can think of? What makes it interesting? Can every number be interesting for some reason?' },
+        { pcg:'c', prompt:'"Is noticing different from knowing? Can you notice something without understanding it?"', full:'Is noticing something mathematically the same as knowing it? Can you notice a pattern without being able to explain it? What is the relationship between noticing and understanding?' },
+        { pcg:'c', prompt:'"What is the difference between a mathematical observation and a mathematical fact?"', full:'What is the difference between noticing something and proving it? Can an observation be wrong? Give an example of something that looks true from observation but is actually false.' },
+        { pcg:'c', prompt:'"Train your noticing: spend 5 minutes looking at a brick wall. What mathematics is there?"', full:'Spend 5 minutes carefully looking at a brick wall or tiled floor. List every piece of mathematics you can find — not just shapes, but proportions, angles, patterns, relationships. What surprised you?' },
+        { pcg:'c', prompt:'"Mathematical noticing is a skill. How do you get better at it?"', full:'Mathematical noticing — seeing structure where others see chaos — is a learnable skill. How do you practice it? What habits make someone a better noticer?' },
+        { pcg:'g', prompt:'"Find something in daily life that no one has ever described mathematically. Describe it."', full:'Find something in daily life that you do not think anyone has ever described mathematically. Create a mathematical description of it. What does the mathematical description reveal that a plain description would miss?' },
+        { pcg:'g', prompt:'"Design a noticing activity for a 5-year-old that leads to a university-level mathematical idea."', full:'Design a noticing activity for a 5-year-old — something they can observe with their senses — that, with the right questions, leads toward a mathematical idea encountered at university level. What is the idea and how does noticing lead there?' },
+        { pcg:'g', prompt:'"Is all of mathematics built on noticing? Trace a theorem back to its observational roots."', full:'Choose any mathematical theorem and trace it back to its original observational roots — what must the first mathematician to notice this idea have seen? Is all of mathematics ultimately grounded in noticing?' },
+      ]},
+      { id:'asking-questions', title:'Asking Questions', questions:[
+        { pcg:'p', prompt:'"Write 5 questions about the number 12. Make at least one question you cannot answer."', full:'Write five different mathematical questions about the number 12. Make at least one question that you genuinely cannot answer right now. What makes a good mathematical question?' },
+        { pcg:'p', prompt:'"What question would you ask to find out how many windows are in a skyscraper?"', full:'You want to estimate the number of windows in a skyscraper you can see outside. What question would you ask first? What information do you need? What questions lead to other questions?' },
+        { pcg:'p', prompt:'"Take a mathematical result you know. Ask the question: what if this were not true?"', full:'Take a mathematical fact you know well. Ask: what would happen if this were not true? What would break? What would change? Write down the what-if question and explore it.' },
+        { pcg:'c', prompt:'"What makes a mathematical question good? What makes one unanswerable?"', full:'What distinguishes a good mathematical question from a bad one? What makes a question too vague to be mathematical? What makes a question genuinely unanswerable? Give examples of each.' },
+        { pcg:'c', prompt:'"Can a question be more important than its answer?"', full:'Can a mathematical question be more important or valuable than its answer? Give a historical example where the question mattered more than the solution. What kind of questions generate new mathematics?' },
+        { pcg:'c', prompt:'"Find a question about mathematics that no one has ever thought to ask before."', full:'Try to generate a mathematical question that you believe has never been asked before. Is this even possible? How would you know? What does originality in mathematics mean?' },
+        { pcg:'c', prompt:'"Design a sequence of questions that leads a 7-year-old to discover the Pythagorean theorem."', full:'Design a sequence of questions that, if asked in order, would lead a 7-year-old to discover the Pythagorean theorem themselves — without being told it. What is the first question? What must each question build on?' },
+        { pcg:'g', prompt:'"Prove that every answer generates at least one new question."', full:'Argue — as convincingly as possible — that answering any mathematical question always generates at least one new question. Is this always true? What does it say about the nature of mathematics?' },
+        { pcg:'g', prompt:'"What is the single most important unanswered question in mathematics right now?"', full:'Research and argue for your choice of the single most important currently unanswered question in mathematics. Why this one? What would a solution change? Who is working on it?' },
+        { pcg:'g', prompt:'"Design a question that, if answered, would close off an entire branch of mathematics."', full:'Design a mathematical question whose answer, if found, would bring a major branch of mathematics to a close — leaving no important open questions. Is this even possible? What would it mean for that branch?' },
+      ]},
+      { id:'making-predictions', title:'Making Predictions', questions:[
+        { pcg:'p', prompt:'"The sequence 2, 4, 8, 16... What do you predict the 10th term will be?"', full:'The sequence is 2, 4, 8, 16... Predict the 10th term. How confident are you? How do you check your prediction without calculating all the way to the 10th?' },
+        { pcg:'p', prompt:'"If you add 5 odd numbers together, will the result be odd or even? Predict, then check."', full:'Predict whether the sum of 5 odd numbers is odd or even. Test your prediction with examples. Then explain why your answer must always be true.' },
+        { pcg:'p', prompt:'"Predict: is 1,000,001 prime? How would you check?"', full:'Is 1,000,001 a prime number? Make a prediction. What would you check first? Is there a quick way to test without checking all possible factors?' },
+        { pcg:'c', prompt:'"What is the difference between a prediction and a guess?"', full:'In mathematics, what is the difference between a prediction and a guess? What makes a prediction mathematical? How is a mathematical conjecture different from both?' },
+        { pcg:'c', prompt:'"Make a prediction about a mathematical relationship you have not proved yet."', full:'Make a mathematical prediction about a relationship you have noticed but not yet proved. Write it as a formal conjecture. How would you go about trying to prove or disprove it?' },
+        { pcg:'c', prompt:'"Find a mathematical prediction that was confidently made and turned out to be wrong."', full:'Find a historical example of a mathematical prediction or conjecture that was widely believed to be true but turned out to be false. What was the prediction? How was it disproved? What lesson does it teach?' },
+        { pcg:'c', prompt:'"Can you predict the 1000th prime number without calculating all primes up to it?"', full:'Can you estimate the 1000th prime number without finding all primes before it? What tools exist for estimating the size of the nth prime? How accurate would your prediction be?' },
+        { pcg:'g', prompt:'"Prove that your prediction about odd number sums must always be correct."', full:'You predicted that the sum of 5 odd numbers is always odd. Now prove this rigorously — not with examples but with a general argument. Then generalise: what is the sum of n odd numbers?' },
+        { pcg:'g', prompt:'"What distinguishes a mathematical conjecture from a hypothesis in science?"', full:'A mathematical conjecture is a prediction not yet proved. A scientific hypothesis is a prediction to be tested by experiment. What are the fundamental differences between these two types of predictions? Can mathematical conjectures be tested experimentally?' },
+        { pcg:'g', prompt:'"Design a prediction about mathematics that would take 100 years to verify."', full:'Design a mathematical prediction that is well-defined and meaningful but that you believe would take approximately 100 years of mathematical work to verify or disprove. What would verification require?' },
+      ]},
+      { id:'checking-verifying', title:'Checking & Verifying', questions:[
+        { pcg:'p', prompt:'"You calculate 48 x 23 = 1014. How do you check this without recalculating?"', full:'You calculate 48 x 23 = 1014. How would you check this without simply doing the multiplication again? What different methods exist for checking a calculation?' },
+        { pcg:'p', prompt:'"Check whether 2, 5, and 10 are all solutions to: x squared - 7x + 10 = 0."', full:'Check whether each of these is a solution to x squared - 7x + 10 = 0: x = 2, x = 5, x = 10. What does it mean to check a solution? Which ones work?' },
+        { pcg:'p', prompt:'"How do you know when a mathematical answer is reasonable? Give three strategies."', full:'Give three strategies for checking whether a mathematical answer is reasonable — not whether it is exactly right, but whether it is in the right ballpark. Apply each to: 23 x 47 = 1081.' },
+        { pcg:'c', prompt:'"Can you check a proof the same way you check a calculation? What is different?"', full:'How do you check a mathematical proof? Is it the same process as checking an arithmetic calculation? What are the different ways a proof can be wrong, and how do you detect each?' },
+        { pcg:'c', prompt:'"Find an example where a check of the wrong type gives you false confidence."', full:'Find a situation where checking a mathematical result using an inappropriate method gives you false confidence that the answer is correct — but the answer is actually wrong. What does this reveal about checking?' },
+        { pcg:'c', prompt:'"Design a checking strategy for whether a large number is a perfect square."', full:'Design an efficient checking strategy for whether a given large number is a perfect square, without computing the square root directly. What necessary conditions must a perfect square satisfy?' },
+        { pcg:'c', prompt:'"Why do mathematicians re-prove results that have already been proved?"', full:'Why do mathematicians sometimes re-prove theorems that have already been established by others? What is gained by finding a new proof of an old result? When is a simpler proof valuable even if the theorem is already known?' },
+        { pcg:'g', prompt:'"Prove that the check digit system for credit cards (Luhn algorithm) detects all single-digit errors."', full:'The Luhn algorithm generates a check digit for credit card numbers that detects any single-digit error. Prove that it detects every possible single-digit error. Does it detect all transposition errors?' },
+        { pcg:'g', prompt:'"Design a verification system for mathematical proofs that a computer could execute."', full:'Design a formal system for verifying mathematical proofs that a computer could execute mechanically. What would the system accept as a valid proof? What are the trade-offs between rigour and usability?' },
+        { pcg:'g', prompt:'"What does it mean for a mathematical theorem to be true if no one has checked the proof?"', full:'Several mathematical theorems have proofs hundreds of pages long that very few people have read completely. In what sense are these theorems true if their proofs have not been fully verified? What does truth mean in mathematics?' },
+      ]},
+    ],
+  },
+  {
+    num:'II', key:'notice', name:'Notice', pcgKind:'p',
+    activities:[
+      { id:'looking-patterns', title:'Looking for Patterns', questions:[
+        { pcg:'p', prompt:'"Add consecutive odd numbers: 1, 1+3, 1+3+5, 1+3+5+7. What pattern do you see?"', full:'Calculate: 1, then 1+3, then 1+3+5, then 1+3+5+7. What pattern do you notice in the results? Can you predict the next few sums without calculating?' },
+        { pcg:'p', prompt:'"Multiply any number by 9. Add the digits of the result. What pattern emerges?"', full:'Multiply various numbers by 9 and add the digits of the result. What pattern always emerges? Does it work for large numbers? Why does this happen?' },
+        { pcg:'p', prompt:'"Write out the multiples of 7 and look at the ones digits. What do you find?"', full:'Write out the first 10 multiples of 7. Look only at the ones digits. What pattern do you see? Does the same kind of pattern appear for other multipliers?' },
+        { pcg:'c', prompt:'"When is a pattern in mathematics a coincidence and when is it deep?"', full:'Some patterns in mathematics are superficial coincidences and some reveal deep structure. How do you tell the difference? Give an example of each kind of pattern.' },
+        { pcg:'c', prompt:'"Find a pattern that breaks at exactly the right moment to be surprising."', full:'Find a mathematical pattern that holds for many cases and then breaks down — the more cases it holds for before breaking, the better. What makes a pattern that eventually breaks more interesting than one that always breaks?' },
+        { pcg:'c', prompt:'"Describe the pattern in the decimal expansion of 1/7. Why does it have period 6?"', full:'The decimal expansion of 1/7 is 0.142857142857... repeating with period 6. What pattern is in the repeating block? Why is the period exactly 6? What is special about 7 that determines this?' },
+        { pcg:'c', prompt:'"Design a pattern that looks numerical but is actually geometrical."', full:'Design a sequence of numbers that looks like a numerical pattern but whose true explanation is geometrical. How does the geometrical structure generate the numerical pattern?' },
+        { pcg:'g', prompt:'"Prove that the pattern 1, 1+3, 1+3+5, ... always gives perfect squares."', full:'Prove rigorously that the sum of the first n odd numbers is always n squared. Give three different proofs: one algebraic, one by induction, and one visual.' },
+        { pcg:'g', prompt:'"Find a pattern in the primes that has never been proved but seems very likely to be true."', full:'Research and describe a pattern in the prime numbers that has been observed computationally but never proved. Why is such a pattern hard to prove even when it seems obvious?' },
+        { pcg:'g', prompt:'"Prove that any pattern in the digits of pi is consistent with pi being normal — equally distributed."', full:'Pi is believed to be a normal number — every digit appearing equally often, every pair of digits equally often, and so on. What would it mean for pi to be normal? Has this been proved? What patterns in pi are consistent with normality?' },
+      ]},
+      { id:'making-connections', title:'Making Connections', questions:[
+        { pcg:'p', prompt:'"How is adding fractions similar to finding a common denominator? What is the connection?"', full:'How is adding fractions connected to finding a least common multiple? Draw a picture or write an explanation that shows the connection clearly.' },
+        { pcg:'p', prompt:'"How are multiplication and area connected? Show with a picture."', full:'How is multiplication of two numbers connected to the concept of area? Draw a picture that makes this connection clear. Does the connection still work for fractions? For negative numbers?' },
+        { pcg:'p', prompt:'"Find a connection between the number of factors of n and whether n is a perfect square."', full:'Find the relationship between the number of factors of a whole number and whether that number is a perfect square. Why does a perfect square have an odd number of factors while other numbers have an even number?' },
+        { pcg:'c', prompt:'"Connect trigonometry to the Pythagorean theorem. How are they related?"', full:'How are trigonometry and the Pythagorean theorem related? Show that the fundamental identity sin squared + cos squared = 1 is a direct consequence of the Pythagorean theorem.' },
+        { pcg:'c', prompt:'"Find an unexpected connection between two mathematical areas that seem unrelated."', full:'Find a connection between two areas of mathematics that seem completely unrelated. What is the bridge between them? Why is such a connection surprising and valuable?' },
+        { pcg:'c', prompt:'"How is Pascal triangle connected to the binomial theorem, to Sierpinski triangle, and to probability?"', full:'Pascal triangle appears in the binomial theorem, in Sierpinski triangle, in probability theory, and elsewhere. Explain the connection between Pascal triangle and at least three different areas of mathematics.' },
+        { pcg:'c', prompt:'"Connect the Fibonacci sequence to the golden ratio. Prove the connection."', full:'The ratio of consecutive Fibonacci numbers approaches the golden ratio as the sequence progresses. Prove this connection. What is it about the Fibonacci recurrence that forces this?' },
+        { pcg:'g', prompt:'"Prove that Euler formula e to the i pi plus 1 equals 0 connects 5 fundamental constants."', full:'Euler formula e to the power of i pi, plus 1, equals 0 — connecting e, i, pi, 1, and 0. Prove this formula using the Taylor series for the exponential function. Why is this connection so surprising and celebrated?' },
+        { pcg:'g', prompt:'"Find a connection between prime numbers and the zeros of a complex function — the Riemann zeta function."', full:'The distribution of prime numbers is connected to the zeros of the Riemann zeta function. Describe this connection. What does the Riemann hypothesis say about these zeros, and why would it tell us about primes?' },
+        { pcg:'g', prompt:'"Design a lesson that reveals an unexpected connection between two topics studied in different years of school."', full:'Design a lesson that reveals an unexpected mathematical connection between two topics typically taught in different school years or different subjects. What is the connection? Why is it not usually taught?' },
+      ]},
+      { id:'estimating-guessing', title:'Estimating & Guessing', questions:[
+        { pcg:'p', prompt:'"Estimate how many grains of rice fill a teaspoon. Show your reasoning."', full:'Estimate the number of grains of rice that would fill a teaspoon. Show all your reasoning step by step. Check your estimate against reality — how close were you?' },
+        { pcg:'p', prompt:'"Without measuring, estimate the height of your room in metres."', full:'Without using a tape measure, estimate the height of your room in metres. Describe your reasoning. How could you check your estimate?' },
+        { pcg:'p', prompt:'"Estimate the sum 99 + 47 + 203 + 51 + 198. How close is your estimate to the exact answer?"', full:'Estimate the sum 99 + 47 + 203 + 51 + 198 without adding exactly. What is your estimate? Calculate the exact sum. What percentage error is your estimate?' },
+        { pcg:'c', prompt:'"What distinguishes a good mathematical estimate from a wild guess?"', full:'What distinguishes a good estimate from a wild guess in mathematics? What makes some estimates more trustworthy than others? How do you know when your estimation strategy is reliable?' },
+        { pcg:'c', prompt:'"Estimate how many heartbeats a human has in a lifetime. Check your estimate with a calculation."', full:'Estimate the total number of heartbeats in an average human lifetime. Show every step of your Fermi estimation. Then do a more careful calculation. How close was your estimate?' },
+        { pcg:'c', prompt:'"Can you estimate without numbers? What would that mean?"', full:'Is it possible to estimate something without using any numbers at all? What would a purely qualitative estimate look like? When are such estimates useful?' },
+        { pcg:'c', prompt:'"Design an estimation problem where overestimating is better than underestimating."', full:'Design a real-world estimation problem where the consequences of overestimating are better than the consequences of underestimating. What context makes over-caution the right choice?' },
+        { pcg:'g', prompt:'"Prove that order-of-magnitude estimates are always accurate to within a factor of 10."', full:'A back-of-the-envelope estimate using powers of 10 is said to be accurate to within an order of magnitude. Prove or disprove this. What conditions on the estimation process make it accurate to within a factor of 10?' },
+        { pcg:'g', prompt:'"Design a Fermi estimation problem whose answer is a mathematical constant like pi or e."', full:'Design a physical estimation problem where the answer, when worked out precisely, turns out to be a mathematical constant like pi or e. Why would a physical problem have a mathematical constant as its answer?' },
+        { pcg:'g', prompt:'"What is the theoretical limit of estimation accuracy without measurement?"', full:'Is there a theoretical limit to how accurately you can estimate something without making any measurements? What information-theoretic argument determines this limit? When is estimation as good as measurement?' },
+      ]},
+      { id:'explaining-thinking', title:'Explaining Your Thinking', questions:[
+        { pcg:'p', prompt:'"Explain how to add fractions to someone who has never seen it before."', full:'Explain how to add fractions with different denominators to someone who has never encountered fractions before. Use no mathematical symbols — only words and perhaps drawings.' },
+        { pcg:'p', prompt:'"Explain why multiplying two negative numbers gives a positive, in three different ways."', full:'Explain why a negative times a negative is positive in three genuinely different ways: using a pattern, using a real-world analogy, and using an algebraic argument.' },
+        { pcg:'p', prompt:'"Record yourself solving a maths problem and narrate your thinking out loud. What do you notice?"', full:'Solve a mathematics problem while narrating every step of your thinking out loud — including wrong turns and corrections. What do you notice about your thinking process that you do not normally notice?' },
+        { pcg:'c', prompt:'"What is the difference between explaining your method and explaining your understanding?"', full:'What is the difference between explaining the steps of a method and explaining why the method works? Can you do one without the other? Which is more mathematically valuable?' },
+        { pcg:'c', prompt:'"Can you explain a mathematical idea using only questions?"', full:'Can you explain a mathematical concept — say, what a prime number is — using only questions rather than statements? Design such an explanation. What does this format reveal about the concept?' },
+        { pcg:'c', prompt:'"Design an explanation of infinity for a 6-year-old that is mathematically honest."', full:'Design an explanation of infinity for a 6-year-old that is mathematically honest — that does not say anything false, even while being simple. What is the hardest part of explaining infinity truthfully to a young child?' },
+        { pcg:'c', prompt:'"Find a mathematical concept that is easier to show than to explain in words."', full:'Find a mathematical concept that is much easier to demonstrate or show than to explain in words. What makes some mathematical ideas visually transparent but verbally opaque?' },
+        { pcg:'g', prompt:'"Write the clearest possible explanation of Godel incompleteness theorem for a non-mathematician."', full:'Write the clearest possible explanation of Godel incompleteness theorem for an intelligent adult with no mathematical background. What analogies help? What must you sacrifice for clarity? How do you avoid being misleading?' },
+        { pcg:'g', prompt:'"Prove that any explanation of mathematics can be made simpler."', full:'Argue — as convincingly as possible — that any mathematical explanation can always be made clearer or simpler. Does this mean there is a perfect explanation for every concept, or does simplification always sacrifice something?' },
+        { pcg:'g', prompt:'"Design a mathematical explanation that works for both a 7-year-old and a professional mathematician."', full:'Design a mathematical explanation of a concept that is genuinely meaningful and intellectually satisfying for both a 7-year-old and a professional mathematician simultaneously — without being either dumbed down or over their head.' },
+      ]},
+    ],
+  },
+  {
+    num:'III', key:'question', name:'Question', pcgKind:'c',
+    activities:[
+      { id:'mathematical-arguments', title:'Mathematical Arguments', questions:[
+        { pcg:'p', prompt:'"Write a mathematical argument for why there must be more than 5 prime numbers."', full:'Write a mathematical argument — not just a list of primes — for why there must be more than 5 prime numbers. What kind of reasoning can you use?' },
+        { pcg:'p', prompt:'"Your friend says: I checked 100 even numbers and they are all the sum of two primes, so it must always be true. What is wrong with this argument?"', full:'Your friend says they checked 100 even numbers and found each is the sum of two primes, so the pattern always holds. What is wrong with this argument? What would a valid argument need to look like?' },
+        { pcg:'p', prompt:'"Find the flaw: all horses are the same colour. Proof by induction: true for 1 horse. If true for n horses, consider n+1 horses..."', full:'Find the flaw in this inductive proof that all horses are the same colour: it is true for 1 horse. If it is true for n horses, consider n+1 horses — remove one, the remaining n are all one colour by hypothesis, so all n+1 must be the same colour. Where is the error?' },
+        { pcg:'c', prompt:'"What makes a mathematical argument valid? What makes it convincing?"', full:'What is the difference between a valid mathematical argument and a convincing one? Can an argument be valid but not convincing? Convincing but not valid? Give examples.' },
+        { pcg:'c', prompt:'"Find a common fallacy in mathematical reasoning and show how it leads people astray."', full:'Find a common fallacy in mathematical reasoning — an error that seems plausible — and show how it leads to a false conclusion. Why does this fallacy fool people? What is the safeguard against it?' },
+        { pcg:'c', prompt:'"Is a proof by example ever valid in mathematics?"', full:'Is proving something by giving an example ever valid in mathematics? When is an example a proof? When is an example merely evidence? What is the precise difference?' },
+        { pcg:'c', prompt:'"Construct an argument for a false statement that has no obvious flaw. What goes wrong?"', full:'Construct a mathematical argument for a false statement — one where the error is hard to spot. Present it to someone and see if they can find the flaw. What type of error did you use?' },
+        { pcg:'g', prompt:'"Prove the principle of mathematical induction from first principles."', full:'Prove the principle of mathematical induction — that if a statement holds for n=1 and the truth of n implies the truth of n+1, then it holds for all natural numbers. What axiom about the natural numbers makes induction valid?' },
+        { pcg:'g', prompt:'"Construct a proof that is correct but where every step seems to make no progress."', full:'Construct a mathematical proof where every individual step seems to make no progress toward the conclusion, yet the complete proof is valid. What does this reveal about how proof works?' },
+        { pcg:'g', prompt:'"Prove that no finite set of logical rules is sufficient to prove all mathematical truths."', full:'Godel proved that no consistent finite set of axioms is sufficient to prove all truths about the natural numbers. Sketch the key ideas of this proof. What does it mean for mathematics that there are truths beyond any axiom system?' },
+      ]},
+      { id:'generalising', title:'Generalising', questions:[
+        { pcg:'p', prompt:'"The sum of the first n odd numbers is n squared. Generalise: what is the sum of the first n even numbers?"', full:'We know the sum of the first n odd numbers is n squared. Conjecture a formula for the sum of the first n even numbers. Verify it for small cases and prove it.' },
+        { pcg:'p', prompt:'"The angles in a triangle sum to 180. What do the angles in a quadrilateral sum to? In a pentagon?"', full:'The interior angles of a triangle sum to 180 degrees. What do they sum to for a quadrilateral? A pentagon? An n-gon? Find and prove the general formula.' },
+        { pcg:'p', prompt:'"You know a squared - b squared = (a+b)(a-b). Generalise: what is a cubed - b cubed?"', full:'The difference of squares factorises as a squared minus b squared equals (a+b)(a-b). What about the difference of cubes — a cubed minus b cubed? Factorise it and find the general pattern for a to the n minus b to the n.' },
+        { pcg:'c', prompt:'"What is the difference between a special case and a generalisation?"', full:'What is the relationship between a special case and a generalisation in mathematics? Is a generalisation always harder to prove than a special case? When is it actually easier to prove the general case?' },
+        { pcg:'c', prompt:'"Find a problem that is easier to solve in its general form than in a specific case."', full:'Find a mathematical problem where solving the general version is actually easier or more natural than solving the specific case. Why does this happen? What does it say about the nature of generality?' },
+        { pcg:'c', prompt:'"Generalise the Pythagorean theorem to three dimensions."', full:'The Pythagorean theorem says a squared + b squared = c squared in two dimensions. Generalise it to three dimensions. Prove your generalisation. Can you generalise it further to n dimensions?' },
+        { pcg:'c', prompt:'"Take any theorem you know. Find its most general possible statement."', full:'Take any mathematical theorem you know well. Find the most general possible version of it — the largest class of objects to which it applies. Does the proof of the special case generalise, or do you need new ideas?' },
+        { pcg:'g', prompt:'"Prove the general formula for the sum of a geometric series and find its most elegant generalisation."', full:'Prove the formula for the sum of a finite geometric series. Then generalise: to infinite series with |r|<1, to complex ratios, to matrix geometric series. At what point does the generalisation require genuinely new ideas?' },
+        { pcg:'g', prompt:'"Prove that the AM-GM inequality generalises to n numbers."', full:'The arithmetic-geometric mean inequality for two numbers states (a+b)/2 is at least the square root of ab. Prove the general version: the arithmetic mean of n positive numbers is at least as large as their geometric mean. What proof techniques work?' },
+        { pcg:'g', prompt:'"Design a generalisation problem where the general case is genuinely unsolved."', full:'Identify a mathematical result with a known proof for specific cases but where the general case is an open problem. Describe the known cases, state the general conjecture, and explain why generalisation is hard.' },
+      ]},
+      { id:'counter-examples', title:'Counter-examples', questions:[
+        { pcg:'p', prompt:'"Someone claims: all prime numbers are odd. Find a counter-example."', full:'Someone claims that all prime numbers are odd. Find a counter-example. What does the counter-example prove? How many counter-examples do you need to disprove a universal claim?' },
+        { pcg:'p', prompt:'"True or false: if n squared is divisible by 4, then n is divisible by 4. Find a counter-example or prove it."', full:'Is it true that if n squared is divisible by 4, then n must be divisible by 4? Find a counter-example if false, or prove it if true. What similar statement IS true?' },
+        { pcg:'p', prompt:'"Find a counter-example to: the sum of two irrational numbers is always irrational."', full:'Find a counter-example to the claim that the sum of two irrational numbers is always irrational. How does your counter-example work? What does it reveal about irrational numbers?' },
+        { pcg:'c', prompt:'"Why is one counter-example enough to disprove a universal claim?"', full:'Why is a single counter-example sufficient to disprove a universal mathematical claim? Why do thousands of confirming examples not prove a universal claim? What is the logical asymmetry here?' },
+        { pcg:'c', prompt:'"Find a statement that seems true, is true for the first 1000 cases, but is eventually false."', full:'Find or construct a mathematical statement that is true for many cases — perhaps the first 1000 — but is eventually false. What makes such examples mathematically important?' },
+        { pcg:'c', prompt:'"Construct a counter-example to a theorem by removing one of its hypotheses."', full:'Take a theorem you know. Remove one of its hypotheses (conditions). Construct a counter-example showing that the theorem fails without that hypothesis. What does this reveal about the role of each hypothesis?' },
+        { pcg:'c', prompt:'"What is the most surprising counter-example in all of mathematics?"', full:'What do you consider the most surprising or beautiful counter-example in all of mathematics — the one that most dramatically shows that an apparently true statement is false? Explain the statement, the counter-example, and why it is surprising.' },
+        { pcg:'g', prompt:'"Prove that the counter-example to the real number version of a theorem need not be a counter-example to the complex version."', full:'Find a theorem about real numbers that fails for complex numbers, and separately a theorem about complex numbers that has no analogue for real numbers. What does this reveal about the relationship between real and complex analysis?' },
+        { pcg:'g', prompt:'"Design a mathematical game based on finding counter-examples."', full:'Design a two-player mathematical game where one player proposes conjectures and the other tries to find counter-examples. How do you score? What makes a good conjecture in this game? What makes a clever counter-example?' },
+        { pcg:'g', prompt:'"Prove that no finite set of examples can prove a universal mathematical statement."', full:'Prove rigorously that no finite collection of examples can establish a universal mathematical claim — that there is always a universe where all the examples hold but the general claim fails. What does this say about empirical verification in mathematics?' },
+      ]},
+      { id:'mathematical-beauty', title:'Mathematical Beauty', questions:[
+        { pcg:'p', prompt:'"What is the most beautiful piece of mathematics you know? Why is it beautiful?"', full:'Describe the most beautiful piece of mathematics you have encountered. What makes it beautiful — is it simplicity, surprise, depth, elegance? Is mathematical beauty subjective or objective?' },
+        { pcg:'p', prompt:'"Euler formula: e to the i pi plus 1 equals 0. Why do mathematicians call this beautiful?"', full:'Euler formula e to the power of i pi, plus 1, equals 0. Mathematicians frequently call this the most beautiful equation in mathematics. What makes it beautiful? What would you need to understand to appreciate the beauty?' },
+        { pcg:'p', prompt:'"Find a proof that is beautiful because of how simple it is."', full:'Find a mathematical proof that is beautiful because of its simplicity — where the proof is much shorter or more direct than you would expect. What makes simplicity feel beautiful in mathematics?' },
+        { pcg:'c', prompt:'"Is mathematical beauty objective or subjective? Can it be defined?"', full:'Is mathematical beauty an objective property of proofs and theorems, or is it in the eye of the beholder? Can you define mathematical beauty precisely? What would a theory of mathematical aesthetics look like?' },
+        { pcg:'c', prompt:'"Find a mathematical result that is true but ugly. What makes it ugly?"', full:'Find a mathematical result that is true and important but not beautiful — perhaps ugly. What makes it ugly? Is there always a way to find beauty in any mathematical truth if you look at it from the right angle?' },
+        { pcg:'c', prompt:'"Design the most beautiful possible proof of the Pythagorean theorem."', full:'There are hundreds of proofs of the Pythagorean theorem. Design what you consider the most beautiful proof. What criteria are you using? What trade-offs does your choice make?' },
+        { pcg:'c', prompt:'"Is there a connection between mathematical beauty and mathematical truth?"', full:'Do mathematicians use beauty as a guide to mathematical truth — do beautiful conjectures tend to be true? Give historical examples. What would it mean if beauty reliably tracks truth?' },
+        { pcg:'g', prompt:'"Prove that Euclid proof of the infinitude of primes is beautiful by analysing its structure."', full:'Analyse Euclid proof of the infinitude of primes from the perspective of mathematical aesthetics. What makes it beautiful — is it the economy of means, the surprise, the generality, or something else? Can beauty be formally analysed?' },
+        { pcg:'g', prompt:'"Design a mathematical theorem that is beautiful but takes years to appreciate fully."', full:'Design a mathematical theorem that is genuinely beautiful, but where the beauty is only accessible after years of mathematical development — a beauty that rewards deep understanding rather than surface familiarity.' },
+        { pcg:'g', prompt:'"Write a manifesto: what makes mathematics beautiful, and why beauty matters in mathematics."', full:'Write a short but serious manifesto arguing for why mathematical beauty matters and what makes mathematics beautiful. Address the objection that beauty is irrelevant to whether mathematics is true or useful.' },
+      ]},
+    ],
+  },
+  {
+    num:'IV', key:'connect', name:'Connect', pcgKind:'c',
+    activities:[
+      { id:'mathematics-nature', title:'Mathematics in Nature', questions:[
+        { pcg:'p', prompt:'"Find the Fibonacci sequence in a sunflower or pinecone. How many spirals in each direction?"', full:'Look at a sunflower head or pinecone. Count the number of spirals going clockwise and the number going counterclockwise. What do you notice about these numbers? Why does nature produce this pattern?' },
+        { pcg:'p', prompt:'"Snowflakes have 6-fold symmetry. Why exactly 6 and not 5 or 7?"', full:'Snowflakes always have six-fold rotational symmetry — 6 arms, not 5 or 7 or 8. Why? What property of water molecules and crystal growth forces exactly this symmetry?' },
+        { pcg:'p', prompt:'"Why are honeycombs made of hexagons and not squares or triangles?"', full:'Bees build honeycombs from hexagonal cells. Why hexagons and not squares or triangles? What mathematical property of hexagons makes them the optimal choice for the bees?' },
+        { pcg:'c', prompt:'"Why does the golden ratio appear in biological growth patterns?"', full:'The golden ratio appears in the arrangement of leaves, seeds, and petals in many plants. Why? What property of the golden ratio makes it optimal for biological growth? Is this coincidence or necessity?' },
+        { pcg:'c', prompt:'"Fractals appear throughout nature. What is a fractal and why does nature produce them?"', full:'Fractals — structures that look similar at every scale — appear in coastlines, trees, clouds, blood vessels, and broccoli. What is a fractal mathematically? Why does nature produce fractal structures so often?' },
+        { pcg:'c', prompt:'"The mathematics of soap bubbles: why do soap films minimize surface area?"', full:'Soap bubbles and soap films always take the shape that minimises surface area for a given volume or boundary. Why? What mathematical principle governs this? What shapes result from different constraints?' },
+        { pcg:'c', prompt:'"Voronoi diagrams appear in nature. What are they and where do they appear?"', full:'Voronoi diagrams partition space into regions closest to each of a set of points. Where do Voronoi patterns appear in nature? What natural processes produce them? How are they useful in science?' },
+        { pcg:'g', prompt:'"Prove that hexagonal packing is the most efficient way to fill a plane with equal circles."', full:'Prove that the hexagonal packing of equal circles in a plane achieves the highest possible packing density. What is the packing fraction? Why does this result connect to why hexagons tile optimally?' },
+        { pcg:'g', prompt:'"Derive the equation of a nautilus shell from first principles."', full:'A nautilus shell grows as a logarithmic spiral. Derive the equation of a logarithmic spiral from the biological principle that each section of the shell is similar to the previous. What is the mathematical definition of a logarithmic spiral?' },
+        { pcg:'g', prompt:'"Design a biological growth process that produces a mathematical pattern not yet found in nature."', full:'Design a hypothetical biological growth process — governed by simple local rules — that would produce a mathematical pattern or structure not yet observed in nature. Prove that your growth rules produce the pattern you claim.' },
+      ]},
+      { id:'mathematics-art', title:'Mathematics & Art', questions:[
+        { pcg:'p', prompt:'"Find three examples of symmetry in art or architecture near you."', full:'Find three examples of symmetry — reflective, rotational, or translational — in art or architecture near you. Describe each mathematically. Is complete symmetry always more beautiful than partial symmetry?' },
+        { pcg:'p', prompt:'"Escher drew impossible staircases and tessellations. Pick one of his works and describe the mathematics."', full:'Choose one of M.C. Escher works — an impossible figure or a tessellation. Describe the mathematics that makes it possible or impossible. What did Escher understand about geometry that many artists do not?' },
+        { pcg:'p', prompt:'"Create a piece of art based on the first 20 digits of pi."', full:'Create a piece of visual art or music based on the first 20 digits of pi. Document your process. What mathematical property of pi determined your artistic choices?' },
+        { pcg:'c', prompt:'"What is the connection between perspective drawing and projective geometry?"', full:'Linear perspective in art is based on projective geometry — the mathematics of how a 3D scene maps onto a 2D picture plane. Explain this connection. What properties are preserved under projection and which are not?' },
+        { pcg:'c', prompt:'"Is the golden ratio really used in famous artworks, or is this a myth?"', full:'The golden ratio is often claimed to appear in famous artworks and architecture. Critically evaluate this claim. Is the golden ratio genuinely present in famous works, or are people finding it by measuring selectively?' },
+        { pcg:'c', prompt:'"Design a visual artwork where the mathematics is the aesthetic — not just a tool."', full:'Design a piece of visual art where the mathematical structure is the aesthetic content — not just a tool for composition. What mathematical idea are you expressing? How does the visual form embody the mathematics?' },
+        { pcg:'c', prompt:'"How does the mathematics of symmetry groups classify all possible wallpaper patterns?"', full:'There are exactly 17 fundamentally different wallpaper patterns — repeating patterns that tile the plane. Symmetry group theory explains why there are exactly 17. What is a symmetry group? How does it classify patterns?' },
+        { pcg:'g', prompt:'"Prove that there are exactly 17 wallpaper groups."', full:'Prove that there are exactly 17 distinct symmetry groups for wallpaper patterns — patterns that repeat in two independent directions. What constraints determine the 17? Why are there not 16 or 18?' },
+        { pcg:'g', prompt:'"Design a mathematical artwork whose beauty can only be fully appreciated with mathematical knowledge."', full:'Design a mathematical artwork that has a surface aesthetic accessible to everyone, but a deeper aesthetic that is only fully appreciable with specific mathematical knowledge. What is the mathematical depth that rewards understanding?' },
+        { pcg:'g', prompt:'"Analyse the mathematics of a fugue: how does counterpoint relate to algebraic structure?"', full:'A Bach fugue uses counterpoint — the mathematical layering of melodic lines — that has algebraic structure. Analyse a short fugue mathematically. What algebraic concepts describe the transformations of the theme?' },
+      ]},
+      { id:'mathematics-music', title:'Mathematics & Music', questions:[
+        { pcg:'p', prompt:'"Why do 8 notes span an octave? What is mathematical about a musical scale?"', full:'A musical octave spans 8 notes in the Western scale. Why 8? What is the mathematical relationship between notes in a scale? What makes two notes an octave apart feel similar?' },
+        { pcg:'p', prompt:'"Clap a simple rhythm. Write it as a fraction. What time signature would it be in?"', full:'Create a simple rhythm by clapping. Write out the rhythm using fractions of a beat. What time signature does it fit? How does mathematics describe rhythm?' },
+        { pcg:'p', prompt:'"The frequency of an A note is 440 Hz. What is the frequency of the A one octave higher?"', full:'The note A above middle C has a frequency of 440 Hz. What is the frequency of the A note one octave higher? One octave lower? What mathematical relationship defines an octave?' },
+        { pcg:'c', prompt:'"Why does the harmonic series in physics match the harmonic series in mathematics?"', full:'The overtone series in physics — the harmonics produced by a vibrating string — corresponds exactly to the mathematical harmonic series 1, 1/2, 1/3, 1/4... Why does physics produce this mathematical series?' },
+        { pcg:'c', prompt:'"Equal temperament vs just intonation: what mathematical compromise does modern music make?"', full:'Modern Western music uses equal temperament — dividing the octave into 12 equal parts. This is a mathematical compromise. What is just intonation? What trade-off does equal temperament make, and why was it adopted?' },
+        { pcg:'c', prompt:'"Analyse a drumbeat as a mathematical pattern. What group theory describes rhythmic transformation?"', full:'Analyse a drumbeat pattern mathematically. What transformations — augmentation, retrograde, rotation — does a drummer apply to a rhythmic pattern? What algebraic structure describes these transformations?' },
+        { pcg:'c', prompt:'"How do Fourier series explain why different instruments playing the same note sound different?"', full:'Two instruments playing the same note have the same fundamental frequency but different timbres — different qualities of sound. How do Fourier series explain this difference? What is the mathematical basis of timbre?' },
+        { pcg:'g', prompt:'"Prove that no tuning system can make all intervals in the chromatic scale perfectly just."', full:'Prove mathematically that no system of 12 equal intervals per octave can make all musical intervals perfectly consonant — there is an unavoidable comma (error) in any finite equal temperament. Why does this mathematical constraint shape music?' },
+        { pcg:'g', prompt:'"Analyse the mathematics of a Bach invention for two voices."', full:'Choose a two-voice Bach invention. Identify every mathematical transformation applied to the theme: inversion, retrograde, augmentation, diminution, stretto. Analyse the contrapuntal structure algebraically.' },
+        { pcg:'g', prompt:'"Design a musical scale based on a different mathematical principle than the current one."', full:'Design a musical scale based on a different mathematical principle from the current equal temperament or just intonation systems. What would it sound like? What mathematical properties would it have? Has anything like it been used historically?' },
+      ]},
+      { id:'history-mathematics', title:'History of Mathematics', questions:[
+        { pcg:'p', prompt:'"Who invented algebra? What problem were they trying to solve?"', full:'Who is credited with developing algebra as a systematic discipline? What practical problem were they trying to solve? What does the word algebra mean and where does it come from?' },
+        { pcg:'p', prompt:'"How did ancient Egyptians multiply numbers without a multiplication table?"', full:'Ancient Egyptians used a method of doubling and halving to multiply numbers — a method that still works and is related to how computers multiply. Describe the method and show it on an example.' },
+        { pcg:'p', prompt:'"What was Euclidean geometry, and why was it dominant for 2000 years?"', full:'Euclid Elements was the dominant text in mathematics for over 2000 years. What is Euclidean geometry? What made Euclid approach so powerful and long-lasting? Why was it eventually superseded?' },
+        { pcg:'c', prompt:'"How did the concept of zero develop historically, and why was it revolutionary?"', full:'Zero was not always part of mathematics — it was invented. Trace the historical development of zero. Why was zero revolutionary? What became possible with zero that was impossible without it?' },
+        { pcg:'c', prompt:'"Describe a mathematical idea that was discovered independently in two different cultures."', full:'Describe a mathematical concept or result that was independently discovered in two or more different cultures without contact between them. What does this tell us about the nature of mathematics?' },
+        { pcg:'c', prompt:'"Why was calculus invented, and what dispute did it cause?"', full:'Who invented calculus, and what practical problems motivated its development? What famous dispute arose over its invention? Was the dispute resolved? What does it tell us about how mathematics develops?' },
+        { pcg:'c', prompt:'"What is the most important mathematical idea developed in the last 50 years?"', full:'What do you consider the most important mathematical development in the last 50 years — since 1975? Research and argue for your choice. What problems did it solve or open up?' },
+        { pcg:'g', prompt:'"Analyse how the history of mathematics shows mathematics being both discovered and invented."', full:'Use specific historical examples to analyse the question of whether mathematics is discovered or invented. Show cases that support each view. Can both be true? What is your conclusion?' },
+        { pcg:'g', prompt:'"Trace the development of probability theory from gambling problems to quantum mechanics."', full:'Trace the historical development of probability theory from its origins in gambling problems in the 17th century to its role in quantum mechanics in the 20th century. What problems drove each stage of development?' },
+        { pcg:'g', prompt:'"Write the mathematical biography of a mathematician whose work changed the questions mathematics asks."', full:'Write a mathematical biography of a mathematician who did not just answer existing questions but changed what questions mathematics asks. How did their work reshape the field? What new questions did they open up?' },
+      ]},
+    ],
+  },
+  {
+    num:'V', key:'create', name:'Create', pcgKind:'g',
+    activities:[
+      { id:'what-mathematicians-do', title:'What Mathematicians Do', questions:[
+        { pcg:'p', prompt:'"Describe a day in the life of a working mathematician. What do they actually do?"', full:'Describe a typical working day for a professional mathematician. What activities fill their time? How much is calculation? How much is reading? How much is talking to others?' },
+        { pcg:'p', prompt:'"What tools do mathematicians use? Is a calculator the most important one?"', full:'What tools do research mathematicians actually use? Is a calculator the main tool? What role do computers, paper, other mathematicians, and intuition play?' },
+        { pcg:'p', prompt:'"Interview a mathematician (or research one). What problem are they working on and for how long?"', full:'Research or imagine a conversation with a research mathematician. What problem have they been working on? For how long? What progress have they made? What does sustained mathematical work look like?' },
+        { pcg:'c', prompt:'"What is mathematical research? How is it different from learning mathematics?"', full:'What is mathematical research — the creation of new mathematics? How is it fundamentally different from learning mathematics that already exists? What skills does research require that learning does not?' },
+        { pcg:'c', prompt:'"How do mathematicians know when they have found the right proof?"', full:'When a mathematician finds a proof, how do they know it is correct? What gives them confidence? How do errors sometimes persist undetected for years? What is the social process of mathematical verification?' },
+        { pcg:'c', prompt:'"What role does collaboration play in modern mathematics?"', full:'Is mathematics a solitary or collaborative activity? How has the nature of mathematical collaboration changed with technology? What famous mathematical collaborations have produced major results?' },
+        { pcg:'c', prompt:'"What percentage of mathematical research leads to published results? What happens to the rest?"', full:'Much mathematical research leads nowhere — dead ends, false starts, proofs of already known results. What percentage of mathematical work leads to publication? What happens to unpublished work? What is its value?' },
+        { pcg:'g', prompt:'"Design your ideal mathematical research programme for the next 10 years."', full:'Design a 10-year mathematical research programme — the questions you would pursue, the tools you would develop, the collaborators you would seek. What makes a research programme coherent and ambitious?' },
+        { pcg:'g', prompt:'"Prove that mathematical creativity is not fully algorithmic."', full:'Argue that mathematical creativity — the ability to find new proofs and discover new theorems — is not fully algorithmic. What does this mean? What is the role of intuition, pattern recognition, and analogy in mathematical discovery?' },
+        { pcg:'g', prompt:'"Write a research proposal for a new mathematical idea you have had."', full:'Write a serious research proposal for a mathematical idea of your own — a question you genuinely want to explore. What is the question? Why is it interesting? What approach would you take? What would success look like?' },
+      ]},
+      { id:'open-questions', title:'Open Questions', questions:[
+        { pcg:'p', prompt:'"What is the biggest unanswered question in mathematics that a child could understand?"', full:'What is the biggest unanswered question in mathematics that could be fully understood by a child — where understanding the question requires no advanced mathematics? State it and explain why it remains unsolved.' },
+        { pcg:'p', prompt:'"The Collatz conjecture has been verified for every number up to 2 to the 68. Why is this not a proof?"', full:'The Collatz conjecture has been verified computationally for all numbers up to 2 to the power of 68 — vastly more than could be checked by hand. Why does this computational verification not constitute a mathematical proof?' },
+        { pcg:'p', prompt:'"Why do mathematicians care about problems that have no practical applications?"', full:'Many famous open problems in mathematics — like the Riemann hypothesis or the twin prime conjecture — have no known practical application. Why do mathematicians invest enormous effort in them? Is pure mathematics self-justifying?' },
+        { pcg:'c', prompt:'"What is the Millennium Prize? Which of the 7 problems have been solved?"', full:'The Clay Mathematics Institute offers $1 million for each of 7 Millennium Prize Problems. Name the problems. Which one has been solved, by whom, and what happened when the prize was offered?' },
+        { pcg:'c', prompt:'"P vs NP: why might the resolution of this problem change the world?"', full:'If P = NP, many currently difficult computational problems would become easy. If P is not equal to NP, many problems are fundamentally hard. What practical consequences would each answer have? What industries and security systems would be affected?' },
+        { pcg:'c', prompt:'"Design a mathematical question that you believe is unsolved but provable."', full:'Design a mathematical question that you genuinely believe is both currently unsolved and provable — one that a determined mathematician could solve. What makes you think it is provable rather than undecidable? What approach might work?' },
+        { pcg:'c', prompt:'"What does it feel like to work on an unsolved problem for years without progress?"', full:'Research or imagine the experience of working on an unsolved mathematical problem for years without apparent progress. What keeps mathematicians going? What is the psychological experience of mathematical frustration? What is a breakthrough like?' },
+        { pcg:'g', prompt:'"Analyse the P vs NP problem: what has been proved and what remains unknown?"', full:'Give a careful analysis of the P vs NP problem: what has been proved, what approaches have been tried and why they failed, what the current state of knowledge is, and what a proof in either direction might look like.' },
+        { pcg:'g', prompt:'"Prove a small new result in an area of mathematics that interests you."', full:'Attempt to prove a small, original result in an area of mathematics that interests you. It need not be a known theorem — try to prove something new, even if modest. Document your attempts, including dead ends.' },
+        { pcg:'g', prompt:'"Write a letter to a mathematician 100 years from now describing what we do and do not know today."', full:'Write a letter to a mathematician 100 years from now describing the state of mathematics in 2025 — what we know, what we do not know, what we expect to learn. What open questions do you expect will be resolved? What do you expect will still be open?' },
+      ]},
+      { id:'mathematics-philosophy', title:'Mathematics & Philosophy', questions:[
+        { pcg:'p', prompt:'"Is mathematics discovered or invented? Give your view with a reason."', full:'Is mathematics something humans invent, or something they discover? Give your own view with at least one reason. Is there a fact of the matter, or is this a question with no right answer?' },
+        { pcg:'p', prompt:'"Does mathematics exist if no one is thinking about it?"', full:'If every human and conscious being ceased to exist, would mathematics continue to exist? Does the fact that 2 + 2 = 4 depend on anyone thinking about it? What would it mean for mathematics to exist independently?' },
+        { pcg:'p', prompt:'"Could mathematics have been different? Could 2 + 2 = 5 in a different universe?"', full:'Could there be a universe where 2 + 2 = 5 is true? Could mathematics have been fundamentally different? What is it about mathematics that seems necessary rather than contingent?' },
+        { pcg:'c', prompt:'"What is mathematical Platonism and what is the main objection to it?"', full:'Mathematical Platonism holds that mathematical objects exist independently of human minds, in an abstract realm. State the view precisely. What is the main philosophical objection to it? What alternative views exist?' },
+        { pcg:'c', prompt:'"Is mathematics a language, a science, or an art — or none of these?"', full:'Is mathematics best described as a language, a science, or an art? Argue for one of these characterisations or propose a better one. What does each characterisation capture and what does it miss?' },
+        { pcg:'c', prompt:'"Why does mathematics describe the physical world so accurately? This is unreasonably effective."', full:'Physicist Eugene Wigner wrote about the unreasonable effectiveness of mathematics in the natural sciences — the fact that mathematics developed for purely abstract reasons often turns out to describe physical reality. Why does this happen?' },
+        { pcg:'c', prompt:'"Is there a difference between mathematical truth and provability?"', full:'Godel showed there are mathematical truths that cannot be proved within any consistent axiomatic system. Is there a difference between something being mathematically true and being provable? What does truth mean in mathematics?' },
+        { pcg:'g', prompt:'"Analyse the formalist, Platonist, and intuitionist positions on the nature of mathematics."', full:'Analyse three major positions in the philosophy of mathematics: formalism (mathematics is manipulation of symbols without inherent meaning), Platonism (mathematical objects independently exist), and intuitionism (mathematics is a mental construction). What are the strengths and weaknesses of each?' },
+        { pcg:'g', prompt:'"Prove that mathematics cannot be fully formalised — using Godel argument."', full:'Present a careful version of Godel first incompleteness theorem. What is the self-referential statement? Why does it show the limits of formal systems? What does this prove about the relationship between mathematics and formal logic?' },
+        { pcg:'g', prompt:'"Write a philosophical defence of the claim that mathematics is both discovered and invented."', full:'Write a philosophical argument defending the position that mathematics is neither purely discovered nor purely invented — that both processes are involved. Use examples from the history of mathematics to support your case.' },
+      ]},
+      { id:'being-mathematician', title:'Being a Mathematical Thinker', questions:[
+        { pcg:'p', prompt:'"Describe a time you felt like a mathematician. What were you doing?"', full:'Describe a moment — in or out of school — when you felt genuinely like a mathematician. What were you doing? What feeling did it produce? What made it mathematical?' },
+        { pcg:'p', prompt:'"What is the most important quality for a mathematical thinker: memory, creativity, persistence, or something else?"', full:'What do you think is the single most important quality for a mathematical thinker? Memory? Creativity? Persistence? Curiosity? Argue for your choice and explain why the others, though valuable, are less essential.' },
+        { pcg:'p', prompt:'"What has doing mathematics taught you about how you think?"', full:'What has doing mathematics taught you about your own thinking? Have you discovered anything about how you approach problems — how you get stuck, how you get unstuck, what helps you think clearly?' },
+        { pcg:'c', prompt:'"How is mathematical thinking different from everyday thinking?"', full:'In what specific ways is mathematical thinking different from everyday thinking? What habits of mind does mathematics cultivate that most people do not naturally use? What does sustained mathematical practice change about how you think?' },
+        { pcg:'c', prompt:'"Can anyone become a mathematical thinker, or is there innate talent?"', full:'Is mathematical ability primarily innate or primarily developed? What does research suggest? What do the experiences of mathematicians and mathematics educators say? What is the role of practice, environment, and expectation?' },
+        { pcg:'c', prompt:'"What does it mean to understand mathematics deeply rather than just know it?"', full:'What is the difference between deeply understanding a piece of mathematics and merely knowing it? How do you know when you truly understand something? Give an example of understanding becoming deeper over time.' },
+        { pcg:'c', prompt:'"Design a mathematical thinking curriculum for life — not for a year of school."', full:'Design a curriculum for developing mathematical thinking across a lifetime — not a school year, but a life. What mathematical habits would you cultivate at each stage? What would a mathematically thinking 80-year-old look like?' },
+        { pcg:'g', prompt:'"Write a personal manifesto for mathematical thinking."', full:'Write a personal manifesto for what it means to think mathematically — your own statement of the values, habits, and practices that define mathematical thinking as you understand it. What commitments does mathematical thinking require?' },
+        { pcg:'g', prompt:'"Prove — to your own satisfaction — that you are a mathematical thinker."', full:'Construct a rigorous argument, with evidence, that you are a genuine mathematical thinker. What counts as evidence? What would disprove the claim? Is this a mathematical question or a philosophical one?' },
+        { pcg:'g', prompt:'"What kind of mathematics do you want to do that has not been done yet?"', full:'Describe the kind of mathematics you want to do — not necessarily a specific problem, but a kind of thinking, a type of question, an area of exploration — that you believe has not yet been fully explored. What draws you to it?' },
+      ]},
+    ],
+  },
+];
+
+
+
+const OBSERVATORY_NODES = [
+  { id:'noticing-wondering',    li:0, ai:0, label:'Noticing & Wondering', nx:0.10, ny:0.35 },
+  { id:'asking-questions',      li:0, ai:1, label:'Asking Questions',     nx:0.18, ny:0.55 },
+  { id:'making-predictions',    li:0, ai:2, label:'Making Predictions',   nx:0.12, ny:0.72 },
+  { id:'checking-verifying',    li:0, ai:3, label:'Checking & Verifying', nx:0.26, ny:0.48 },
+  { id:'looking-patterns',      li:1, ai:0, label:'Looking for Patterns', nx:0.38, ny:0.20 },
+  { id:'making-connections',    li:1, ai:1, label:'Making Connections',   nx:0.44, ny:0.38 },
+  { id:'estimating-guessing',   li:1, ai:2, label:'Estimating',           nx:0.36, ny:0.58 },
+  { id:'explaining-thinking',   li:1, ai:3, label:'Explaining Thinking',  nx:0.46, ny:0.72 },
+  { id:'mathematical-arguments',li:2, ai:0, label:'Arguments',            nx:0.58, ny:0.18 },
+  { id:'generalising',          li:2, ai:1, label:'Generalising',         nx:0.64, ny:0.36 },
+  { id:'counter-examples',      li:2, ai:2, label:'Counter-examples',     nx:0.58, ny:0.54 },
+  { id:'mathematical-beauty',   li:2, ai:3, label:'Mathematical Beauty',  nx:0.64, ny:0.70 },
+  { id:'mathematics-nature',    li:3, ai:0, label:'Maths in Nature',      nx:0.76, ny:0.22 },
+  { id:'mathematics-art',       li:3, ai:1, label:'Maths & Art',          nx:0.80, ny:0.40 },
+  { id:'mathematics-music',     li:3, ai:2, label:'Maths & Music',        nx:0.74, ny:0.58 },
+  { id:'history-mathematics',   li:3, ai:3, label:'History of Maths',     nx:0.80, ny:0.74 },
+  { id:'what-mathematicians-do',li:4, ai:0, label:'What Mathematicians Do',nx:0.90,ny:0.28 },
+  { id:'open-questions',        li:4, ai:1, label:'Open Questions',       nx:0.92, ny:0.46 },
+  { id:'mathematics-philosophy',li:4, ai:2, label:'Philosophy',           nx:0.88, ny:0.62 },
+  { id:'being-mathematician',   li:4, ai:3, label:'Being a Mathematician',nx:0.93,ny:0.78 },
+];
+
+const OBSERVATORY_EDGES = [
+  ['noticing-wondering','asking-questions'],['noticing-wondering','making-predictions'],
+  ['asking-questions','checking-verifying'],['making-predictions','checking-verifying'],
+  ['checking-verifying','looking-patterns'],['asking-questions','looking-patterns'],
+  ['looking-patterns','making-connections'],['making-connections','estimating-guessing'],
+  ['estimating-guessing','explaining-thinking'],['looking-patterns','mathematical-arguments'],
+  ['making-connections','generalising'],['explaining-thinking','mathematical-arguments'],
+  ['mathematical-arguments','counter-examples'],['generalising','counter-examples'],
+  ['counter-examples','mathematical-beauty'],['generalising','mathematical-beauty'],
+  ['mathematical-beauty','mathematics-nature'],['mathematics-nature','mathematics-art'],
+  ['mathematics-art','mathematics-music'],['mathematics-music','history-mathematics'],
+  ['mathematical-beauty','history-mathematics'],['history-mathematics','what-mathematicians-do'],
+  ['what-mathematicians-do','open-questions'],['open-questions','mathematics-philosophy'],
+  ['mathematics-philosophy','being-mathematician'],['what-mathematicians-do','being-mathematician'],
+  ['counter-examples','open-questions'],['making-connections','mathematics-nature'],
+];
+
+const OBSERVATORY_LVL_COLORS = ['#AAAAC0','#8888A0','#666680','#444460','#CCCCDA'];
+let observatoryFocused = JSON.parse(localStorage.getItem('kelvi_observatory_focused') || 'null') || { li:0, ai:0 };
+let observatorySelectedNode = null;
+
+function saveObservatoryFocused() { localStorage.setItem('kelvi_observatory_focused', JSON.stringify(observatoryFocused)); }
+function observatoryVisitedKey(id) { return 'kelvi_observatory_visited_' + id; }
+function loadObservatoryVisited() { OBSERVATORY_NODES.forEach(n => { if (localStorage.getItem(observatoryVisitedKey(n.id))) n.visited = true; }); }
+function getObservatoryNodeQuestion(node) {
+  const act = OBSERVATORY_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_observatory_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0') % act.questions.length;
+  return { q: act.questions[idx], idx, total: act.questions.length };
+}
+function advanceObservatoryNodeQuestion(node) {
+  const act = OBSERVATORY_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_observatory_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0');
+  localStorage.setItem(key, (idx + 1) % act.questions.length);
+}
+
+function renderObservatory() {
+  loadObservatoryVisited();
+  const wrap = document.querySelector('#scene-map .geo-map-wrap');
+  if (!wrap) return;
+  const W = wrap.clientWidth || 600, H = wrap.clientHeight || 420;
+  const svg = document.getElementById('observatory-svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  drawObservatoryMap(svg, W, H);
+  closeObservatoryHero();
+}
+
+function drawObservatoryMap(svg, W, H) {
+  svg.innerHTML = '';
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const vig = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
+  vig.setAttribute('id','obs-vig'); vig.setAttribute('cx','50%'); vig.setAttribute('cy','50%'); vig.setAttribute('r','65%');
+  [['0%','rgba(245,242,238,0)'],['100%','rgba(225,224,235,0.30)']].forEach(([off,col])=>{
+    const s=document.createElementNS('http://www.w3.org/2000/svg','stop'); s.setAttribute('offset',off); s.setAttribute('stop-color',col); vig.appendChild(s);
+  });
+  defs.appendChild(vig); svg.appendChild(defs);
+  const vigEl=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  vigEl.setAttribute('x',0);vigEl.setAttribute('y',0);vigEl.setAttribute('width',W);vigEl.setAttribute('height',H);vigEl.setAttribute('fill','url(#obs-vig)');
+  svg.appendChild(vigEl);
+
+  OBSERVATORY_EDGES.forEach(([aId,bId])=>{
+    const a=OBSERVATORY_NODES.find(n=>n.id===aId),b=OBSERVATORY_NODES.find(n=>n.id===bId);
+    if(!a||!b)return;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.nx*W);line.setAttribute('y1',a.ny*H);line.setAttribute('x2',b.nx*W);line.setAttribute('y2',b.ny*H);
+    line.setAttribute('stroke',(a.visited&&b.visited)?'rgba(136,136,160,0.42)':'rgba(160,140,110,0.18)');
+    line.setAttribute('stroke-width','1.2');line.setAttribute('stroke-dasharray',(a.visited||b.visited)?'':'4 6');
+    svg.appendChild(line);
+  });
+
+  // ── Nodes as pie charts ──
+  OBSERVATORY_NODES.forEach(node => {
+    const cx=node.nx*W,cy=node.ny*H;
+    const color='#8B5CF6';
+    const isSelected=observatorySelectedNode&&observatorySelectedNode.id===node.id;
+    const isStart=!observatorySelectedNode&&node.li===observatoryFocused.li&&node.ai===observatoryFocused.ai;
+    const r=20, exchanges=getObservatoryExchanges(node.id);
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform',`translate(${cx},${cy})`);g.style.cursor='pointer';
+    g.addEventListener('click',()=>selectObservatoryNode(node));
+    if(isStart&&exchanges===0){
+      const pulse=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pulse.setAttribute('r',r+10);pulse.setAttribute('fill','none');pulse.setAttribute('stroke',color);pulse.setAttribute('stroke-width','1.5');pulse.setAttribute('opacity','0');
+      const a1=document.createElementNS('http://www.w3.org/2000/svg','animate');a1.setAttribute('attributeName','opacity');a1.setAttribute('values','0;0.45;0');a1.setAttribute('dur','2.2s');a1.setAttribute('repeatCount','indefinite');
+      const a2=document.createElementNS('http://www.w3.org/2000/svg','animate');a2.setAttribute('attributeName','r');a2.setAttribute('values',`${r+6};${r+14};${r+6}`);a2.setAttribute('dur','2.2s');a2.setAttribute('repeatCount','indefinite');
+      pulse.appendChild(a1);pulse.appendChild(a2);g.appendChild(pulse);
+    }
+    if(isSelected){
+      const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('r',r+5);ring.setAttribute('fill','none');ring.setAttribute('stroke',color);ring.setAttribute('stroke-width','2');ring.setAttribute('opacity','0.5');g.appendChild(ring);
+    }
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    bg.setAttribute('r',r);bg.setAttribute('fill','#FFFFFF');bg.setAttribute('stroke','#1C1917');bg.setAttribute('stroke-width','2');g.appendChild(bg);
+    for(let i=0;i<10;i++){
+      const sa=(i*36-90)*Math.PI/180,ea=((i+1)*36-90)*Math.PI/180;
+      const x1=Math.cos(sa)*r,y1=Math.sin(sa)*r,x2=Math.cos(ea)*r,y2=Math.sin(ea)*r;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',`M 0 0 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`);
+      path.setAttribute('fill',i<exchanges?color:'transparent');
+      path.setAttribute('stroke','#FFFFFF');path.setAttribute('stroke-width','1.5');g.appendChild(path);
+    }
+    const words=node.label.toUpperCase().split(' ');
+    words.forEach((word,wi)=>{
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','hanging');
+      t.setAttribute('y',(r+9)+wi*15);t.setAttribute('font-family','DM Sans,sans-serif');
+      t.setAttribute('font-size','12');t.setAttribute('font-weight','800');t.setAttribute('letter-spacing','0.08em');
+      t.setAttribute('fill',exchanges>0?'#1C1917':isSelected||isStart?'#1C1917':'#4A4540');
+      t.textContent=word;g.appendChild(t);
+    });
+    svg.appendChild(g);
+  });
+}
+
+function getObservatoryExchanges(id){return Math.min(10,parseInt(localStorage.getItem('kelvi_observatory_exchanges_'+id)||'0'));}
+function incrementObservatoryExchange(){
+  if(!observatorySelectedNode)return;
+  const cur=getObservatoryExchanges(observatorySelectedNode.id);
+  if(cur<10){
+    localStorage.setItem('kelvi_observatory_exchanges_'+observatorySelectedNode.id,cur+1);
+    if(cur===0){observatorySelectedNode.visited=true;localStorage.setItem('kelvi_observatory_visited_'+observatorySelectedNode.id,'1');}
+    const wrap=document.querySelector('.geo-map-wrap');
+    if(wrap){const s=document.getElementById('observatory-svg');if(s)renderObservatory();}
+  }
+}
+
+
+function selectObservatoryNode(node) {
+  observatorySelectedNode=node; observatoryFocused={li:node.li,ai:node.ai}; saveObservatoryFocused();
+  const wrap=document.querySelector('#scene-map .geo-map-wrap');
+  drawObservatoryMap(document.getElementById('observatory-svg'),wrap.clientWidth,wrap.clientHeight);
+  openObservatoryHero(node);
+}
+
+function openObservatoryHero(node) {
+  const act=OBSERVATORY_LEVELS[node.li].activities[node.ai];
+  const {q,idx,total}=getObservatoryNodeQuestion(node);
+  const inner=document.getElementById('observatory-hero-inner');
+  const qNum=total>1?`<span style="font-size:10px;color:var(--text-faint);margin-left:10px;font-family:var(--font-body)">${idx+1} of ${total}</span>`:'';
+  inner.innerHTML=`<button class="geo-dismiss" onclick="closeObservatoryHero()">&times;</button>
+    <div class="geo-hero-prompt-row"><div class="geo-hero-prompt">${escapeHtml(q.prompt)}${qNum}</div>
+    <button class="geo-speak-btn" onclick="speakEl('observatory-hero-inner')" title="Listen"><span class="speak-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></span></button></div>
+    <div class="geo-hero-sub">${escapeHtml(act.title)}</div>
+    <div class="geo-hero-ctas"><button class="geo-btn-primary" onclick="beginObservatoryQuestion()">Begin this question →</button><button class="geo-btn-secondary" onclick="closeObservatoryHero()">Keep exploring</button></div>`;
+  document.getElementById('observatory-hero-overlay').classList.add('open');
+}
+
+function closeObservatoryHero() { document.getElementById('observatory-hero-overlay').classList.remove('open'); }
+
+function beginObservatoryQuestion() {
+  const node=observatorySelectedNode||OBSERVATORY_NODES.find(n=>n.li===observatoryFocused.li&&n.ai===observatoryFocused.ai);
+  if(!node)return;
+  const act=OBSERVATORY_LEVELS[node.li].activities[node.ai];
+  const {q}=getObservatoryNodeQuestion(node);
+  advanceObservatoryNodeQuestion(node);
+  node.visited=true; localStorage.setItem(observatoryVisitedKey(node.id),'1');
+  openActivity(act.id,act.title,q.full,'Observatory');
+}
+
+window.addEventListener('resize',()=>{
+  if(!window.observatoryResizeRaf)window.observatoryResizeRaf=0;
+  clearTimeout(window.observatoryResizeRaf);
+  window.observatoryResizeRaf=setTimeout(()=>{if(document.getElementById('scene-map').style.display!=='none')renderObservatory();},150);
+});
+
+
+function buildSYS(activity) {
+  const planet = (activity && activity.planet) ? activity.planet : 'Observatory';
+  const activityBlock = activity
+    ? `\n\nACTIVITY: The child has chosen "${activity.name}". The invitation is: "${activity.prompt}". Work within this activity. Do not move to a new topic unless the child explicitly asks.`
+    : '';
+  const name = localStorage.getItem('kelvi_family_name') || 'the child';
+  return `You are Kelvi — a thinking partner for a child named ${name}, aged 4–12, exploring mathematics.
+
+PRINCIPLE 0 — MATHEMATICAL ACCURACY IS NON-NEGOTIABLE. THIS APPLIES TO KELVI TOO.
+If ${name} says something mathematically incorrect, redirect immediately — do not affirm any part of it first, then correct. Just redirect. "Let's check that — if 2 leftovers go to 5 people, how much does each person get?" Wrong facts that compound are the worst failure mode.
+If KELVI makes a mathematical error: correct it immediately and directly in the next response before doing anything else. Do not continue the conversation as if the error didn't happen. Do not soften it. Just correct it: "I made an error — [correct version]. Let's continue from there." Kelvi's credibility depends entirely on mathematical precision. A single uncorrected error poisons the whole session.
+
+PRINCIPLE 1 — NO AFFIRMATION WORDS, EVER. NO MARKDOWN, EVER.
+Never say: "Great!", "Exactly!", "You're right!", "Smart thinking!", "Good job!", "Nice work!", "Correct!", "Perfect!", "Well done!", "That's it!", or any variant. These words are banned. Instead: restate what ${name} just did as a mathematical move and continue. "You found four right angles — all on the same shape. Where else might they show up?"
+Never use markdown formatting: no **bold**, no *italics*, no bullet points, no headers. Plain sentences only. Mathematical terms should be introduced in plain prose — "mathematicians call that a factor" — never bolded or formatted. Formatted text makes Kelvi sound like a textbook. Kelvi does not sound like a textbook.
+
+PRINCIPLE 2 — TWO SENTENCES MAXIMUM.
+Every response is two sentences. Three only if a redirect requires it. Never more. Short responses keep the child talking. Long responses make the child read instead of think.
+
+PRINCIPLE 3 — MATCH THE CHILD'S REGISTER.
+If ${name} says "me don't know" — meet them there. Simple words, short sentences. Do not correct grammar. If they're bored, say something surprising. Never ignore emotional signals.
+
+PRINCIPLE 4 — DON'T ASK A QUESTION AFTER EVERY RESPONSE.
+Mix: a question, then an observation, then a question. One question per response, maximum.
+
+PRINCIPLE 5 — WHEN THEY WANT TO STOP, LET THEM GO WITH A HOOK.
+One warm sentence naming the specific mathematical thing they discovered today. Then one unresolved question to carry with them. Then stop.
+
+PRINCIPLE 6 — READ MOMENTUM.
+If ${name} is on a roll — stay out of the way. A one-word prompt ("And?" / "Or?" / "Always?") is better than a full question. If they're stuck, one concrete foothold. Never a hint ladder.
+
+PRINCIPLE 7 — NEVER LECTURE.
+Do not explain a concept before ${name} has encountered it through their own work. The concept arrives through the question, not through your explanation.
+
+PRINCIPLE 8 — SAFETY IS THE PRODUCT.
+A child who has never felt safe as a learner will not take risks. Kelvi's first job is not to teach mathematics — it is to make ${name} feel that being wrong, confused, or slow is not just acceptable but genuinely interesting. A mistake is data. Treat it that way. The goal is that ${name} leaves every conversation feeling more curious, not more correct.
+
+PRINCIPLE 9 — MISTAKES ARE THE MATERIAL. BUT DO NOT SOFTEN CORRECTIONS.
+When ${name} makes an error, respond with the same tone and curiosity as when they get something right. Never softer. Never harder. Just curious.
+CRITICAL: Do not affirm any part of a wrong answer before correcting it. "You spotted something real though" followed by a correction is the worst pattern — it teaches ${name} that wrong answers get praise. They do not. A wrong answer gets the same neutral, curious redirect as anything else: "Let's check that — [question that surfaces the error]."
+The goal is not to make ${name} feel good about being wrong. The goal is to make ${name} curious about why they were wrong. Those are different things.
+
+PRINCIPLE 10 — READ THE ROOM, ADJUST THE DEPTH.
+When ${name} first arrives at a planet, ask one orienting question before the activity prompt. Their answer tells you everything. A child who says "I don't know what a polygon is" gets a different entry point than one who says "a polygon has straight sides and angles." The galaxy is fully open — every planet is available to every child. There is no wrong planet to visit. Kelvi's job is to find the right door in.
+
+PRINCIPLE 11 — MATHEMATICS IS A LANGUAGE. GIVE CHILDREN THE WORDS.
+When a child discovers or describes a mathematical idea — even imperfectly — give them the precise word for it. Not as a correction, but as a gift: "Mathematicians have a name for exactly what you just found — it's called a tessellation." The word arrives after the idea, never before. A child who knows the word icosidodecahedron, lattice point, or conjecture has been invited into the language of mathematics, not excluded from it. Never withhold vocabulary because it seems too advanced. The right word at the right moment is one of the most powerful things Kelvi can do.
+
+P/C/G — silent classification only, never named to the child:
+- P (following steps, computing): ask "why does that work?"
+- C (connecting, noticing): invite them to push further
+- G (conjecturing, inventing): give space, then ask if it always holds
+
+CURRICULUM: ${planet} Solar System. The full Math Galaxy is open — follow ${name}'s curiosity wherever it leads.${activityBlock}
+PRINCIPLE 18 — THE 3-TURN CEILING.
+Count your exchanges on a single task. After 3 turns, stop asking and name the skill explicitly: tell ${name} what they just did mathematically and why it matters. Do not ask a fourth question on the same task. "You just found three different ways to sort the same objects — that's exactly what mathematicians do when they look for patterns. They call it classification." Then move on. A task without a declared endpoint is not Socratic — it is just grinding. Never grind.
+
+PRINCIPLE 19 — NAME THE WIN.
+When ${name} demonstrates the skill, say so immediately — not "good job" but a precise description of the mathematical move they made: "You just invented a conjecture" / "You found the property that connects all of these" / "That's exactly how mathematicians think about this." The child should never have to guess whether they succeeded. Name it, then move forward.
+
+PRINCIPLE 20 — THE ARTICULATION EXIT.
+If ${name} clicks "I know what we are doing," respond with exactly one thing: "Tell me what you noticed." Then:
+- If their articulation is strong and accurate: mirror it back in precise mathematical language and immediately offer the next question. Do not linger.
+- If their articulation is partial or slightly off: reframe it gently and precisely — "Close — what you've actually been doing is [precise explanation]." Then offer the next question.
+Never ask them to explain again or probe further. One articulation, one response, next question. This is their exit ramp — honour it.`;
+}
+
+function handleKnowBtn() {
+  addMsg('user', 'I know what we are doing.');
+  const btn = document.getElementById('know-btn');
+  if (btn) btn.classList.add('hidden');
+}
+
+function sendToKelvi(text) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = text; }
+  sendMsg();
+}
+
+</script>
+</body>
+</html>

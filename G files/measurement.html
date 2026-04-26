@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelvi · Measurement Solar System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'OpenDyslexic';src:url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype')}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+:root{
+  --bg:#FFF0EC;--surface:rgba(255,255,255,0.4);--deeper:#E0D8C8;--divider:rgba(0,0,0,0.1);
+  --text-primary:#2F2B25;--text-muted:#6F6A61;--text-faint:#9A9488;
+  --accent:#3A6B5C;--accent-dark:#2D5347;--accent-light:#EBF3EF;
+  --family:#B8784E;--family-dark:#9E6640;--family-light:#F5EDE5;
+  --gold:#C9A84C;
+  --font-heading:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;--font-serif:'DM Sans',serif;
+}
+.scene{position:fixed;inset:0;display:flex;flex-direction:column}
+/* ── GEOMETRY V4 ── */
+/* ── GEOMETRY CONCEPT MAP ── */
+.geo-scene{position:absolute;inset:0;background:#FFF0EC;display:flex;flex-direction:column;overflow:hidden}
+.geo-scene::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:100;background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(216,90,48,0.12) 100%)}
+.geo-topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0;z-index:20;background:#FFF0EC;border-bottom:none}
+.geo-planet-sphere{width:40px;height:40px;flex-shrink:0;filter:drop-shadow(0 3px 10px rgba(160,125,74,0.5))}
+.geo-planet-info{flex:1}
+.geo-planet-name{font-family:var(--font-heading);font-size:1.1rem;color:#FF5722;line-height:1;font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:0.08em}
+.geo-planet-tagline{font-family:var(--font-body);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(110,100,85,0.55);margin-top:3px}
+.geo-back-btn{background:none;border:1px solid rgba(110,100,85,0.25);padding:5px 12px;border-radius:14px;font-size:12px;color:rgba(80,70,55,0.7);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.geo-back-btn:hover{border-color:#5286B4;color:#5286B4}
+/* map canvas */
+.geo-map-wrap{flex:1;position:relative;overflow:hidden;min-height:0}
+.geo-svg{position:absolute;inset:0;width:100%;height:100%;cursor:default}
+/* hero overlay — slides up from bottom */
+.geo-hero-overlay{position:absolute;bottom:0;left:0;right:0;z-index:30;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.61,.36,1);pointer-events:none;background:#FFFFFF;border-top:1px solid #F0F0F0}
+.geo-hero-overlay.open{transform:translateY(0);pointer-events:auto}
+.geo-hero-inner{padding:28px 32px 20px;max-width:680px}
+.geo-hero-eyebrow{font-family:var(--font-body);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-weight:700}
+.geo-hero-prompt-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.geo-hero-prompt{font-family:'DM Sans',sans-serif;font-style:normal;font-size:clamp(20px,2.8vw,32px);color:#1C1917;line-height:1.25;flex:1;font-weight:800;letter-spacing:-0.02em}
+.geo-speak-btn{flex-shrink:0;background:#F4F4F4;border:1px solid #E0E0E0;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#888;transition:all .15s;margin-top:4px}
+.geo-speak-btn:hover{background:#FFF0EC;color:#FF5722}
+.geo-speak-btn .speak-icon{display:flex;align-items:center}
+.geo-hero-sub{font-family:var(--font-body);font-size:13px;color:#888;line-height:1.6;margin-bottom:18px}
+.geo-hero-ctas{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.geo-btn-primary{background:#FF5722;color:#FFFFFF;padding:11px 22px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .12s}
+.geo-btn-primary:hover{background:#BF360C}
+.geo-btn-secondary{background:none;border:1px solid #E0E0E0;border-radius:8px;color:#888;padding:11px 14px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:color .12s}
+.geo-btn-secondary:hover{color:#333;border-color:#AAAAAA}
+.geo-dismiss{position:absolute;top:14px;right:18px;background:#F4F4F4;border:1px solid #E0E0E0;color:#555;font-size:17px;cursor:pointer;line-height:1;font-family:var(--font-body);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.geo-dismiss:hover{background:#E8E8E8;color:#333}
+/* ── TOPBAR ADDITIONS ── */
+.topbar-nav{display:flex;gap:4px;align-items:center}
+.topbar.space-mode .topbar-tab{color:rgba(240,232,204,0.65)}
+.topbar.space-mode .topbar-tab:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.topbar.space-mode .topbar-tab.active{background:rgba(184,120,78,0.18);color:#F5E6A8}
+.settings-btn{background:none;border:none;color:rgba(240,232,204,0.65);cursor:pointer;padding:4px 6px;border-radius:6px;display:flex;align-items:center;transition:all .15s}
+.settings-btn:hover{color:#F5E6A8;background:rgba(255,255,255,0.08)}
+.topbar.light-mode .settings-btn{color:var(--text-muted)}
+.topbar.light-mode .settings-btn:hover{color:#FF5722;background:#FFF0EC}
+
+/* ── PLANET VIEW ── */
+.planet-scene{position:absolute;inset:56px 0 0 0;background:var(--bg);overflow-y:auto}
+.planet-header{
+  padding:48px 40px 30px;text-align:center;position:relative;
+  background:linear-gradient(180deg, rgba(232,216,184,0.35) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--divider);
+}
+.planet-back{
+  position:absolute;top:16px;left:20px;background:none;border:1px solid var(--divider);
+  padding:6px 14px;border-radius:20px;font-size:12px;color:var(--text-muted);
+  display:flex;align-items:center;gap:6px;transition:all .15s;cursor:pointer;font-family:var(--font-body);
+}
+.planet-back:hover{border-color:#FF5722;color:#FF5722}
+.planet-visual{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 30%, #DCC094 0%, #A07D4A 55%, #6C502C 100%);
+  box-shadow:0 4px 30px rgba(160,125,74,0.3);position:relative;
+  animation:planetFloat 6s ease-in-out infinite;
+}
+.planet-visual::after{
+  content:'';position:absolute;width:170%;height:22%;left:-35%;top:40%;border-radius:50%;
+  background:linear-gradient(to bottom, transparent 30%, rgba(160,125,74,0.5) 50%, transparent 70%);
+  transform:rotate(-16deg);
+}
+@keyframes planetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.planet-title{font-family:var(--font-heading);font-size:2.6rem;letter-spacing:-0.01em;margin-bottom:8px}
+.planet-tagline{font-family:'DM Sans',serif;font-style:italic;color:var(--text-muted);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.5}
+.planet-meta{display:inline-flex;gap:24px;margin-top:10px;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase}
+.planet-meta strong{color:var(--text-primary);font-family:var(--font-body);font-weight:600;font-size:13px;display:block;letter-spacing:0;text-transform:none;margin-bottom:2px}
+.levels-wrap{max-width:1280px;margin:0 auto;padding:40px}
+.levels-intro{text-align:center;margin-bottom:30px;color:var(--text-muted);font-size:14px;line-height:1.6;max-width:640px;margin-left:auto;margin-right:auto}
+.levels-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:16px}
+.level-col{background:#fff;border:1px solid var(--divider);border-radius:14px;padding:20px 18px 24px;min-height:540px;position:relative;transition:all .2s ease}
+.level-col:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(47,43,37,0.08)}
+.level-col::before{content:'';position:absolute;top:0;left:16px;right:16px;height:3px;border-radius:0 0 3px 3px}
+.level-col.l1::before{background:#E09C50}
+.level-col.l2::before{background:#D8AA58}
+.level-col.l3::before{background:#3E9282}
+.level-col.l4::before{background:#5286B4}
+.level-col.l5::before{background:#6856A8}
+.level-num{font-family:var(--font-heading);font-style:italic;font-size:1rem;color:var(--text-muted);letter-spacing:0.05em}
+.level-name{font-family:var(--font-heading);font-size:1.4rem;letter-spacing:-0.01em;margin-bottom:6px;margin-top:-2px}
+.level-pcg{display:inline-block;padding:3px 8px;border-radius:8px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.pcg-p{background:#F5DDD3;color:#8A4B1E}
+.pcg-c{background:#D6E8DC;color:#2D5347}
+.pcg-g{background:#E8DDF0;color:#48366E}
+.level-desc{font-size:12px;color:var(--text-muted);line-height:1.5;margin:12px 0 18px;min-height:48px}
+.activity{background:var(--bg);border:1px solid var(--divider);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;position:relative}
+.activity:hover{background:#FFF0EC;border-color:#FF5722;transform:translateY(-1px)}
+.activity-title{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.activity-prompt{font-size:11px;color:var(--text-muted);line-height:1.5;font-style:italic}
+.activity-visited{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+
+/* ── CHAT ── */
+.chat-scene{position:absolute;inset:56px 0 0 0;display:flex;flex-direction:column;background:#FFFFFF}
+.chat-header{padding:14px 28px;border-bottom:1px solid #F0F0F0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;flex-shrink:0}
+.chat-back{font-size:13px;color:#333;font-weight:500;background:none;border:none;display:flex;align-items:center;gap:4px;cursor:pointer;font-family:var(--font-body);justify-self:start}
+.chat-back:hover{color:#BF360C}
+.chat-topic{text-align:center}
+.chat-kicker{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#888;font-weight:600;margin-bottom:2px}
+.chat-activity-title{font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:var(--text-primary)}
+.chat-header-right{justify-self:end;display:flex;align-items:center;gap:8px}
+.dyslexic-toggle{background:none;border:1px solid var(--divider);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s}
+.dyslexic-toggle:hover{border-color:#FF5722;color:#FF5722}
+.dyslexic-toggle.on{border-color:#FF5722;background:#FFF0EC;color:#FF5722}
+.activity-banner{padding:24px 32px;background:#FFFFFF;border-bottom:1px solid #F0F0F0;flex-shrink:0}
+.activity-banner-text{flex:1}
+.activity-banner-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6B6B6B;margin-bottom:10px;font-family:var(--font-body)}
+.activity-banner-prompt{font-size:clamp(22px,3vw,36px);line-height:1.2;color:#1C1917;font-style:normal;font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-0.02em}
+.activity-banner-speak{flex-shrink:0;background:none;border:1px solid var(--divider);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all .15s;margin-top:2px}
+.activity-banner-speak:hover{background:#FFF0EC;color:#FF5722;border-color:#FF5722}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px;margin:0 auto;width:100%}
+.msg{max-width:100%;animation:fadeUp .3s ease}
+.msg-k{align-self:flex-start;width:100%}
+.msg-s{align-self:flex-end;max-width:72%}
+.msg-name{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;padding-left:2px;color:var(--text-faint)}
+.msg-name-s{text-align:right;padding-right:2px}
+.msg-bubble-k{background:transparent;border:none;padding:0;font-size:14px;line-height:1.75;color:var(--text-primary);white-space:pre-wrap}
+.msg-bubble-s{background:#FFF0EC;border:1px solid var(--divider);border-radius:16px;border-bottom-right-radius:4px;padding:10px 16px;font-size:14px;line-height:1.55;color:var(--text-primary);white-space:pre-wrap}
+.typing{display:none;align-self:flex-start;padding:8px 14px;background:transparent;border-radius:12px;border-bottom-left-radius:4px;gap:4px;align-items:center;margin-left:32px}
+.typing.vis{display:flex}
+.dot{width:5px;height:5px;border-radius:50%;background:#FF5722;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.chat-input-bar{padding:14px 20px 20px;display:flex;gap:8px;align-items:flex-end;background:#FFFFFF;flex-shrink:0;max-width:820px;margin:0 auto;width:100%}
+.chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+.chat-input:focus{border-color:#FF5722}
+.chat-mic{background:#F4F4F4;color:#555;border:1.5px solid #E0E0E0;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;cursor:pointer}
+.chat-mic:hover{background:#E8E8E8;color:#333;border-color:#CCC}
+.chat-mic.recording{background:#D94A4A;border-color:#D94A4A;color:#fff;animation:micPulse 1.2s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+.chat-send{background:#FF5722;color:#fff;border:none;padding:0;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;cursor:pointer}
+.chat-send:hover{background:#BF360C}
+.chat-send:disabled{background:var(--divider);color:var(--text-faint);cursor:not-allowed}
+.speak-btn{background:none;border:none;cursor:pointer;color:var(--text-faint);padding:4px 6px;border-radius:5px;transition:color .12s;margin-left:6px;vertical-align:middle;display:inline-flex;align-items:center}
+.speak-btn:hover{color:#FF5722}
+.speak-btn.speaking{background:#FF5722;color:#fff}
+body.dyslexic .activity-banner-prompt,body.dyslexic .msg-bubble-k,body.dyslexic .msg-bubble-s,body.dyslexic .chat-input{flex:1;border:1.5px solid #E0E0E0;border-radius:16px;padding:12px 16px;font-size:14px;font-family:var(--font-body);outline:none;resize:none;max-height:120px;background:#FFFFFF;color:#1C1917;transition:border-color .15s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,74,74,0.5)}50%{box-shadow:0 0 0 10px rgba(217,74,74,0)}}
+
+.topbar-apikey{background:rgba(0,0,0,0.04);border:1px solid rgba(110,100,85,0.2);border-radius:8px;padding:4px 10px;font-size:11px;color:rgba(60,50,35,0.7);font-family:var(--font-body);width:180px;outline:none;transition:all .15s}
+.topbar-apikey::placeholder{color:rgba(110,100,85,0.35)}
+.topbar-apikey:focus{border-color:#A07D4A;color:var(--text-primary);background:rgba(255,255,255,0.8)}
+
+.mic-btn.recording{border-color:#D94A4A;color:#D94A4A;animation:micPulse 1s infinite}
+.autospeak-toggle{background:none;border:1px solid var(--divider);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body);transition:all .15s;margin-right:4px}
+.autospeak-toggle.on{border-color:#FF5722;background:#FFF0EC;color:#FF5722}
+.know-btn{
+  background:none;
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:20px;
+  color:rgba(255,255,255,0.75);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.05em;
+  padding:6px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:all .15s;
+}
+.know-btn:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.5)}
+.know-btn.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- MAP SCENE -->
+<div class="scene geo-scene" id="scene-map" style="background:#F5F3EE">
+  <div class="geo-topbar" style="background:#FFF0EC;border-bottom:none">
+    <svg class="geo-planet-sphere" viewBox="-50 -50 100 100" xmlns="http://www.w3.org/2000/svg">
+        <rect x="-40" y="-12" width="80" height="24" rx="4" fill="#FF5722" stroke="#1C1917" stroke-width="2.5"/>
+        <line x1="-40" y1="-12" x2="-40" y2="12" stroke="white" stroke-width="3" opacity="0.9"/>
+        <line x1="40"  y1="-12" x2="40"  y2="12" stroke="white" stroke-width="3" opacity="0.9"/>
+        <line x1="-20" y1="-12" x2="-20" y2="4"  stroke="white" stroke-width="1.5" opacity="0.8"/>
+        <line x1="0"   y1="-12" x2="0"   y2="6"  stroke="white" stroke-width="2" opacity="0.9"/>
+        <line x1="20"  y1="-12" x2="20"  y2="4"  stroke="white" stroke-width="1.5" opacity="0.8"/>
+        <line x1="-30" y1="-12" x2="-30" y2="0"  stroke="white" stroke-width="1" opacity="0.6"/>
+        <line x1="-10" y1="-12" x2="-10" y2="0"  stroke="white" stroke-width="1" opacity="0.6"/>
+        <line x1="10"  y1="-12" x2="10"  y2="0"  stroke="white" stroke-width="1" opacity="0.6"/>
+        <line x1="30"  y1="-12" x2="30"  y2="0"  stroke="white" stroke-width="1" opacity="0.6"/>
+      </svg>
+    <div class="geo-planet-info">
+      <div class="geo-planet-name" style="color:#FF5722">Measurement</div>
+      <div class="geo-planet-tagline">Length · Time · Weight</div>
+    </div>
+    <input class="topbar-apikey" id="topbar-apikey" type="password" placeholder="API key for testing" title="API key" oninput="localStorage.setItem('kelvi_api_key',this.value)">
+    <button class="geo-back-btn" onclick="goGalaxy()">← Galaxy</button>
+  </div>
+  <div class="geo-map-wrap">
+    <svg class="geo-svg" id="measurement-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="geo-hero-overlay" id="measurement-hero-overlay" style="background:#FFFFFF;border-top:1px solid #F0F0F0">
+    <div class="geo-hero-inner" id="measurement-hero-inner"></div>
+  </div>
+</div>
+
+<!-- CHAT SCENE -->
+<div class="scene" id="scene-chat" style="display:none;background:#FFFFFF">
+  <div class="chat-header">
+    <button class="chat-back" onclick="goMap()">← Measurement</button>
+    <div class="chat-topic">
+      <div class="chat-kicker">Measurement Solar System</div>
+      <div class="chat-activity-title" id="chat-title">Activity</div>
+    </div>
+    <div class="chat-header-right">
+      <button class="dyslexic-toggle" id="dyslexic-btn" onclick="toggleDyslexic()" title="Aa">Aa</button>
+    </div>
+  </div>
+  <div class="activity-banner">
+    <div class="activity-banner-text">
+      <div class="activity-banner-label">The invitation</div>
+      <div class="activity-banner-prompt" id="chat-prompt"></div>
+    </div>
+    <button class="activity-banner-speak" onclick="speakEl('chat-prompt')" title="Listen">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+    </button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="typing" id="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" rows="1" placeholder="Say what you're thinking…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-mic" id="mic-btn" onclick="toggleMic()" title="Speak">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="know-btn" id="know-btn" onclick="handleKnowBtn()" title="I know what we are doing">I know what we are doing</button>
+        <button class="chat-send" id="send-btn" onclick="sendMsg()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="../../shared/kelvi.js"></script>
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let msgs = [];
+let sessionStart = null;
+let currentActivity = null;
+const childName = localStorage.getItem('kelvi_family_name') || 'Explorer';
+let autoSpeak = localStorage.getItem('kelvi_autospeak') === 'true';
+let recognition = null;
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goGalaxy() { saveSession(); window.location.href = 'family.html'; }
+
+function goMap() {
+  saveSession();
+  document.getElementById('scene-chat').style.display = 'none';
+  document.getElementById('scene-map').style.display = 'flex';
+  initVoice();
+  renderMeasurement();
+
+  // Pre-fill API key input if already set
+  const keyInput = document.getElementById('topbar-apikey');
+  if (keyInput) {
+    const saved = localStorage.getItem('kelvi_api_key') || '';
+    if (saved) keyInput.value = saved;
+  }
+
+}
+
+function openActivity(id, name, prompt, planet) {
+  currentActivity = { id, name, prompt, planet };
+  sessionStart = Date.now();
+  msgs = [];
+  document.getElementById('chat-title').textContent = name;
+  document.getElementById('chat-prompt').textContent = prompt;
+  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('scene-map').style.display = 'none';
+  document.getElementById('scene-chat').style.display = 'flex';
+  document.getElementById('scene-chat').style.flexDirection = 'column';
+  const openers = [
+    "What's the first thing you notice?",
+    "What's your instinct?",
+    "Where would you begin?",
+    "Have you seen anything like this before?"
+  ];
+  setTimeout(() => addMsg('assistant', openers[Math.floor(Math.random()*openers.length)]), 300);
+}
+
+// ── SESSION SAVING ────────────────────────────────────────────────────────────
+function saveSession() {
+  if (!currentActivity || msgs.length < 2) return;
+  const sessions = JSON.parse(localStorage.getItem('kelvi_sessions') || '[]');
+  sessions.unshift({ id:Date.now(), planet:currentActivity.planet, activityName:currentActivity.name, prompt:currentActivity.prompt, date:new Date().toISOString(), duration:sessionStart?Math.round((Date.now()-sessionStart)/60000):0, msgs:msgs.slice() });
+  localStorage.setItem('kelvi_sessions', JSON.stringify(sessions.slice(0,50)));
+  currentActivity = null;
+}
+window.addEventListener('beforeunload', saveSession);
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function addMsg(role, content) {
+  msgs.push({role, content});
+  const container = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role==='user' ? 'msg-s' : 'msg-k');
+  const speakBtn = role==='assistant' ? '<button class="speak-btn" onclick="speakEl(this)" title="Listen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></button>' : '';
+  wrap.innerHTML = '<div class="msg-name' + (role==='user'?' msg-name-s':'') + '">' + (role==='user'?escapeHtml(childName):'KELVI') + '</div><div class="' + (role==='user'?'msg-bubble-s':'msg-bubble-k') + '">' + escapeHtml(content) + speakBtn + '</div>';
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+  if (role==='assistant') { if(autoSpeak) speakText(content); incrementMeasurementExchange(); }
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; autoResize(input);
+  addMsg('user', text);
+  callAPI();
+}
+
+function callAPI() {
+  const key = localStorage.getItem('kelvi_api_key') || '';
+  if (!key) { addMsg('assistant','No API key — update in Kelvi Family settings.'); return; }
+  document.getElementById('typing').classList.add('vis');
+  document.getElementById('send-btn').disabled = true;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, system:buildSYS(currentActivity), messages:msgs.filter(m=>m.role!=='system').slice(-20).map(m=>({'role':m.role,'content':m.content})) })
+  }).then(r=>r.json()).then(data=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant', data.content?.[0]?.text || 'Something went wrong.');
+  }).catch(()=>{
+    document.getElementById('typing').classList.remove('vis');
+    document.getElementById('send-btn').disabled = false;
+    addMsg('assistant','Connection error — check your API key.');
+  });
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function speakText(text) { if (!text) return; window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); window.speechSynthesis.speak(u); }
+function speakEl(el) { const text = typeof el==='string' ? document.getElementById(el)?.textContent : el.closest('.msg-bubble-k')?.textContent; if(text) window.speechSynthesis.speak(new SpeechSynthesisUtterance(text)); }
+function toggleDyslexic() { document.body.classList.toggle('dyslexic'); document.getElementById('dyslexic-btn')?.classList.toggle('on',document.body.classList.contains('dyslexic')); }
+
+
+
+
+
+
+function hexToRgba(hex,alpha) { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${alpha})`; }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('kelvi_api_key') && !localStorage.getItem('kelvi_family_name')) { window.location.href='family.html'; return; }
+  renderMeasurement();
+});
+window.addEventListener('resize', () => { if(document.getElementById('scene-map').style.display!=='none') renderMeasurement(); });
+
+// ── PLANET DATA ───────────────────────────────────────────────────────────────
+const MEASUREMENT_LEVELS = [
+  {
+    num:'I', key:'arrive', name:'Arrive', pcgKind:'p',
+    activities:[
+      { id:'longer-shorter', title:'Longer & Shorter', questions:[
+        { pcg:'p', prompt:'"Find two objects. Which is longer? How do you know without a ruler?"', full:'Find two objects in the room. Which is longer? How do you know without using a ruler? What are you actually comparing?' },
+        { pcg:'p', prompt:'"Put these in order from shortest to longest: a pencil, a book, a finger, a table."', full:'Put these in order from shortest to longest: a pencil, a book, a finger, a table. How did you decide the order without measuring?' },
+        { pcg:'p', prompt:'"Is your arm longer or shorter than your leg? How do you check?"', full:'Is your arm longer or shorter than your leg? How would you check? What method works best when you cannot use a ruler?' },
+        { pcg:'c', prompt:'"Can two things be the same length but look different?"', full:'Can two objects be exactly the same length but look different? Give an example. What makes something look longer than it actually is?' },
+        { pcg:'c', prompt:'"You measure a table with your hand. Your friend measures it with their hand. You get different numbers. Who is right?"', full:'You measure a table using your hand as a unit and get 8 hands. Your friend measures the same table and gets 7 hands. Who is right? What does this reveal about measurement?' },
+        { pcg:'c', prompt:'"What does it mean for two things to be the same length?"', full:'What does it really mean for two things to have exactly the same length? How would you prove two objects are exactly the same length?' },
+        { pcg:'c', prompt:'"Can something be longer and shorter than the same object at the same time?"', full:'Can an object be simultaneously longer than something in one sense and shorter in another? Design a situation where this is possible.' },
+        { pcg:'g', prompt:'"Invent a unit of length using only your body. What are its limitations?"', full:'Invent your own unit of length using only your body — something repeatable and consistent. What are the limitations of your unit? When would it fail?' },
+        { pcg:'g', prompt:'"How did humans decide on the metre as a standard unit?"', full:'The metre was originally defined as one ten-millionth of the distance from the equator to the North Pole. Why would scientists choose such a strange definition? How is the metre defined today?' },
+        { pcg:'g', prompt:'"Is there a longest possible length? A shortest possible length?"', full:'Is there a theoretical maximum length in the universe? Is there a minimum length below which the concept of length breaks down? What do physicists say about this?' },
+      ]},
+      { id:'heavier-lighter', title:'Heavier & Lighter', questions:[
+        { pcg:'p', prompt:'"Hold a book in each hand. Which feels heavier? How do you know?"', full:'Hold a book in each hand. Which feels heavier? How does your body tell you? Is this always reliable?' },
+        { pcg:'p', prompt:'"A big pillow or a small rock — which is heavier? What does this tell you?"', full:'A large pillow versus a small rock — which is heavier? What does this tell you about the relationship between size and weight?' },
+        { pcg:'p', prompt:'"Order these from lightest to heaviest: a grape, a watermelon, an apple, a cherry."', full:'Put these in order from lightest to heaviest: a grape, a watermelon, an apple, a cherry. How confident are you without weighing them?' },
+        { pcg:'c', prompt:'"What is the difference between heavy and dense?"', full:'What is the difference between heavy and dense? Give an example of something heavy but not dense, and something dense but not heavy.' },
+        { pcg:'c', prompt:'"A kilogram of feathers and a kilogram of gold — which is heavier?"', full:'A kilogram of feathers and a kilogram of gold — which is heavier? Which takes up more space? What is the difference between mass and volume?' },
+        { pcg:'c', prompt:'"Would you weigh more or less on the moon? Would you be more or less massive?"', full:'Would you weigh more or less on the moon than on Earth? Would your mass change? What is the difference between weight and mass?' },
+        { pcg:'c', prompt:'"Design a balance scale using only materials you can find at home."', full:'Design and build a balance scale using only household materials. What properties does it need to work accurately? What makes a good balance scale?' },
+        { pcg:'g', prompt:'"The kilogram was defined by a physical object in Paris until 2019. Why was that a problem?"', full:'Until 2019, the kilogram was defined by a specific platinum-iridium cylinder kept in Paris. Why was this a problem for science? How is the kilogram defined now?' },
+        { pcg:'g', prompt:'"In space, objects are weightless but not massless. What does this mean for measuring things?"', full:'In orbit, astronauts and objects float weightlessly, but they still have mass. How do scientists measure mass in space without gravity? What techniques do they use?' },
+        { pcg:'g', prompt:'"Prove that a balance scale measures mass, not weight."', full:'A balance scale compares objects on two pans. Does it measure mass or weight? Would it give the same result on the moon as on Earth? Prove your answer.' },
+      ]},
+      { id:'full-empty', title:'Full & Empty', questions:[
+        { pcg:'p', prompt:'"Pour water into two different shaped glasses. Which has more water?"', full:'Pour the same amount of water into two differently shaped glasses. Which looks like it has more? Does it? How do you check?' },
+        { pcg:'p', prompt:'"What does it mean for a container to be half full?"', full:'What does it mean for a container to be exactly half full? How would you achieve this? Is there more than one way?' },
+        { pcg:'p', prompt:'"Which holds more: a tall thin glass or a short wide glass?"', full:'Which holds more water: a tall thin glass or a short wide glass? Can you tell just by looking? How would you find out for certain?' },
+        { pcg:'c', prompt:'"The same amount of juice looks different in different shaped containers. Why?"', full:'The same volume of juice looks different in a tall thin glass versus a short wide bowl. Why does this happen? What does this say about how we perceive volume?' },
+        { pcg:'c', prompt:'"If you fill a container halfway, is it always half the volume?"', full:'If a container looks half full, does it always contain exactly half the total volume? Could the shape of the container make this misleading?' },
+        { pcg:'c', prompt:'"Design a container where it is impossible to fill it to exactly half by looking."', full:'Design a container shape where it is genuinely impossible to fill it to exactly half just by looking at it. What shape would make visual estimation completely unreliable?' },
+        { pcg:'c', prompt:'"A swimming pool and a teacup are both full. Which contains more? What does full mean?"', full:'A swimming pool and a teacup are both described as full. Which contains more water? What does the word full really mean mathematically?' },
+        { pcg:'g', prompt:'"Archimedes used water displacement to measure volume. Explain how and when it works."', full:'Archimedes used the displacement of water to measure the volume of irregular objects. Explain how this works. When does this method work well and when does it fail?' },
+        { pcg:'g', prompt:'"Design a measuring cup that makes it easy to measure any fraction of its capacity."', full:'Design a measuring cup whose shape makes it easy to measure any simple fraction of its total capacity — half, third, quarter — just by looking. What shape would achieve this?' },
+        { pcg:'g', prompt:'"Is there a smallest possible volume? What does quantum physics say?"', full:'Is there a smallest possible volume in physics — below which the concept of volume breaks down? What does quantum mechanics and the Planck scale say about minimum measurable lengths and volumes?' },
+      ]},
+      { id:'what-time', title:'What Time Is It?', questions:[
+        { pcg:'p', prompt:'"The hour hand points to 3 and the minute hand points to 12. What time is it?"', full:'The hour hand points to 3 and the minute hand points to 12. What time is it? How do you know which hand is which?' },
+        { pcg:'p', prompt:'"It is 2:30. Where exactly are both hands on the clock?"', full:'It is 2:30. Draw where both hands would be on a clock face. Is the hour hand exactly on the 2, or somewhere else?' },
+        { pcg:'p', prompt:'"How many minutes are in an hour? How many seconds? How many hours in a day?"', full:'How many minutes are in an hour? Seconds in a minute? Hours in a day? Days in a year? Why these particular numbers?' },
+        { pcg:'c', prompt:'"Why do clocks go 1 to 12 twice a day instead of 1 to 24?"', full:'Why do analog clocks use a 12-hour format and repeat twice a day, instead of going from 1 to 24? What are the advantages and disadvantages of each system?' },
+        { pcg:'c', prompt:'"At what times are the hour and minute hands exactly together?"', full:'At what times during the day are the hour hand and minute hand of a clock pointing in exactly the same direction? How many times does this happen?' },
+        { pcg:'c', prompt:'"Time zones exist because of how the Earth rotates. If it is noon here, what time is it on the opposite side of the Earth?"', full:'Time zones exist because the Earth rotates. If it is noon where you are, what time is it on the exactly opposite side of the Earth? Why do time zones have irregular boundaries?' },
+        { pcg:'c', prompt:'"Why do we have 60 minutes in an hour and 60 seconds in a minute? Why not 100?"', full:'We use 60 minutes per hour and 60 seconds per minute. Why 60? Why not 100? What ancient civilization introduced this, and what was their reason?' },
+        { pcg:'g', prompt:'"Design a better time system from scratch. What units would you use?"', full:'If you were designing a time measurement system from scratch today, what units would you choose? What would you keep from the current system and what would you change?' },
+        { pcg:'g', prompt:'"What is time? Can it be measured, or only counted?"', full:'What is time, fundamentally? Is it a thing that can be measured, or just a count of repeated events? What does physics say about the nature of time?' },
+        { pcg:'g', prompt:'"The atomic clock is accurate to one second in 300 million years. Why does such precision matter?"', full:'Modern atomic clocks are accurate to one second in 300 million years. Why does such extreme precision matter? What technologies depend on highly accurate timekeeping?' },
+      ]},
+    ],
+  },
+  {
+    num:'II', key:'notice', name:'Notice', pcgKind:'p',
+    activities:[
+      { id:'measuring-length', title:'Measuring Length', questions:[
+        { pcg:'p', prompt:'"Measure your desk in centimetres. Then measure in inches. Which unit gives a bigger number?"', full:'Measure your desk in centimetres, then in inches. Which unit gives a bigger number? What does this tell you about the relationship between the two units?' },
+        { pcg:'p', prompt:'"Estimate the length of this room in metres before you measure. How close were you?"', full:'Estimate the length of a room in metres without measuring. Write down your estimate, then measure. How close were you? What strategies help with estimation?' },
+        { pcg:'p', prompt:'"Measure the same object three times. Do you get the same answer each time?"', full:'Measure the same object three times using a ruler. Do you get exactly the same answer each time? What causes any differences? What is the most accurate value?' },
+        { pcg:'c', prompt:'"Why do different countries use different units of length?"', full:'The US uses inches, feet, and miles while most of the world uses metres and kilometres. How did this happen? What problems does it cause? Has it ever caused a disaster?' },
+        { pcg:'c', prompt:'"How do you measure the length of a curved line?"', full:'How would you accurately measure the length of a curved line or a wiggly path? What tools or techniques could you use?' },
+        { pcg:'c', prompt:'"What is the most accurate way to measure the height of a building without climbing it?"', full:'What is the most accurate way to measure the height of a tall building without climbing it or using electronic devices? What mathematical principles would you apply?' },
+        { pcg:'c', prompt:'"The coastline paradox: the length of a coastline depends on the ruler you use. Why?"', full:'If you measure the coastline of an island with a 100km ruler versus a 1km ruler, you get different answers — the shorter ruler gives a longer coastline. Why? What does this say about measurement?' },
+        { pcg:'g', prompt:'"How do astronomers measure the distance to stars they cannot visit?"', full:'How do astronomers measure the distance to stars billions of kilometres away? What techniques do they use for nearby stars versus distant galaxies? How accurate are these measurements?' },
+        { pcg:'g', prompt:'"Is any measurement ever perfectly exact?"', full:'Is it theoretically possible to make a perfectly exact measurement of any length? What physical and mathematical limits prevent perfect precision? What does the Heisenberg uncertainty principle say?' },
+        { pcg:'g', prompt:'"Prove that no ruler can be perfectly accurate."', full:'Prove that no physical ruler can ever be perfectly accurate — that every measurement has some irreducible uncertainty. What are the fundamental sources of this uncertainty?' },
+      ]},
+      { id:'measuring-weight', title:'Measuring Weight & Mass', questions:[
+        { pcg:'p', prompt:'"Find three objects and estimate their mass in grams before weighing them. How close were you?"', full:'Find three household objects and estimate their mass in grams before weighing them. How close were your estimates? What objects helped you calibrate your intuition?' },
+        { pcg:'p', prompt:'"Convert 2.5 kg to grams. Convert 750g to kg."', full:'Convert 2.5 kg to grams. Convert 750g to kg. How does knowing the relationship between units help you check your answer?' },
+        { pcg:'p', prompt:'"A recipe needs 250g of flour. The scale reads in ounces. What do you set it to?"', full:'A recipe requires 250 grams of flour, but your kitchen scale only shows ounces. How do you convert? What is the approximate conversion factor?' },
+        { pcg:'c', prompt:'"Why do scientists use mass rather than weight in most calculations?"', full:'Scientists almost always use mass in calculations rather than weight. Why? What goes wrong if you use weight instead of mass in a physics formula?' },
+        { pcg:'c', prompt:'"Design a way to measure the mass of a gas."', full:'Gases have mass, but measuring them is tricky because they fill their containers and float in air. Design a method to accurately measure the mass of a quantity of gas.' },
+        { pcg:'c', prompt:'"How do you measure the mass of something as large as a planet?"', full:'How do scientists calculate the mass of the Earth, the Moon, or other planets? What measurements do they take, and what equations do they use?' },
+        { pcg:'c', prompt:'"If you lost 10kg on a diet, did you mostly breathe it out, sweat it out, or excrete it?"', full:'When you lose body mass through diet and exercise, where does the mass go? The answer might surprise you — mostly you breathe it out as carbon dioxide. Is this true? How can you verify it?' },
+        { pcg:'g', prompt:'"Prove that the weight of an object depends on where it is, but its mass does not."', full:'Prove using physics that an object has the same mass on the moon as on Earth, but a different weight. What equation connects mass, weight, and gravitational acceleration?' },
+        { pcg:'g', prompt:'"Design a scale that works in zero gravity."', full:'Design a practical scale for measuring mass in zero gravity aboard a space station, where conventional scales do not work. What physical principles would your design rely on?' },
+        { pcg:'g', prompt:'"Is there a maximum possible mass for a single object?"', full:'Is there a theoretical maximum mass for a single object in the universe? What happens when you try to make something arbitrarily massive? Does a black hole count as a single object?' },
+      ]},
+      { id:'measuring-volume', title:'Measuring Volume & Capacity', questions:[
+        { pcg:'p', prompt:'"Fill a measuring jug to 350ml. Now add 200ml more. What do you have?"', full:'Fill a measuring jug to 350ml. Add 200ml more. What is the total? How do you read a measuring jug accurately — where do you look?' },
+        { pcg:'p', prompt:'"Convert 1.5 litres to millilitres. Convert 250ml to litres."', full:'Convert 1.5 litres to millilitres. Convert 250ml to litres. What is the relationship between litres and millilitres?' },
+        { pcg:'p', prompt:'"Estimate the volume of a room in cubic metres."', full:'Estimate the volume of a room in cubic metres. How do you measure three dimensions and combine them? Is the room a perfect rectangular prism?' },
+        { pcg:'c', prompt:'"What is the difference between volume and capacity?"', full:'What is the difference between volume and capacity? Is the volume of a jug the same as its capacity? How do these concepts differ for solid objects versus containers?' },
+        { pcg:'c', prompt:'"A 1cm cube has a volume of 1ml of water. Why?"', full:'A cube that is 1cm on each side has a volume of exactly 1 cubic centimetre, which holds exactly 1 millilitre of water. Why was the metric system designed so that these units correspond?' },
+        { pcg:'c', prompt:'"How would you measure the volume of an irregular solid like a potato?"', full:'How would you accurately measure the volume of an irregular solid object like a potato, a rock, or a person? What method works best and why?' },
+        { pcg:'c', prompt:'"If you double all the dimensions of a box, does the volume double?"', full:'If you double the length, width, and height of a box, what happens to the volume? Does it double? What is the mathematical relationship between scaling dimensions and volume?' },
+        { pcg:'g', prompt:'"Design a measuring system where volume, mass, and length are all simply related."', full:'The metric system was designed so that 1ml of water has a mass of 1g and fits in a 1cm cube. Design a completely coherent measurement system where all units are simply related to each other.' },
+        { pcg:'g', prompt:'"The volume of a sphere is 4/3 times pi times r cubed. Derive this without calculus."', full:'The formula for the volume of a sphere is (4/3)pi r cubed. Can you derive or at least motivate this formula without using calculus? What relationship does it have to the formula for a cylinder?' },
+        { pcg:'g', prompt:'"How do you measure the volume of the atmosphere of a planet?"', full:'How do planetary scientists estimate the volume of a planet atmosphere? What measurements do they need, and what assumptions must they make about the atmosphere shape and extent?' },
+      ]},
+      { id:'reading-clock', title:'Reading a Clock', questions:[
+        { pcg:'p', prompt:'"What is the angle between the hands at 3 oclock? At 6 oclock? At 12 oclock?"', full:'What is the angle between the hour and minute hands at 3 oclock? At 6 oclock? At 12 oclock? How did you find each angle?' },
+        { pcg:'p', prompt:'"How many degrees does the minute hand turn in 15 minutes? In one hour?"', full:'How many degrees does the minute hand rotate in 15 minutes? In 30 minutes? In a full hour? How many degrees does the hour hand turn in one hour?' },
+        { pcg:'p', prompt:'"Convert 3 hours 45 minutes to minutes. Convert 200 minutes to hours and minutes."', full:'Convert 3 hours 45 minutes to total minutes. Convert 200 minutes to hours and minutes. Why is time arithmetic different from normal arithmetic?' },
+        { pcg:'c', prompt:'"At what angle are the hands at 2:15? Is the hour hand exactly on the 2?"', full:'What is the angle between the clock hands at 2:15? Careful — the hour hand is not exactly on the 2. Where exactly is it? Calculate the precise angle.' },
+        { pcg:'c', prompt:'"How many times a day do the clock hands point in opposite directions?"', full:'How many times in a 24-hour day do the hour and minute hands of a clock point in exactly opposite directions? Calculate this precisely.' },
+        { pcg:'c', prompt:'"Time uses base 60 but we usually work in base 10. What problems does this create?"', full:'Time is measured in base 60 (60 seconds per minute, 60 minutes per hour) but our number system is base 10. What problems does this mismatch create? Where do calculation errors often occur?' },
+        { pcg:'c', prompt:'"Design a 24-hour analog clock. What would it look like?"', full:'Design an analog clock that shows 24-hour time instead of 12-hour time. What would it look like? How would the hands move differently? Would it be easier or harder to read?' },
+        { pcg:'g', prompt:'"Calculate the exact angle between clock hands for any time h:m."', full:'Derive a formula for the exact angle between the hour and minute hands for any time given as hours h and minutes m. Test your formula on several times.' },
+        { pcg:'g', prompt:'"Prove that the hands of a clock overlap exactly 11 times in 12 hours."', full:'Prove that the hour and minute hands of a clock overlap exactly 11 times in every 12-hour period (not 12 times). Why is the answer 11 and not 12?' },
+        { pcg:'g', prompt:'"Clocks and calendars are both measurement systems. Compare their mathematical structure."', full:'Clocks and calendars are both systems for measuring time, but they have very different mathematical structures. Compare them: what makes each one work, and where does each one have awkward special cases?' },
+      ]},
+    ],
+  },
+  {
+    num:'III', key:'question', name:'Question', pcgKind:'c',
+    activities:[
+      { id:'perimeter-area', title:'Perimeter & Area', questions:[
+        { pcg:'p', prompt:'"Find the perimeter and area of a 4cm by 7cm rectangle."', full:'Find the perimeter and area of a rectangle that is 4 cm by 7 cm. What is the difference between perimeter and area? What units do you use for each?' },
+        { pcg:'p', prompt:'"A square has perimeter 36cm. What is its area?"', full:'A square has a perimeter of 36 cm. What is its area? Show all your steps.' },
+        { pcg:'p', prompt:'"Find the area of a triangle with base 8cm and height 5cm."', full:'Find the area of a triangle with base 8 cm and perpendicular height 5 cm. Where does the formula come from? Why is there a factor of 1/2?' },
+        { pcg:'c', prompt:'"Two shapes have the same area. Must they have the same perimeter?"', full:'Two shapes have the same area. Must they have the same perimeter? Find two shapes with equal areas but very different perimeters.' },
+        { pcg:'c', prompt:'"Two shapes have the same perimeter. Which has the larger area?"', full:'If two shapes have the same perimeter, which one has the larger area? Can you always tell? What shape maximises area for a given perimeter?' },
+        { pcg:'c', prompt:'"A farmer has 100m of fence. What rectangle encloses the largest area?"', full:'A farmer has exactly 100 metres of fencing. What rectangular shape encloses the largest possible area? What if the fence could be any shape, not just a rectangle?' },
+        { pcg:'c', prompt:'"Why does the area formula for a parallelogram use height, not side length?"', full:'The area of a parallelogram is base times height, not base times slanted side. Why? Draw a picture that makes it obvious why the perpendicular height is what matters.' },
+        { pcg:'g', prompt:'"Prove that among all shapes with a given perimeter, the circle encloses the greatest area."', full:'Prove — or at least argue convincingly — that among all closed shapes with a fixed perimeter, a circle encloses the maximum area. This is called the isoperimetric inequality.' },
+        { pcg:'g', prompt:'"Find a shape with finite area but infinite perimeter."', full:'Find a mathematical shape that has a finite area but an infinite perimeter. Does this seem paradoxical? What fractal shapes have this property?' },
+        { pcg:'g', prompt:'"The area of a circle is pi r squared. Derive this without integration."', full:'The area of a circle is pi r squared. Can you derive or convincingly motivate this formula without using integration or calculus? What approach did Archimedes use?' },
+      ]},
+      { id:'converting-units', title:'Converting Units', questions:[
+        { pcg:'p', prompt:'"Convert 5.2 km to metres. Convert 3400ml to litres."', full:'Convert 5.2 kilometres to metres. Convert 3400 millilitres to litres. What is the pattern in metric conversions?' },
+        { pcg:'p', prompt:'"A recipe uses 2 cups of milk. Convert to millilitres. (1 cup is approximately 240ml)"', full:'A recipe calls for 2 cups of milk. Convert this to millilitres, given that 1 cup is approximately 240ml. How would you do this without a calculator?' },
+        { pcg:'p', prompt:'"Convert 60 miles per hour to kilometres per hour. (1 mile is approximately 1.6km)"', full:'Convert 60 miles per hour to kilometres per hour. Given that 1 mile is approximately 1.6 km, what is 60 mph in km/h?' },
+        { pcg:'c', prompt:'"Why does the metric system make conversions easier than the imperial system?"', full:'Why does the metric system make unit conversions much easier than the imperial system? What design principle makes it simpler? When was the metric system adopted and why?' },
+        { pcg:'c', prompt:'"Convert 1 cubic metre to cubic centimetres. The answer might surprise you."', full:'Convert 1 cubic metre to cubic centimetres. How many cubic centimetres fit in a cubic metre? Why is the answer not just 100?' },
+        { pcg:'c', prompt:'"A NASA spacecraft was lost because of a unit conversion error. What happened?"', full:'In 1999, the Mars Climate Orbiter was lost because of a unit conversion error — one team used metric, another used imperial. What went wrong? What does this tell you about unit consistency in science?' },
+        { pcg:'c', prompt:'"Convert 100 km/h to metres per second."', full:'Convert 100 kilometres per hour to metres per second. Show each step of the conversion. What is a quick mental approximation for converting km/h to m/s?' },
+        { pcg:'g', prompt:'"Prove that unit conversion is always multiplicative, never additive (except temperature)."', full:'Prove that converting between most units is always done by multiplication, not addition. Why is temperature the famous exception? What makes the Celsius-Fahrenheit conversion different from km-to-miles?' },
+        { pcg:'g', prompt:'"Design a unit system where all conversions involve powers of 2."', full:'Design a measurement system where every unit conversion involves a power of 2. What advantages would this have? What disadvantages? How would it compare to metric?' },
+        { pcg:'g', prompt:'"Dimensional analysis: prove that F = ma has consistent units."', full:'Use dimensional analysis to prove that Newton second law F = ma has consistent units — that the units on both sides of the equation are the same. What is dimensional analysis and why is it powerful?' },
+      ]},
+      { id:'angles-degrees', title:'Angles & Degrees', questions:[
+        { pcg:'p', prompt:'"Classify these angles: 35 degrees, 90 degrees, 130 degrees, 180 degrees, 270 degrees."', full:'Classify each of these angles as acute, right, obtuse, straight, or reflex: 35 degrees, 90 degrees, 130 degrees, 180 degrees, 270 degrees.' },
+        { pcg:'p', prompt:'"Measure the angles in a triangle. What do they sum to?"', full:'Draw a triangle and measure all three interior angles with a protractor. What do they add up to? Is this always true for any triangle?' },
+        { pcg:'p', prompt:'"Two lines cross. If one angle is 40 degrees, find all four angles."', full:'Two straight lines cross each other. One of the four angles formed is 40 degrees. Find all four angles without measuring. What rules do you use?' },
+        { pcg:'c', prompt:'"Why are there 360 degrees in a full rotation? Why not 100 or 400?"', full:'Why do we divide a full rotation into 360 degrees? Why not 100 or 400? What ancient civilisation introduced this, and what was their reasoning?' },
+        { pcg:'c', prompt:'"The angles in any triangle sum to 180 degrees. Is this true on a curved surface?"', full:'The angles in any flat triangle sum to exactly 180 degrees. Is this true for a triangle drawn on the surface of a sphere? What about on a saddle-shaped surface?' },
+        { pcg:'c', prompt:'"Radians are another way to measure angles. What is pi radians in degrees?"', full:'Radians are an alternative unit for measuring angles. What is pi radians in degrees? Why do mathematicians prefer radians to degrees in most calculations?' },
+        { pcg:'c', prompt:'"How do you measure the angle of a mountain slope from a photograph?"', full:'How could you estimate the angle of a mountain slope using only a photograph and some measurements on the photograph? What geometric principles would you apply?' },
+        { pcg:'g', prompt:'"Prove that the sum of interior angles of any polygon with n sides is (n-2) times 180 degrees."', full:'Prove that the sum of the interior angles of any polygon with n sides is (n - 2) times 180 degrees. How does dividing into triangles help?' },
+        { pcg:'g', prompt:'"Design a navigation system using only angles — no distances."', full:'Design a navigation system that locates positions using only angle measurements — no distance measurements allowed. When would such a system be useful? What are its limitations?' },
+        { pcg:'g', prompt:'"Why do navigators and scientists sometimes prefer radians to degrees? Derive the formula for arc length."', full:'Why do mathematicians and scientists prefer radians to degrees? Derive the formula for arc length s = r theta using the definition of radians. What makes this formula so clean?' },
+      ]},
+      { id:'speed-distance-time', title:'Speed, Distance & Time', questions:[
+        { pcg:'p', prompt:'"A car travels 240km in 3 hours. What is its average speed?"', full:'A car travels 240 km in 3 hours at constant speed. What is its average speed? Write the formula that connects speed, distance, and time.' },
+        { pcg:'p', prompt:'"A train travels at 120 km/h. How far does it travel in 2.5 hours?"', full:'A train travels at 120 km/h. How far does it travel in 2.5 hours? Show your working.' },
+        { pcg:'p', prompt:'"A runner completes a 10km race in 50 minutes. What is her speed in km/h?"', full:'A runner completes a 10km race in 50 minutes. What is her speed in km/h? What steps do you need to take?' },
+        { pcg:'c', prompt:'"Average speed for a round trip is not the average of the two speeds. Why?"', full:'You drive from A to B at 60 km/h and return at 40 km/h. What is your average speed for the whole journey? Is it 50 km/h? Why not?' },
+        { pcg:'c', prompt:'"Light travels at 300,000 km per second. How far does it travel in one year?"', full:'The speed of light is approximately 300,000 km per second. How far does light travel in one year? Why do astronomers use light-years as a unit of distance?' },
+        { pcg:'c', prompt:'"Two trains head toward each other 200km apart, one at 60 km/h and one at 40 km/h. When do they meet?"', full:'Two trains are 200 km apart and heading toward each other. One travels at 60 km/h, the other at 40 km/h. How long until they meet? Where does the meeting occur?' },
+        { pcg:'c', prompt:'"Design a speed trap using only two sensors placed 10 metres apart."', full:'Design a speed trap for catching speeding cars using only two sensors placed 10 metres apart. How do you calculate the speed of a passing car? What are the potential errors?' },
+        { pcg:'g', prompt:'"Prove that for a fixed distance, average speed equals harmonic mean of speeds, not arithmetic mean."', full:'Prove that for a round trip over a fixed distance at two different speeds, the average speed is the harmonic mean of the two speeds, not the arithmetic mean. Why does this matter practically?' },
+        { pcg:'g', prompt:'"Relativity: at very high speeds, time and distance change. How does this affect speed calculations?"', full:'According to special relativity, time and distance change for objects moving at very high speeds. How does this affect speed, distance, and time calculations? Can anything travel faster than light?' },
+        { pcg:'g', prompt:'"Model the motion of a ball thrown upward: find height, speed, and time to peak and return."', full:'Model the complete motion of a ball thrown straight upward with initial speed 20 m/s. Find its height, speed, and time at the peak. Find when it returns to its starting height. What assumptions are you making?' },
+      ]},
+    ],
+  },
+  {
+    num:'IV', key:'connect', name:'Connect', pcgKind:'c',
+    activities:[
+      { id:'area-complex', title:'Area of Complex Shapes', questions:[
+        { pcg:'p', prompt:'"Find the area of an L-shaped room by splitting it into rectangles."', full:'Find the area of an L-shaped room by splitting it into two rectangles. How many ways can you split it? Do all ways give the same answer?' },
+        { pcg:'p', prompt:'"Find the area of a circle with radius 6cm."', full:'Find the area of a circle with radius 6 cm. What is the formula? How would you verify that your answer is reasonable?' },
+        { pcg:'p', prompt:'"Find the shaded area: a square of side 10cm with a circle of radius 3cm cut out."', full:'Find the shaded area of a square with side 10 cm that has a circle of radius 3 cm removed from its centre. Show all steps.' },
+        { pcg:'c', prompt:'"How do you find the area of a shape with curved edges?"', full:'How do you find the exact area of a shape bounded by curved edges? What techniques exist? When is an approximate answer good enough?' },
+        { pcg:'c', prompt:'"The area of a trapezium is half the sum of the parallel sides times the height. Derive this."', full:'Derive the formula for the area of a trapezium: half the sum of the two parallel sides multiplied by the perpendicular height. Use a diagram to make your derivation clear.' },
+        { pcg:'c', prompt:'"Design a method to estimate the area of an irregular shape like a lake from a map."', full:'Design a practical method to estimate the area of an irregular shape — like a lake on a map — without any calculus. How accurate can your method be?' },
+        { pcg:'c', prompt:'"What is the area enclosed by the curve y = x squared from x = 0 to x = 3?"', full:'Estimate the area enclosed between the curve y = x squared, the x-axis, and the line x = 3. What methods could you use to get closer and closer to the exact answer?' },
+        { pcg:'g', prompt:'"Prove that the area of a regular hexagon is 3 times root 3 over 2, multiplied by the side squared."', full:'Prove that the area of a regular hexagon with side length s is (3 root 3 / 2) times s squared. Use the fact that a hexagon can be divided into equilateral triangles.' },
+        { pcg:'g', prompt:'"Cavalieri principle: two solids with equal cross-sectional areas at every height have equal volumes. Prove it."', full:'Cavalieri principle states that if two solids have the same cross-sectional area at every height, they have the same volume. How does this principle let you derive volume formulas? Prove it for a cylinder and an oblique cylinder.' },
+        { pcg:'g', prompt:'"Design a shape whose area you can calculate exactly but whose perimeter you cannot."', full:'Design a mathematical shape whose area can be calculated exactly with simple formulas, but whose perimeter involves an expression that cannot be simplified to a closed form. What does this reveal about area versus perimeter?' },
+      ]},
+      { id:'surface-area-volume', title:'Surface Area & Volume', questions:[
+        { pcg:'p', prompt:'"Find the volume and surface area of a cube with side 4cm."', full:'Find the volume and surface area of a cube with side length 4 cm. What is the difference between volume and surface area? What units do you use for each?' },
+        { pcg:'p', prompt:'"Find the volume of a cylinder with radius 3cm and height 10cm."', full:'Find the volume of a cylinder with radius 3 cm and height 10 cm. What is the formula? Why does it make sense?' },
+        { pcg:'p', prompt:'"A cereal box is 30cm tall, 20cm wide, and 8cm deep. How much cardboard is needed?"', full:'A cereal box is 30 cm tall, 20 cm wide, and 8 cm deep. How much cardboard is needed to make it? Draw a net and calculate the surface area.' },
+        { pcg:'c', prompt:'"Double all dimensions of a cube. How do volume and surface area change?"', full:'Double all the dimensions of a cube. How does the volume change? How does the surface area change? Why do they change by different factors?' },
+        { pcg:'c', prompt:'"Why do small animals lose heat faster relative to their size than large animals?"', full:'Small animals lose body heat faster relative to their body size than large animals do. Use surface area and volume to explain why. What evolutionary consequences does this have?' },
+        { pcg:'c', prompt:'"Which holds more: a sphere or a cube with the same surface area?"', full:'A sphere and a cube have the same surface area. Which encloses the greater volume? By how much? What shape maximises volume for a given surface area?' },
+        { pcg:'c', prompt:'"Design a container that minimises surface area for a given volume."', full:'Design a container shape that uses the minimum amount of material to enclose a given volume. What shape is optimal? Why do manufacturers not always use this shape?' },
+        { pcg:'g', prompt:'"Prove the formula for the volume of a pyramid: one third times base area times height."', full:'Prove that the volume of any pyramid is one-third of the base area times the perpendicular height. Use Cavalieri principle or another approach.' },
+        { pcg:'g', prompt:'"The surface area of a sphere is 4 pi r squared. Derive this."', full:'Derive the surface area formula for a sphere: 4 pi r squared. What is the elegant connection between this and the area of a circle? How did Archimedes discover this relationship?' },
+        { pcg:'g', prompt:'"Design a package that fits a tennis ball perfectly. Minimise wasted space."', full:'Design the optimal package to hold one tennis ball, minimising the ratio of package volume to ball volume. Compare a cube, a cylinder, and a sphere-shaped package. Which is most efficient?' },
+      ]},
+      { id:'scale-maps', title:'Scale & Map Reading', questions:[
+        { pcg:'p', prompt:'"A map has scale 1:50,000. Two towns are 4cm apart on the map. How far apart are they really?"', full:'A map uses a scale of 1:50,000. Two towns appear 4 cm apart on the map. How far apart are they in reality? Express your answer in km.' },
+        { pcg:'p', prompt:'"A model car is 1/20th scale. If the model is 22cm long, how long is the real car?"', full:'A model car is built at 1/20 scale. The model is 22 cm long. How long is the real car? What other dimensions can you calculate?' },
+        { pcg:'p', prompt:'"Draw a scale diagram of your bedroom. Choose an appropriate scale."', full:'Draw a scale diagram of your bedroom. What scale do you choose? How do you decide? What measurements do you need to take first?' },
+        { pcg:'c', prompt:'"Maps distort the Earth because a sphere cannot be flattened without distortion. What gets distorted?"', full:'Any flat map of the Earth must distort something because a sphere cannot be unrolled into a flat surface without stretching or tearing. What different map projections distort, and which properties do they preserve?' },
+        { pcg:'c', prompt:'"Scale drawings of buildings look proportionally correct. Scale models of insects look wrong. Why?"', full:'Scale models of buildings look correct in proportion. But scale models of insects or cells at the same reduction factor look strangely wrong. What physical properties change with scale that cause this?' },
+        { pcg:'c', prompt:'"If a country doubled in size, would its map scale change?"', full:'If a country doubled its physical area, what would happen to the map scale if you wanted it to fit on the same sized paper? How would the scale factor change?' },
+        { pcg:'c', prompt:'"Google Maps can zoom from street level to a view of the Earth. How does scale change continuously?"', full:'Google Maps can zoom smoothly from a view of a single street to a view of the entire Earth. How does the scale change as you zoom out? Is this change linear or something else?' },
+        { pcg:'g', prompt:'"Prove that area scales as the square of the linear scale factor."', full:'Prove that if a map has linear scale factor 1:n, then areas on the map are n squared times smaller than real areas. Illustrate with the national area of a country.' },
+        { pcg:'g', prompt:'"Design a map projection that preserves area but not shape."', full:'Design a map projection that preserves the relative areas of countries and continents correctly, even if it distorts their shapes. What trade-offs does your projection make?' },
+        { pcg:'g', prompt:'"What mathematical object represents the Earth surface most accurately, and how do you map it?"', full:'What mathematical object best represents the surface of the Earth? How do you create a flat map from it with minimal distortion? What is the Mercator projection and what does it distort?' },
+      ]},
+      { id:'precision-error', title:'Precision & Error', questions:[
+        { pcg:'p', prompt:'"A measurement is given as 5.4 plus or minus 0.1 cm. What is the range of possible values?"', full:'A measurement is recorded as 5.4 plus or minus 0.1 cm. What is the range of possible true values? What does the plus or minus notation mean?' },
+        { pcg:'p', prompt:'"Round 3.14159 to 2 decimal places. How much error does this introduce?"', full:'Round 3.14159 to 2 decimal places. What is the maximum error introduced by this rounding? Express the error as a percentage of the rounded value.' },
+        { pcg:'p', prompt:'"You measure a side as 10.0cm with accuracy to the nearest mm. Calculate the area and its possible error."', full:'You measure the side of a square as 10.0 cm, accurate to the nearest millimetre. Calculate the area, and find the maximum possible error in your area calculation.' },
+        { pcg:'c', prompt:'"Why do scientists always report measurements with error bounds?"', full:'Why do scientists always report measurements as a value plus or minus an error, rather than just giving a single number? What would it mean to report a measurement with zero error?' },
+        { pcg:'c', prompt:'"If you add two measurements, how do the errors combine?"', full:'If you add two measurements, each with their own error bounds, how do the errors combine in the sum? What about when you multiply two measurements?' },
+        { pcg:'c', prompt:'"The ruler you are using may have shrunk from the cold. How does this affect your measurement?"', full:'If the ruler you are using has contracted slightly due to cold temperature, how does this affect your measurements? Would you measure everything as slightly too long or too short? By how much?' },
+        { pcg:'c', prompt:'"Design a procedure for measuring a room dimension to the nearest half millimetre."', full:'Design a careful measurement procedure for measuring the length of a room to the nearest half millimetre. What sources of error must you control? What equipment would you need?' },
+        { pcg:'g', prompt:'"Prove that errors multiply in area calculations: delta-A / A is approximately 2 times delta-L / L."', full:'Prove that if you measure a length L with a relative error of delta-L / L, the resulting relative error in the area L squared is approximately twice as large. What does this say about how errors propagate through calculations?' },
+        { pcg:'g', prompt:'"The Heisenberg uncertainty principle sets a fundamental limit on precision. What is it?"', full:'The Heisenberg uncertainty principle states that the precision of position and momentum measurements are fundamentally linked. What does this say about the ultimate limits of measurement? Is this a practical limit or a fundamental one?' },
+        { pcg:'g', prompt:'"Design a measurement system that tracks and propagates uncertainty through complex calculations."', full:'Design a mathematical framework for tracking how measurement uncertainty propagates through a complex multi-step calculation. How do errors compound? When do they cancel out?' },
+      ]},
+    ],
+  },
+  {
+    num:'V', key:'create', name:'Create', pcgKind:'g',
+    activities:[
+      { id:'dimensional-analysis', title:'Dimensional Analysis', questions:[
+        { pcg:'p', prompt:'"Check if this equation is dimensionally consistent: v = u + at, where v and u are speeds, a is acceleration, t is time."', full:'Check whether the equation v = u + at is dimensionally consistent, where v and u are speeds (m/s), a is acceleration (m/s squared), and t is time (s). What does dimensional consistency mean?' },
+        { pcg:'p', prompt:'"Convert 9.8 m/s squared (acceleration due to gravity) into km per hour squared."', full:'Convert the acceleration due to gravity, 9.8 metres per second squared, into kilometres per hour squared. Show every step of the unit conversion.' },
+        { pcg:'p', prompt:'"The period of a pendulum depends on its length and gravity. Use dimensions to find the formula."', full:'The period T of a pendulum depends only on its length L and the gravitational acceleration g. Use dimensional analysis to find the form of the formula for T. What can dimensions tell you and what can they not tell you?' },
+        { pcg:'c', prompt:'"Why is dimensional analysis a powerful tool for checking equations?"', full:'Why is dimensional analysis such a powerful tool for checking physical equations and deriving new ones? What can it tell you? What are its limitations?' },
+        { pcg:'c', prompt:'"Derive the formula for kinetic energy using dimensional analysis."', full:'Use dimensional analysis to find the form of the formula for kinetic energy, knowing it depends on mass m and speed v. What additional information do you need that dimensional analysis cannot provide?' },
+        { pcg:'c', prompt:'"Why are dimensionless numbers like pi and e particularly important in physics?"', full:'Dimensionless quantities — numbers with no units — appear throughout physics and engineering. Why are they especially useful? What is the Reynolds number and why does it matter?' },
+        { pcg:'c', prompt:'"Design a formula for the speed of sound in terms of pressure and density. Use dimensions."', full:'The speed of sound in a gas depends on the pressure p (units: kg per metre per second squared) and density rho (units: kg per cubic metre). Use dimensional analysis to find the form of the speed formula.' },
+        { pcg:'g', prompt:'"Prove that all physically meaningful equations must be dimensionally homogeneous."', full:'Prove that any equation relating physical quantities must be dimensionally homogeneous — the dimensions on both sides must match. What would it mean for an equation to be dimensionally inconsistent?' },
+        { pcg:'g', prompt:'"The Buckingham pi theorem says you can always reduce the number of variables in a physical problem. Explain and apply it."', full:'The Buckingham pi theorem states that any physical relationship between n variables with k independent dimensions can be expressed in terms of n minus k dimensionless groups. Explain this theorem and apply it to a simple example.' },
+        { pcg:'g', prompt:'"Design an experiment whose outcome can be predicted entirely from dimensional analysis."', full:'Design a physical experiment whose key result — the scaling relationship between variables — can be predicted purely from dimensional analysis, without solving any equations. What kind of phenomena are amenable to this approach?' },
+      ]},
+      { id:'rates-of-change', title:'Rates of Change', questions:[
+        { pcg:'p', prompt:'"A bath fills at 12 litres per minute. How long to fill a 180-litre bath?"', full:'A bath fills at a rate of 12 litres per minute. How long will it take to fill a 180-litre bath? What assumptions are you making?' },
+        { pcg:'p', prompt:'"Temperature drops 3 degrees every hour. Starting at 20 degrees, find the temperature after 4.5 hours."', full:'Temperature is dropping at a steady rate of 3 degrees Celsius per hour. Starting at 20 degrees, what is the temperature after 4.5 hours? Write a formula for temperature as a function of time.' },
+        { pcg:'p', prompt:'"A candle is 24cm tall and burns down 2cm per hour. When is it 10cm tall?"', full:'A candle starts at 24 cm and burns at 2 cm per hour. When will it be 10 cm tall? Write an equation and solve it.' },
+        { pcg:'c', prompt:'"What is the difference between a rate and a rate of change?"', full:'What is the difference between a rate and a rate of change? Give an example of each. When does a rate of change itself change — what do you call that?' },
+        { pcg:'c', prompt:'"A car accelerates from 0 to 100 km/h in 5 seconds. What is the rate of change of speed?"', full:'A car accelerates from 0 to 100 km/h in 5 seconds. What is the rate of change of speed? What is this called? Is the rate of change constant during acceleration?' },
+        { pcg:'c', prompt:'"Water drains from a tank faster when the tank is full than when it is nearly empty. Why?"', full:'Water drains from a tank through a hole at the bottom faster when the tank is full than when it is almost empty. Why? What does this tell you about the rate of change of volume?' },
+        { pcg:'c', prompt:'"Design a scenario where the rate of change of a rate of change is constant."', full:'Design a real-world scenario where the rate of change of a rate of change is constant. What does this correspond to physically? What type of motion does this describe?' },
+        { pcg:'g', prompt:'"Derive the concept of instantaneous rate of change from average rates of change."', full:'How does the concept of instantaneous rate of change emerge from taking average rates of change over smaller and smaller time intervals? What does this process lead to in calculus?' },
+        { pcg:'g', prompt:'"Model a population with a rate of change proportional to its current size. What kind of growth is this?"', full:'Model a population where the rate of change is proportional to the current population size — more individuals means faster growth. What type of function describes this? Write the differential equation.' },
+        { pcg:'g', prompt:'"Prove that constant rate of change implies linear relationship."', full:'Prove that if a quantity changes at a constant rate with respect to time, the relationship between that quantity and time must be linear. What is the rate of change equal to in the linear formula?' },
+      ]},
+      { id:'similarity-measurement', title:'Similarity & Measurement', questions:[
+        { pcg:'p', prompt:'"Two similar triangles have sides in ratio 3:5. If the smaller has area 18cm squared, find the area of the larger."', full:'Two similar triangles have corresponding sides in the ratio 3:5. The smaller triangle has area 18 cm squared. What is the area of the larger triangle?' },
+        { pcg:'p', prompt:'"A 6-foot tall person casts a 4-foot shadow at the same time a tree casts a 30-foot shadow. How tall is the tree?"', full:'A person 6 feet tall casts a shadow 4 feet long. At the same moment, a nearby tree casts a shadow 30 feet long. How tall is the tree? What assumption makes this calculation valid?' },
+        { pcg:'p', prompt:'"Use trigonometry to find the height of a building if you are 50m away and the angle of elevation is 30 degrees."', full:'You are standing 50 m from a building. The angle of elevation to the top of the building is 30 degrees. Use trigonometry to find the height of the building.' },
+        { pcg:'c', prompt:'"Thales used shadows to measure the height of the Egyptian pyramids. How?"', full:'The ancient Greek mathematician Thales is said to have measured the height of the Egyptian pyramids using shadows. How did he do it? What mathematical principle did he use?' },
+        { pcg:'c', prompt:'"Why do similar figures have areas in the ratio of the square of the linear scale factor?"', full:'If two similar figures have linear dimensions in the ratio k:1, their areas are in the ratio k squared: 1. Prove this. What happens to the volume ratio for similar 3D objects?' },
+        { pcg:'c', prompt:'"Design a method to measure the distance across a river without crossing it."', full:'Design a practical method to measure the width of a river without crossing it, using only measuring tape and a clinometer or protractor. What mathematical principle does your method use?' },
+        { pcg:'c', prompt:'"Eratosthenes measured the circumference of the Earth in 240 BC. How?"', full:'Eratosthenes calculated the circumference of the Earth around 240 BC by measuring the angle of the sun shadow at two locations simultaneously. Describe his method. How accurate was he?' },
+        { pcg:'g', prompt:'"Prove the triangle similarity theorems: AA, SAS, SSS."', full:'Prove the three triangle similarity theorems: if two triangles share two angles (AA), two sides and included angle (SAS), or three sides in proportion (SSS), they are similar. Which proof is easiest and which is hardest?' },
+        { pcg:'g', prompt:'"Design a surveying method using only angle measurements to locate any point on a flat plain."', full:'Design a surveying technique using only angle measurements — no distances — to precisely locate any point on a flat plain relative to two known reference points. This is called triangulation. What are its limitations?' },
+        { pcg:'g', prompt:'"Fractal dimensions: the Koch snowflake has a dimension between 1 and 2. What does this mean?"', full:'The Koch snowflake has a fractal dimension of approximately 1.26 — between 1 (a line) and 2 (a surface). What does a non-integer dimension mean? How is fractal dimension calculated? What does it measure?' },
+      ]},
+      { id:'measurement-science', title:'Measurement in Science', questions:[
+        { pcg:'p', prompt:'"Record 5 measurements of the same length. Find the mean and range."', full:'Measure the same object 5 times independently and record all measurements. Find the mean, the range, and identify any outliers. What does the spread tell you about precision?' },
+        { pcg:'p', prompt:'"A thermometer reads 37.2 degrees. What is the uncertainty if it is accurate to plus or minus 0.1 degree?"', full:'A thermometer reads 37.2 degrees C and is accurate to plus or minus 0.1 degree. What is the range of possible true temperatures? Would you be concerned about a fever based on this reading?' },
+        { pcg:'p', prompt:'"Calculate the density of an object given its mass and volume, and estimate the uncertainty."', full:'An object has mass 85.3 plus or minus 0.5 grams and volume 22.1 plus or minus 0.3 cubic centimetres. Calculate its density and estimate the uncertainty in the density.' },
+        { pcg:'c', prompt:'"Why do scientists repeat experiments and take averages?"', full:'Why do scientists repeat experiments many times and take the average of their measurements? What does averaging reduce? What does it not reduce? When does averaging fail?' },
+        { pcg:'c', prompt:'"What is the difference between accuracy and precision? Can you have one without the other?"', full:'What is the difference between accuracy and precision in measurement? Give an example of a measurement that is precise but not accurate, and one that is accurate but not precise.' },
+        { pcg:'c', prompt:'"Design a double-blind experiment to test whether a new thermometer is accurate."', full:'Design a double-blind experiment to test whether a new type of thermometer gives accurate readings. What controls do you need? What would constitute evidence that it is accurate?' },
+        { pcg:'c', prompt:'"The SI system has 7 base units. What are they and why these 7?"', full:'The International System of Units (SI) has exactly 7 base units: metre, kilogram, second, ampere, kelvin, mole, and candela. Why these 7? What makes a unit fundamental versus derived?' },
+        { pcg:'g', prompt:'"Prove that systematic error cannot be reduced by taking more measurements."', full:'Prove that taking more measurements and averaging can reduce random error but cannot reduce systematic error. What is the difference between systematic and random error? How do you detect systematic error?' },
+        { pcg:'g', prompt:'"Design the most accurate possible measurement of the speed of light using classroom equipment."', full:'Design the most accurate possible measurement of the speed of light using equipment you could find in a school. What methods could you use? What would limit your accuracy? Compare to Romer method in 1676.' },
+        { pcg:'g', prompt:'"How would you measure time if no clocks or atomic transitions existed?"', full:'If every artificial clock and atomic oscillation were unavailable, how would you measure time? What natural phenomena could you use? How would you calibrate your method? What precision could you achieve?' },
+      ]},
+    ],
+  },
+];
+
+
+
+const MEASUREMENT_NODES = [
+  { id:'longer-shorter',     li:0, ai:0, label:'Longer & Shorter',   nx:0.10, ny:0.35 },
+  { id:'heavier-lighter',    li:0, ai:1, label:'Heavier & Lighter',  nx:0.18, ny:0.55 },
+  { id:'full-empty',         li:0, ai:2, label:'Full & Empty',       nx:0.12, ny:0.72 },
+  { id:'what-time',          li:0, ai:3, label:'What Time Is It?',   nx:0.26, ny:0.48 },
+  { id:'measuring-length',   li:1, ai:0, label:'Measuring Length',   nx:0.38, ny:0.20 },
+  { id:'measuring-weight',   li:1, ai:1, label:'Weight & Mass',      nx:0.44, ny:0.38 },
+  { id:'measuring-volume',   li:1, ai:2, label:'Volume & Capacity',  nx:0.36, ny:0.58 },
+  { id:'reading-clock',      li:1, ai:3, label:'Reading a Clock',    nx:0.46, ny:0.72 },
+  { id:'perimeter-area',     li:2, ai:0, label:'Perimeter & Area',   nx:0.58, ny:0.18 },
+  { id:'converting-units',   li:2, ai:1, label:'Converting Units',   nx:0.64, ny:0.36 },
+  { id:'angles-degrees',     li:2, ai:2, label:'Angles & Degrees',   nx:0.58, ny:0.54 },
+  { id:'speed-distance-time',li:2, ai:3, label:'Speed Distance Time',nx:0.64, ny:0.70 },
+  { id:'area-complex',       li:3, ai:0, label:'Complex Areas',      nx:0.76, ny:0.22 },
+  { id:'surface-area-volume',li:3, ai:1, label:'Surface Area',       nx:0.80, ny:0.40 },
+  { id:'scale-maps',         li:3, ai:2, label:'Scale & Maps',       nx:0.74, ny:0.58 },
+  { id:'precision-error',    li:3, ai:3, label:'Precision & Error',  nx:0.80, ny:0.74 },
+  { id:'dimensional-analysis',li:4,ai:0, label:'Dimensional Analysis',nx:0.90,ny:0.28 },
+  { id:'rates-of-change',    li:4, ai:1, label:'Rates of Change',    nx:0.92, ny:0.46 },
+  { id:'similarity-measurement',li:4,ai:2,label:'Similarity',        nx:0.88, ny:0.62 },
+  { id:'measurement-science',li:4, ai:3, label:'Science',            nx:0.93, ny:0.78 },
+];
+
+const MEASUREMENT_EDGES = [
+  ['longer-shorter','heavier-lighter'],['longer-shorter','measuring-length'],
+  ['heavier-lighter','measuring-weight'],['full-empty','measuring-volume'],
+  ['what-time','reading-clock'],['longer-shorter','what-time'],
+  ['measuring-length','perimeter-area'],['measuring-weight','converting-units'],
+  ['measuring-volume','perimeter-area'],['reading-clock','converting-units'],
+  ['perimeter-area','area-complex'],['converting-units','speed-distance-time'],
+  ['angles-degrees','perimeter-area'],['measuring-length','angles-degrees'],
+  ['speed-distance-time','area-complex'],['area-complex','surface-area-volume'],
+  ['surface-area-volume','scale-maps'],['converting-units','precision-error'],
+  ['precision-error','dimensional-analysis'],['speed-distance-time','rates-of-change'],
+  ['scale-maps','similarity-measurement'],['angles-degrees','similarity-measurement'],
+  ['dimensional-analysis','measurement-science'],['rates-of-change','measurement-science'],
+  ['similarity-measurement','measurement-science'],['precision-error','measurement-science'],
+];
+
+const MEASUREMENT_LVL_COLORS = ['#7AAAD4','#5286B4','#3A6A9A','#2A5080','#8AAAD4'];
+let measurementFocused = JSON.parse(localStorage.getItem('kelvi_measurement_focused') || 'null') || { li:0, ai:0 };
+let measurementSelectedNode = null;
+
+function saveMeasurementFocused() { localStorage.setItem('kelvi_measurement_focused', JSON.stringify(measurementFocused)); }
+function measurementVisitedKey(id) { return 'kelvi_measurement_visited_' + id; }
+function loadMeasurementVisited() { MEASUREMENT_NODES.forEach(n => { if (localStorage.getItem(measurementVisitedKey(n.id))) n.visited = true; }); }
+function getMeasurementNodeQuestion(node) {
+  const act = MEASUREMENT_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_measurement_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0') % act.questions.length;
+  return { q: act.questions[idx], idx, total: act.questions.length };
+}
+function advanceMeasurementNodeQuestion(node) {
+  const act = MEASUREMENT_LEVELS[node.li].activities[node.ai];
+  const key = 'kelvi_measurement_q_' + node.id;
+  const idx = parseInt(localStorage.getItem(key) || '0');
+  localStorage.setItem(key, (idx + 1) % act.questions.length);
+}
+
+function renderMeasurement() {
+  loadMeasurementVisited();
+  const wrap = document.querySelector('#scene-map .geo-map-wrap');
+  if (!wrap) return;
+  const W = wrap.clientWidth || 600, H = wrap.clientHeight || 420;
+  const svg = document.getElementById('measurement-svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  drawMeasurementMap(svg, W, H);
+  closeMeasurementHero();
+}
+
+function drawMeasurementMap(svg, W, H) {
+  svg.innerHTML = '';
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const vig = document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
+  vig.setAttribute('id','meas-vig'); vig.setAttribute('cx','50%'); vig.setAttribute('cy','50%'); vig.setAttribute('r','65%');
+  [['0%','rgba(245,242,238,0)'],['100%','rgba(220,230,242,0.28)']].forEach(([off,col])=>{
+    const s=document.createElementNS('http://www.w3.org/2000/svg','stop'); s.setAttribute('offset',off); s.setAttribute('stop-color',col); vig.appendChild(s);
+  });
+  defs.appendChild(vig); svg.appendChild(defs);
+  const vigEl=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  vigEl.setAttribute('x',0);vigEl.setAttribute('y',0);vigEl.setAttribute('width',W);vigEl.setAttribute('height',H);vigEl.setAttribute('fill','url(#meas-vig)');
+  svg.appendChild(vigEl);
+
+  MEASUREMENT_EDGES.forEach(([aId,bId])=>{
+    const a=MEASUREMENT_NODES.find(n=>n.id===aId),b=MEASUREMENT_NODES.find(n=>n.id===bId);
+    if(!a||!b)return;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',a.nx*W);line.setAttribute('y1',a.ny*H);line.setAttribute('x2',b.nx*W);line.setAttribute('y2',b.ny*H);
+    line.setAttribute('stroke',(a.visited&&b.visited)?'rgba(82,134,180,0.40)':'rgba(160,140,110,0.18)');
+    line.setAttribute('stroke-width','1.2');line.setAttribute('stroke-dasharray',(a.visited||b.visited)?'':'4 6');
+    svg.appendChild(line);
+  });
+
+  // ── Nodes as pie charts ──
+  MEASUREMENT_NODES.forEach(node => {
+    const cx = node.nx*W, cy = node.ny*H;
+    const color = '#FF5722';
+    const isSelected = measurementSelectedNode && measurementSelectedNode.id === node.id;
+    const isStart = !measurementSelectedNode && node.li === measurementFocused.li && node.ai === measurementFocused.ai;
+    const r = 20;
+    const exchanges = getMeasurementExchanges(node.id);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform',`translate(${cx},${cy})`);
+    g.style.cursor = 'pointer';
+    g.addEventListener('click', () => selectMeasurementNode(node));
+    if (isStart && exchanges===0) {
+      const pulse=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pulse.setAttribute('r',r+10);pulse.setAttribute('fill','none');pulse.setAttribute('stroke',color);pulse.setAttribute('stroke-width','1.5');pulse.setAttribute('opacity','0');
+      const a1=document.createElementNS('http://www.w3.org/2000/svg','animate');a1.setAttribute('attributeName','opacity');a1.setAttribute('values','0;0.45;0');a1.setAttribute('dur','2.2s');a1.setAttribute('repeatCount','indefinite');
+      const a2=document.createElementNS('http://www.w3.org/2000/svg','animate');a2.setAttribute('attributeName','r');a2.setAttribute('values',`${r+6};${r+14};${r+6}`);a2.setAttribute('dur','2.2s');a2.setAttribute('repeatCount','indefinite');
+      pulse.appendChild(a1);pulse.appendChild(a2);g.appendChild(pulse);
+    }
+    if (isSelected) {
+      const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('r',r+5);ring.setAttribute('fill','none');ring.setAttribute('stroke',color);ring.setAttribute('stroke-width','2');ring.setAttribute('opacity','0.5');g.appendChild(ring);
+    }
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    bg.setAttribute('r',r);bg.setAttribute('fill','#FFFFFF');bg.setAttribute('stroke','#1C1917');bg.setAttribute('stroke-width','2');g.appendChild(bg);
+    for (let i=0;i<10;i++) {
+      const sa=(i*36-90)*Math.PI/180,ea=((i+1)*36-90)*Math.PI/180;
+      const x1=Math.cos(sa)*r,y1=Math.sin(sa)*r,x2=Math.cos(ea)*r,y2=Math.sin(ea)*r;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',`M 0 0 L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`);
+      path.setAttribute('fill',i<exchanges?color:'transparent');
+      path.setAttribute('stroke','#FFFFFF');path.setAttribute('stroke-width','1.5');g.appendChild(path);
+    }
+    const words=node.label.toUpperCase().split(' ');
+    words.forEach((word,wi)=>{
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','hanging');
+      t.setAttribute('y',(r+9)+wi*15);t.setAttribute('font-family','DM Sans,sans-serif');
+      t.setAttribute('font-size','12');t.setAttribute('font-weight','800');t.setAttribute('letter-spacing','0.08em');
+      t.setAttribute('fill',exchanges>0?'#1C1917':isSelected||isStart?'#1C1917':'#4A4540');
+      t.textContent=word;g.appendChild(t);
+    });
+    svg.appendChild(g);
+  });
+}
+
+function getMeasurementExchanges(id) { return Math.min(10, parseInt(localStorage.getItem('kelvi_measurement_exchanges_'+id)||'0')); }
+function incrementMeasurementExchange() {
+  if (!measurementSelectedNode) return;
+  const cur=getMeasurementExchanges(measurementSelectedNode.id);
+  if (cur<10) {
+    localStorage.setItem('kelvi_measurement_exchanges_'+measurementSelectedNode.id, cur+1);
+    if (cur===0) { measurementSelectedNode.visited=true; localStorage.setItem('kelvi_measurement_visited_'+measurementSelectedNode.id,'1'); }
+    const wrap=document.querySelector('.geo-map-wrap');
+    if(wrap){const svg=document.getElementById('measurement-svg');if(svg)renderMeasurement();}
+  }
+}
+
+
+function selectMeasurementNode(node) {
+  measurementSelectedNode=node; measurementFocused={li:node.li,ai:node.ai}; saveMeasurementFocused();
+  const wrap=document.querySelector('#scene-map .geo-map-wrap');
+  drawMeasurementMap(document.getElementById('measurement-svg'),wrap.clientWidth,wrap.clientHeight);
+  openMeasurementHero(node);
+}
+
+function openMeasurementHero(node) {
+  const act=MEASUREMENT_LEVELS[node.li].activities[node.ai];
+  const {q,idx,total}=getMeasurementNodeQuestion(node);
+  const inner=document.getElementById('measurement-hero-inner');
+  const qNum=total>1?`<span style="font-size:10px;color:var(--text-faint);margin-left:10px;font-family:var(--font-body)">${idx+1} of ${total}</span>`:'';
+  inner.innerHTML=`<button class="geo-dismiss" onclick="closeMeasurementHero()">&times;</button>
+    <div class="geo-hero-prompt-row"><div class="geo-hero-prompt">${escapeHtml(q.prompt)}${qNum}</div>
+    <button class="geo-speak-btn" onclick="speakEl('measurement-hero-inner')" title="Listen"><span class="speak-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></span></button></div>
+    <div class="geo-hero-sub">${escapeHtml(act.title)}</div>
+    <div class="geo-hero-ctas"><button class="geo-btn-primary" onclick="beginMeasurementQuestion()">Begin this question →</button><button class="geo-btn-secondary" onclick="closeMeasurementHero()">Keep exploring</button></div>`;
+  document.getElementById('measurement-hero-overlay').classList.add('open');
+}
+
+function closeMeasurementHero() { document.getElementById('measurement-hero-overlay').classList.remove('open'); }
+
+function beginMeasurementQuestion() {
+  const node=measurementSelectedNode||MEASUREMENT_NODES.find(n=>n.li===measurementFocused.li&&n.ai===measurementFocused.ai);
+  if(!node)return;
+  const act=MEASUREMENT_LEVELS[node.li].activities[node.ai];
+  const {q}=getMeasurementNodeQuestion(node);
+  advanceMeasurementNodeQuestion(node);
+  node.visited=true; localStorage.setItem(measurementVisitedKey(node.id),'1');
+  openActivity(act.id,act.title,q.full,'Measurement');
+}
+
+window.addEventListener('resize',()=>{
+  if(!window.measurementResizeRaf)window.measurementResizeRaf=0;
+  clearTimeout(window.measurementResizeRaf);
+  window.measurementResizeRaf=setTimeout(()=>{if(document.getElementById('scene-map').style.display!=='none')renderMeasurement();},150);
+});
+
+
+function buildSYS(activity) {
+  const planet = (activity && activity.planet) ? activity.planet : 'Measurement';
+  const activityBlock = activity
+    ? `\n\nACTIVITY: The child has chosen "${activity.name}". The invitation is: "${activity.prompt}". Work within this activity. Do not move to a new topic unless the child explicitly asks.`
+    : '';
+  const name = localStorage.getItem('kelvi_family_name') || 'the child';
+  return `You are Kelvi — a thinking partner for a child named ${name}, aged 4–12, exploring mathematics.
+
+PRINCIPLE 0 — MATHEMATICAL ACCURACY IS NON-NEGOTIABLE. THIS APPLIES TO KELVI TOO.
+If ${name} says something mathematically incorrect, redirect immediately — do not affirm any part of it first, then correct. Just redirect. "Let's check that — if 2 leftovers go to 5 people, how much does each person get?" Wrong facts that compound are the worst failure mode.
+If KELVI makes a mathematical error: correct it immediately and directly in the next response before doing anything else. Do not continue the conversation as if the error didn't happen. Do not soften it. Just correct it: "I made an error — [correct version]. Let's continue from there." Kelvi's credibility depends entirely on mathematical precision. A single uncorrected error poisons the whole session.
+
+PRINCIPLE 1 — NO AFFIRMATION WORDS, EVER. NO MARKDOWN, EVER.
+Never say: "Great!", "Exactly!", "You're right!", "Smart thinking!", "Good job!", "Nice work!", "Correct!", "Perfect!", "Well done!", "That's it!", or any variant. These words are banned. Instead: restate what ${name} just did as a mathematical move and continue. "You found four right angles — all on the same shape. Where else might they show up?"
+Never use markdown formatting: no **bold**, no *italics*, no bullet points, no headers. Plain sentences only. Mathematical terms should be introduced in plain prose — "mathematicians call that a factor" — never bolded or formatted. Formatted text makes Kelvi sound like a textbook. Kelvi does not sound like a textbook.
+
+PRINCIPLE 2 — TWO SENTENCES MAXIMUM.
+Every response is two sentences. Three only if a redirect requires it. Never more. Short responses keep the child talking. Long responses make the child read instead of think.
+
+PRINCIPLE 3 — MATCH THE CHILD'S REGISTER.
+If ${name} says "me don't know" — meet them there. Simple words, short sentences. Do not correct grammar. If they're bored, say something surprising. Never ignore emotional signals.
+
+PRINCIPLE 4 — DON'T ASK A QUESTION AFTER EVERY RESPONSE.
+Mix: a question, then an observation, then a question. One question per response, maximum.
+
+PRINCIPLE 5 — WHEN THEY WANT TO STOP, LET THEM GO WITH A HOOK.
+One warm sentence naming the specific mathematical thing they discovered today. Then one unresolved question to carry with them. Then stop.
+
+PRINCIPLE 6 — READ MOMENTUM.
+If ${name} is on a roll — stay out of the way. A one-word prompt ("And?" / "Or?" / "Always?") is better than a full question. If they're stuck, one concrete foothold. Never a hint ladder.
+
+PRINCIPLE 7 — NEVER LECTURE.
+Do not explain a concept before ${name} has encountered it through their own work. The concept arrives through the question, not through your explanation.
+
+PRINCIPLE 8 — SAFETY IS THE PRODUCT.
+A child who has never felt safe as a learner will not take risks. Kelvi's first job is not to teach mathematics — it is to make ${name} feel that being wrong, confused, or slow is not just acceptable but genuinely interesting. A mistake is data. Treat it that way. The goal is that ${name} leaves every conversation feeling more curious, not more correct.
+
+PRINCIPLE 9 — MISTAKES ARE THE MATERIAL. BUT DO NOT SOFTEN CORRECTIONS.
+When ${name} makes an error, respond with the same tone and curiosity as when they get something right. Never softer. Never harder. Just curious.
+CRITICAL: Do not affirm any part of a wrong answer before correcting it. "You spotted something real though" followed by a correction is the worst pattern — it teaches ${name} that wrong answers get praise. They do not. A wrong answer gets the same neutral, curious redirect as anything else: "Let's check that — [question that surfaces the error]."
+The goal is not to make ${name} feel good about being wrong. The goal is to make ${name} curious about why they were wrong. Those are different things.
+
+PRINCIPLE 10 — READ THE ROOM, ADJUST THE DEPTH.
+When ${name} first arrives at a planet, ask one orienting question before the activity prompt. Their answer tells you everything. A child who says "I don't know what a polygon is" gets a different entry point than one who says "a polygon has straight sides and angles." The galaxy is fully open — every planet is available to every child. There is no wrong planet to visit. Kelvi's job is to find the right door in.
+
+PRINCIPLE 11 — MATHEMATICS IS A LANGUAGE. GIVE CHILDREN THE WORDS.
+When a child discovers or describes a mathematical idea — even imperfectly — give them the precise word for it. Not as a correction, but as a gift: "Mathematicians have a name for exactly what you just found — it's called a tessellation." The word arrives after the idea, never before. A child who knows the word icosidodecahedron, lattice point, or conjecture has been invited into the language of mathematics, not excluded from it. Never withhold vocabulary because it seems too advanced. The right word at the right moment is one of the most powerful things Kelvi can do.
+
+P/C/G — silent classification only, never named to the child:
+- P (following steps, computing): ask "why does that work?"
+- C (connecting, noticing): invite them to push further
+- G (conjecturing, inventing): give space, then ask if it always holds
+
+CURRICULUM: ${planet} Solar System. The full Math Galaxy is open — follow ${name}'s curiosity wherever it leads.${activityBlock}
+PRINCIPLE 18 — THE 3-TURN CEILING.
+Count your exchanges on a single task. After 3 turns, stop asking and name the skill explicitly: tell ${name} what they just did mathematically and why it matters. Do not ask a fourth question on the same task. "You just found three different ways to sort the same objects — that's exactly what mathematicians do when they look for patterns. They call it classification." Then move on. A task without a declared endpoint is not Socratic — it is just grinding. Never grind.
+
+PRINCIPLE 19 — NAME THE WIN.
+When ${name} demonstrates the skill, say so immediately — not "good job" but a precise description of the mathematical move they made: "You just invented a conjecture" / "You found the property that connects all of these" / "That's exactly how mathematicians think about this." The child should never have to guess whether they succeeded. Name it, then move forward.
+
+PRINCIPLE 20 — THE ARTICULATION EXIT.
+If ${name} clicks "I know what we are doing," respond with exactly one thing: "Tell me what you noticed." Then:
+- If their articulation is strong and accurate: mirror it back in precise mathematical language and immediately offer the next question. Do not linger.
+- If their articulation is partial or slightly off: reframe it gently and precisely — "Close — what you've actually been doing is [precise explanation]." Then offer the next question.
+Never ask them to explain again or probe further. One articulation, one response, next question. This is their exit ramp — honour it.`;
+}
+
+function handleKnowBtn() {
+  addMsg('user', 'I know what we are doing.');
+  const btn = document.getElementById('know-btn');
+  if (btn) btn.classList.add('hidden');
+}
+
+function sendToKelvi(text) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = text; }
+  sendMsg();
+}
+
+</script>
+</body>
+</html>
