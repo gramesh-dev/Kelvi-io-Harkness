@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasRealSupabasePublicConfig } from "@/lib/supabase/public-env";
-import { KelviWordmark } from "@/components/kelvi-wordmark";
 import { isInviteOnlyModeEnabled } from "@/lib/auth/invite-only";
 
 const inviteOnlyMode = isInviteOnlyModeEnabled();
@@ -91,7 +90,6 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    // Browser + SSR client returns an authorize URL; navigation is not always automatic.
     if (data.url) {
       window.location.assign(data.url);
       return;
@@ -101,168 +99,206 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-kelvi-cream px-4">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center mb-8">
-          <KelviWordmark />
-          {intentProduct && (
-            <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-kelvi-600">
-              {intentProduct}
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" />
+      
+      <style jsx global>{`
+        body { font-family: 'IBM Plex Sans', system-ui, sans-serif; background: #FAF8F3; }
+      `}</style>
+
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F3] px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Logo & Header */}
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-2.5 mb-4">
+              <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50 6 C 65 4, 80 14, 78 32 C 76 48, 60 52, 44 50 C 28 48, 24 32, 28 18 C 32 8, 40 6, 50 6 Z" fill="#E26B4F"/>
+                <path d="M 22 56 C 36 54, 44 64, 42 80 C 40 92, 28 96, 16 92 C 6 88, 4 76, 8 66 C 12 58, 16 56, 22 56 Z" fill="#2D4A3D"/>
+                <path d="M 70 56 C 84 56, 94 64, 92 78 C 90 92, 78 96, 66 92 C 54 88, 52 76, 56 66 C 60 58, 64 56, 70 56 Z" fill="#B594DC"/>
+              </svg>
+              <span style={{fontFamily: "'Instrument Serif', serif", fontSize: '32px', color: '#1A1A1A'}}>kelvi</span>
+            </Link>
+            
+            {intentProduct && (
+              <p style={{fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#9A9488', marginBottom: '16px'}}>
+                {intentProduct}
+              </p>
+            )}
+            
+            <h1 style={{fontFamily: "'Instrument Serif', serif", fontSize: '2rem', fontWeight: 400, lineHeight: 1.2, marginBottom: '8px', color: '#1A1A1A'}}>
+              Join Kelvi
+            </h1>
+            <p style={{fontSize: '15px', color: '#6B6B6B', lineHeight: 1.6}}>
+              Sign in or create an account to get started
             </p>
-          )}
-          <p className="mt-3 text-kelvi-slate">Welcome back</p>
-        </div>
-
-        <div className="bg-surface rounded-xl border border-border p-8 space-y-5">
-          {error && (
-            <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm">
-              {error}
-            </div>
-          )}
-
-          {passwordResetOk && (
-            <div className="p-3 rounded-lg bg-green-50 text-green-800 text-sm">
-              Your password was updated. Sign in with your new password.
-            </div>
-          )}
-
-          {inviteRequired && (
-            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
-              This environment is invite-only right now. Ask an admin to add your email before
-              signing in.
-            </div>
-          )}
-
-          {configError && (
-            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
-              Sign-in could not complete: the server is missing public Supabase settings, or the
-              callback could not save your session. In Vercel, set{" "}
-              <code className="text-xs">NEXT_PUBLIC_SUPABASE_URL</code> (base URL only, not{" "}
-              <code className="text-xs">/rest/v1</code>) and an anon/publishable key for{" "}
-              <strong>Preview</strong> and <strong>Production</strong>, redeploy, then try again. In
-              Supabase → Authentication → URL configuration, add this site&apos;s URL and{" "}
-              <code className="text-xs break-all">{callbackHint || "/callback"}</code>.
-            </div>
-          )}
-
-          {!supabaseReady && (
-            <div className="p-3 rounded-lg bg-amber-50 text-amber-900 text-sm">
-              Google sign-in needs Supabase env on the server that built this app. In Vercel, add{" "}
-              <code className="text-xs">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-              <code className="text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> (or publishable key)
-              for <strong>Production</strong>, then redeploy. In Supabase → URL configuration, allow{" "}
-              <code className="text-xs break-all">{callbackHint || "https://your-domain/callback"}</code>.
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={handleGoogle}
-            disabled={loading || !supabaseReady}
-            className="w-full flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg bg-white text-text-primary font-medium hover:bg-surface-secondary transition disabled:opacity-50"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continue with Google
-          </button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-surface px-2 text-text-muted">or</span>
-            </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-primary mb-1.5"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-kelvi-500 focus:border-transparent"
-                placeholder="you@example.com"
-              />
-            </div>
+          {/* Form Card */}
+          <div style={{background: '#fff', borderRadius: '4px', border: '1px solid #E8E3DA', padding: '32px'}}>
+            
+            {/* Alerts */}
+            {error && (
+              <div style={{padding: '12px 16px', borderRadius: '4px', background: '#FEF2F2', color: '#991B1B', fontSize: '14px', marginBottom: '20px', border: '1px solid #FECACA'}}>
+                {error}
+              </div>
+            )}
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-primary mb-1.5"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-kelvi-500 focus:border-transparent"
-                placeholder="••••••••"
-              />
-              <div className="mt-2 text-right">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-kelvi-600 font-medium hover:underline"
-                >
-                  Forgot password?
-                </Link>
+            {passwordResetOk && (
+              <div style={{padding: '12px 16px', borderRadius: '4px', background: '#F0FDF4', color: '#166534', fontSize: '14px', marginBottom: '20px', border: '1px solid #BBF7D0'}}>
+                Your password was updated. Sign in with your new password.
+              </div>
+            )}
+
+            {inviteRequired && (
+              <div style={{padding: '12px 16px', borderRadius: '4px', background: '#FFFBEB', color: '#78350F', fontSize: '14px', marginBottom: '20px', border: '1px solid #FDE68A'}}>
+                This environment is invite-only right now. Ask an admin to add your email before signing in.
+              </div>
+            )}
+
+            {/* Google Button */}
+            <button
+              type="button"
+              onClick={handleGoogle}
+              disabled={loading || !supabaseReady}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '14px 24px',
+                border: '1px solid #E8E3DA',
+                borderRadius: '2px',
+                background: '#fff',
+                color: '#1A1A1A',
+                fontSize: '14px',
+                fontWeight: 500,
+                cursor: loading || !supabaseReady ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s',
+                opacity: loading || !supabaseReady ? 0.5 : 1,
+                fontFamily: "'IBM Plex Sans', sans-serif"
+              }}
+              onMouseEnter={(e) => {
+                if (!loading && supabaseReady) {
+                  e.currentTarget.style.background = '#FAF8F3';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#fff';
+              }}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            {/* Divider */}
+            <div style={{position: 'relative', margin: '24px 0'}}>
+              <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center'}}>
+                <div style={{width: '100%', borderTop: '1px solid #E8E3DA'}} />
+              </div>
+              <div style={{position: 'relative', display: 'flex', justifyContent: 'center'}}>
+                <span style={{background: '#fff', padding: '0 12px', fontSize: '12px', textTransform: 'uppercase', color: '#9A9488', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.1em'}}>or</span>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 bg-kelvi-600 text-white font-medium rounded-lg hover:bg-kelvi-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Signing in..." : "Continue with email"}
-            </button>
-          </form>
+            {/* Email/Password Form */}
+            <form onSubmit={handleLogin} style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+              <div>
+                <label htmlFor="email" style={{display: 'block', fontSize: '13px', fontWeight: 500, color: '#1A1A1A', marginBottom: '6px', fontFamily: "'IBM Plex Sans', sans-serif"}}>
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{width: '100%', padding: '10px 14px', border: '1px solid #E8E3DA', borderRadius: '2px', fontSize: '14px', fontFamily: "'IBM Plex Sans', sans-serif"}}
+                  placeholder="you@example.com"
+                />
+              </div>
 
-          {inviteOnlyMode ? (
-            <p className="text-center text-sm text-text-secondary">
-              Invite-only beta is enabled. Ask an admin for access.
-            </p>
-          ) : (
-            <p className="text-center text-sm text-text-secondary">
-              Don&apos;t have an account?{" "}
-              <Link
-                href={signupHref}
-                className="text-kelvi-600 font-medium hover:underline"
+              <div>
+                <label htmlFor="password" style={{display: 'block', fontSize: '13px', fontWeight: 500, color: '#1A1A1A', marginBottom: '6px', fontFamily: "'IBM Plex Sans', sans-serif"}}>
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  style={{width: '100%', padding: '10px 14px', border: '1px solid #E8E3DA', borderRadius: '2px', fontSize: '14px', fontFamily: "'IBM Plex Sans', sans-serif"}}
+                  placeholder="••••••••"
+                />
+                <div style={{marginTop: '8px', textAlign: 'right'}}>
+                  <Link href="/forgot-password" style={{fontSize: '13px', color: '#E26B4F', fontWeight: 500, textDecoration: 'none'}}>
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '14px 24px',
+                  background: '#E26B4F',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  borderRadius: '2px',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.15s',
+                  opacity: loading ? 0.5 : 1,
+                  fontFamily: "'IBM Plex Sans', sans-serif"
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = '#C4543A';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#E26B4F';
+                }}
               >
-                Sign up
-              </Link>
-            </p>
-          )}
+                {loading ? "Signing in..." : "Continue with email"}
+              </button>
+            </form>
+
+            {/* Sign up link */}
+            {inviteOnlyMode ? (
+              <p style={{textAlign: 'center', fontSize: '14px', color: '#6B6B6B', marginTop: '24px', fontFamily: "'IBM Plex Sans', sans-serif"}}>
+                Invite-only beta is enabled. Ask an admin for access.
+              </p>
+            ) : (
+              <p style={{textAlign: 'center', fontSize: '14px', color: '#6B6B6B', marginTop: '24px', fontFamily: "'IBM Plex Sans', sans-serif"}}>
+                Don't have an account?{" "}
+                <Link href={signupHref} style={{color: '#E26B4F', fontWeight: 500, textDecoration: 'none'}}>
+                  Sign up
+                </Link>
+              </p>
+            )}
+          </div>
+
+          {/* Back link */}
+          <div style={{textAlign: 'center', marginTop: '24px'}}>
+            <Link href="/" style={{fontSize: '13px', color: '#9A9488', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.06em'}}>
+              ← Back to home
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
