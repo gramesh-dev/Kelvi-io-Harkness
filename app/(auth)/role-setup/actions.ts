@@ -28,7 +28,6 @@ export async function submitSchoolOrg(formData: FormData) {
   const admin = createServiceClient();
   
   console.log("[submitSchoolOrg] Updating user metadata for user:", user.id);
-  // Just set user role, skip org creation
   const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { role: 'teacher' }
   });
@@ -38,7 +37,24 @@ export async function submitSchoolOrg(formData: FormData) {
     return { error: "Failed to update user role" };
   }
 
-  console.log("[submitSchoolOrg] User metadata updated successfully");
+  console.log("[submitSchoolOrg] Updating profiles table");
+  // Update profiles table with completion flag
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ 
+      metadata: { 
+        kelvi_completed_role_setup: true,
+        kelvi_segment: 'school'
+      } 
+    })
+    .eq("id", user.id);
+
+  if (profileError) {
+    console.error("[submitSchoolOrg] Error updating profile:", profileError);
+    return { error: "Failed to update profile" };
+  }
+
+  console.log("[submitSchoolOrg] User metadata and profile updated successfully");
   console.log("[submitSchoolOrg] Getting redirect path");
   const redirectPath = await getPostAuthRedirectPath();
   console.log("[submitSchoolOrg] Redirecting to:", redirectPath);
@@ -60,10 +76,30 @@ export async function submitFamilyOrg(formData: FormData) {
 
   const admin = createServiceClient();
   
-  // Just set user role, skip org creation
-  await admin.auth.admin.updateUserById(user.id, {
+  const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { role: 'family' }
   });
+
+  if (updateError) {
+    console.error("Error updating user:", updateError);
+    return { error: "Failed to update user role" };
+  }
+
+  // Update profiles table with completion flag
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ 
+      metadata: { 
+        kelvi_completed_role_setup: true,
+        kelvi_segment: 'family'
+      } 
+    })
+    .eq("id", user.id);
+
+  if (profileError) {
+    console.error("Error updating profile:", profileError);
+    return { error: "Failed to update profile" };
+  }
 
   redirect(await getPostAuthRedirectPath());
 }
@@ -82,10 +118,30 @@ export async function submitStudentSegment() {
 
   const admin = createServiceClient();
   
-  // Just set user role, skip org creation
-  await admin.auth.admin.updateUserById(user.id, {
+  const { error: updateError } = await admin.auth.admin.updateUserById(user.id, {
     user_metadata: { role: 'student' }
   });
+
+  if (updateError) {
+    console.error("Error updating user:", updateError);
+    return { error: "Failed to update user role" };
+  }
+
+  // Update profiles table with completion flag
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ 
+      metadata: { 
+        kelvi_completed_role_setup: true,
+        kelvi_segment: 'student'
+      } 
+    })
+    .eq("id", user.id);
+
+  if (profileError) {
+    console.error("Error updating profile:", profileError);
+    return { error: "Failed to update profile" };
+  }
 
   redirect(await getPostAuthRedirectPath());
 }
