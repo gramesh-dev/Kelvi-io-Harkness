@@ -77,7 +77,7 @@ export default function LearnerPage() {
             <div className="age-card-title">Explore the <em>Math Galaxy</em></div>
             <p className="age-card-sub">Nine planets. Fractions, Geometry, Algebra, and more. Click a planet, get a question you can&apos;t stop thinking about, and go from there. No timer. No score.</p>
             <div className="age-card-actions">
-              <a href="/family/family.html" className="btn btn-coral">Open the Math Galaxy →</a>
+              <a href="/family/family.html" className="btn btn-coral">Sign up with parent →</a>
             </div>
           </div>
 

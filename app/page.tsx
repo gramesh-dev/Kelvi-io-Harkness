@@ -58,7 +58,7 @@ export default function Home() {
 
         <div className="select-label">Who are you?</div>
         <div className="select-btns">
-          <a href="/teacher" className="select-btn select-btn-teacher">
+          <a href="/login?intent=school" className="select-btn select-btn-teacher">
             <span className="select-btn-label">For educators</span>
             <span className="select-btn-title">I'm a teacher</span>
             <span className="select-btn-sub">Build discovery-based curriculum. See how your students think.</span>
