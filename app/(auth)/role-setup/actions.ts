@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { getPostAuthRedirectPath } from "@/lib/auth/post-auth";
 
 export async function submitSchoolOrg(formData: FormData) {
   console.log("[submitSchoolOrg] START");
@@ -56,11 +55,9 @@ export async function submitSchoolOrg(formData: FormData) {
   }
 
   console.log("[submitSchoolOrg] User metadata and profile updated successfully");
-  console.log("[submitSchoolOrg] Getting redirect path");
-  const redirectPath = await getPostAuthRedirectPath();
-  console.log("[submitSchoolOrg] Redirecting to:", redirectPath);
+  console.log("[submitSchoolOrg] Redirecting to /teach");
   
-  redirect(redirectPath);
+  redirect("/teach");
 }
 
 export async function submitFamilyOrg(formData: FormData) {
@@ -103,7 +100,7 @@ export async function submitFamilyOrg(formData: FormData) {
     return { error: `Failed to update profile: ${profileError.message}` };
   }
 
-  redirect(await getPostAuthRedirectPath());
+  redirect("/family");
 }
 
 export async function submitStudentSegment() {
@@ -146,5 +143,5 @@ export async function submitStudentSegment() {
     return { error: `Failed to update profile: ${profileError.message}` };
   }
 
-  redirect(await getPostAuthRedirectPath());
+  redirect("/student");
 }
