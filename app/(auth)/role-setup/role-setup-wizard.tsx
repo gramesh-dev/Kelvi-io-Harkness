@@ -31,22 +31,15 @@ export function RoleSetupWizard() {
     const fd = new FormData();
     fd.set("orgName", orgName);
     
-    try {
-      console.log("[onSchoolSubmit] Calling submitSchoolOrg");
-      const res = await submitSchoolOrg(fd);
-      console.log("[onSchoolSubmit] Got response:", res);
-      
-      // If we get here, redirect didn't happen - check for errors
-      if (res?.error) {
-        console.log("[onSchoolSubmit] Error:", res.error);
-        setError(res.error);
-        setLoading(false);
-      }
-      // If no error and we're still here, something went wrong
-    } catch (error) {
-      // Let Next.js redirect errors bubble up
-      console.log("[onSchoolSubmit] Caught error:", error);
-      throw error;
+    console.log("[onSchoolSubmit] Calling submitSchoolOrg");
+    const res = await submitSchoolOrg(fd);
+    console.log("[onSchoolSubmit] Got response:", res);
+    
+    // If we get here, redirect didn't happen - check for errors
+    if (res?.error) {
+      console.log("[onSchoolSubmit] Error:", res.error);
+      setError(res.error);
+      setLoading(false);
     }
   }
 
@@ -59,19 +52,14 @@ export function RoleSetupWizard() {
     const fd = new FormData();
     fd.set("familyName", familyName);
     
-    try {
-      console.log("[onFamilySubmit] Calling submitFamilyOrg");
-      const res = await submitFamilyOrg(fd);
-      console.log("[onFamilySubmit] Got response:", res);
-      
-      if (res?.error) {
-        console.log("[onFamilySubmit] Error:", res.error);
-        setError(res.error);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log("[onFamilySubmit] Caught error:", error);
-      throw error;
+    console.log("[onFamilySubmit] Calling submitFamilyOrg");
+    const res = await submitFamilyOrg(fd);
+    console.log("[onFamilySubmit] Got response:", res);
+    
+    if (res?.error) {
+      console.log("[onFamilySubmit] Error:", res.error);
+      setError(res.error);
+      setLoading(false);
     }
   }
 
@@ -80,19 +68,14 @@ export function RoleSetupWizard() {
     setError(null);
     console.log("[onStudentContinue] Starting submission");
     
-    try {
-      console.log("[onStudentContinue] Calling submitStudentSegment");
-      const res = await submitStudentSegment();
-      console.log("[onStudentContinue] Got response:", res);
-      
-      if (res?.error) {
-        console.log("[onStudentContinue] Error:", res.error);
-        setError(res.error);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log("[onStudentContinue] Caught error:", error);
-      throw error;
+    console.log("[onStudentContinue] Calling submitStudentSegment");
+    const res = await submitStudentSegment();
+    console.log("[onStudentContinue] Got response:", res);
+    
+    if (res?.error) {
+      console.log("[onStudentContinue] Error:", res.error);
+      setError(res.error);
+      setLoading(false);
     }
   }
 
