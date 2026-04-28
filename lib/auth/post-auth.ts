@@ -94,7 +94,7 @@ export async function getPostAuthRedirectPath(): Promise<string> {
   const rows = (memberships ?? []) as unknown as MembershipRow[];
   const primary = resolvePrimaryHomePath(rows);
 
-  if (primary !== "/onboarding") {
+  if (primary !== "/teach") {
     return mapHomePathToDashboardUrl(primary);
   }
 
