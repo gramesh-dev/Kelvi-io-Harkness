@@ -26,13 +26,27 @@ export function RoleSetupWizard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    console.log("[onSchoolSubmit] Starting submission with orgName:", orgName);
+    
+    const fd = new FormData();
+    fd.set("orgName", orgName);
+    
     try {
-      const fd = new FormData();
-      fd.set("orgName", orgName);
+      console.log("[onSchoolSubmit] Calling submitSchoolOrg");
       const res = await submitSchoolOrg(fd);
-      if (res?.error) setError(res.error);
-    } finally {
-      setLoading(false);
+      console.log("[onSchoolSubmit] Got response:", res);
+      
+      // If we get here, redirect didn't happen - check for errors
+      if (res?.error) {
+        console.log("[onSchoolSubmit] Error:", res.error);
+        setError(res.error);
+        setLoading(false);
+      }
+      // If no error and we're still here, something went wrong
+    } catch (error) {
+      // Let Next.js redirect errors bubble up
+      console.log("[onSchoolSubmit] Caught error:", error);
+      throw error;
     }
   }
 
@@ -40,24 +54,45 @@ export function RoleSetupWizard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    console.log("[onFamilySubmit] Starting submission with familyName:", familyName);
+    
+    const fd = new FormData();
+    fd.set("familyName", familyName);
+    
     try {
-      const fd = new FormData();
-      fd.set("familyName", familyName);
+      console.log("[onFamilySubmit] Calling submitFamilyOrg");
       const res = await submitFamilyOrg(fd);
-      if (res?.error) setError(res.error);
-    } finally {
-      setLoading(false);
+      console.log("[onFamilySubmit] Got response:", res);
+      
+      if (res?.error) {
+        console.log("[onFamilySubmit] Error:", res.error);
+        setError(res.error);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("[onFamilySubmit] Caught error:", error);
+      throw error;
     }
   }
 
   async function onStudentContinue() {
     setLoading(true);
     setError(null);
+    console.log("[onStudentContinue] Starting submission");
+    
     try {
+      console.log("[onStudentContinue] Calling submitStudentSegment");
       const res = await submitStudentSegment();
-      if (res?.error) setError(res.error);
-    } finally {
-      setLoading(false);
+      console.log("[onStudentContinue] Got response:", res);
+      
+      if (res?.error) {
+        console.log("[onStudentContinue] Error:", res.error);
+        setError(res.error);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log("[onStudentContinue] Caught error:", error);
+      throw error;
     }
   }
 
