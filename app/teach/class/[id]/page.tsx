@@ -94,7 +94,7 @@ export default function ClassPage() {
 
   async function send() {
     if (!input.trim() || loading) return
-    const newMsgs = [...messages, { role: 'user', content: input }]
+    const newMsgs: Message[] = [...messages, { role: 'user', content: input }]
     setMessages(newMsgs)
     setInput('')
     setLoading(true)
