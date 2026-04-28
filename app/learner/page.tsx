@@ -77,7 +77,7 @@ export default function LearnerPage() {
             <div className="age-card-title">Explore the <em>Math Galaxy</em></div>
             <p className="age-card-sub">Nine planets. Fractions, Geometry, Algebra, and more. Click a planet, get a question you can&apos;t stop thinking about, and go from there. No timer. No score.</p>
             <div className="age-card-actions">
-              <a href="/family/family.html" className="btn btn-coral">Sign up with parent →</a>
+              <a href="/login?intent=family" className="btn btn-coral">Sign up with parent →</a>
             </div>
           </div>
 
@@ -87,8 +87,8 @@ export default function LearnerPage() {
             <div className="age-card-title">Explore or get <em>homework help</em></div>
             <p className="age-card-sub">Wander the Math Galaxy on your own, or bring a problem you&apos;re stuck on. Take a photo of your homework or just type it in. Kelvi thinks through it with you — it never just gives you the answer.</p>
             <div className="age-card-actions">
-              <a href="/family/family.html" className="btn btn-coral">Open the Math Galaxy →</a>
-              <a href="/student/student.html" className="btn btn-purple-outline">Get homework help →</a>
+              <a href="/login?intent=family" className="btn btn-coral">Open the Math Galaxy →</a>
+              <a href="/login?intent=student" className="btn btn-purple-outline">Get homework help →</a>
             </div>
           </div>
 
