@@ -63,7 +63,7 @@ export default function Home() {
             <span className="select-btn-title">I'm a teacher</span>
             <span className="select-btn-sub">Build discovery-based curriculum. See how your students think.</span>
           </a>
-          <a href="/family" className="select-btn select-btn-learner">
+          <a href="/learner" className="select-btn select-btn-learner">
             <span className="select-btn-label">For learners</span>
             <span className="select-btn-title">I'm a learner</span>
             <span className="select-btn-sub">Explore the Math Galaxy or get help with a problem.</span>

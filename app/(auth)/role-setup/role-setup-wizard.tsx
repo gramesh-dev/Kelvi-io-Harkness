@@ -17,9 +17,19 @@ export function RoleSetupWizard() {
       const raw = sessionStorage.getItem("kelvi_signup_intent");
       if (raw === "school" || raw === "family" || raw === "student") {
         setRole(raw);
+        // For students, auto-submit immediately - no form needed for homework help
+        if (raw === "student") {
+          sessionStorage.removeItem("kelvi_signup_intent");
+          // Use setTimeout to ensure state updates before submitting
+          setTimeout(() => {
+            void onStudentContinue();
+          }, 0);
+          return;
+        }
       }
       sessionStorage.removeItem("kelvi_signup_intent");
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function onSchoolSubmit(e: React.FormEvent) {

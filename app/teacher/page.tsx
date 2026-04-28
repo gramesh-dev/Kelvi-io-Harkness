@@ -127,7 +127,7 @@ export default function TeacherPage() {
         </Link>
         <div className="nav-right">
           <Link href="/" className="nav-back">← Back</Link>
-          <Link href="/login" className="nav-signin">Log in to create your own</Link>
+          <Link href="/login?intent=school" className="nav-signin">Log in to create your own</Link>
         </div>
       </nav>
 
@@ -276,7 +276,7 @@ export default function TeacherPage() {
         <h2>Ready to build your own problem set?</h2>
         <p>Discovery-based mathematics problem sets. Built around the questions that help students think like mathematicians.</p>
         <div className="cta-btns">
-          <Link href="/login" className="btn-primary">Create your account →</Link>
+          <Link href="/login?intent=school" className="btn-primary">Create your account →</Link>
         </div>
       </div>
 
