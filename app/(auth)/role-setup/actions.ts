@@ -68,6 +68,10 @@ export async function submitSchoolOrg(formData: FormData) {
     return { error: marked.error };
   }
 
+
+await admin.auth.admin.updateUserById(user.id, {
+  user_metadata: { role: 'teacher' }
+});
   redirect(await getPostAuthRedirectPath());
 }
 
@@ -132,6 +136,10 @@ export async function submitFamilyOrg(formData: FormData) {
   if (marked.error) {
     return { error: marked.error };
   }
+
+  await admin.auth.admin.updateUserById(user.id, {
+    user_metadata: { role: 'family' }
+  });
 
   redirect(await getPostAuthRedirectPath());
 }
@@ -225,6 +233,10 @@ export async function submitStudentSegment() {
   if (error) {
     return { error: error.message };
   }
+
+  await admin.auth.admin.updateUserById(user.id, {
+    user_metadata: { role: 'student' }
+  });
 
   redirect(await getPostAuthRedirectPath());
 }
