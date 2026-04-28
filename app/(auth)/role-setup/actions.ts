@@ -37,21 +37,22 @@ export async function submitSchoolOrg(formData: FormData) {
     return { error: "Failed to update user role" };
   }
 
-  console.log("[submitSchoolOrg] Updating profiles table");
-  // Update profiles table with completion flag
-  const { error: profileError } = await supabase
+  console.log("[submitSchoolOrg] Upserting profiles table with admin client");
+  // Use admin client and UPSERT to ensure row exists
+  const { error: profileError } = await admin
     .from("profiles")
-    .update({ 
+    .upsert({ 
+      id: user.id,
+      email: user.email,
       metadata: { 
         kelvi_completed_role_setup: true,
         kelvi_segment: 'school'
       } 
-    })
-    .eq("id", user.id);
+    }, { onConflict: 'id' });
 
   if (profileError) {
     console.error("[submitSchoolOrg] Error updating profile:", profileError);
-    return { error: "Failed to update profile" };
+    return { error: `Failed to update profile: ${profileError.message}` };
   }
 
   console.log("[submitSchoolOrg] User metadata and profile updated successfully");
@@ -85,20 +86,21 @@ export async function submitFamilyOrg(formData: FormData) {
     return { error: "Failed to update user role" };
   }
 
-  // Update profiles table with completion flag
-  const { error: profileError } = await supabase
+  // Use admin client and UPSERT
+  const { error: profileError } = await admin
     .from("profiles")
-    .update({ 
+    .upsert({ 
+      id: user.id,
+      email: user.email,
       metadata: { 
         kelvi_completed_role_setup: true,
         kelvi_segment: 'family'
       } 
-    })
-    .eq("id", user.id);
+    }, { onConflict: 'id' });
 
   if (profileError) {
     console.error("Error updating profile:", profileError);
-    return { error: "Failed to update profile" };
+    return { error: `Failed to update profile: ${profileError.message}` };
   }
 
   redirect(await getPostAuthRedirectPath());
@@ -127,20 +129,21 @@ export async function submitStudentSegment() {
     return { error: "Failed to update user role" };
   }
 
-  // Update profiles table with completion flag
-  const { error: profileError } = await supabase
+  // Use admin client and UPSERT
+  const { error: profileError } = await admin
     .from("profiles")
-    .update({ 
+    .upsert({ 
+      id: user.id,
+      email: user.email,
       metadata: { 
         kelvi_completed_role_setup: true,
         kelvi_segment: 'student'
       } 
-    })
-    .eq("id", user.id);
+    }, { onConflict: 'id' });
 
   if (profileError) {
     console.error("Error updating profile:", profileError);
-    return { error: "Failed to update profile" };
+    return { error: `Failed to update profile: ${profileError.message}` };
   }
 
   redirect(await getPostAuthRedirectPath());
