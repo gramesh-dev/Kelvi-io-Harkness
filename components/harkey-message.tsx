@@ -109,8 +109,7 @@ export function HarkeyMessage({ text }: { text: string }) {
     // Render immediately without KaTeX on first paint
     if (typeof window !== 'undefined' && katexReady) return processMarkdown(text)
     // Fallback: just apply markdown without KaTeX
-    const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    return applyMarkdown(escaped)
+    return processMarkdown(text)
   })
 
   useEffect(() => {
