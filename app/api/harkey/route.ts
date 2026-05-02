@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Fetch full Exeter problem index
     const { data: problems } = await supabase
       .from('problems')
-      .select('problem_number, topic, body')
+      .select('problem_number, topic')
       .eq('course', 'Math2')
       .order('problem_number', { ascending: true })
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       .join('\n')
 
     const problemIndex = (problems || []).map(p =>
-      `#${p.problem_number} [${p.topic}]: ${(p.body || '').slice(0, 160)}${(p.body || '').length > 160 ? '…' : ''}`
+      `#${p.problem_number} [${p.topic}]`
     ).join('\n')
 
     const system = `You are Harkey — a Harkness mathematics thinking partner for teachers at Phillips Exeter Academy. You are direct, opinionated, and brief — like a brilliant PEA math colleague between classes.
@@ -48,6 +48,10 @@ WHAT YOU DO:
 - After listing topic problems, ALWAYS end with: "**Want me to package these?** Say yes and I'll generate a PDF, Harkey Brief, AI solution guide, and student link — all at once."
 - When teacher says yes: respond with ONLY this JSON and nothing else:
   {"action":"package","problems":[list of numbers],"title":"[topic] — Math 2"}
+
+When a teacher asks for JUST a student link (says "just the link", "only the link", "student link only", "just a link", "can I just get a link"):
+- Respond with ONLY this JSON and nothing else:
+  {"action":"student_link_only","problems":[list of numbers from last discussed topic],"title":"[topic] — Math 2"}
 - Sequence planning: name specific problem numbers with rationale
 - Spiral advice: explain the mathematical thread linking problems
 - Post-discussion debrief: help teachers read what happened
@@ -75,7 +79,7 @@ RULES:
 
     // Detect package action
     // Extract JSON action block — find matching braces
-    const jsonStart = reply.indexOf('{"action":"package"')
+    const jsonStart = Math.max(reply.indexOf('{"action":"package"'), reply.indexOf('{"action":"student_link_only"'))
     if (jsonStart !== -1) {
       let depth = 0, jsonEnd = -1
       for (let i = jsonStart; i < reply.length; i++) {

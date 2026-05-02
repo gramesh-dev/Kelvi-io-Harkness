@@ -58,6 +58,8 @@ export default function HarknessTeacherDashboard() {
   const [logNote,          setLogNote]          = useState('')
   const [logLoading,       setLogLoading]       = useState(false)
   const [logResult,        setLogResult]        = useState<string>('')
+  const [micListening,     setMicListening]     = useState(false)
+  const micRef = useRef<any>(null)
   const [selectedMember,   setSelectedMember]   = useState<Member | null>(null)
   const [memberNotes,      setMemberNotes]      = useState<any[]>([])
   const [classView,        setClassView]        = useState<'roster'|'log'|'student'>('roster')
@@ -169,6 +171,33 @@ export default function HarknessTeacherDashboard() {
     setMemberNotes(d.notes || [])
   }
 
+  function toggleMic() {
+    if (typeof window === 'undefined') return
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Voice input works best in Chrome or Edge. Please type your note instead.')
+      return
+    }
+    if (micListening) {
+      micRef.current?.stop()
+      setMicListening(false)
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
+    micRef.current = recognition
+    recognition.onresult = (e: any) => {
+      const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join('')
+      setLogNote(transcript)
+    }
+    recognition.onerror = () => setMicListening(false)
+    recognition.onend = () => setMicListening(false)
+    recognition.start()
+    setMicListening(true)
+  }
+
   async function submitLog() {
     if (!logNote.trim() || !selectedClass || logLoading) return
     setLogLoading(true)
@@ -212,6 +241,29 @@ export default function HarknessTeacherDashboard() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: newMessages }),
       }).then(r => r.json())
+
+      if (data.action?.action === 'student_link_only') {
+        setChatLoading(false)
+        setMessages([...newMessages, { role: 'assistant', content: '✓ Creating student link…' }])
+        setPackaging(true)
+        try {
+          const res = await fetch('/api/harkness-publish', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: data.action.title, problems: data.action.problems.map((n: number) => ({ problem_number: n })), visibility: 'anyone' }),
+          })
+          const d = await res.json()
+          if (d.error) throw new Error(d.error)
+          await loadSavedSets()
+          const link = `${window.location.origin}/harkness/student/${d.id}`
+          await navigator.clipboard.writeText(link).catch(() => {})
+          setMessages(m => [...m, { role: 'assistant', content: `✓ Student link ready (copied to clipboard):
+
+${link}` }])
+        } catch (e: any) {
+          setMessages(m => [...m, { role: 'assistant', content: `Error: ${e.message}` }])
+        } finally { setPackaging(false) }
+        return
+      }
 
       if (data.action?.action === 'package') {
         setMessages([...newMessages, { role: 'assistant', content: '✓ Generating package…' }])
@@ -506,10 +558,19 @@ export default function HarknessTeacherDashboard() {
                     <textarea value={logNote} onChange={e => setLogNote(e.target.value)}
                       placeholder={`What happened in ${selectedClass.name} today?`} rows={4}
                       style={{ width: '100%', padding: '10px 12px', border: '1px solid #D9D4C9', borderRadius: 8, fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
-                    <button onClick={submitLog} disabled={logLoading || !logNote.trim()}
-                      style={{ padding: '9px 20px', background: logLoading || !logNote.trim() ? '#E8E3DA' : '#2D4A3D', color: logLoading || !logNote.trim() ? '#9A9488' : '#fff', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 500, cursor: logLoading || !logNote.trim() ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
-                      {logLoading ? 'Logging…' : 'Log session'}
-                    </button>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <button onClick={submitLog} disabled={logLoading || !logNote.trim()}
+                        style={{ padding: '9px 20px', background: logLoading || !logNote.trim() ? '#E8E3DA' : '#2D4A3D', color: logLoading || !logNote.trim() ? '#9A9488' : '#fff', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 500, cursor: logLoading || !logNote.trim() ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+                        {logLoading ? 'Logging…' : 'Log session'}
+                      </button>
+                      <button onClick={toggleMic} title={micListening ? 'Stop recording' : 'Speak your session note'}
+                        style={{ width: 40, height: 40, borderRadius: '50%', border: `2px solid ${micListening ? '#E26B4F' : '#D9D4C9'}`, background: micListening ? '#FEF0EC' : '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all .15s' }}>
+                        {micListening
+                          ? <svg width="16" height="16" viewBox="0 0 24 24" fill="#E26B4F"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                          : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6F6A61" strokeWidth="2" strokeLinecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>}
+                      </button>
+                      {micListening && <span style={{ fontSize: 12, color: '#E26B4F', fontWeight: 500 }}>● Recording…</span>}
+                    </div>
                     {logResult && (
                       <div style={{ marginTop: 12, padding: '12px 14px', background: '#EDF4F0', border: '1px solid #C3DDD3', borderRadius: 8, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-line', color: '#1A1A1A' }}>
                         <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 6 }}>Harkey logged:</div>
