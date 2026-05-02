@@ -53,6 +53,14 @@ export default function HarknessTeacherDashboard() {
   const [selected,         setSelected]         = useState<Problem[]>([])
   const [psTitle,          setPsTitle]          = useState('')
   const [savedSets,        setSavedSets]        = useState<ProbSet[]>([])
+  const [studentNotes,     setStudentNotes]     = useState<any[]>([])
+  const [sessionLogs,      setSessionLogs]      = useState<any[]>([])
+  const [logNote,          setLogNote]          = useState('')
+  const [logLoading,       setLogLoading]       = useState(false)
+  const [logResult,        setLogResult]        = useState<string>('')
+  const [selectedMember,   setSelectedMember]   = useState<Member | null>(null)
+  const [memberNotes,      setMemberNotes]      = useState<any[]>([])
+  const [classView,        setClassView]        = useState<'roster'|'log'|'student'>('roster')
   const [firstName,        setFirstName]        = useState('Gayatri')
   const [userEmail,        setUserEmail]        = useState('')
 
@@ -63,7 +71,15 @@ export default function HarknessTeacherDashboard() {
       if (d.email) setUserEmail(d.email)
     })
   }, [])
-  useEffect(() => { if (selectedClass) loadMembers(selectedClass.id) }, [selectedClass])
+  useEffect(() => {
+    if (selectedClass) {
+      loadMembers(selectedClass.id)
+      loadClassNotes(selectedClass.id)
+      setClassView('roster')
+      setLogResult('')
+      setSelectedMember(null)
+    }
+  }, [selectedClass])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, chatLoading])
 
   async function loadClasses() {
@@ -140,6 +156,49 @@ export default function HarknessTeacherDashboard() {
     }
     setBulkInput(''); setBulkMode(false); setAddingBulk(false)
     if (added > 0) alert(`Added ${added} student${added !== 1 ? 's' : ''}`)
+  }
+
+  async function loadClassNotes(classId: string) {
+    const d = await fetch(`/api/harkness-log?class_id=${classId}`).then(r => r.json())
+    setSessionLogs(d.logs || [])
+    setStudentNotes(d.notes || [])
+  }
+
+  async function loadMemberNotes(memberId: string) {
+    const d = await fetch(`/api/harkness-log?member_id=${memberId}`).then(r => r.json())
+    setMemberNotes(d.notes || [])
+  }
+
+  async function submitLog() {
+    if (!logNote.trim() || !selectedClass || logLoading) return
+    setLogLoading(true)
+    setLogResult('')
+    try {
+      const res = await fetch('/api/harkness-log', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          class_id: selectedClass.id,
+          note: logNote,
+          roster: members.map(m => m.student_name),
+        }),
+      })
+      const d = await res.json()
+      if (d.error) { setLogResult('Error: ' + d.error); return }
+      setLogResult(d.summary || 'Logged.')
+      setLogNote('')
+      await loadClassNotes(selectedClass.id)
+    } catch (e: any) { setLogResult('Error: ' + e.message) }
+    finally { setLogLoading(false) }
+  }
+
+  function hwStreakFor(memberId: string): { streak: number; lastDid: boolean | null } {
+    const hw = studentNotes
+      .filter(n => n.member_id === memberId && n.type === 'homework')
+      .sort((a, b) => b.date.localeCompare(a.date))
+    if (!hw.length) return { streak: 0, lastDid: null }
+    let streak = 0
+    for (const h of hw) { if (h.value === true) streak++; else break }
+    return { streak, lastDid: hw[0].value }
   }
 
   async function sendHarkey(payload: SendPayload) {
@@ -352,59 +411,191 @@ export default function HarknessTeacherDashboard() {
           </div>}
 
           {/* CLASS DETAIL */}
-          {view === 'class-detail' && selectedClass && <div style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-            <div style={{ maxWidth: 800, margin: '0 auto' }}>
-              <button onClick={() => setView('classes')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6F6A61', fontSize: 14, fontFamily: 'inherit', padding: 0, marginBottom: 8 }}>← Classes</button>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                <div>
-                  <h1 style={{ fontFamily: 'serif', fontSize: 26, fontWeight: 400 }}>{selectedClass.name}</h1>
-                  <div style={{ color: '#6F6A61', fontSize: 13, marginTop: 3 }}>{selectedClass.course} · {members.length} student{members.length !== 1 ? 's' : ''}</div>
-                </div>
-                <button onClick={() => deleteClass(selectedClass.id)} style={{ padding: '6px 12px', border: '1px solid #fcc', borderRadius: 6, background: 'none', color: '#c0392b', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>Delete</button>
+          {view === 'class-detail' && selectedClass && <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+            {/* Left: roster + student detail */}
+            <div style={{ width: 280, borderRight: '1px solid #E8E3DA', display: 'flex', flexDirection: 'column', background: '#fff', flexShrink: 0 }}>
+              {/* Header */}
+              <div style={{ padding: '14px 16px', borderBottom: '1px solid #E8E3DA', flexShrink: 0 }}>
+                <button onClick={() => setView('classes')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6F6A61', fontSize: 13, fontFamily: 'inherit', padding: 0, marginBottom: 6 }}>← Classes</button>
+                <div style={{ fontFamily: 'serif', fontSize: 20 }}>{selectedClass.name}</div>
+                <div style={{ fontSize: 12, color: '#9A9488', marginTop: 2 }}>{selectedClass.course} · {members.length} students · {sessionLogs.length} sessions logged</div>
               </div>
-              <div style={{ background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 10, padding: '14px 16px', marginBottom: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>Add students</div>
-                  <button onClick={() => setBulkMode(v => !v)} style={{ fontSize: 12, color: '#6F6A61', background: 'none', border: '1px solid #D9D4C9', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    {bulkMode ? 'One at a time' : 'Paste a list'}
-                  </button>
+
+              {/* Roster */}
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                {members.length === 0
+                  ? <div style={{ padding: '24px 16px', color: '#9A9488', fontSize: 14, textAlign: 'center' }}>No students yet.</div>
+                  : members.map(m => {
+                    const { streak, lastDid } = hwStreakFor(m.id)
+                    const recentNote = studentNotes.filter(n => n.member_id === m.id && n.type !== 'homework').sort((a:any,b:any) => b.date.localeCompare(a.date))[0]
+                    const isSelected = selectedMember?.id === m.id && classView === 'student'
+                    return (
+                      <div key={m.id} onClick={() => { setSelectedMember(m); loadMemberNotes(m.id); setClassView('student') }}
+                        style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderBottom: '1px solid #F0EDE6', cursor: 'pointer', background: isSelected ? '#EDF4F0' : 'none', borderLeft: `3px solid ${isSelected ? '#2D4A3D' : 'transparent'}` }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: lastDid === false ? '#E26B4F' : lastDid === true ? '#2D4A3D' : '#D9D4C9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 600, marginRight: 10, flexShrink: 0 }}>
+                          {m.student_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 14, fontWeight: 500, color: '#1A1A1A' }}>{m.student_name}</div>
+                          <div style={{ fontSize: 11, color: '#9A9488', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {streak > 0 ? `🔥 ${streak} hw` : lastDid === false ? '✗ missed hw' : recentNote ? recentNote.content?.slice(0,40) : 'No entries yet'}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                }
+              </div>
+
+              {/* Add student */}
+              <div style={{ padding: '10px 12px', borderTop: '1px solid #E8E3DA', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: '#6F6A61', fontWeight: 500 }}>Add student</span>
+                  <button onClick={() => setBulkMode(v => !v)} style={{ fontSize: 11, color: '#6F6A61', background: 'none', border: '1px solid #D9D4C9', borderRadius: 4, padding: '2px 6px', cursor: 'pointer', fontFamily: 'inherit' }}>{bulkMode ? 'One at a time' : 'Paste list'}</button>
                 </div>
                 {bulkMode ? (
                   <div>
-                    <textarea value={bulkInput} onChange={e => setBulkInput(e.target.value)} placeholder={'One name or email per line:\nAlice Johnson\nbob@school.edu\nCarla Smith'} rows={5}
-                      style={{ width: '100%', padding: '8px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={addBulkMembers} disabled={addingBulk || !bulkInput.trim()} style={{ padding: '7px 16px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>{addingBulk ? 'Adding…' : 'Add all'}</button>
-                      <button onClick={() => { setBulkMode(false); setBulkInput('') }} style={{ padding: '7px 12px', background: 'none', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', color: '#6F6A61' }}>Cancel</button>
+                    <textarea value={bulkInput} onChange={e => setBulkInput(e.target.value)} placeholder={'One name or email per line'} rows={3}
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'none', boxSizing: 'border-box', marginBottom: 6 }} />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button onClick={addBulkMembers} disabled={addingBulk||!bulkInput.trim()} style={{ flex: 1, padding: '6px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>{addingBulk ? 'Adding…' : 'Add all'}</button>
+                      <button onClick={() => { setBulkMode(false); setBulkInput('') }} style={{ padding: '6px 10px', background: 'none', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', color: '#6F6A61' }}>✕</button>
                     </div>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input value={newStudentName} onChange={e => setNewStudentName(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Student name"
-                      style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <input value={newStudentName} onChange={e => setNewStudentName(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Name"
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
                     <input value={newStudentEmail} onChange={e => setNewStudentEmail(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Email (optional)"
-                      style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
-                    <button onClick={addMember} disabled={!newStudentName.trim()} style={{ padding: '7px 14px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Add</button>
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                    <button onClick={addMember} disabled={!newStudentName.trim()} style={{ padding: '7px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>Add</button>
                   </div>
                 )}
               </div>
-              {members.length === 0
-                ? <div style={{ textAlign: 'center', padding: '32px 20px', background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 10, color: '#9A9488', fontSize: 14 }}>No students yet.</div>
-                : <div style={{ border: '1px solid #E8E3DA', borderRadius: 10, overflow: 'hidden' }}>
-                    <div style={{ padding: '9px 14px', background: '#F5F3EE', borderBottom: '1px solid #E8E3DA', fontSize: 11, fontFamily: 'monospace', letterSpacing: '.1em', textTransform: 'uppercase', color: '#9A9488' }}>Roster · {members.length}</div>
-                    {members.map((m, i) => (
-                      <div key={m.id} style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderBottom: i < members.length-1 ? '1px solid #F0EDE6' : 'none', background: '#fff' }}>
-                        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#2D4A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 600, marginRight: 12, flexShrink: 0 }}>{m.student_name.charAt(0).toUpperCase()}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 14, fontWeight: 500 }}>{m.student_name}</div>
-                          {m.student_email
-                            ? <a href={`mailto:${m.student_email}`} style={{ fontSize: 12, color: '#2D4A3D', textDecoration: 'none' }}>{m.student_email}</a>
-                            : <div style={{ fontSize: 12, color: '#C4BFB8', fontStyle: 'italic' }}>No email</div>}
-                        </div>
-                        <button onClick={() => removeMember(m.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4BFB8', fontSize: 16, padding: '4px 8px', marginLeft: 8 }} title="Remove student">✕</button>
+            </div>
+
+            {/* Right: main panel — log session OR student detail */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+              {/* Tab bar */}
+              <div style={{ display: 'flex', borderBottom: '1px solid #E8E3DA', background: '#FAF8F3', flexShrink: 0 }}>
+                {([['roster', 'Session Log'], ['student', selectedMember ? selectedMember.student_name.split(' ')[0] : 'Student']] as const).map(([v, label]) => (
+                  <button key={v} onClick={() => setClassView(v as any)}
+                    style={{ padding: '12px 20px', border: 'none', background: classView === v ? '#FAF8F3' : '#F0EDE6', borderBottom: classView === v ? '2px solid #2D4A3D' : 'none', color: classView === v ? '#2D4A3D' : '#6F6A61', fontWeight: 500, cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* SESSION LOG */}
+              {classView === 'roster' && <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}>
+                  {/* Log input */}
+                  <div style={{ marginBottom: 28 }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>Log today's session</div>
+                    <div style={{ fontSize: 13, color: '#6F6A61', marginBottom: 12, lineHeight: 1.5 }}>
+                      Talk naturally — Harkey figures out the rest.
+                    </div>
+                    <div style={{ background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, color: '#9A9488', fontFamily: 'monospace', marginBottom: 8, letterSpacing: '.06em', textTransform: 'uppercase' }}>Try saying…</div>
+                      {["Everyone did their homework except Tyler.", "Maria asked why vectors can't be added to scalars.", "James presented #43. Olivia was absent."].map(ex => (
+                        <button key={ex} onClick={() => setLogNote(ex)} style={{ display: 'block', fontSize: 12, color: '#6F6A61', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '2px 0', textAlign: 'left', lineHeight: 1.5 }}>"{ex}"</button>
+                      ))}
+                    </div>
+                    <textarea value={logNote} onChange={e => setLogNote(e.target.value)}
+                      placeholder={`What happened in ${selectedClass.name} today?`} rows={4}
+                      style={{ width: '100%', padding: '10px 12px', border: '1px solid #D9D4C9', borderRadius: 8, fontSize: 14, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
+                    <button onClick={submitLog} disabled={logLoading || !logNote.trim()}
+                      style={{ padding: '9px 20px', background: logLoading || !logNote.trim() ? '#E8E3DA' : '#2D4A3D', color: logLoading || !logNote.trim() ? '#9A9488' : '#fff', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 500, cursor: logLoading || !logNote.trim() ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
+                      {logLoading ? 'Logging…' : 'Log session'}
+                    </button>
+                    {logResult && (
+                      <div style={{ marginTop: 12, padding: '12px 14px', background: '#EDF4F0', border: '1px solid #C3DDD3', borderRadius: 8, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-line', color: '#1A1A1A' }}>
+                        <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 6 }}>Harkey logged:</div>
+                        {logResult}
                       </div>
-                    ))}
-                  </div>}
+                    )}
+                  </div>
+
+                  {/* Past session logs */}
+                  {sessionLogs.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#9A9488', marginBottom: 12, letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'monospace' }}>Past sessions</div>
+                      {sessionLogs.map((log: any) => (
+                        <div key={log.id} style={{ marginBottom: 12, padding: '10px 14px', background: '#fff', border: '1px solid #E8E3DA', borderRadius: 8 }}>
+                          <div style={{ fontSize: 11, color: '#9A9488', fontFamily: 'monospace', marginBottom: 4 }}>{new Date(log.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                          <div style={{ fontSize: 13, color: '#1A1A1A', lineHeight: 1.6 }}>{log.raw_note}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>}
+
+              {/* STUDENT DETAIL */}
+              {classView === 'student' && selectedMember && <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#2D4A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#fff', fontWeight: 600, flexShrink: 0 }}>
+                    {selectedMember.student_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: 'serif', fontSize: 22 }}>{selectedMember.student_name}</div>
+                    {selectedMember.student_email && <a href={`mailto:${selectedMember.student_email}`} style={{ fontSize: 13, color: '#2D4A3D', textDecoration: 'none' }}>{selectedMember.student_email}</a>}
+                  </div>
+                  <button onClick={() => removeMember(selectedMember.id)} style={{ marginLeft: 'auto', padding: '5px 10px', border: '1px solid #fcc', borderRadius: 6, background: 'none', color: '#c0392b', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>Remove</button>
+                </div>
+
+                {/* Stats row */}
+                {(() => {
+                  const hw = memberNotes.filter(n => n.type === 'homework')
+                  const hwDone = hw.filter(n => n.value === true).length
+                  const questions = memberNotes.filter(n => n.type === 'question')
+                  const presentations = memberNotes.filter(n => n.type === 'presentation')
+                  const { streak } = hwStreakFor(selectedMember.id)
+                  return (
+                    <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+                      {[
+                        { label: 'HW done', val: `${hwDone}/${hw.length}` },
+                        { label: 'Streak', val: streak > 0 ? `🔥 ${streak}` : '—' },
+                        { label: 'Questions', val: questions.length },
+                        { label: 'Presentations', val: presentations.length },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ flex: 1, padding: '10px 12px', background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 8, textAlign: 'center' }}>
+                          <div style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>{val}</div>
+                          <div style={{ fontSize: 11, color: '#9A9488', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '.06em' }}>{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+
+                {/* Timeline */}
+                {memberNotes.length === 0
+                  ? <div style={{ color: '#9A9488', fontSize: 14, textAlign: 'center', padding: '32px 0' }}>No entries yet. Log a session to see {selectedMember.student_name.split(' ')[0]}'s record.</div>
+                  : <div>
+                      <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '.1em', textTransform: 'uppercase', color: '#9A9488', marginBottom: 12 }}>Activity log</div>
+                      {Object.entries(
+                        memberNotes.reduce((acc: any, n: any) => { if (!acc[n.date]) acc[n.date] = []; acc[n.date].push(n); return acc }, {})
+                      ).sort(([a],[b]) => b.localeCompare(a)).map(([date, notes]: [string, any]) => (
+                        <div key={date} style={{ marginBottom: 16 }}>
+                          <div style={{ fontSize: 11, color: '#9A9488', fontFamily: 'monospace', marginBottom: 6 }}>
+                            {new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          </div>
+                          {(notes as any[]).map((n: any, i: number) => (
+                            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+                              <div style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>
+                                {n.type === 'homework' ? (n.value ? '✓' : '✗') : n.type === 'question' ? '💬' : n.type === 'presentation' ? '📐' : n.type === 'absent' ? '⬜' : '📝'}
+                              </div>
+                              <div style={{ fontSize: 14, color: '#1A1A1A', lineHeight: 1.5 }}>
+                                {n.type === 'homework' ? (n.value ? 'Did homework' : 'Missed homework') : n.content}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>}
+              </div>}
             </div>
           </div>}
 
