@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { KelviChatInput, type SendPayload } from '@/components/kelvi-chat-input'
 import { useParams } from 'next/navigation'
 
 const KELVI_SYSTEM = `You are Kelvi — a mathematics thinking companion. You develop questioning and reasoning. You never give answers.
@@ -85,6 +86,22 @@ export default function HarknessStudentPage() {
   const [studentName,   setStudentName]   = useState('')
   const [nameInput,     setNameInput]     = useState('')
   const [desmosOpen,    setDesmosOpen]    = useState(false)
+  const [desmosWidth,   setDesmosWidth]   = useState(380)
+  const draggingDesmos  = useRef(false)
+
+  function startDragDesmos(e: React.MouseEvent) {
+    e.preventDefault()
+    draggingDesmos.current = true
+    const startX = e.clientX
+    const startW = desmosWidth
+    const onMove = (ev: MouseEvent) => {
+      if (!draggingDesmos.current) return
+      setDesmosWidth(Math.max(200, Math.min(700, startW - (ev.clientX - startX))))
+    }
+    const onUp = () => { draggingDesmos.current = false; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
   const [dragOver,      setDragOver]      = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileRef     = useRef<HTMLInputElement>(null)
@@ -273,36 +290,30 @@ export default function HarknessStudentPage() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
-          <div style={{ padding: '0 16px 16px', flexShrink: 0, position: 'relative' }}
-            onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleImage(f) }}>
-            {dragOver && <div style={{ position: 'absolute', inset: '0 16px 16px', background: 'rgba(45,74,61,.08)', border: '2px dashed #2D4A3D', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, pointerEvents: 'none' }}><span style={{ color: '#2D4A3D', fontWeight: 500 }}>Drop image here</span></div>}
-            <div style={{ background: '#F8F7F4', border: '1.5px solid #D9D4C9', borderRadius: 14, padding: '10px 12px' }}>
-              <textarea ref={textareaRef} value={input}
-                onChange={e => { setInput(e.target.value); autoResize(e.target) }}
-                onKeyDown={e => { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
-                placeholder="Share your thinking… (drag in an image of your work)"
-                disabled={aiLoading} rows={1}
-                style={{ width: '100%', border: 'none', outline: 'none', fontSize: 15, fontFamily: 'inherit', resize: 'none', lineHeight: 1.5, color: '#2F2B25', background: 'transparent', maxHeight: 150, overflowY: 'auto', display: 'block' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-                <button onClick={() => fileRef.current?.click()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A9488', padding: 4 }}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                </button>
-                <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) handleImage(f); e.target.value='' }} />
-                <button onClick={() => send()} disabled={!input.trim() || aiLoading}
-                  style={{ background: (!input.trim()||aiLoading)?'#D9D4C9':'#2D4A3D', color: '#F8F7F4', border: 'none', padding: '6px 16px', borderRadius: 8, fontSize: 13, fontFamily: 'inherit', fontWeight: 500, cursor: (!input.trim()||aiLoading)?'not-allowed':'pointer' }}>
-                  Send
-                </button>
-              </div>
-            </div>
+          {/* Input — KelviChatInput with mic, file upload, equation editor */}
+          <div style={{ padding: '0 12px 12px', flexShrink: 0 }}>
+            <KelviChatInput
+              onSend={(payload: SendPayload) => {
+                if (payload.text?.trim()) send(payload.text)
+              }}
+              onToggleDesmos={() => setDesmosOpen(v => !v)}
+              desmosOpen={desmosOpen}
+              disabled={aiLoading}
+              placeholder="Share your thinking…"
+              lastAssistantMessage={messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content as string || ''}
+              externalFile={null}
+            />
           </div>
         </div>
 
-        {/* Desmos */}
+        {/* Desmos resize handle + panel */}
         {desmosOpen && (
-          <div style={{ width: 400, borderLeft: '1px solid #D9D4C9', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div onMouseDown={startDragDesmos} style={{ width: 4, background: 'transparent', cursor: 'col-resize', flexShrink: 0, borderLeft: '1px solid #D9D4C9', transition: 'background .1s' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#2D4A3D'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'} />
+        )}
+        {desmosOpen && (
+          <div style={{ width: desmosWidth, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
             <div style={{ padding: '7px 12px', borderBottom: '1px solid #D9D4C9', fontSize: 11, fontFamily: 'monospace', color: '#9A9488', textTransform: 'uppercase', letterSpacing: '.08em', background: '#F0EDE6' }}>Desmos</div>
             <iframe src="https://www.desmos.com/calculator" style={{ flex: 1, border: 'none' }} title="Desmos" />
           </div>

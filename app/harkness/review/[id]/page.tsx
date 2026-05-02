@@ -57,7 +57,42 @@ function ReviewInner() {
   const [pdfSettings,   setPdfSettings]   = useState(pdfDefaults)
   const [pdfSettingsOpen, setPdfSettingsOpen] = useState(false)
   const [title]         = useState(titleParam)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const bottomRef      = useRef<HTMLDivElement>(null)
+  const [chatWidth,    setChatWidth]    = useState(400)
+  const [desmosWidth,  setDesmosWidth]  = useState(460)
+  const draggingChat   = useRef(false)
+  const draggingDesmos = useRef(false)
+  const containerRef   = useRef<HTMLDivElement>(null)
+
+  function startDragChat(e: React.MouseEvent) {
+    e.preventDefault()
+    draggingChat.current = true
+    const startX = e.clientX
+    const startW = chatWidth
+    const onMove = (ev: MouseEvent) => {
+      if (!draggingChat.current) return
+      const delta = ev.clientX - startX
+      setChatWidth(Math.max(200, Math.min(700, startW + delta)))
+    }
+    const onUp = () => { draggingChat.current = false; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
+  function startDragDesmos(e: React.MouseEvent) {
+    e.preventDefault()
+    draggingDesmos.current = true
+    const startX = e.clientX
+    const startW = desmosWidth
+    const onMove = (ev: MouseEvent) => {
+      if (!draggingDesmos.current) return
+      const delta = startX - ev.clientX
+      setDesmosWidth(Math.max(200, Math.min(800, startW + delta)))
+    }
+    const onUp = () => { draggingDesmos.current = false; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   useEffect(() => {
     async function load() {
@@ -254,7 +289,7 @@ ${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDa
       {/* Split view */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left: Harkey chat */}
-        <div style={{ width: 400, borderRight: '1px solid #E8E3DA', display: 'flex', flexDirection: 'column', background: '#fff' }}>
+        <div style={{ width: chatWidth, borderRight: 'none', display: 'flex', flexDirection: 'column', background: '#fff', flexShrink: 0 }}>
           <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
             {messages.length === 0 && (
               <div style={{ fontSize: 14, color: '#6F6A61', lineHeight: 1.6 }}>
@@ -287,6 +322,10 @@ ${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDa
         </div>
 
         {/* Right: tabs + content + action bar */}
+        {/* Chat resize handle */}
+        <div onMouseDown={startDragChat} style={{ width: 4, background: 'transparent', cursor: 'col-resize', flexShrink: 0, borderLeft: '1px solid #E8E3DA', transition: 'background .1s' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#2D4A3D'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'} />
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {/* Tabs */}
@@ -405,9 +444,14 @@ ${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDa
             </div>
           </div>
 
-          {/* Desmos panel */}
+          {/* Desmos resize handle + panel */}
           {desmosOpen && (
-            <div style={{ width: 460, borderLeft: '1px solid #E8E3DA', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+            <div onMouseDown={startDragDesmos} style={{ width: 4, background: 'transparent', cursor: 'col-resize', flexShrink: 0, borderLeft: '1px solid #E8E3DA', transition: 'background .1s' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2D4A3D'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'} />
+          )}
+          {desmosOpen && (
+            <div style={{ width: desmosWidth, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
               <div style={{ padding: '8px 14px', borderBottom: '1px solid #E8E3DA', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0EDE6' }}>
                 <span style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '.1em', textTransform: 'uppercase', color: '#9A9488' }}>Desmos {desmos3D?'3D':''}</span>
                 <div style={{ display: 'flex', gap: 6 }}>
