@@ -74,12 +74,20 @@ RULES:
     const reply = response.content[0]?.type === 'text' ? response.content[0].text : ''
 
     // Detect package action
-    const jsonMatch = reply.match(/\{"action":"package".*?\}/)
-    if (jsonMatch) {
-      try {
-        const action = JSON.parse(jsonMatch[0])
-        return NextResponse.json({ reply, action })
-      } catch { /* fall through */ }
+    // Extract JSON action block — find matching braces
+    const jsonStart = reply.indexOf('{"action":"package"')
+    if (jsonStart !== -1) {
+      let depth = 0, jsonEnd = -1
+      for (let i = jsonStart; i < reply.length; i++) {
+        if (reply[i] === '{') depth++
+        else if (reply[i] === '}') { depth--; if (depth === 0) { jsonEnd = i + 1; break } }
+      }
+      if (jsonEnd !== -1) {
+        try {
+          const action = JSON.parse(reply.slice(jsonStart, jsonEnd))
+          return NextResponse.json({ reply: reply.slice(0, jsonStart).trim() || '✓ Packaging now…', action })
+        } catch { /* fall through */ }
+      }
     }
 
     return NextResponse.json({ reply })
