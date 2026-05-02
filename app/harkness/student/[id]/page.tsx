@@ -91,18 +91,10 @@ export default function HarknessStudentPage() {
   const bottomRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    async function load() {
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
-      const { data } = await supabase
-        .from('harkness_problem_sets').select('*').eq('id', id).single()
-      setProblemSet(data)
-      setLoading(false)
-    }
-    load()
+    fetch(`/api/harkness-set?id=${id}`)
+      .then(r => r.json())
+      .then(d => { setProblemSet(d.set || null); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [id])
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, aiLoading])

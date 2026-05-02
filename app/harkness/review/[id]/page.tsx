@@ -74,9 +74,8 @@ function ReviewInner() {
         setProblems(sorted)
         loadExeterData(supabase, sorted.map(p => p.id))
       } else {
-        // Load published problem set
-        const { data: ps } = await supabase
-          .from('harkness_problem_sets').select('*').eq('id', id).single()
+        // Load published problem set via server API
+        const { set: ps } = await fetch(`/api/harkness-set?id=${id}`).then(r => r.json())
         if (ps) {
           const probs = ps.problem_data || []
           setProblems(probs)
@@ -89,12 +88,12 @@ function ReviewInner() {
     load()
   }, [id])
 
-  async function loadExeterData(supabase: any, problemIds: string[]) {
+  async function loadExeterData(_supabase: any, problemIds: string[]) {
     if (!problemIds.length) return
-    const [{ data: comms }, { data: sols }] = await Promise.all([
-      supabase.from('exeter_commentary').select('*').in('problem_id', problemIds),
-      supabase.from('exeter_solutions').select('*').in('problem_id', problemIds),
-    ])
+    const { commentary: comms, solutions: sols } = await fetch('/api/exeter-data', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ problemIds }),
+    }).then(r => r.json())
     const commMap: Record<string, any> = {}
     for (const c of comms || []) commMap[c.problem_id] = c
     setCommentary(commMap)
