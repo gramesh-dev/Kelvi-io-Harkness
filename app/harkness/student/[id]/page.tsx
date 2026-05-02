@@ -68,6 +68,12 @@ THE PRINCIPLES:
 
 25. WHEN THE PROBLEM NEEDS A TOOL THE STUDENT HASN'T MET — NAME THE GAP, DON'T TEACH IT.
 
+TRANSITION MOVES — when a student uses these phrases, respond specifically:
+- "Let me summarize what I found:" → Listen to their summary. Ask about ONE thing they left out or said imprecisely. Don't praise.
+- "Give me a similar problem" → Give one immediately. No preamble.
+- "I need a foothold" → Give the smallest possible question, not a hint. "What do you know for certain?" or "Can you draw it?"
+- "What should I do next?" → Ask them what they think first. Don't answer directly.
+
 RESPONSE LENGTH: Two to three sentences maximum. Never write paragraphs.`
 
 type Message = { role: 'user' | 'assistant'; content: string | any[] }
@@ -289,6 +295,35 @@ export default function HarknessStudentPage() {
             )}
             <div ref={bottomRef} />
           </div>
+
+          {/* Transition buttons — appear after 4+ messages */}
+          {messages.length >= 4 && (
+            <div style={{ padding: '0 12px 6px', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Let me summarize what I found', prompt: 'Let me summarize what I found: ' },
+                { label: 'Give me a similar problem', prompt: "Can you give me a similar problem to try on my own?" },
+                { label: 'I need a foothold', prompt: "I'm stuck. Can you give me a smaller question to try?" },
+                { label: 'What should I do next?', prompt: "I think I understand this. What should I try next?" },
+              ].map(({ label, prompt }) => (
+                <button key={label}
+                  onClick={() => {
+                    if (label === 'Let me summarize what I found') {
+                      // Pre-fill input so student writes their own summary
+                      const ta = document.querySelector('textarea') as HTMLTextAreaElement | null
+                      if (ta) { ta.value = prompt; ta.focus(); ta.dispatchEvent(new Event('input', { bubbles: true })) }
+                    } else {
+                      send(prompt)
+                    }
+                  }}
+                  disabled={aiLoading}
+                  style={{ padding: '5px 12px', border: '1px solid #D9D4C9', borderRadius: 16, fontSize: 12, color: '#6F6A61', background: '#F8F7F4', cursor: aiLoading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', transition: 'all .12s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#2D4A3D'; e.currentTarget.style.color = '#2D4A3D' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#D9D4C9'; e.currentTarget.style.color = '#6F6A61' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Input — KelviChatInput with mic, file upload, equation editor */}
           <div style={{ padding: '0 12px 12px', flexShrink: 0 }}>
