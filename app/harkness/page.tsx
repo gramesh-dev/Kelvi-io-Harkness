@@ -79,8 +79,10 @@ export default function HarknessPage() {
           const t = encodeURIComponent(data.action.title || 'Problem Set')
           setMessages(m => [...m, {
             role: 'assistant',
-            content: `✓ Package ready!\n\n**Student link** (copied): ${link}\n\n**Review page** with PDF, Word, Google Doc, Brief and Solutions: [Open →](/harkness/review/${pkg.studentId})`
+            content: `✓ Package ready for ${data.action.problems.length} problems!\n\n**Student link** (copied to clipboard):\n${link}\n\n**Open review page** to access PDF, Word, Google Doc, Brief, and Solutions:\n[Open review →](/harkness/review/${pkg.studentId})`
           }])
+          // Open review page automatically
+          window.open(`/harkness/review/${pkg.studentId}`, '_blank')
         } catch (e: any) {
           setMessages(m => [...m, { role: 'assistant', content: `Error: ${e.message}` }])
         } finally { setPackaging(false) }

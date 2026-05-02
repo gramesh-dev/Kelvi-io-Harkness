@@ -76,6 +76,8 @@ function processMarkdown(text: string): string {
     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>')
+    // Links [text](url)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#2D4A3D;text-decoration:underline" target="_blank" rel="noopener">$1</a>')
     // Inline code
     .replace(/`([^`]+)`/g, '<code style="font-family:\'IBM Plex Mono\',monospace;font-size:.875em;background:#F0EDE6;padding:2px 5px;border-radius:3px">$1</code>')
     // Blockquote
@@ -103,18 +105,18 @@ function processMarkdown(text: string): string {
 }
 
 export function HarkeyMessage({ text }: { text: string }) {
-  const [html, setHtml] = useState('')
+  const [html, setHtml] = useState(() => {
+    // Render immediately without KaTeX on first paint
+    if (typeof window !== 'undefined' && katexReady) return processMarkdown(text)
+    // Fallback: just apply markdown without KaTeX
+    const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    return applyMarkdown(escaped)
+  })
 
   useEffect(() => {
+    if (katexReady) { setHtml(processMarkdown(text)); return }
     ensureKaTeX(() => setHtml(processMarkdown(text)))
-    // Also render immediately in case KaTeX already loaded
-    if (katexReady) setHtml(processMarkdown(text))
   }, [text])
-
-  if (!html) {
-    // Plain text fallback while KaTeX loads
-    return <div style={{ lineHeight: 1.75, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{text}</div>
-  }
 
   return (
     <div
