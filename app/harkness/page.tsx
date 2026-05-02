@@ -21,27 +21,26 @@ export default function HarknessPage() {
   const [desmosOpen, setDesmosOpen]     = useState(false)
   const [packaging, setPackaging]       = useState(false)
   const [packageResult, setPackageResult] = useState<any>(null)
-  const [view, setView]                 = useState<'chat' | 'pick'>('chat')
+  const [view, setView]                 = useState<'chat' | 'pick' | 'library'>('chat')
+  const [savedSets, setSavedSets]       = useState<any[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Load problems
   useEffect(() => {
-    async function load() {
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
-      const { data } = await supabase
-        .from('problems')
-        .select('id, problem_number, body, topic')
-        .eq('course', 'Math2')
-        .order('problem_number', { ascending: true })
-      setProblems(data || [])
-      const t = [...new Set((data || []).map(p => p.topic).filter(Boolean))].sort() as string[]
-      setTopics(t)
-    }
-    load()
+    fetch('/api/exeter-problems')
+      .then(r => r.json())
+      .then(data => {
+        setProblems(data.problems || [])
+        const t = [...new Set((data.problems || []).map((p: any) => p.topic).filter(Boolean))].sort() as string[]
+        setTopics(t)
+      })
+      .catch(console.error)
+
+    // Load saved problem sets
+    fetch('/api/harkness-sets')
+      .then(r => r.json())
+      .then(d => setSavedSets(d.sets || []))
+      .catch(console.error)
   }, [])
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, loading])
@@ -136,6 +135,9 @@ export default function HarknessPage() {
           </button>
           <button onClick={() => setView('pick')} style={{ padding: '8px 16px', border: '1px solid #E8E3DA', borderRadius: 6, background: view==='pick' ? '#2D4A3D' : '#fff', color: view==='pick' ? '#fff' : '#6F6A61', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
             Pick Problems {selected.length > 0 && `(${selected.length})`}
+          </button>
+          <button onClick={() => setView('library')} style={{ padding: '8px 16px', border: '1px solid #E8E3DA', borderRadius: 6, background: view==='library' ? '#2D4A3D' : '#fff', color: view==='library' ? '#fff' : '#6F6A61', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
+            Library {savedSets.length > 0 && `(${savedSets.length})`}
           </button>
         </div>
       </div>
@@ -262,6 +264,46 @@ export default function HarknessPage() {
                 Review & Export →
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Library view */}
+      {view === 'library' && (
+        <div style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
+          <div style={{ maxWidth: 860, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+              <h1 style={{ fontFamily: 'serif', fontSize: 26, fontWeight: 400 }}>Worksheet Library</h1>
+              <button onClick={() => setView('pick')} style={{ padding: '8px 16px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                + New Problem Set
+              </button>
+            </div>
+            {savedSets.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 12 }}>
+                <div style={{ fontFamily: 'serif', fontSize: 20, marginBottom: 10 }}>No problem sets yet</div>
+                <p style={{ color: '#6F6A61', fontSize: 14, marginBottom: 20 }}>Ask Harkey to suggest problems, or pick them manually.</p>
+                <button onClick={() => setView('chat')} style={{ padding: '9px 20px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Ask Harkey →</button>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+                {savedSets.map((ps: any) => {
+                  const nums = (ps.problem_numbers || []).slice(0, 5)
+                  const date = new Date(ps.updated_at || ps.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  return (
+                    <div key={ps.id} onClick={() => window.open(`/harkness/review/${ps.id}`, '_blank')}
+                      style={{ padding: '18px 20px', background: '#fff', border: '1px solid #E8E3DA', borderRadius: 10, cursor: 'pointer', transition: 'border-color .12s' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = '#2D4A3D'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = '#E8E3DA'}>
+                      <div style={{ fontFamily: 'serif', fontSize: 17, marginBottom: 8, lineHeight: 1.3 }}>{ps.title}</div>
+                      <div style={{ fontSize: 12, color: '#9A9488', fontFamily: 'monospace' }}>
+                        {(ps.problem_numbers || []).length} problems · #{nums.join(', ')}{(ps.problem_numbers || []).length > 5 ? '…' : ''}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#9A9488', marginTop: 6 }}>{date}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

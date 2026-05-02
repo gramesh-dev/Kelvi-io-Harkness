@@ -68,11 +68,9 @@ function ReviewInner() {
       )
 
       if (isNew) {
-        // Load from problem numbers in URL
-        const { data: probs } = await supabase
-          .from('problems').select('*').eq('course', 'Math2')
-          .in('problem_number', problemNumbers)
-        const sorted = problemNumbers.map(n => probs?.find(p => p.problem_number === n)).filter(Boolean) as Problem[]
+        // Load from API (avoids RLS browser-client issues)
+        const allProbs = await fetch('/api/exeter-problems').then(r => r.json()).then(d => d.problems || [])
+        const sorted = problemNumbers.map(n => allProbs.find((p: any) => p.problem_number === n)).filter(Boolean) as Problem[]
         setProblems(sorted)
         loadExeterData(supabase, sorted.map(p => p.id))
       } else {

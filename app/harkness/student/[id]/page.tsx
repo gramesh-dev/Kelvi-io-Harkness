@@ -232,11 +232,11 @@ export default function HarknessStudentPage() {
 
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* Problem banner */}
+          {/* Problem banner - full text, scrollable */}
           {current && (
-            <div style={{ padding: '8px 20px', background: '#F0EDE6', borderBottom: '1px solid #D9D4C9', flexShrink: 0 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 2 }}>Problem #{current.problem_number} · {current.topic}</div>
-              <div style={{ fontSize: 13, lineHeight: 1.5, color: '#2F2B25' }}>{current.body?.slice(0, 180)}{(current.body?.length||0)>180?'…':''}</div>
+            <div style={{ padding: '12px 20px', background: '#F0EDE6', borderBottom: '1px solid #D9D4C9', flexShrink: 0, maxHeight: '35vh', overflowY: 'auto' }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 4 }}>Problem #{current.problem_number} · {current.topic}</div>
+              <div style={{ fontSize: 14, lineHeight: 1.65, color: '#2F2B25', whiteSpace: 'pre-wrap' }}>{current.body}</div>
             </div>
           )}
 
