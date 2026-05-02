@@ -35,6 +35,9 @@ export default function HarknessTeacherDashboard() {
   const [newClassPeriod,   setNewClassPeriod]   = useState('')
   const [newStudentName,   setNewStudentName]   = useState('')
   const [newStudentEmail,  setNewStudentEmail]  = useState('')
+  const [bulkInput,        setBulkInput]        = useState('')
+  const [bulkMode,         setBulkMode]         = useState(false)
+  const [addingBulk,       setAddingBulk]       = useState(false)
   const [savingClass,      setSavingClass]      = useState(false)
 
   const [messages,         setMessages]         = useState<Message[]>([])
@@ -50,8 +53,16 @@ export default function HarknessTeacherDashboard() {
   const [selected,         setSelected]         = useState<Problem[]>([])
   const [psTitle,          setPsTitle]          = useState('')
   const [savedSets,        setSavedSets]        = useState<ProbSet[]>([])
+  const [firstName,        setFirstName]        = useState('Gayatri')
+  const [userEmail,        setUserEmail]        = useState('')
 
-  useEffect(() => { loadClasses(); loadProblems(); loadSavedSets() }, [])
+  useEffect(() => {
+    loadClasses(); loadProblems(); loadSavedSets()
+    fetch('/api/me').then(r => r.json()).then(d => {
+      if (d.firstName) setFirstName(d.firstName)
+      if (d.email) setUserEmail(d.email)
+    })
+  }, [])
   useEffect(() => { if (selectedClass) loadMembers(selectedClass.id) }, [selectedClass])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, chatLoading])
 
@@ -105,6 +116,30 @@ export default function HarknessTeacherDashboard() {
   async function removeMember(memberId: string) {
     await fetch(`/api/harkness-class-members?id=${memberId}`, { method: 'DELETE' })
     setMembers(m => m.filter(x => x.id !== memberId))
+  }
+
+  function greeting() {
+    const h = new Date().getHours()
+    return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  }
+
+  async function addBulkMembers() {
+    if (!bulkInput.trim() || !selectedClass || addingBulk) return
+    setAddingBulk(true)
+    const lines = bulkInput.split('\n').map(l => l.trim()).filter(Boolean)
+    let added = 0
+    for (const line of lines) {
+      const isEmail = line.includes('@')
+      const student_name = isEmail ? line.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : line
+      const student_email = isEmail ? line : ''
+      const d = await fetch('/api/harkness-class-members', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: selectedClass.id, student_name, student_email }),
+      }).then(r => r.json())
+      if (d.member) { setMembers(m => [...m, d.member]); added++ }
+    }
+    setBulkInput(''); setBulkMode(false); setAddingBulk(false)
+    if (added > 0) alert(`Added ${added} student${added !== 1 ? 's' : ''}`)
   }
 
   async function sendHarkey(payload: SendPayload) {
@@ -211,6 +246,16 @@ export default function HarknessTeacherDashboard() {
               {!c.available && <span style={{ fontSize: 9, background: '#F0EDE6', color: '#9A9488', padding: '1px 5px', borderRadius: 3, fontFamily: 'monospace' }}>soon</span>}
             </button>
           ))}
+          <div style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '.12em', textTransform: 'uppercase', color: '#9A9488', padding: '12px 8px 4px', display: sidebarCollapsed ? 'none' : 'block' }}>Account</div>
+          {!sidebarCollapsed && <div style={{ padding: '6px 8px 10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', borderRadius: 6, background: '#EAE7E0' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#2D4A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 600, flexShrink: 0 }}>{firstName.charAt(0).toUpperCase()}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{firstName}</div>
+                <div style={{ fontSize: 11, color: '#9A9488', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userEmail}</div>
+              </div>
+            </div>
+          </div>}
         </div>
       </div>
 
@@ -234,7 +279,7 @@ export default function HarknessTeacherDashboard() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: 820, margin: '0 auto', width: '100%', overflow: 'hidden' }}>
               <div style={{ flex: 1, overflowY: 'auto', padding: '32px 24px 20px' }}>
                 {messages.length === 0 && <>
-                  <h1 style={{ fontFamily: 'serif', fontSize: 26, marginBottom: 6 }}>Good morning, Harkey.</h1>
+                  <h1 style={{ fontFamily: 'serif', fontSize: 26, marginBottom: 6 }}>{greeting()}, {firstName}.</h1>
                   <p style={{ color: '#6F6A61', fontSize: 15, marginBottom: 24 }}>I know every problem in Math 2. Ask me about sequencing, connections, or what to assign.</p>
                   {['Show me all parametric equation problems', 'Design a 3-problem arc on vectors', 'What connects circles to trigonometry?', 'Which problems work for a first Harkness discussion?'].map(p => (
                     <button key={p} onClick={() => sendHarkey({ text: p })} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', marginBottom: 6, border: '1px solid #E8E3DA', borderRadius: 8, background: '#F5F3EE', fontSize: 14, color: '#6F6A61', cursor: 'pointer', fontFamily: 'inherit', transition: 'all .12s' }}
@@ -318,25 +363,45 @@ export default function HarknessTeacherDashboard() {
                 <button onClick={() => deleteClass(selectedClass.id)} style={{ padding: '6px 12px', border: '1px solid #fcc', borderRadius: 6, background: 'none', color: '#c0392b', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>Delete</button>
               </div>
               <div style={{ background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 10, padding: '14px 16px', marginBottom: 20 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 10 }}>Add a student</div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input value={newStudentName} onChange={e => setNewStudentName(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Student name" style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
-                  <input value={newStudentEmail} onChange={e => setNewStudentEmail(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Email (optional)" style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
-                  <button onClick={addMember} disabled={!newStudentName.trim()} style={{ padding: '7px 14px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Add</button>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500 }}>Add students</div>
+                  <button onClick={() => setBulkMode(v => !v)} style={{ fontSize: 12, color: '#6F6A61', background: 'none', border: '1px solid #D9D4C9', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {bulkMode ? 'One at a time' : 'Paste a list'}
+                  </button>
                 </div>
+                {bulkMode ? (
+                  <div>
+                    <textarea value={bulkInput} onChange={e => setBulkInput(e.target.value)} placeholder={'One name or email per line:\nAlice Johnson\nbob@school.edu\nCarla Smith'} rows={5}
+                      style={{ width: '100%', padding: '8px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 13, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }} />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={addBulkMembers} disabled={addingBulk || !bulkInput.trim()} style={{ padding: '7px 16px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>{addingBulk ? 'Adding…' : 'Add all'}</button>
+                      <button onClick={() => { setBulkMode(false); setBulkInput('') }} style={{ padding: '7px 12px', background: 'none', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', color: '#6F6A61' }}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input value={newStudentName} onChange={e => setNewStudentName(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Student name"
+                      style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+                    <input value={newStudentEmail} onChange={e => setNewStudentEmail(e.target.value)} onKeyDown={e => e.key==='Enter' && addMember()} placeholder="Email (optional)"
+                      style={{ flex: 1, padding: '7px 11px', border: '1px solid #D9D4C9', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+                    <button onClick={addMember} disabled={!newStudentName.trim()} style={{ padding: '7px 14px', background: '#2D4A3D', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>Add</button>
+                  </div>
+                )}
               </div>
               {members.length === 0
                 ? <div style={{ textAlign: 'center', padding: '32px 20px', background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 10, color: '#9A9488', fontSize: 14 }}>No students yet.</div>
                 : <div style={{ border: '1px solid #E8E3DA', borderRadius: 10, overflow: 'hidden' }}>
                     <div style={{ padding: '9px 14px', background: '#F5F3EE', borderBottom: '1px solid #E8E3DA', fontSize: 11, fontFamily: 'monospace', letterSpacing: '.1em', textTransform: 'uppercase', color: '#9A9488' }}>Roster · {members.length}</div>
                     {members.map((m, i) => (
-                      <div key={m.id} style={{ display: 'flex', alignItems: 'center', padding: '11px 14px', borderBottom: i < members.length-1 ? '1px solid #F0EDE6' : 'none', background: '#fff' }}>
+                      <div key={m.id} style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', borderBottom: i < members.length-1 ? '1px solid #F0EDE6' : 'none', background: '#fff' }}>
                         <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#2D4A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#fff', fontWeight: 600, marginRight: 12, flexShrink: 0 }}>{m.student_name.charAt(0).toUpperCase()}</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 15 }}>{m.student_name}</div>
-                          {m.student_email && <div style={{ fontSize: 12, color: '#9A9488' }}>{m.student_email}</div>}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 14, fontWeight: 500 }}>{m.student_name}</div>
+                          {m.student_email
+                            ? <a href={`mailto:${m.student_email}`} style={{ fontSize: 12, color: '#2D4A3D', textDecoration: 'none' }}>{m.student_email}</a>
+                            : <div style={{ fontSize: 12, color: '#C4BFB8', fontStyle: 'italic' }}>No email</div>}
                         </div>
-                        <button onClick={() => removeMember(m.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4BFB8', fontSize: 16, padding: '4px 8px' }}>✕</button>
+                        <button onClick={() => removeMember(m.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4BFB8', fontSize: 16, padding: '4px 8px', marginLeft: 8 }} title="Remove student">✕</button>
                       </div>
                     ))}
                   </div>}
@@ -418,8 +483,14 @@ export default function HarknessTeacherDashboard() {
                       onMouseEnter={e => e.currentTarget.style.borderColor = '#2D4A3D'}
                       onMouseLeave={e => e.currentTarget.style.borderColor = '#E8E3DA'}>
                       <div style={{ fontFamily: 'serif', fontSize: 16, marginBottom: 6, lineHeight: 1.3 }}>{ps.title}</div>
-                      <div style={{ fontSize: 12, color: '#9A9488', fontFamily: 'monospace' }}>{(ps.problem_numbers||[]).length} problems · #{(ps.problem_numbers||[]).slice(0,4).join(', ')}{(ps.problem_numbers||[]).length>4?'…':''}</div>
-                      <div style={{ fontSize: 11, color: '#C4BFB8', marginTop: 6 }}>{new Date(ps.updated_at||ps.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+                      <div style={{ fontSize: 12, color: '#9A9488', fontFamily: 'monospace', marginBottom: 10 }}>{(ps.problem_numbers||[]).length} problems · #{(ps.problem_numbers||[]).slice(0,4).join(', ')}{(ps.problem_numbers||[]).length>4?'…':''}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ fontSize: 11, color: '#C4BFB8' }}>{new Date(ps.updated_at||ps.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={e => { e.stopPropagation(); window.open(`/harkness/student/${ps.id}`, '_blank') }} style={{ fontSize: 11, padding: '3px 8px', border: '1px solid #D9D4C9', borderRadius: 4, background: 'none', color: '#6F6A61', cursor: 'pointer', fontFamily: 'inherit' }}>Student ↗</button>
+                          <button onClick={e => { e.stopPropagation(); window.open(`/harkness/review/${ps.id}`, '_blank') }} style={{ fontSize: 11, padding: '3px 8px', border: '1px solid #2D4A3D', borderRadius: 4, background: 'none', color: '#2D4A3D', cursor: 'pointer', fontFamily: 'inherit' }}>Review ↗</button>
+                        </div>
+                      </div>
                     </div>)}
                   </div>}
             </div>
