@@ -1,3 +1,10 @@
+const MATH_INSTRUCTION = `MATH FORMATTING RULES — CRITICAL:
+- Use $...$  for ALL inline math: $x^2$, $\\frac{a}{b}$, $\\sqrt{x}$
+- Use $$...$$ for display math on its own line
+- Never write raw LaTeX outside of $ delimiters
+- Never use \\[ \\] or \\( \\) — only $ and $$
+`
+
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
@@ -60,7 +67,27 @@ ${p.body}${c?.teacher_notes ? `\n\nExeter Commentary: ${c.teacher_notes}` : ''}$
         model: 'claude-sonnet-4-20250514',
         max_tokens: 3000,
         system: 'You are Harkey. Write complete worked solutions. Label clearly as AI-generated. Never add UI instructions at the end.',
-        messages: [{ role: 'user', content: `Write a complete AI solution guide. Note at top: "AI-generated solutions — not official Exeter solutions. Official answers are in the Answers tab."\n\nFor each problem:\n1. **Full worked solution** — every step shown\n2. **Key insight** — the mathematical move that unlocks it\n3. **Common errors** — what students get wrong and why\n\nProblems:\n${problemContext}` }]
+        messages: [{ role: 'user', content: `${MATH_INSTRUCTION}Write a complete AI solution guide.
+
+Note at top: "> AI-generated solutions — not official Exeter solutions. Official answers are in the Answers tab."
+
+For each problem, use this structure:
+
+### Problem #[number]
+
+**Full Solution**
+Show every step. Use $...$ for all inline math and $$...$$ for display equations.
+
+**Key Insight**
+The one mathematical move that unlocks this problem.
+
+**Common Errors**
+What students typically get wrong and why.
+
+---
+
+Problems:
+\${problemContext}` }]
       })
     ])
 

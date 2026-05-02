@@ -47,6 +47,8 @@ function ReviewInner() {
   const [briefLoading,  setBriefLoading]  = useState(false)
   const [aiSolutions,   setAiSolutions]   = useState('')
   const [solLoading,    setSolLoading]    = useState(false)
+  const [fmtCommentary, setFmtCommentary] = useState('')
+  const [fmtLoading,    setFmtLoading]    = useState(false)
   const [messages,      setMessages]      = useState<Message[]>([])
   const [loading,       setLoading]       = useState(false)
   const [activeTab,     setActiveTab]     = useState<Tab>('problems')
@@ -184,12 +186,33 @@ function ReviewInner() {
     try {
       const res = await fetch('/api/harkey', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: `Write a complete AI solution guide. Note at top: "AI-generated — not official Exeter solutions. Official answers are in the Answers tab."\n\nFor each problem:\n1. **Full worked solution** — every step\n2. **Key insight** — the move that unlocks it\n3. **Common errors** — what students get wrong\n\nProblems:\n${context}` }] }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: `MATH RULES: use $...$ for inline math, $$...$$ for display math. Never write raw LaTeX outside $ delimiters.\n\nWrite a complete AI solution guide.\n\n> AI-generated — not official Exeter solutions.\n\nFor each problem:\n\n### Problem #[number]\n\n**Full Solution**\nEvery step shown with $...$ for all math.\n\n**Key Insight**\nThe mathematical move that unlocks it.\n\n**Common Errors**\nWhat students get wrong.\n\n---\n\nProblems:\n${context}` }] }),
       })
       const data = await res.json()
       setAiSolutions(data.reply || '')
     } catch (e) { console.error(e) }
     finally { setSolLoading(false) }
+  }
+
+  async function formatCommentary() {
+    if (fmtLoading || !problems.length) return
+    setFmtLoading(true)
+    try {
+      const payload = problems.map(p => ({
+        problem_number: p.problem_number,
+        topic: p.topic,
+        body: p.body,
+        teacher_notes: commentary[p.id]?.teacher_notes || '',
+        answers: [...(commentary[p.id]?.answers || []), answers[p.id]].filter(Boolean),
+      }))
+      const res = await fetch('/api/format-commentary', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problems: payload }),
+      })
+      const data = await res.json()
+      setFmtCommentary(data.formatted || '')
+    } catch (e) { console.error(e) }
+    finally { setFmtLoading(false) }
   }
 
   async function publish() {
@@ -362,35 +385,61 @@ ${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDa
 
               {activeTab==='commentary' && (
                 <div style={{ maxWidth: 700 }}>
-                  <h2 style={{ fontFamily: 'serif', fontSize: 26, marginBottom: 8, fontWeight: 400 }}>Exeter Commentary</h2>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <h2 style={{ fontFamily: 'serif', fontSize: 26, fontWeight: 400 }}>Exeter Commentary</h2>
+                    <button onClick={() => { if (!fmtCommentary && !fmtLoading) formatCommentary() }}
+                      disabled={fmtLoading}
+                      style={{ padding: '7px 14px', background: fmtCommentary ? '#F0EDE6' : '#2D4A3D', color: fmtCommentary ? '#2D4A3D' : '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: fmtLoading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', flexShrink: 0, marginTop: 4 }}>
+                      {fmtLoading ? 'Formatting…' : fmtCommentary ? '✓ AI formatted' : '✨ AI format'}
+                    </button>
+                  </div>
                   <p style={{ color: '#6F6A61', fontSize: 14, marginBottom: 28 }}>Teacher notes from the PEA Mathematics Department.</p>
-                  {problems.map(p => {
-                    const c = commentary[p.id]
-                    return (
-                      <div key={p.id} style={{ marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid #E8E3DA' }}>
-                        <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 8 }}>Problem #{p.problem_number}</div>
-                        {c?.teacher_notes ? <div style={{ fontSize: 14, lineHeight: 1.7 }}>{c.teacher_notes}</div>
-                          : <div style={{ color: '#9A9488', fontSize: 14 }}>No commentary.</div>}
-                      </div>
-                    )
-                  })}
+                  {fmtCommentary ? (
+                    <HarkeyMessage text={fmtCommentary} />
+                  ) : (
+                    problems.map(p => {
+                      const c = commentary[p.id]
+                      return (
+                        <div key={p.id} style={{ marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid #E8E3DA' }}>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: '#2D4A3D', marginBottom: 6 }}>Problem #{p.problem_number} — {p.topic}</div>
+                          {c?.teacher_notes
+                            ? <div style={{ fontSize: 14, lineHeight: 1.75, color: '#1A1A1A', whiteSpace: 'pre-wrap' }}>{c.teacher_notes}</div>
+                            : <div style={{ color: '#9A9488', fontSize: 14 }}>No commentary for this problem.</div>}
+                          {c?.answers?.length > 0 && (
+                            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed #E8E3DA' }}>
+                              <div style={{ fontSize: 11, fontFamily: 'monospace', letterSpacing: '.08em', textTransform: 'uppercase', color: '#9A9488', marginBottom: 4 }}>Appendix</div>
+                              {c.answers.map((a: string, i: number) => <div key={i} style={{ fontSize: 13, color: '#6F6A61', lineHeight: 1.6 }}>{a}</div>)}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
                 </div>
               )}
 
               {activeTab==='answers' && (
                 <div style={{ maxWidth: 700 }}>
                   <h2 style={{ fontFamily: 'serif', fontSize: 26, marginBottom: 8, fontWeight: 400 }}>Answers</h2>
-                  <p style={{ color: '#6F6A61', fontSize: 14, marginBottom: 28 }}>From the Math 2 appendix. Short answers only.</p>
+                  <p style={{ color: '#6F6A61', fontSize: 14, marginBottom: 28 }}>Official answers from the Math 2 appendix.</p>
                   {problems.map(p => {
                     const a = answers[p.id]; const c = commentary[p.id]
+                    const allAnswers = [a, ...(c?.answers || [])].filter(Boolean)
                     return (
                       <div key={p.id} style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #E8E3DA' }}>
-                        <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 6 }}>Problem #{p.problem_number}</div>
-                        {a && <div style={{ padding: '8px 12px', background: '#F0EDE6', borderRadius: 6, fontSize: 14, marginBottom: 6 }}>{a}</div>}
-                        {c?.answers?.map((ans: string, i: number) => (
-                          <div key={i} style={{ padding: '6px 12px', background: '#F5F3EE', border: '1px solid #E8E3DA', borderRadius: 6, fontSize: 13, marginBottom: 4, color: '#6F6A61' }}>{ans}</div>
-                        ))}
-                        {!a && !c?.answers?.length && <div style={{ color: '#9A9488', fontSize: 14 }}>No answer in appendix.</div>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                          <div style={{ fontSize: 15, fontWeight: 600, color: '#2D4A3D' }}>Problem #{p.problem_number}</div>
+                          <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#9A9488', background: '#F0EDE6', padding: '2px 7px', borderRadius: 4 }}>{p.topic}</div>
+                        </div>
+                        {allAnswers.length > 0 ? (
+                          allAnswers.map((ans: string, i: number) => (
+                            <div key={i} style={{ padding: '10px 14px', background: i===0 ? '#F0EDE6' : '#F5F3EE', border: `1px solid ${i===0 ? '#D9D4C9' : '#E8E3DA'}`, borderRadius: 6, fontSize: i===0 ? 13 : 14, marginBottom: 6, color: '#1A1A1A', lineHeight: 1.6, fontFamily: i===0 ? "'IBM Plex Mono', monospace" : 'inherit' }}>
+                              <HarkeyMessage text={ans} />
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ color: '#9A9488', fontSize: 14, fontStyle: 'italic' }}>No answer in appendix for this problem.</div>
+                        )}
                       </div>
                     )
                   })}
