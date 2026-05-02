@@ -33,7 +33,7 @@ export default function HarknessPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
       const { data } = await supabase
-        .from('exeter_problems')
+        .from('problems')
         .select('id, problem_number, body, topic')
         .eq('course', 'Math2')
         .order('problem_number', { ascending: true })

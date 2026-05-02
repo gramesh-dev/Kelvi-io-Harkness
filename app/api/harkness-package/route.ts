@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch problems + commentary
     const { data: problems } = await supabase
-      .from('exeter_problems')
+      .from('problems')
       .select('id, problem_number, body, topic, course')
       .eq('course', 'Math2')
       .in('problem_number', problemNumbers)

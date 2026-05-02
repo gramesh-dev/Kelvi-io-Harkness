@@ -70,7 +70,7 @@ function ReviewInner() {
       if (isNew) {
         // Load from problem numbers in URL
         const { data: probs } = await supabase
-          .from('exeter_problems').select('*').eq('course', 'Math2')
+          .from('problems').select('*').eq('course', 'Math2')
           .in('problem_number', problemNumbers)
         const sorted = problemNumbers.map(n => probs?.find(p => p.problem_number === n)).filter(Boolean) as Problem[]
         setProblems(sorted)

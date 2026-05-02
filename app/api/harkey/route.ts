@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch full Exeter problem index
     const { data: problems } = await supabase
-      .from('exeter_problems')
+      .from('problems')
       .select('problem_number, topic, body')
       .eq('course', 'Math2')
       .order('problem_number', { ascending: true })
