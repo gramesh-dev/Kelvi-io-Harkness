@@ -100,7 +100,7 @@ export default function SignupPage() {
                   <path d="M 22 56 C 36 54, 44 64, 42 80 C 40 92, 28 96, 16 92 C 6 88, 4 76, 8 66 C 12 58, 16 56, 22 56 Z" fill="#2D4A3D"/>
                   <path d="M 70 56 C 84 56, 94 64, 92 78 C 90 92, 78 96, 66 92 C 54 88, 52 76, 56 66 C 60 58, 64 56, 70 56 Z" fill="#B594DC"/>
                 </svg>
-                <span style={{fontFamily: "'Instrument Serif', serif", fontSize: '32px', color: '#1A1A1A'}}>kelvi</span>
+                
               </Link>
               <p style={{fontSize: '15px', color: '#6B6B6B'}}>Invite-only access</p>
             </div>
@@ -142,14 +142,14 @@ export default function SignupPage() {
                 <path d="M 22 56 C 36 54, 44 64, 42 80 C 40 92, 28 96, 16 92 C 6 88, 4 76, 8 66 C 12 58, 16 56, 22 56 Z" fill="#2D4A3D"/>
                 <path d="M 70 56 C 84 56, 94 64, 92 78 C 90 92, 78 96, 66 92 C 54 88, 52 76, 56 66 C 60 58, 64 56, 70 56 Z" fill="#B594DC"/>
               </svg>
-              <span style={{fontFamily: "'Instrument Serif', serif", fontSize: '32px', color: '#1A1A1A'}}>kelvi</span>
+              
             </Link>
             
             <h1 style={{fontFamily: "'Instrument Serif', serif", fontSize: '2rem', fontWeight: 400, lineHeight: 1.2, marginBottom: '8px', color: '#1A1A1A'}}>
               Create your account
             </h1>
             <p style={{fontSize: '15px', color: '#6B6B6B', lineHeight: 1.6}}>
-              Join Kelvi and start your mathematical journey
+              Create your account
             </p>
           </div>
 

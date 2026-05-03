@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
           )}
 
           <p className="text-sm text-text-secondary">
-            Enter the email you use for Kelvi. We&apos;ll send a link to choose
+            Enter the email you use for Harkness. We&apos;ll send a link to choose
             a new password.
           </p>
 
