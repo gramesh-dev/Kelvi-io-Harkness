@@ -9,8 +9,8 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Protect all /harkness routes
-  if (pathname.startsWith('/harkness')) {
+  // Protect /harkness routes — but NOT student links (those are public)
+  if (pathname.startsWith('/harkness') && !pathname.startsWith('/harkness/student/')) {
     const creds = getSupabasePublicCredentials()
     if (!creds) return response
 
