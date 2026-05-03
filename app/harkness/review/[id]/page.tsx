@@ -7,7 +7,7 @@ import { HarkeyMessage } from '@/components/harkey-message'
 
 type Message  = { role: 'user' | 'assistant'; content: string }
 type Problem  = { id: string; problem_number: number; body: string; topic: string }
-type Tab      = 'problems' | 'commentary' | 'answers' | 'brief' | 'solutions'
+type Tab      = 'problems' | 'commentary' | 'answers' | 'brief' | 'solutions' | 'students'
 
 const pdfDefaults = {
   accentColor:        '#2D4A3D',
@@ -47,6 +47,9 @@ function ReviewInner() {
   const [briefLoading,  setBriefLoading]  = useState(false)
   const [aiSolutions,   setAiSolutions]   = useState('')
   const [solLoading,    setSolLoading]    = useState(false)
+  const [sessions,       setSessions]       = useState<any[]>([])
+  const [sessionsLoading,setSessionsLoading]= useState(false)
+  const [selectedSession,setSelectedSession]= useState<any | null>(null)
   const [fmtCommentary, setFmtCommentary] = useState('')
   const [fmtLoading,    setFmtLoading]    = useState(false)
   const [messages,      setMessages]      = useState<Message[]>([])
@@ -215,6 +218,17 @@ function ReviewInner() {
     finally { setFmtLoading(false) }
   }
 
+  async function loadSessions() {
+    if (sessionsLoading || !studentId) return
+    setSessionsLoading(true)
+    try {
+      const res = await fetch(`/api/student-sessions?problem_set_id=${studentId}`)
+      const d = await res.json()
+      setSessions(d.sessions || [])
+    } catch (e) { console.error(e) }
+    finally { setSessionsLoading(false) }
+  }
+
   async function publish() {
     if (publishing || !problems.length) return
     setPublishing(true)
@@ -361,6 +375,10 @@ ${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDa
               </button>
               <button onClick={() => { setActiveTab('solutions'); if (!aiSolutions && !solLoading) generateSolutions() }} style={tb('solutions')}>
                 {solLoading ? 'Solutions…' : aiSolutions ? 'Solutions ✓' : 'Solutions'}
+              </button>
+              <button onClick={() => { setActiveTab('solutions' as Tab) }} style={{ display: 'none' }} />
+              <button onClick={() => { setActiveTab('students' as Tab); if (!sessions.length && !sessionsLoading) loadSessions() }} style={tb('students' as Tab)}>
+                Students{sessions.length > 0 ? ` (${sessions.length})` : ''}
               </button>
             </div>
 

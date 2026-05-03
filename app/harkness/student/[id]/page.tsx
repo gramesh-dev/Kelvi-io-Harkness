@@ -95,6 +95,7 @@ export default function HarknessStudentPage() {
   const [emailInput,    setEmailInput]    = useState('')
   const [desmosOpen,    setDesmosOpen]    = useState(false)
   const [desmosWidth,   setDesmosWidth]   = useState(380)
+  const [sessionId,     setSessionId]     = useState<string | null>(null)
   const draggingDesmos  = useRef(false)
 
   function startDragDesmos(e: React.MouseEvent) {
@@ -164,7 +165,24 @@ export default function HarknessStudentPage() {
         body: JSON.stringify({ messages: [...messages, userMsg], problemContext, system: KELVI_SYSTEM }),
       })
       const data = await res.json()
-      setMessages([...newMessages, { role: 'assistant', content: data.reply || '' }])
+      const reply = data.reply || ''
+      const finalMessages = [...newMessages, { role: 'assistant' as const, content: reply }]
+      setMessages(finalMessages)
+
+      // Save session to Supabase
+      const saveRes = await fetch('/api/save-student-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          problem_set_id: problemSet.id,
+          problem_id: current?.id || null,
+          student_name: studentName,
+          student_email: studentEmail || null,
+          messages: finalMessages.map(m => ({ role: m.role, content: typeof m.content === 'string' ? m.content : '[image]' })),
+          session_id: sessionId,
+        }),
+      }).then(r => r.json()).catch(() => null)
+      if (saveRes?.session_id && !sessionId) setSessionId(saveRes.session_id)
     } catch (e) { console.error(e) }
     finally { setAiLoading(false) }
   }

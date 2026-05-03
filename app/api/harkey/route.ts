@@ -9,6 +9,9 @@ export const maxDuration = 60
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const { messages } = await request.json()
 
     // Fetch full Exeter problem index
