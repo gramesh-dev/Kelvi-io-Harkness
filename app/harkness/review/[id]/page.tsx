@@ -11,7 +11,7 @@ type Tab      = 'problems' | 'commentary' | 'answers' | 'brief' | 'solutions' | 
 
 const pdfDefaults = {
   accentColor:        '#2D4A3D',
-  showKelviFooter:    true,
+  showFooter:    true,
   workSpaceSize:      'medium' as 'none' | 'small' | 'medium' | 'large',
   showProblemNumbers: true,
   bodyFont:           'IBM Plex Sans',
@@ -248,7 +248,7 @@ function ReviewInner() {
 
   function generatePDF() {
     if (!problems.length) return
-    const { accentColor, showKelviFooter, workSpaceSize, showProblemNumbers, bodyFont } = pdfSettings
+    const { accentColor, showFooter, workSpaceSize, showProblemNumbers, bodyFont } = pdfSettings
     const workH = workSpaceSize==='none'?'0':workSpaceSize==='small'?'48pt':workSpaceSize==='large'?'120pt':'80pt'
     const fontImport = bodyFont==='OpenDyslexic'?`<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">`:bodyFont==='Comic Sans MS'?'':`<link href="https://fonts.googleapis.com/css2?family=${bodyFont.replace(/ /g,'+')}:wght@400;500&display=swap" rel="stylesheet">`
     const fontStack = bodyFont==='OpenDyslexic'?'"OpenDyslexic",sans-serif':bodyFont==='Comic Sans MS'?'"Comic Sans MS",cursive':`"${bodyFont}",sans-serif`
@@ -261,7 +261,7 @@ ${fontImport}
 <div class="header"><div class="eyebrow">Phillips Exeter Academy · Math 2</div><h1>${title}</h1></div>
 ${problems.map((p,i)=>`<div class="problem">${showProblemNumbers?`<div class="prob-num">${i+1}. Problem #${p.problem_number}</div>`:''}<div class="prob-body">${p.body}</div>${workSpaceSize!=='none'?'<div class="workspace"></div>':''}</div>`).join('')}
 ${brief?`<div style="margin-top:24pt"><div style="font-family:'IBM Plex Mono',monospace;font-size:8pt;letter-spacing:.12em;text-transform:uppercase;color:${accentColor};margin-bottom:8pt">Harkey Brief</div><div style="background:#F0EDE6;padding:14pt 18pt;border-radius:6pt;line-height:1.7">${brief.replace(/\n/g,'<br>')}</div></div>`:''}
-${showKelviFooter?`<div class="footer">Kelvi Harkness · ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>`:''}
+${showFooter?`<div class="footer">${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>`:''}
 </body></html>`
 
     const win = window.open('', '_blank')

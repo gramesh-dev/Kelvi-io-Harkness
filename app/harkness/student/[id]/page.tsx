@@ -223,7 +223,7 @@ export default function HarknessStudentPage() {
     if (messages.length === 0) return
     const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     const header = [
-      'Kelvi Harkness — ' + problemSet.title,
+      problemSet.title,
       'Student: ' + studentName,
       studentEmail ? 'Email: ' + studentEmail : '',
       'Date: ' + date,
@@ -233,12 +233,12 @@ export default function HarknessStudentPage() {
     ].filter(Boolean).join('\n')
     const body = messages.map(m => {
       const c = typeof m.content === 'string' ? m.content : '[image]'
-      return (m.role === 'user' ? studentName : 'Kelvi') + ': ' + c
+      return (m.role === 'user' ? studentName : '●') + ': ' + c
     }).join('\n\n')
     const blob = new Blob([header + body], { type: 'text/plain' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'kelvi-' + studentName.toLowerCase().replace(/\s+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.txt'
+    a.download = 'transcript-' + studentName.toLowerCase().replace(/\s+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.txt'
     a.click()
     URL.revokeObjectURL(a.href)
   }
@@ -285,7 +285,7 @@ export default function HarknessStudentPage() {
             <path d="M22 56C36 54,44 64,42 80C40 92,28 96,16 92C6 88,4 76,8 66C12 58,16 56,22 56Z" fill="#2D4A3D"/>
             <path d="M70 56C84 56,94 64,92 78C90 92,78 96,66 92C54 88,52 76,56 66C60 58,64 56,70 56Z" fill="#B594DC"/>
           </svg>
-          <span style={{ fontFamily: 'serif', fontSize: '1.1rem', color: '#2D4A3D' }}>kelvi</span>
+          
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {problems.length > 1 && problems.map((p: any, i: number) => (
@@ -329,7 +329,7 @@ export default function HarknessStudentPage() {
               <div key={i} style={{ marginBottom: 18 }}>
                 {m.role === 'assistant' ? (
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 4 }}>Kelvi</div>
+                    <div style={{ width: 18, height: 18, marginBottom: 6 }}><svg viewBox='0 0 100 100' width='18' height='18'><path d='M50 6C65 4,80 14,78 32C76 48,60 52,44 50C28 48,24 32,28 18C32 8,40 6,50 6Z' fill='#E26B4F'/><path d='M22 56C36 54,44 64,42 80C40 92,28 96,16 92C6 88,4 76,8 66C12 58,16 56,22 56Z' fill='#2D4A3D'/><path d='M70 56C84 56,94 64,92 78C90 92,78 96,66 92C54 88,52 76,56 66C60 58,64 56,70 56Z' fill='#B594DC'/></svg></div>
                     <div style={{ fontSize: 15, lineHeight: 1.7, color: '#2F2B25' }}>{typeof m.content === 'string' ? m.content : ''}</div>
                   </div>
                 ) : (
@@ -347,7 +347,7 @@ export default function HarknessStudentPage() {
             ))}
             {aiLoading && (
               <div style={{ marginBottom: 18 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#2D4A3D', marginBottom: 4 }}>Kelvi</div>
+                <div style={{ width: 18, height: 18, marginBottom: 6 }}><svg viewBox='0 0 100 100' width='18' height='18'><path d='M50 6C65 4,80 14,78 32C76 48,60 52,44 50C28 48,24 32,28 18C32 8,40 6,50 6Z' fill='#E26B4F'/><path d='M22 56C36 54,44 64,42 80C40 92,28 96,16 92C6 88,4 76,8 66C12 58,16 56,22 56Z' fill='#2D4A3D'/><path d='M70 56C84 56,94 64,92 78C90 92,78 96,66 92C54 88,52 76,56 66C60 58,64 56,70 56Z' fill='#B594DC'/></svg></div>
                 <div style={{ display: 'flex', gap: 4 }}>
                   {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: '#2D4A3D', animation: 'bounce 1.2s infinite', animationDelay: `${i*.15}s` }} />)}
                 </div>

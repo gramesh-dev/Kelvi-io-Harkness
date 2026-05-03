@@ -15,9 +15,9 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Kelvi — AI Learning for Kids",
+  title: "Harkness",
   description:
-    "An AI thinking partner that never gives answers — only better questions. For schools and families.",
+    "AI-powered Harkness discussion tools for mathematics teachers.",
 };
 
 /** Matches static pages (`public/*.html`) — avoids odd mobile scaling if the browser falls back oddly without an explicit tag. */

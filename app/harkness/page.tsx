@@ -316,7 +316,7 @@ ${link}` }])
         <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'space-between', padding: sidebarCollapsed ? 0 : '0 12px', borderBottom: '1px solid #E8E3DA', flexShrink: 0 }}>
           {!sidebarCollapsed && <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <svg width="22" height="22" viewBox="0 0 100 100"><path d="M50 6C65 4,80 14,78 32C76 48,60 52,44 50C28 48,24 32,28 18C32 8,40 6,50 6Z" fill="#E26B4F"/><path d="M22 56C36 54,44 64,42 80C40 92,28 96,16 92C6 88,4 76,8 66C12 58,16 56,22 56Z" fill="#2D4A3D"/><path d="M70 56C84 56,94 64,92 78C90 92,78 96,66 92C54 88,52 76,56 66C60 58,64 56,70 56Z" fill="#B594DC"/></svg>
-            <span style={{ fontFamily: 'serif', fontSize: 17 }}>kelvi</span>
+            
           </div>}
           {sidebarCollapsed && <svg width="22" height="22" viewBox="0 0 100 100" style={{ cursor: 'pointer' }} onClick={() => setSidebarCollapsed(false)}><path d="M50 6C65 4,80 14,78 32C76 48,60 52,44 50C28 48,24 32,28 18C32 8,40 6,50 6Z" fill="#E26B4F"/><path d="M22 56C36 54,44 64,42 80C40 92,28 96,16 92C6 88,4 76,8 66C12 58,16 56,22 56Z" fill="#2D4A3D"/><path d="M70 56C84 56,94 64,92 78C90 92,78 96,66 92C54 88,52 76,56 66C60 58,64 56,70 56Z" fill="#B594DC"/></svg>}
           {!sidebarCollapsed && <button onClick={() => setSidebarCollapsed(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A9488', padding: 4 }}>
