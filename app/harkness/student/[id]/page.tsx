@@ -90,7 +90,9 @@ export default function HarknessStudentPage() {
   const [aiLoading,     setAiLoading]     = useState(false)
   const [started,       setStarted]       = useState(false)
   const [studentName,   setStudentName]   = useState('')
+  const [studentEmail,  setStudentEmail]  = useState('')
   const [nameInput,     setNameInput]     = useState('')
+  const [emailInput,    setEmailInput]    = useState('')
   const [desmosOpen,    setDesmosOpen]    = useState(false)
   const [desmosWidth,   setDesmosWidth]   = useState(380)
   const draggingDesmos  = useRef(false)
@@ -146,22 +148,20 @@ export default function HarknessStudentPage() {
 
     const userMsg: Message = { role: 'user', content: userContent }
 
-    // Add problem context to first message
-    const contextMsg: Message = messages.length === 0 && current
-      ? { role: 'user', content: `Problem #${current.problem_number} — ${current.topic}:\n\n${current.body}\n\n${typeof userContent === 'string' ? userContent : (text || 'Here is my work.')}` }
-      : userMsg
-
     const newMessages = [...messages, userMsg]
-    const apiMessages = messages.length === 0 ? [contextMsg] : [...messages, userMsg]
-
     setMessages(newMessages)
     setAiLoading(true)
+
+    // Always pass the current problem as context — Kelvi must always know what problem is on the table
+    const problemContext = current
+      ? `Problem #${current.problem_number} — ${current.topic}\n\n${current.body}`
+      : ''
 
     try {
       const res = await fetch('/api/student-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: apiMessages, system: KELVI_SYSTEM }),
+        body: JSON.stringify({ messages: [...messages, userMsg], problemContext, system: KELVI_SYSTEM }),
       })
       const data = await res.json()
       setMessages([...newMessages, { role: 'assistant', content: data.reply || '' }])
@@ -194,6 +194,37 @@ export default function HarknessStudentPage() {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8F7F4', color: '#6F6A61' }}>Problem set not found.</div>
   }
 
+  function startWithName(name: string, email: string) {
+    if (!name.trim()) return
+    setStudentName(name.trim())
+    setStudentEmail(email.trim())
+    setStarted(true)
+  }
+
+  function downloadTranscript() {
+    if (messages.length === 0) return
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    const header = [
+      'Kelvi Harkness — ' + problemSet.title,
+      'Student: ' + studentName,
+      studentEmail ? 'Email: ' + studentEmail : '',
+      'Date: ' + date,
+      '',
+      '------------------------------------------------------------',
+      '',
+    ].filter(Boolean).join('\n')
+    const body = messages.map(m => {
+      const c = typeof m.content === 'string' ? m.content : '[image]'
+      return (m.role === 'user' ? studentName : 'Kelvi') + ': ' + c
+    }).join('\n\n')
+    const blob = new Blob([header + body], { type: 'text/plain' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'kelvi-' + studentName.toLowerCase().replace(/\s+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.txt'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
   if (!started) {
     return (
       <div style={{ minHeight: '100vh', background: '#F8F7F4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif' }}>
@@ -205,14 +236,19 @@ export default function HarknessStudentPage() {
           </svg>
           <h1 style={{ fontFamily: 'serif', fontSize: '2.2rem', marginBottom: 8, color: '#2F2B25' }}>Think it through.</h1>
           <p style={{ color: '#6F6A61', fontSize: 15, marginBottom: 28, lineHeight: 1.6 }}>{problemSet.title} · {problems.length} problem{problems.length !== 1 ? 's' : ''}</p>
-          <div style={{ display: 'flex', gap: 8, maxWidth: 300, margin: '0 auto' }}>
-            <input value={nameInput} onChange={e => setNameInput(e.target.value)} onKeyDown={e => e.key==='Enter' && nameInput.trim() && (setStudentName(nameInput.trim()), setStarted(true))}
-              placeholder="Your first name" autoFocus
-              style={{ flex: 1, padding: '11px 14px', border: '1.5px solid #D9D4C9', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', background: '#F8F7F4' }} />
-            <button onClick={() => nameInput.trim() && (setStudentName(nameInput.trim()), setStarted(true))}
-              style={{ background: '#2D4A3D', color: '#fff', border: 'none', padding: '11px 20px', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
-              Start
-            </button>
+          <div style={{ maxWidth: 320, margin: '0 auto' }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              <input value={nameInput} onChange={e => setNameInput(e.target.value)} onKeyDown={e => e.key==='Enter' && nameInput.trim() && startWithName(nameInput, emailInput)}
+                placeholder="Your first name" autoFocus
+                style={{ flex: 1, padding: '11px 14px', border: '1.5px solid #D9D4C9', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', outline: 'none', background: '#F8F7F4' }} />
+              <button onClick={() => nameInput.trim() && startWithName(nameInput, emailInput)}
+                style={{ background: '#2D4A3D', color: '#fff', border: 'none', padding: '11px 20px', borderRadius: 8, fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
+                Start
+              </button>
+            </div>
+            <input value={emailInput} onChange={e => setEmailInput(e.target.value)} onKeyDown={e => e.key==='Enter' && nameInput.trim() && startWithName(nameInput, emailInput)}
+              placeholder="School email — optional, sends transcript to your teacher" type="email"
+              style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #D9D4C9', borderRadius: 8, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: '#F8F7F4', boxSizing: 'border-box', color: '#6F6A61' }} />
           </div>
         </div>
       </div>
@@ -235,7 +271,13 @@ export default function HarknessStudentPage() {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {problems.length > 1 && problems.map((p: any, i: number) => (
-            <button key={i} onClick={() => { setCurrentIdx(i); setMessages([]) }}
+            <button key={i} onClick={() => {
+                const newProb = problems[i]
+                setCurrentIdx(i)
+                if (messages.length > 0 && newProb) {
+                  setMessages(m => [...m, { role: 'user', content: `I'd like to move to Problem #${newProb.problem_number}.` }])
+                }
+              }}
               style={{ padding: '4px 10px', borderRadius: 6, border: `1px solid ${i===currentIdx?'#2D4A3D':'#D9D4C9'}`, background: i===currentIdx?'#2D4A3D':'none', color: i===currentIdx?'#fff':'#6F6A61', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
               #{p.problem_number}
             </button>
@@ -322,6 +364,17 @@ export default function HarknessStudentPage() {
                   {label}
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* Download transcript button — appears after 4+ messages */}
+          {messages.length >= 4 && (
+            <div style={{ padding: '0 12px 4px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={downloadTranscript}
+                style={{ fontSize: 12, color: '#9A9488', background: 'none', border: '1px solid #E8E3DA', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download transcript
+              </button>
             </div>
           )}
 
