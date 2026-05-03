@@ -15,6 +15,7 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
+  icons: { icon: '/favicon.svg' },
   title: "Harkness",
   description:
     "AI-powered Harkness discussion tools for mathematics teachers.",
